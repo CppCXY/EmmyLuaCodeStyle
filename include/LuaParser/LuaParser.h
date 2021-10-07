@@ -3,6 +3,7 @@
 #include <memory>
 #include "LuaTokenParser.h"
 #include "LuaOperatorType.h"
+#include "LuaAstNode.h"
 
 class LuaParser
 {
@@ -41,7 +42,7 @@ private:
 	
 	std::shared_ptr<LuaTokenParser> _tokenParser;
 
-
+	std::shared_ptr<LuaAstNode> _chunkAstNode;
 	
 };
 

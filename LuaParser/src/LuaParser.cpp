@@ -4,6 +4,8 @@
 #include "Util/format.h"
 
 LuaParser::LuaParser(std::shared_ptr<LuaTokenParser> tokenParser)
+	: _tokenParser(tokenParser),
+	  _chunkAstNode(nullptr)
 {
 }
 
@@ -66,7 +68,7 @@ void LuaParser::ifStatement()
 void LuaParser::testThenBlock()
 {
 	_tokenParser->Next(); /*skip if or elseif*/
-	expression()
+	expression();
 }
 
 bool LuaParser::testNext(LuaTokenType type)
@@ -107,7 +109,7 @@ void LuaParser::expression()
 void LuaParser::subexpression()
 {
 	UnOpr uop = getUnoperator(_tokenParser->Current().TokenType);
-	if(uop != OPR_NOUNOPR)
+	if (uop != OPR_NOUNOPR)
 	{
 		_tokenParser->Next();
 		subexpression();
@@ -116,8 +118,6 @@ void LuaParser::subexpression()
 	{
 		simpleExpression();
 	}
-
-	
 }
 
 UnOpr LuaParser::getUnoperator(LuaTokenType op)
