@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 3.11)
+
+project(LuaParser)
+
+add_library(LuaParser STATIC)
+
+target_include_directories(LuaParser PUBLIC
+	${LuaCodeStyle_SOURCE_DIR}/include
+	src
+)
+
+target_sources(LuaParser PUBLIC
+	#include
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenParser.h
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaParseException.h
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenType.h
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaParser.h
+	
+	#src
+	${LuaParser_SOURCE_DIR}/src/LuaDefine.h
+	${LuaParser_SOURCE_DIR}/src/LuaParser.cpp	
+	${LuaParser_SOURCE_DIR}/src/LuaTokenParser.cpp	
+)
