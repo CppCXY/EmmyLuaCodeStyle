@@ -1,7 +1,23 @@
 #include "LuaParser/LuaParser.h"
 
+#include "LuaDefine.h"
+#include "LuaTokenTypeDetail.h"
 #include "LuaParser/LuaOperatorType.h"
 #include "Util/format.h"
+
+bool LuaParser::Parse()
+{
+	_chunkAstNode = createAstNode(LuaAstNodeType::Chunk);
+
+	block(_chunkAstNode);
+
+	return true;
+}
+
+std::shared_ptr<LuaAstNode> LuaParser::GetAst()
+{
+	return _chunkAstNode;
+}
 
 LuaParser::LuaParser(std::shared_ptr<LuaTokenParser> tokenParser)
 	: _tokenParser(tokenParser),
@@ -24,15 +40,15 @@ bool LuaParser::blockFollow(bool withUntil)
 	}
 }
 
-void LuaParser::statementList()
+void LuaParser::statementList(std::shared_ptr<LuaAstNode> blockNode)
 {
 	while (blockFollow(true))
 	{
-		statement();
+		statement(blockNode);
 	}
 }
 
-void LuaParser::statement()
+void LuaParser::statement(std::shared_ptr<LuaAstNode> blockNode)
 {
 	switch (_tokenParser->Current().TokenType)
 	{
@@ -43,32 +59,39 @@ void LuaParser::statement()
 		}
 	case TK_IF:
 		{
-			ifStatement();
+			ifStatement(blockNode);
 			break;
 		}
 	}
 }
 
 /* ifstat -> IF cond THEN block {ELSEIF cond THEN block} [ELSE block] END */
-void LuaParser::ifStatement()
+void LuaParser::ifStatement(std::shared_ptr<LuaAstNode> blockNode)
 {
-	testThenBlock();
+	auto ifNode = createAstNode(LuaAstNodeType::IfStatement);
+
+	testThenBlock(ifNode);
 	while (_tokenParser->Current().TokenType == TK_ELSEIF)
 	{
-		testThenBlock();
+		testThenBlock(ifNode);
 	}
 	if (testNext(TK_ELSE))
 	{
-		block();
+		block(ifNode);
 	}
 	checkMatch(TK_END, TK_IF);
+
+	blockNode->AddChild(ifNode);
 }
 
 /* test_then_block -> [IF | ELSEIF] cond THEN block */
-void LuaParser::testThenBlock()
+void LuaParser::testThenBlock(std::shared_ptr<LuaAstNode> ifNode)
 {
+	auto ifOrElseifKeyNode = createAstNodeFromToken(LuaAstNodeType::KeyWord, _tokenParser->Current());
+	ifNode->AddChild(ifOrElseifKeyNode);
+
 	_tokenParser->Next(); /*skip if or elseif*/
-	expression();
+	expression(ifNode);
 }
 
 bool LuaParser::testNext(LuaTokenType type)
@@ -84,9 +107,13 @@ bool LuaParser::testNext(LuaTokenType type)
 	}
 }
 
-void LuaParser::block()
+void LuaParser::block(std::shared_ptr<LuaAstNode> parent)
 {
-	statementList();
+	auto blockNode = createAstNode(LuaAstNodeType::Block);
+
+	statementList(blockNode);
+
+	parent->AddChild(blockNode);
 }
 
 void LuaParser::checkMatch(LuaTokenType what, LuaTokenType who)
@@ -97,52 +124,168 @@ void LuaParser::checkMatch(LuaTokenType what, LuaTokenType who)
 	}
 }
 
-void LuaParser::expression()
+void LuaParser::expression(std::shared_ptr<LuaAstNode> parent)
 {
-	subexpression();
+	auto expressNode = createAstNode(LuaAstNodeType::Expression);
+	subexpression(parent, 0);
+
+	parent->AddChild(expressNode);
 }
 
 /*
 ** subexpr -> (simpleexp | unop subexpr) { binop subexpr }
 ** where 'binop' is any binary operator with a priority higher than 'limit'
 */
-void LuaParser::subexpression()
+BinOpr LuaParser::subexpression(std::shared_ptr<LuaAstNode> expressNode, int limit)
 {
-	UnOpr uop = getUnoperator(_tokenParser->Current().TokenType);
-	if (uop != OPR_NOUNOPR)
+	UnOpr uop = getUnaryOperator(_tokenParser->Current().TokenType);
+	if (uop != UnOpr::OPR_NOUNOPR) /* prefix (unary) operator? */
 	{
+		auto unaryTokenNode = createAstNodeFromToken(LuaAstNodeType::UnaryOperator, _tokenParser->Current());
+		expressNode->AddChild(unaryTokenNode);
+
 		_tokenParser->Next();
-		subexpression();
+		subexpression(expressNode, UNARY_PRIORITY);
 	}
 	else
 	{
-		simpleExpression();
+		simpleExpression(expressNode);
 	}
+
+	auto op = getBinaryOperator(_tokenParser->Current().TokenType);
+	/* expand while operators have priorities higher than 'limit' */
+	while(op != BinOpr::OPR_NOBINOPR && priority[static_cast<int>(op)].left > limit)
+	{
+		auto binaryOperator = createAstNodeFromToken(LuaAstNodeType::BinaryOperator, _tokenParser->Current());
+		_tokenParser->Next();
+		auto nextop = subexpression(expressNode, priority[static_cast<int>(op)].right);
+
+		op = nextop;
+	}
+
+	return op; /* return first untreated operator */
 }
 
-UnOpr LuaParser::getUnoperator(LuaTokenType op)
+/* simpleexp -> FLT | INT | STRING | NIL | TRUE | FALSE | ... |
+				constructor | FUNCTION body | suffixedexp */
+void LuaParser::simpleExpression(std::shared_ptr<LuaAstNode> expressNode)
+{
+	switch (_tokenParser->Current().TokenType)
+	{
+	case TK_FLT:
+	case TK_INT:
+	case TK_STRING:
+	case TK_NIL:
+	case TK_TRUE:
+	case TK_FALSE:
+	case TK_DOTS:
+		{
+			auto tokenNode = createAstNodeFromToken(LuaAstNodeType::LiteralExpression, _tokenParser->Current());
+			break;
+		}
+	case '{':
+		{
+			tableConstructor(expressNode);
+			break;
+		}
+	case TK_FUNCTION:
+		{
+			auto closureNode = createAstNode(LuaAstNodeType::ClosureExpression);
+			auto functionKeyWordNode = createAstNodeFromToken(LuaAstNodeType::KeyWord, _tokenParser->Current());
+			closureNode->AddChild(functionKeyWordNode);
+
+			_tokenParser->Next();
+			functionBody(closureNode);
+
+			expressNode->AddChild(closureNode);
+			break;
+		}
+	default:
+		{
+			suffixedExpression(expressNode);
+			return;
+		}
+	}
+	_tokenParser->Next();
+}
+
+/* constructor -> '{' [ field { sep field } [sep] ] '}'
+   sep -> ',' | ';'
+*/
+void LuaParser::tableConstructor(std::shared_ptr<LuaAstNode> expressNode)
+{
+}
+
+void LuaParser::functionBody(std::shared_ptr<LuaAstNode> expressNode)
+{
+}
+
+void LuaParser::suffixedExpression(std::shared_ptr<LuaAstNode> expressNode)
+{
+}
+
+UnOpr LuaParser::getUnaryOperator(LuaTokenType op)
 {
 	switch (op)
 	{
 	case TK_NOT:
 		{
-			return OPR_NOT;
+			return UnOpr::OPR_NOT;
 		}
 	case '-':
 		{
-			return OPR_MINUS;
+			return UnOpr::OPR_MINUS;
 		}
 	case '~':
 		{
-			return OPR_BNOT;
+			return UnOpr::OPR_BNOT;
 		}
 	case '#':
 		{
-			return OPR_LEN;
+			return UnOpr::OPR_LEN;
 		}
 	default:
 		{
-			return OPR_NOUNOPR;
+			return UnOpr::OPR_NOUNOPR;
 		}
 	}
+}
+
+BinOpr LuaParser::getBinaryOperator(LuaTokenType op)
+{
+	switch (op)
+	{
+	case '+': return BinOpr::OPR_ADD;
+	case '-': return BinOpr::OPR_SUB;
+	case '*': return BinOpr::OPR_MUL;
+	case '%': return BinOpr::OPR_MOD;
+	case '^': return BinOpr::OPR_POW;
+	case '/': return BinOpr::OPR_DIV;
+	case TK_IDIV: return BinOpr::OPR_IDIV;
+	case '&': return BinOpr::OPR_BAND;
+	case '|': return BinOpr::OPR_BOR;
+	case '~': return BinOpr::OPR_BXOR;
+	case TK_SHL: return BinOpr::OPR_SHL;
+	case TK_SHR: return BinOpr::OPR_SHR;
+	case TK_CONCAT: return BinOpr::OPR_CONCAT;
+	case TK_NE: return BinOpr::OPR_NE;
+	case TK_EQ: return BinOpr::OPR_EQ;
+	case '<': return BinOpr::OPR_LT;
+	case TK_LE: return BinOpr::OPR_LE;
+	case '>': return BinOpr::OPR_GT;
+	case TK_GE: return BinOpr::OPR_GE;
+	case TK_AND: return BinOpr::OPR_AND;
+	case TK_OR: return BinOpr::OPR_OR;
+	default: return BinOpr::OPR_NOBINOPR;
+	}
+}
+
+std::shared_ptr<LuaAstNode> LuaParser::createAstNode(LuaAstNodeType type)
+{
+	return std::make_shared<LuaAstNode>(type, _tokenParser->GetSource().c_str());
+}
+
+std::shared_ptr<LuaAstNode> LuaParser::createAstNodeFromToken(LuaAstNodeType type, LuaToken& token)
+{
+	return std::make_shared<LuaAstNode>(type, token);
 }

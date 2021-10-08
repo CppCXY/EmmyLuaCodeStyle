@@ -30,6 +30,8 @@ public:
 	
 	int GetColumn(int offset);
 
+	std::string& GetSource();
+
 private:
 	static std::map<std::string, LuaTokenType, std::less<>> LuaReserved;
 

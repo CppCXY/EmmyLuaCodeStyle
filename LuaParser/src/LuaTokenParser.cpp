@@ -1,6 +1,7 @@
 #include "LuaParser/LuaTokenParser.h"
 #include <limits>
 #include "LuaDefine.h"
+#include "LuaTokenTypeDetail.h"
 #include "Util/format.h"
 
 std::map<std::string, LuaTokenType, std::less<>> LuaTokenParser::LuaReserved = {
@@ -148,6 +149,11 @@ int LuaTokenParser::GetColumn(int offset)
 	int lineStartOffset = _lineOffsetVec[line];
 
 	return offset - lineStartOffset;
+}
+
+std::string& LuaTokenParser::GetSource()
+{
+	return _source;
 }
 
 LuaTokenType LuaTokenParser::llex()
@@ -542,7 +548,7 @@ void LuaTokenParser::readLongString(std::size_t sep)
 				if (skipSep() == sep)
 				{
 					saveAndNext();
-					goto endloop;
+					return;
 				}
 			}
 		case '\n':
@@ -558,8 +564,7 @@ void LuaTokenParser::readLongString(std::size_t sep)
 			}
 		}
 	}
-endloop:
-	void(0);
+
 }
 
 void LuaTokenParser::readString(int del)

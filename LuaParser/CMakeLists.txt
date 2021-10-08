@@ -11,13 +11,21 @@ target_include_directories(LuaParser PUBLIC
 
 target_sources(LuaParser PUBLIC
 	#include
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaToken.h
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenType.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenParser.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaParseException.h
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenType.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaParser.h
-	
+
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaAstNode.h
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaAstNodeType.h
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/TextRange.h
 	#src
-	${LuaParser_SOURCE_DIR}/src/LuaDefine.h
+	PRIVATE
 	${LuaParser_SOURCE_DIR}/src/LuaParser.cpp	
 	${LuaParser_SOURCE_DIR}/src/LuaTokenParser.cpp	
+	${LuaParser_SOURCE_DIR}/src/LuaAstNode.cpp
+	
+	${LuaParser_SOURCE_DIR}/src/LuaDefine.h
+	${LuaParser_SOURCE_DIR}/src/LuaTokenTypeDetail.h
 )

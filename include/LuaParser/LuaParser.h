@@ -14,36 +14,51 @@ public:
 
 	bool Parse();
 
-	struct LuaAstChunk GetAst();
+	std::shared_ptr<LuaAstNode> GetAst();
 private:
 	LuaParser(std::shared_ptr<LuaTokenParser> tokenParser);
 
 	bool blockFollow(bool withUntil = false);
 
-	void statementList();
+	void statementList(std::shared_ptr<LuaAstNode> blockNode);
 
-	void statement();
+	void statement(std::shared_ptr<LuaAstNode> blockNode);
 
-	void ifStatement();
+	void ifStatement(std::shared_ptr<LuaAstNode> blockNode);
 
-	void testThenBlock();
+	void testThenBlock(std::shared_ptr<LuaAstNode> ifNode);
 
 	bool testNext(LuaTokenType type);
 
-	void block();
+	void block(std::shared_ptr<LuaAstNode> parent);
 
 	void checkMatch(LuaTokenType what, LuaTokenType who);
 
-	void expression();
+	void expression(std::shared_ptr<LuaAstNode> parent);
 
-	void subexpression();
+	BinOpr subexpression(std::shared_ptr<LuaAstNode> expressNode, int limit);
 
-	UnOpr getUnoperator(LuaTokenType op);
-	
+	void simpleExpression(std::shared_ptr<LuaAstNode> expressNode);
+
+	void tableConstructor(std::shared_ptr<LuaAstNode> expressNode);
+
+	void functionBody(std::shared_ptr<LuaAstNode> expressNode);
+
+	void suffixedExpression(std::shared_ptr<LuaAstNode> expressNode);
+
+	UnOpr getUnaryOperator(LuaTokenType op);
+
+	BinOpr getBinaryOperator(LuaTokenType op);
+
+	std::shared_ptr<LuaAstNode> createAstNode(LuaAstNodeType type);
+
+	std::shared_ptr<LuaAstNode> createAstNodeFromToken(LuaAstNodeType type, LuaToken& token);
+
 	std::shared_ptr<LuaTokenParser> _tokenParser;
 
 	std::shared_ptr<LuaAstNode> _chunkAstNode;
-	
+
+
 };
 
 
