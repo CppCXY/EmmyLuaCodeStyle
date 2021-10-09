@@ -10,10 +10,15 @@ enum class LuaAstNodeType
 
 	KeyWord,
 
+	EmptyStatement,
+
 	LocalStatement,
 
 	IfStatement,
 
+	WhileStatement,
+
+	DoStatement,
 
 	Expression,
 	LiteralExpression,
@@ -36,6 +41,9 @@ enum class LuaAstNodeType
 
 	ParamList,
 
-	Param
+	Param,
 
+	CallArgList,
+
+	ExpressionList
 };

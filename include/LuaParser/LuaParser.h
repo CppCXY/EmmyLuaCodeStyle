@@ -26,11 +26,19 @@ private:
 
 	void ifStatement(std::shared_ptr<LuaAstNode> blockNode);
 
+	void whileStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void doStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void condition(std::shared_ptr<LuaAstNode> parent);
+
 	void testThenBlock(std::shared_ptr<LuaAstNode> ifNode);
 
 	void block(std::shared_ptr<LuaAstNode> parent);
 
 	void checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent);
+
+	void expressionList(std::shared_ptr<LuaAstNode> parent);
 
 	void expression(std::shared_ptr<LuaAstNode> parent);
 
@@ -51,6 +59,8 @@ private:
 	void paramList(std::shared_ptr<LuaAstNode> functionBodyNode);
 
 	void suffixedExpression(std::shared_ptr<LuaAstNode> expressionNode);
+
+	void functionCallArgs(std::shared_ptr<LuaAstNode> expressionNode);
 
 	void fieldSel(std::shared_ptr<LuaAstNode> expressionNode);
 
@@ -76,9 +86,13 @@ private:
 	 */
 	bool testNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent);
 
+	void codeName(std::shared_ptr<LuaAstNode> parent);
+
 	std::shared_ptr<LuaAstNode> createAstNode(LuaAstNodeType type);
 
 	std::shared_ptr<LuaAstNode> createAstNodeFromToken(LuaAstNodeType type, LuaToken& token);
+
+	std::shared_ptr<LuaAstNode> createAstNodeFromCurrentToken(LuaAstNodeType type);
 
 	std::shared_ptr<LuaTokenParser> _tokenParser;
 
@@ -86,4 +100,6 @@ private:
 
 
 };
+
+
 
