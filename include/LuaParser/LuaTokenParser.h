@@ -32,6 +32,8 @@ public:
 
 	std::string& GetSource();
 
+	std::vector<LuaToken> GetComments();
+
 private:
 	static std::map<std::string, LuaTokenType, std::less<>> LuaReserved;
 
@@ -79,6 +81,9 @@ private:
 	std::string _source;
 
 	std::vector<LuaToken> _tokens;
+	// ×¢ÊÍµ¥¶À´¦Àí
+	std::vector<LuaToken> _commentTokens;
+
 	LuaToken _eosToken;
 
 	std::vector<int> _lineOffsetVec;

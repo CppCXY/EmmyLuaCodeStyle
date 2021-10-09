@@ -18,10 +18,24 @@ enum class LuaAstNodeType
 	Expression,
 	LiteralExpression,
 	ClosureExpression,
+	UnaryExpression,
+	BinaryExpression,
+	TableExpression,
+	CallExpression,
+	IndexExpression,
 
 	UnaryOperator,
 
-	BinaryOperator
+	BinaryOperator,
 
+	IndexOperator,
+
+	TableField,
+
+	FunctionBody,
+
+	ParamList,
+
+	Param
 
 };

@@ -75,11 +75,11 @@ void LuaParser::ifStatement(std::shared_ptr<LuaAstNode> blockNode)
 	{
 		testThenBlock(ifNode);
 	}
-	if (testNext(TK_ELSE))
+	if (testNext(TK_ELSE, ifNode))
 	{
 		block(ifNode);
 	}
-	checkMatch(TK_END, TK_IF);
+	checkMatch(TK_END, TK_IF, ifNode);
 
 	blockNode->AddChild(ifNode);
 }
@@ -94,18 +94,6 @@ void LuaParser::testThenBlock(std::shared_ptr<LuaAstNode> ifNode)
 	expression(ifNode);
 }
 
-bool LuaParser::testNext(LuaTokenType type)
-{
-	if (_tokenParser->Current().TokenType == type)
-	{
-		_tokenParser->Next();
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
 
 void LuaParser::block(std::shared_ptr<LuaAstNode> parent)
 {
@@ -116,9 +104,9 @@ void LuaParser::block(std::shared_ptr<LuaAstNode> parent)
 	parent->AddChild(blockNode);
 }
 
-void LuaParser::checkMatch(LuaTokenType what, LuaTokenType who)
+void LuaParser::checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent)
 {
-	if (!testNext(what))
+	if (!testNext(what, parent))
 	{
 		throw LuaParserException(format("token {} expected ,(to close {} at", what, who));
 	}
@@ -126,49 +114,87 @@ void LuaParser::checkMatch(LuaTokenType what, LuaTokenType who)
 
 void LuaParser::expression(std::shared_ptr<LuaAstNode> parent)
 {
-	auto expressNode = createAstNode(LuaAstNodeType::Expression);
+	// 所有具体表达式树都在表达式节点下
+	// 例如 单一元表达式 作为 表达式节点的一个child
+	// 复杂表达式的顶层也作为表达式节点的child
+	auto expressionNode = createAstNode(LuaAstNodeType::Expression);
 	subexpression(parent, 0);
 
-	parent->AddChild(expressNode);
+	parent->AddChild(expressionNode);
 }
 
 /*
-** subexpr -> (simpleexp | unop subexpr) { binop subexpr }
-** where 'binop' is any binary operator with a priority higher than 'limit'
+* subexpr -> (simpleexp | unop subexpr) { binop subexpr }
 */
-BinOpr LuaParser::subexpression(std::shared_ptr<LuaAstNode> expressNode, int limit)
+void LuaParser::subexpression(std::shared_ptr<LuaAstNode> expressionNode, int limit)
 {
+	// 假设都是二元表达式
+	auto binaryExpression = createAstNode(LuaAstNodeType::BinaryExpression);
+
 	UnOpr uop = getUnaryOperator(_tokenParser->Current().TokenType);
 	if (uop != UnOpr::OPR_NOUNOPR) /* prefix (unary) operator? */
 	{
+		auto unaryExpression = createAstNode(LuaAstNodeType::UnaryExpression);
+
 		auto unaryTokenNode = createAstNodeFromToken(LuaAstNodeType::UnaryOperator, _tokenParser->Current());
-		expressNode->AddChild(unaryTokenNode);
+		unaryExpression->AddChild(unaryTokenNode);
 
 		_tokenParser->Next();
-		subexpression(expressNode, UNARY_PRIORITY);
+		subexpression(unaryExpression, UNARY_PRIORITY);
+
+		binaryExpression->AddChild(unaryExpression);
 	}
 	else
 	{
-		simpleExpression(expressNode);
+		simpleExpression(binaryExpression);
 	}
+
+
+	bool isBinary = false;
 
 	auto op = getBinaryOperator(_tokenParser->Current().TokenType);
 	/* expand while operators have priorities higher than 'limit' */
-	while(op != BinOpr::OPR_NOBINOPR && priority[static_cast<int>(op)].left > limit)
+	while (op != BinOpr::OPR_NOBINOPR && priority[static_cast<int>(op)].left > limit)
 	{
-		auto binaryOperator = createAstNodeFromToken(LuaAstNodeType::BinaryOperator, _tokenParser->Current());
-		_tokenParser->Next();
-		auto nextop = subexpression(expressNode, priority[static_cast<int>(op)].right);
+		if (isBinary)
+		{
+			auto topBinaryExpression = createAstNode(LuaAstNodeType::BinaryExpression);
+			topBinaryExpression->AddChild(binaryExpression);
+			binaryExpression = topBinaryExpression;
+		}
+		else
+		{
+			isBinary = true;
+		}
 
-		op = nextop;
+		auto binaryOperator = createAstNodeFromToken(LuaAstNodeType::BinaryOperator, _tokenParser->Current());
+		binaryExpression->AddChild(binaryOperator);
+
+		_tokenParser->Next();
+		subexpression(binaryExpression, priority[static_cast<int>(op)].right);
+
+		// next op
+		op = getBinaryOperator(_tokenParser->Current().TokenType);
 	}
 
-	return op; /* return first untreated operator */
+
+	if (isBinary)
+	{
+		expressionNode->AddChild(binaryExpression);
+	}
+	else
+	{
+		auto& children = binaryExpression->GetChildren();
+		for (auto child : children)
+		{
+			expressionNode->AddChild(child);
+		}
+	}
 }
 
 /* simpleexp -> FLT | INT | STRING | NIL | TRUE | FALSE | ... |
 				constructor | FUNCTION body | suffixedexp */
-void LuaParser::simpleExpression(std::shared_ptr<LuaAstNode> expressNode)
+void LuaParser::simpleExpression(std::shared_ptr<LuaAstNode> expressionNode)
 {
 	switch (_tokenParser->Current().TokenType)
 	{
@@ -181,11 +207,12 @@ void LuaParser::simpleExpression(std::shared_ptr<LuaAstNode> expressNode)
 	case TK_DOTS:
 		{
 			auto tokenNode = createAstNodeFromToken(LuaAstNodeType::LiteralExpression, _tokenParser->Current());
+			expressionNode->AddChild(tokenNode);
 			break;
 		}
 	case '{':
 		{
-			tableConstructor(expressNode);
+			tableConstructor(expressionNode);
 			break;
 		}
 	case TK_FUNCTION:
@@ -197,12 +224,12 @@ void LuaParser::simpleExpression(std::shared_ptr<LuaAstNode> expressNode)
 			_tokenParser->Next();
 			functionBody(closureNode);
 
-			expressNode->AddChild(closureNode);
+			expressionNode->AddChild(closureNode);
 			break;
 		}
 	default:
 		{
-			suffixedExpression(expressNode);
+			suffixedExpression(expressionNode);
 			return;
 		}
 	}
@@ -212,16 +239,205 @@ void LuaParser::simpleExpression(std::shared_ptr<LuaAstNode> expressNode)
 /* constructor -> '{' [ field { sep field } [sep] ] '}'
    sep -> ',' | ';'
 */
-void LuaParser::tableConstructor(std::shared_ptr<LuaAstNode> expressNode)
+void LuaParser::tableConstructor(std::shared_ptr<LuaAstNode> expressionNode)
+{
+	auto tableExpression = createAstNode(LuaAstNodeType::TableExpression);
+	checkNext('{', tableExpression);
+
+	do
+	{
+		if (_tokenParser->Current().TokenType == '}')
+		{
+			break;
+		}
+		field(tableExpression);
+	}
+	while (testNext(',', tableExpression) || testNext(';', tableExpression));
+
+	checkMatch('}', '{', tableExpression);
+
+	expressionNode->AddChild(tableExpression);
+}
+
+/* field -> listfield | recfield */
+void LuaParser::field(std::shared_ptr<LuaAstNode> tableExpressionNode)
+{
+	auto tableFieldNode = createAstNode(LuaAstNodeType::TableField);
+	switch (_tokenParser->Current().TokenType)
+	{
+	case TK_NAME:
+		{
+			if (_tokenParser->LookAhead().TokenType != '=')
+			{
+				listField(tableFieldNode);
+			}
+			else
+			{
+				rectField(tableFieldNode);
+			}
+			break;
+		}
+	case '[':
+		{
+			rectField(tableFieldNode);
+			break;
+		}
+	default:
+		{
+			listField(tableFieldNode);
+			break;
+		}
+	}
+
+	tableExpressionNode->AddChild(tableFieldNode);
+}
+
+void LuaParser::listField(std::shared_ptr<LuaAstNode> tableExpressionNode)
 {
 }
 
-void LuaParser::functionBody(std::shared_ptr<LuaAstNode> expressNode)
+void LuaParser::rectField(std::shared_ptr<LuaAstNode> tableExpressionNode)
 {
 }
 
-void LuaParser::suffixedExpression(std::shared_ptr<LuaAstNode> expressNode)
+/* body ->  '(' parlist ')' block END */
+void LuaParser::functionBody(std::shared_ptr<LuaAstNode> closureExpression)
 {
+	auto functionBodyNode = createAstNode(LuaAstNodeType::FunctionBody);
+
+	paramList(functionBodyNode);
+
+	block(functionBodyNode);
+
+	checkMatch(TK_END, TK_FUNCTION, functionBodyNode);
+
+	closureExpression->AddChild(functionBodyNode);
+}
+
+void LuaParser::paramList(std::shared_ptr<LuaAstNode> functionBodyNode)
+{
+	auto paramList = createAstNode(LuaAstNodeType::ParamList);
+
+	checkNext('(', paramList);
+
+	bool isVararg = false;
+	if (_tokenParser->Current().TokenType != ')')
+	{
+		do
+		{
+			switch (_tokenParser->Current().TokenType)
+			{
+			case TK_NAME:
+				{
+					auto paramNode = createAstNodeFromToken(LuaAstNodeType::Param, _tokenParser->Current());
+					paramList->AddChild(paramNode);
+					_tokenParser->Next();
+					break;
+				}
+			case TK_DOTS:
+				{
+					isVararg = true;
+					auto paramNode = createAstNodeFromToken(LuaAstNodeType::Param, _tokenParser->Current());
+					paramList->AddChild(paramNode);
+					_tokenParser->Next();
+					break;
+				}
+			default:
+				{
+					throw LuaParserException("<name> or '...' expected");
+				}
+			}
+		}
+		while (!isVararg && testNext(',', paramList));
+	}
+
+	checkNext(')', paramList);
+
+	functionBodyNode->AddChild(paramList);
+}
+
+/* suffixedexp ->
+	 primaryexp { '.' NAME | '[' exp ']' | ':' NAME funcargs | funcargs } */
+void LuaParser::suffixedExpression(std::shared_ptr<LuaAstNode> expressionNode)
+{
+	auto subExpression = createAstNode(LuaAstNodeType::Expression);
+
+	primaryExpression(subExpression);
+	for (;;)
+	{
+		switch (_tokenParser->Current().TokenType)
+		{
+		case '.':
+			{
+				fieldSel(subExpression);
+				break;
+			}
+		case '[':
+			{
+				auto tokenNode = createAstNodeFromToken(LuaAstNodeType::IndexOperator, _tokenParser->Current());
+				subExpression->AddChild(tokenNode);
+				yIndex(subExpression);
+			}
+		case ':':
+			{
+				fieldSel(subExpression);
+				functionArgs();
+				break;
+			}
+		case '(':
+		case TK_STRING:
+		case '{':
+			{
+				functionArgs();
+				break;
+			}
+		default:
+			return;
+		}
+	}
+}
+
+/* fieldsel -> ['.' | ':'] NAME */
+void LuaParser::fieldSel(std::shared_ptr<LuaAstNode> expressionNode)
+{
+	auto tokenNode = createAstNodeFromToken(LuaAstNodeType::IndexOperator, _tokenParser->Current());
+	expressionNode->AddChild(tokenNode);
+
+	_tokenParser->Next();
+}
+
+/* index -> '[' expr ']' */
+void LuaParser::yIndex(std::shared_ptr<LuaAstNode> expressionNode)
+{
+	_tokenParser->Next();
+	expression(expressionNode);
+	checkNext(']', expressionNode);
+}
+
+
+/* primaryexp -> NAME | '(' expr ')' */
+void LuaParser::primaryExpression(std::shared_ptr<LuaAstNode> expressionNode)
+{
+	switch (_tokenParser->Current().TokenType)
+	{
+	case '(':
+		{
+			auto leftBreaketToken = createAstNodeFromToken(LuaAstNodeType::KeyWord, _tokenParser->Current());
+			expressionNode->AddChild(leftBreaketToken);
+
+			expression(expressionNode);
+			checkMatch(')', '(', expressionNode);
+			return;
+		}
+	case TK_NAME:
+		{
+			auto identify = createAstNodeFromToken(LuaAstNodeType::Identify, _tokenParser->Current());
+			expressionNode->AddChild(identify);
+			return;
+		}
+	default:
+		throw LuaParserException("unexpected symbol");
+	}
 }
 
 UnOpr LuaParser::getUnaryOperator(LuaTokenType op)
@@ -279,6 +495,30 @@ BinOpr LuaParser::getBinaryOperator(LuaTokenType op)
 	default: return BinOpr::OPR_NOBINOPR;
 	}
 }
+
+void LuaParser::checkNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent)
+{
+	if (_tokenParser->Current().TokenType != c)
+	{
+		throw LuaParserException(format("token type {} expected", c));
+	}
+
+	parent->AddChild(createAstNodeFromToken(LuaAstNodeType::KeyWord, _tokenParser->Current()));
+
+	_tokenParser->Next();
+}
+
+bool LuaParser::testNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent)
+{
+	if (_tokenParser->Current().TokenType == c)
+	{
+		parent->AddChild(createAstNodeFromToken(LuaAstNodeType::KeyWord, _tokenParser->Current()));
+		_tokenParser->Next();
+		return true;
+	}
+	return false;
+}
+
 
 std::shared_ptr<LuaAstNode> LuaParser::createAstNode(LuaAstNodeType type)
 {

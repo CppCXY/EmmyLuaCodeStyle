@@ -61,7 +61,14 @@ bool LuaTokenParser::Parse()
 		auto text = getSaveText();
 		if (!text.empty())
 		{
-			_tokens.emplace_back(type, text, _buffStart, _buffIndex);
+			if (type == TK_LONG_COMMENT || type == TK_SHORT_COMMENT)
+			{
+				_commentTokens.emplace_back(type, text, _buffStart, _buffIndex);
+			}
+			else
+			{
+				_tokens.emplace_back(type, text, _buffStart, _buffIndex);
+			}
 		}
 		else
 		{
@@ -154,6 +161,11 @@ int LuaTokenParser::GetColumn(int offset)
 std::string& LuaTokenParser::GetSource()
 {
 	return _source;
+}
+
+std::vector<LuaToken> LuaTokenParser::GetComments()
+{
+	return _commentTokens;
 }
 
 LuaTokenType LuaTokenParser::llex()
@@ -564,7 +576,6 @@ void LuaTokenParser::readLongString(std::size_t sep)
 			}
 		}
 	}
-
 }
 
 void LuaTokenParser::readString(int del)

@@ -28,27 +28,53 @@ private:
 
 	void testThenBlock(std::shared_ptr<LuaAstNode> ifNode);
 
-	bool testNext(LuaTokenType type);
-
 	void block(std::shared_ptr<LuaAstNode> parent);
 
-	void checkMatch(LuaTokenType what, LuaTokenType who);
+	void checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent);
 
 	void expression(std::shared_ptr<LuaAstNode> parent);
 
-	BinOpr subexpression(std::shared_ptr<LuaAstNode> expressNode, int limit);
+	void subexpression(std::shared_ptr<LuaAstNode> expressionNode, int limit);
 
-	void simpleExpression(std::shared_ptr<LuaAstNode> expressNode);
+	void simpleExpression(std::shared_ptr<LuaAstNode> expressionNode);
 
-	void tableConstructor(std::shared_ptr<LuaAstNode> expressNode);
+	void tableConstructor(std::shared_ptr<LuaAstNode> expressionNode);
 
-	void functionBody(std::shared_ptr<LuaAstNode> expressNode);
+	void field(std::shared_ptr<LuaAstNode> tableExpressionNode);
 
-	void suffixedExpression(std::shared_ptr<LuaAstNode> expressNode);
+	void listField(std::shared_ptr<LuaAstNode> tableExpressionNode);
+
+	void rectField(std::shared_ptr<LuaAstNode> tableExpressionNode);
+
+	void functionBody(std::shared_ptr<LuaAstNode> closureExpression);
+
+	void paramList(std::shared_ptr<LuaAstNode> functionBodyNode);
+
+	void suffixedExpression(std::shared_ptr<LuaAstNode> expressionNode);
+
+	void fieldSel(std::shared_ptr<LuaAstNode> expressionNode);
+
+	void yIndex(std::shared_ptr<LuaAstNode> expressionNode);
+
+	void primaryExpression(std::shared_ptr<LuaAstNode> expressionNode);
 
 	UnOpr getUnaryOperator(LuaTokenType op);
 
 	BinOpr getBinaryOperator(LuaTokenType op);
+
+	/*
+	 * 他是检查当前token的type是否与c相同
+	 * 如果是就跳过当前,
+	 * 否则会抛出异常
+	 */
+	void checkNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent);
+
+	/*
+	 * 他是检查当前token的type是否与c相同
+	 * 如果是就跳过当前，并返回true
+	 * 否则返回false
+	 */
+	bool testNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent);
 
 	std::shared_ptr<LuaAstNode> createAstNode(LuaAstNodeType type);
 
@@ -60,5 +86,4 @@ private:
 
 
 };
-
 
