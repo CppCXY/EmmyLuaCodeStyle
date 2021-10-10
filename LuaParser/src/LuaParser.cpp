@@ -15,15 +15,20 @@ std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 		std::stringstream s;
 		s << fin.rdbuf();
 
-		auto tokenParser = std::make_shared<LuaTokenParser>(std::move(s.str()));
-		tokenParser->Parse();
-		auto astParser = std::make_shared<LuaParser>(tokenParser);
-
-		astParser->Parse();
-		return astParser;
+		return LoadFromBuffer(s.str());
 	}
 
 	return nullptr;
+}
+
+std::shared_ptr<LuaParser> LuaParser::LoadFromBuffer(std::string&& buffer)
+{
+	auto tokenParser = std::make_shared<LuaTokenParser>(std::move(buffer));
+	tokenParser->Parse();
+	auto astParser = std::make_shared<LuaParser>(tokenParser);
+
+	astParser->Parse();
+	return astParser;
 }
 
 bool LuaParser::Parse()
@@ -228,7 +233,6 @@ void LuaParser::forStatement(std::shared_ptr<LuaAstNode> blockNode)
 			throw LuaParserException("'=' or 'in' expected");
 		}
 	}
-	checkMatch(TK_END, TK_FOR, forStatement);
 
 	blockNode->AddChild(forStatement);
 }
@@ -540,6 +544,7 @@ void LuaParser::simpleExpression(std::shared_ptr<LuaAstNode> expressionNode)
 		{
 			auto tokenNode = createAstNodeFromToken(LuaAstNodeType::LiteralExpression, _tokenParser->Current());
 			expressionNode->AddChild(tokenNode);
+			_tokenParser->Next();
 			break;
 		}
 	case '{':
@@ -565,7 +570,6 @@ void LuaParser::simpleExpression(std::shared_ptr<LuaAstNode> expressionNode)
 			return;
 		}
 	}
-	_tokenParser->Next();
 }
 
 /* constructor -> '{' [ field { sep field } [sep] ] '}'
@@ -721,6 +725,7 @@ void LuaParser::suffixedExpression(std::shared_ptr<LuaAstNode> expressionNode)
 		case '[':
 			{
 				yIndex(subExpression);
+				break;
 			}
 		case ':':
 			{
