@@ -4,7 +4,8 @@
 LuaAstNode::LuaAstNode(LuaAstNodeType type, const char* source)
 	: _type(type),
 	  _parent(),
-	  _source(source)
+	  _source(source),
+	  _text(source, 0)
 {
 }
 
@@ -15,6 +16,7 @@ LuaAstNode::LuaAstNode(LuaAstNodeType type, LuaToken& token)
 	const char* source = text.data() - token.TextRange.StartOffset;
 	_source = source;
 	_textRange = token.TextRange;
+	_text = token.Text;
 }
 
 TextRange LuaAstNode::GetTextRange() const
@@ -24,7 +26,7 @@ TextRange LuaAstNode::GetTextRange() const
 
 std::string_view LuaAstNode::GetText() const
 {
-	return std::string_view(_source + _textRange.StartOffset, _textRange.EndOffset);
+	return _text;
 }
 
 const std::vector<std::shared_ptr<LuaAstNode>>& LuaAstNode::GetChildren() const
@@ -47,21 +49,37 @@ void LuaAstNode::AddChild(std::shared_ptr<LuaAstNode> child)
 	if (_textRange.StartOffset == 0 && _textRange.EndOffset == 0)
 	{
 		_textRange = child->_textRange;
-		return;
 	}
 
-	if (_textRange.StartOffset > child->_textRange.StartOffset)
+	else
 	{
-		_textRange.StartOffset = child->_textRange.StartOffset;
-	}
+		if (child->_textRange.StartOffset == 0&& child->_textRange.EndOffset == 0)
+		{
+			throw LuaParserException("hhh");
+		}
 
-	if (_textRange.EndOffset < child->_textRange.EndOffset)
-	{
-		_textRange.EndOffset = child->_textRange.EndOffset;
+		if (_textRange.StartOffset > child->_textRange.StartOffset)
+		{
+			_textRange.StartOffset = child->_textRange.StartOffset;
+		}
+
+		if (_textRange.EndOffset < child->_textRange.EndOffset)
+		{
+			_textRange.EndOffset = child->_textRange.EndOffset;
+		}
+
+		
 	}
+	_children.push_back(child);
+	_text = std::string_view(_source + _textRange.StartOffset, _textRange.EndOffset - _textRange.StartOffset + 1);
 }
 
 LuaAstNodeType LuaAstNode::GetType() const
 {
 	return _type;
+}
+
+void LuaAstNode::SetType(LuaAstNodeType type)
+{
+	_type = type;
 }

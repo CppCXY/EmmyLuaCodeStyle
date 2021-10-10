@@ -14,11 +14,31 @@ enum class LuaAstNodeType
 
 	LocalStatement,
 
+	LocalFunctionStatement,
+
 	IfStatement,
 
 	WhileStatement,
 
 	DoStatement,
+
+	ForStatement,
+
+	RepeatStatement,
+
+	FunctionStatement,
+
+	LabelStatement,
+
+	BreakStatement,
+
+	ReturnStatement,
+
+	GotoStatement,
+
+	ExpressionStatement,
+
+	AssignStatement,
 
 	Expression,
 	LiteralExpression,
@@ -28,6 +48,7 @@ enum class LuaAstNodeType
 	TableExpression,
 	CallExpression,
 	IndexExpression,
+	NameExpression,
 
 	UnaryOperator,
 
@@ -35,15 +56,27 @@ enum class LuaAstNodeType
 
 	IndexOperator,
 
+	GeneralOperator,
+
 	TableField,
 
 	FunctionBody,
 
 	ParamList,
 
+	NameDefList,
+
+	Attribute,
+
 	Param,
 
 	CallArgList,
 
-	ExpressionList
+	ExpressionList,
+
+	ForNumber,
+
+	ForList,
+
+	ForBody
 };

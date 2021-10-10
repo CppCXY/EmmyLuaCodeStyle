@@ -63,11 +63,11 @@ bool LuaTokenParser::Parse()
 		{
 			if (type == TK_LONG_COMMENT || type == TK_SHORT_COMMENT)
 			{
-				_commentTokens.emplace_back(type, text, _buffStart, _buffIndex);
+				_commentTokens.emplace_back(type, text, TextRange(_buffStart, _buffIndex));
 			}
 			else
 			{
-				_tokens.emplace_back(type, text, _buffStart, _buffIndex);
+				_tokens.emplace_back(type, text, TextRange(_buffStart, _buffIndex));
 			}
 		}
 		else
@@ -80,9 +80,9 @@ bool LuaTokenParser::Parse()
 
 LuaToken& LuaTokenParser::Next()
 {
-	if ((_currentIndex++) < _tokens.size())
+	if (_currentIndex < _tokens.size())
 	{
-		return _tokens[_currentIndex];
+		return _tokens[_currentIndex++];
 	}
 
 	return _eosToken;
@@ -626,7 +626,7 @@ void LuaTokenParser::incLinenumber()
 		throw LuaParserException("chunk has too many lines");
 	}
 
-	_lineOffsetVec.push_back(_currentParseIndex);
+	_lineOffsetVec.push_back(static_cast<int>(_currentParseIndex));
 }
 
 bool LuaTokenParser::currentIsNewLine()

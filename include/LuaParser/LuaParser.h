@@ -4,6 +4,7 @@
 #include "LuaTokenParser.h"
 #include "LuaOperatorType.h"
 #include "LuaAstNode.h"
+#include "LuaAttribute.h"
 
 class LuaParser
 {
@@ -12,11 +13,13 @@ public:
 
 	static std::shared_ptr<LuaParser> LoadFromBuffer(std::string&& buffer);
 
+	LuaParser(std::shared_ptr<LuaTokenParser> tokenParser);
+
 	bool Parse();
 
 	std::shared_ptr<LuaAstNode> GetAst();
 private:
-	LuaParser(std::shared_ptr<LuaTokenParser> tokenParser);
+
 
 	bool blockFollow(bool withUntil = false);
 
@@ -29,6 +32,35 @@ private:
 	void whileStatement(std::shared_ptr<LuaAstNode> blockNode);
 
 	void doStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void forStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void repeatStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void functionStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void localFunctionStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void localStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void LabelStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void returnStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void breakStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void gotoStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	void expressionStatement(std::shared_ptr<LuaAstNode> blockNode);
+
+	// 赋值语句由表达式语句转换而来
+	void assignStatement(std::shared_ptr<LuaAstNode> assignStatementNode);
+
+	void forNumber(std::shared_ptr<LuaAstNode> forStatement);
+
+	void forList(std::shared_ptr<LuaAstNode> forStatement);
+
+	void forBody(std::shared_ptr<LuaAstNode> forNode);
 
 	void condition(std::shared_ptr<LuaAstNode> parent);
 
@@ -66,6 +98,14 @@ private:
 
 	void yIndex(std::shared_ptr<LuaAstNode> expressionNode);
 
+	void functionName(std::shared_ptr<LuaAstNode> functionNode);
+
+	std::string_view checkName(std::shared_ptr<LuaAstNode> parent);
+
+	LuaAttribute getLocalAttribute(std::shared_ptr<LuaAstNode> nameDefList);
+
+	void check(LuaTokenType c);
+
 	void primaryExpression(std::shared_ptr<LuaAstNode> expressionNode);
 
 	UnOpr getUnaryOperator(LuaTokenType op);
@@ -77,7 +117,7 @@ private:
 	 * 如果是就跳过当前,
 	 * 否则会抛出异常
 	 */
-	void checkNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent);
+	void checkAndNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType = LuaAstNodeType::KeyWord);
 
 	/*
 	 * 他是检查当前token的type是否与c相同
@@ -100,6 +140,7 @@ private:
 
 
 };
+
 
 
 

@@ -24,9 +24,10 @@ public:
 
 	LuaAstNodeType GetType() const;
 
-
+	void SetType(LuaAstNodeType type);
 private:
 	LuaAstNodeType _type;
+	std::string_view _text;
 	std::weak_ptr<LuaAstNode> _parent;
 
 	const char* _source;

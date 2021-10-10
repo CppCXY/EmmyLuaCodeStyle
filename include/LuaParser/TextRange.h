@@ -2,6 +2,6 @@
 
 struct TextRange
 {
-	int StartOffset;
-	int EndOffset;
+	int StartOffset = 0;
+	int EndOffset = 0;
 };
