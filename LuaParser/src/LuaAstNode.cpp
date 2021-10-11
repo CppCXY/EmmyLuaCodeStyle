@@ -84,6 +84,3 @@ void LuaAstNode::SetType(LuaAstNodeType type)
 	_type = type;
 }
 
-void LuaAstNode::SetError(std::string_view errorMessage)
-{
-}

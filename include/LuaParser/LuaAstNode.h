@@ -25,8 +25,6 @@ public:
 	LuaAstNodeType GetType() const;
 
 	void SetType(LuaAstNodeType type);
-
-	void SetError(std::string_view errorMessage);
 private:
 	LuaAstNodeType _type;
 	std::string_view _text;

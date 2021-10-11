@@ -44,6 +44,9 @@ bool LuaParser::Parse()
 		_errors.push_back(tokeError);
 	}
 
+	//在基本ast建立之后会试图将注释插入AST之中
+	buildAstWithComment();
+
 	return true;
 }
 
@@ -60,6 +63,19 @@ std::vector<LuaError>& LuaParser::GetErrors()
 bool LuaParser::HasError() const
 {
 	return !_errors.empty();
+}
+
+void LuaParser::buildAstWithComment()
+{
+	auto& comments = _tokenParser->GetComments();
+	// 将注释注入AST中
+	if(!comments.empty())
+	{
+		for(auto& comment: comments)
+		{
+			_chunkAstNode->AddComment(comment);
+		}
+	}
 }
 
 LuaParser::LuaParser(std::shared_ptr<LuaTokenParser> tokenParser)

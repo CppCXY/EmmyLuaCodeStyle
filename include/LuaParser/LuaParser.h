@@ -23,7 +23,7 @@ public:
 
 	bool HasError() const;
 private:
-
+	void buildAstWithComment();
 
 	bool blockFollow(bool withUntil = false);
 
