@@ -18,6 +18,10 @@ public:
 	bool Parse();
 
 	std::shared_ptr<LuaAstNode> GetAst();
+
+	std::vector<LuaError>& GetErrors();
+
+	bool HasError() const;
 private:
 
 
@@ -134,11 +138,15 @@ private:
 
 	std::shared_ptr<LuaAstNode> createAstNodeFromCurrentToken(LuaAstNodeType type);
 
+	void luaError(std::string_view message, std::shared_ptr<LuaAstNode> parent);
+
+	void luaMatchError(std::string message, TextRange range);
+
 	std::shared_ptr<LuaTokenParser> _tokenParser;
 
 	std::shared_ptr<LuaAstNode> _chunkAstNode;
 
-
+	std::vector<LuaError> _errors;
 };
 
 

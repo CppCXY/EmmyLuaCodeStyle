@@ -78,5 +78,7 @@ enum class LuaAstNodeType
 
 	ForList,
 
-	ForBody
+	ForBody,
+
+	Error
 };

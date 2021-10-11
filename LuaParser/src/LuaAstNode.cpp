@@ -53,9 +53,9 @@ void LuaAstNode::AddChild(std::shared_ptr<LuaAstNode> child)
 
 	else
 	{
-		if (child->_textRange.StartOffset == 0&& child->_textRange.EndOffset == 0)
+		if (child->_textRange.StartOffset == 0 && child->_textRange.EndOffset == 0)
 		{
-			throw LuaParserException("hhh");
+			return;
 		}
 
 		if (_textRange.StartOffset > child->_textRange.StartOffset)
@@ -82,4 +82,8 @@ LuaAstNodeType LuaAstNode::GetType() const
 void LuaAstNode::SetType(LuaAstNodeType type)
 {
 	_type = type;
+}
+
+void LuaAstNode::SetError(std::string_view errorMessage)
+{
 }

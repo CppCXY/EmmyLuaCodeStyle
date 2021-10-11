@@ -1,5 +1,6 @@
 #include <iostream>
 #include "LuaParser/LuaParser.h"
+#include "Util/format.h"
 
 int main()
 {
@@ -11,15 +12,20 @@ dddd,
 [123] =123,
 ["fyu"] =1,
 [self] = "12313131"
-}
+} 
+ffff(
+aaa,
+bbb)
+ccc
+
 )");
-	auto ast = parser->GetAst();
-	for (auto astNode : ast->GetChildren())
+	// auto ast = parser->GetAst();
+	auto errors = parser->GetErrors();
+
+	for (auto& err : errors)
 	{
-		for (auto a : astNode->GetChildren())
-		{
-			std::cout << a->GetText() << std::endl;
-		}
+		std::cout << format("error: {} , textRange({},{})", err.ErrorMessage, err.ErrorRange.StartOffset,
+		                    err.ErrorRange.EndOffset) << std::endl;
 	}
 
 	return 0;

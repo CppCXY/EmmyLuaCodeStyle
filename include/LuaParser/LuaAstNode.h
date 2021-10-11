@@ -25,6 +25,8 @@ public:
 	LuaAstNodeType GetType() const;
 
 	void SetType(LuaAstNodeType type);
+
+	void SetError(std::string_view errorMessage);
 private:
 	LuaAstNodeType _type;
 	std::string_view _text;
@@ -33,5 +35,5 @@ private:
 	const char* _source;
 	TextRange _textRange;
 	std::vector<std::shared_ptr<LuaAstNode>> _children;
-
+	std::string _error;
 };

@@ -108,6 +108,16 @@ LuaToken& LuaTokenParser::Current()
 	return _eosToken;
 }
 
+int LuaTokenParser::LastValidOffset()
+{
+	if(!_tokens.empty())
+	{
+		return _tokens.back().TextRange.EndOffset;
+	}
+	return 0;
+}
+
+
 int LuaTokenParser::GetLine(int offset)
 {
 	if (_lineOffsetVec.empty())
@@ -163,9 +173,19 @@ std::string& LuaTokenParser::GetSource()
 	return _source;
 }
 
-std::vector<LuaToken> LuaTokenParser::GetComments()
+std::vector<LuaToken>& LuaTokenParser::GetComments()
 {
 	return _commentTokens;
+}
+
+std::vector<LuaError>& LuaTokenParser::GetErrors()
+{
+	return _errors;
+}
+
+bool LuaTokenParser::HasError() const
+{
+	return !_errors.empty();
 }
 
 LuaTokenType LuaTokenParser::llex()
@@ -228,7 +248,8 @@ LuaTokenType LuaTokenParser::llex()
 				}
 				else if (sep == 0)
 				{
-					throw LuaParserException("invalid long string delimiter");
+					luaError("invalid long string delimiter", TextRange(_currentParseIndex, _currentParseIndex));
+					return TK_STRING;
 				}
 				return '[';
 			}
@@ -539,7 +560,6 @@ std::size_t LuaTokenParser::skipSep()
 
 void LuaTokenParser::readLongString(std::size_t sep)
 {
-	int line = _linenumber;
 	saveAndNext();
 
 	if (currentIsNewLine())
@@ -553,7 +573,8 @@ void LuaTokenParser::readLongString(std::size_t sep)
 		{
 		case EOZ:
 			{
-				throw LuaParserException(format("unfinished long string starting (at line {})", line));
+				luaError("unfinished long string starting", TextRange(_currentParseIndex, _currentParseIndex));
+				return;
 			}
 		case ']':
 			{
@@ -589,7 +610,8 @@ void LuaTokenParser::readString(int del)
 		case '\n':
 		case '\r':
 			{
-				throw LuaParserException("unfinished string");
+				luaError("unfinished string", TextRange(_currentParseIndex, _currentParseIndex));
+				return;
 			}
 		case '\\':
 			{
@@ -598,7 +620,8 @@ void LuaTokenParser::readString(int del)
 				switch (getCurrentChar())
 				{
 				case EOZ:
-					throw LuaParserException("unfinished string");
+					luaError("unfinished string", TextRange(_currentParseIndex, _currentParseIndex));
+					return;
 				}
 				break;
 			}
@@ -619,7 +642,6 @@ void LuaTokenParser::incLinenumber()
 	{
 		nextChar(); /* skip '\n\r' or '\r\n' */
 	}
-
 
 	if (++_linenumber >= std::numeric_limits<int>::max())
 	{
@@ -657,4 +679,9 @@ std::string_view LuaTokenParser::getSaveText() const
 bool LuaTokenParser::isReserved(std::string_view text)
 {
 	return LuaReserved.find(text) != LuaReserved.end();
+}
+
+void LuaTokenParser::luaError(std::string_view message, TextRange range)
+{
+	_errors.emplace_back(message, range);
 }

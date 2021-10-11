@@ -3,6 +3,7 @@
 #include <string_view>
 #include "LuaTokenType.h"
 #include "TextRange.h"
+#include "LuaError.h"
 
 class LuaToken
 {

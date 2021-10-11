@@ -9,8 +9,8 @@
 std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 {
 	std::fstream fin(std::string(filename), std::ios::in);
-	
-	if(fin.is_open())
+
+	if (fin.is_open())
 	{
 		std::stringstream s;
 		s << fin.rdbuf();
@@ -37,12 +37,29 @@ bool LuaParser::Parse()
 
 	block(_chunkAstNode);
 
+	auto tokenErrors = _tokenParser->GetErrors();
+
+	for (auto& tokeError : tokenErrors)
+	{
+		_errors.push_back(tokeError);
+	}
+
 	return true;
 }
 
 std::shared_ptr<LuaAstNode> LuaParser::GetAst()
 {
 	return _chunkAstNode;
+}
+
+std::vector<LuaError>& LuaParser::GetErrors()
+{
+	return _errors;
+}
+
+bool LuaParser::HasError() const
+{
+	return !_errors.empty();
 }
 
 LuaParser::LuaParser(std::shared_ptr<LuaTokenParser> tokenParser)
@@ -230,7 +247,7 @@ void LuaParser::forStatement(std::shared_ptr<LuaAstNode> blockNode)
 		}
 	default:
 		{
-			throw LuaParserException("'=' or 'in' expected");
+			luaError("'=' or 'in' expected", forStatement);
 		}
 	}
 
@@ -431,7 +448,9 @@ void LuaParser::checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<
 {
 	if (!testNext(what, parent))
 	{
-		throw LuaParserException(format("token {} expected ,(to close {} at", what, who));
+		auto range = parent->GetTextRange();
+		luaMatchError(format("token {} expected ,(to close {} at", what, who),
+		              TextRange(range.EndOffset, range.EndOffset));
 	}
 }
 
@@ -694,7 +713,7 @@ void LuaParser::paramList(std::shared_ptr<LuaAstNode> functionBodyNode)
 				}
 			default:
 				{
-					throw LuaParserException("<name> or '...' expected");
+					luaError("<name> or '...' expected", paramList);
 				}
 			}
 		}
@@ -779,7 +798,7 @@ void LuaParser::functionCallArgs(std::shared_ptr<LuaAstNode> expressionNode)
 		}
 	default:
 		{
-			throw LuaParserException("function arguments expected");
+			luaError("function arguments expected", callArgsNode);
 		}
 	}
 
@@ -854,7 +873,7 @@ LuaAttribute LuaParser::getLocalAttribute(std::shared_ptr<LuaAstNode> nameDefLis
 			return LuaAttribute::Close;
 		}
 
-		throw LuaParserException(format("unknown attribute {}", attributeName));
+		luaMatchError(format("unknown attribute {}", attributeName), attribute->GetTextRange());
 	}
 
 	return LuaAttribute::NoAttribute;
@@ -864,7 +883,7 @@ void LuaParser::check(LuaTokenType c)
 {
 	if (_tokenParser->Current().TokenType != c)
 	{
-		throw LuaParserException(format("{} expected", c));
+		luaMatchError(format("{} expected", c), _tokenParser->Current().TextRange);
 	}
 }
 
@@ -890,7 +909,7 @@ void LuaParser::primaryExpression(std::shared_ptr<LuaAstNode> expressionNode)
 			return;
 		}
 	default:
-		throw LuaParserException("unexpected symbol");
+		luaError("unexpected symbol", expressionNode);
 	}
 }
 
@@ -954,10 +973,11 @@ void LuaParser::checkAndNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent,
 {
 	if (_tokenParser->Current().TokenType != c)
 	{
-		throw LuaParserException(format("token type {} expected", c));
+		luaError(format("token type {} expected", c), parent);
+		return;
 	}
 
-	parent->AddChild(createAstNodeFromToken(addType, _tokenParser->Current()));
+	parent->AddChild(createAstNodeFromCurrentToken(addType));
 
 	_tokenParser->Next();
 }
@@ -997,6 +1017,30 @@ std::shared_ptr<LuaAstNode> LuaParser::createAstNodeFromToken(LuaAstNodeType typ
 std::shared_ptr<LuaAstNode> LuaParser::createAstNodeFromCurrentToken(LuaAstNodeType type)
 {
 	return createAstNodeFromToken(type, _tokenParser->Current());
+}
+
+void LuaParser::luaError(std::string_view message, std::shared_ptr<LuaAstNode> parent)
+{
+	if (_tokenParser->Current().TokenType != TK_EOS)
+	{
+		auto tokenNode = createAstNodeFromCurrentToken(LuaAstNodeType::Error);
+		parent->AddChild(tokenNode);
+		_tokenParser->Next();
+		_errors.emplace_back(message, tokenNode->GetTextRange());
+	}
+	else
+	{
+		auto offset = _tokenParser->LastValidOffset();
+		if (offset != 0)
+		{
+			_errors.emplace_back(message, TextRange(offset, offset));
+		}
+	}
+}
+
+void LuaParser::luaMatchError(std::string message, TextRange range)
+{
+	_errors.emplace_back(message, range);
 }
 
 void LuaParser::forNumber(std::shared_ptr<LuaAstNode> forStatement)

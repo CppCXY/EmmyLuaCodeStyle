@@ -26,14 +26,19 @@ public:
 
 	LuaToken& Current();
 
+	int LastValidOffset();
+
 	int GetLine(int offset);
 	
 	int GetColumn(int offset);
 
 	std::string& GetSource();
 
-	std::vector<LuaToken> GetComments();
+	std::vector<LuaToken>& GetComments();
 
+	std::vector<LuaError>& GetErrors();
+
+	bool HasError() const;
 private:
 	static std::map<std::string, LuaTokenType, std::less<>> LuaReserved;
 
@@ -69,6 +74,8 @@ private:
 
 	bool isReserved(std::string_view text);
 
+	void luaError(std::string_view message, TextRange range);
+
 	int _linenumber;
 
 	bool _hasSaveText;
@@ -83,6 +90,8 @@ private:
 	std::vector<LuaToken> _tokens;
 	// ×¢ÊÍµ¥¶À´¦Àí
 	std::vector<LuaToken> _commentTokens;
+
+	std::vector<LuaError> _errors;
 
 	LuaToken _eosToken;
 
