@@ -80,5 +80,11 @@ enum class LuaAstNodeType
 
 	ForBody,
 
-	Error
+	Error,
+
+	ShortComment,
+
+	LongComment,
+
+	ShebangComment
 };

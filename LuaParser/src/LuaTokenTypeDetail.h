@@ -45,5 +45,6 @@ enum LuaTokenTypeDetail : int
 	TK_STRING,
 	// custom
 	TK_SHORT_COMMENT,// ¶Ì×¢ÊÍ
-	TK_LONG_COMMENT //³¤×¢ÊÍ
+	TK_LONG_COMMENT, //³¤×¢ÊÍ
+	TK_SHEBANG, //shebang
 };

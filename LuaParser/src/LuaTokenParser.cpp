@@ -48,20 +48,45 @@ LuaTokenParser::LuaTokenParser(std::string&& source)
 	  _buffIndex(0),
 	  _linenumber(0),
 	  _hasEoz(false),
-	  _eosToken(LuaToken{TK_EOS, "", TextRange(0,0)})
+	  _eosToken(LuaToken{TK_EOS, "", TextRange(0, 0)})
 {
 	_lineOffsetVec.push_back(0);
 }
 
 bool LuaTokenParser::Parse()
 {
+	bool lastIsShortComment = false;
 	while (true)
 	{
 		auto type = llex();
 		auto text = getSaveText();
+
 		if (!text.empty())
 		{
-			if (type == TK_LONG_COMMENT || type == TK_SHORT_COMMENT)
+			if (type == TK_SHORT_COMMENT)
+			{
+				if (lastIsShortComment && !_commentTokens.empty())
+				{
+					auto& lastComment = _commentTokens.back();
+
+					auto endLine = GetLine(lastComment.TextRange.EndOffset);
+					auto currentLine = GetLine(_buffStart);
+
+					if (currentLine - endLine == 1)
+					{
+						lastIsShortComment = true;
+						lastComment.TextRange.EndOffset = _buffIndex;
+						lastComment.Text = std::string_view(GetSource().data() + lastComment.TextRange.StartOffset,
+						                                    lastComment.TextRange.EndOffset - lastComment.TextRange.
+						                                    StartOffset + 1);
+						continue;
+					}
+				}
+				lastIsShortComment = true;
+				_commentTokens.emplace_back(type, text, TextRange(_buffStart, _buffIndex));
+				continue;
+			}
+			else if (type == TK_LONG_COMMENT || type == TK_SHEBANG)
 			{
 				_commentTokens.emplace_back(type, text, TextRange(_buffStart, _buffIndex));
 			}
@@ -69,6 +94,7 @@ bool LuaTokenParser::Parse()
 			{
 				_tokens.emplace_back(type, text, TextRange(_buffStart, _buffIndex));
 			}
+			lastIsShortComment = false;
 		}
 		else
 		{
@@ -110,7 +136,7 @@ LuaToken& LuaTokenParser::Current()
 
 int LuaTokenParser::LastValidOffset()
 {
-	if(!_tokens.empty())
+	if (!_tokens.empty())
 	{
 		return _tokens.back().TextRange.EndOffset;
 	}
@@ -236,6 +262,7 @@ LuaTokenType LuaTokenParser::llex()
 				{
 					saveAndNext();
 				}
+
 				return TK_SHORT_COMMENT;
 			}
 		case '[':
@@ -381,7 +408,9 @@ LuaTokenType LuaTokenParser::llex()
 			}
 		case '#':
 			{
-				if(_linenumber == 0 && checkNext1('!'))
+				saveAndNext();
+				// 只认为第一行的才是shebang
+				if (_linenumber == 0 && getCurrentChar() == '!')
 				{
 					// shebang
 					while (!currentIsNewLine() && getCurrentChar() != EOZ)
@@ -391,7 +420,7 @@ LuaTokenType LuaTokenParser::llex()
 
 					return TK_SHEBANG;
 				}
-				// 顺延到default
+				return '#';
 			}
 		default:
 			{

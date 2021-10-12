@@ -25,7 +25,14 @@ public:
 	LuaAstNodeType GetType() const;
 
 	void SetType(LuaAstNodeType type);
+
+	// child会被加入为最底层的叶子节点
+	void AddLeafChild(std::shared_ptr<LuaAstNode> child);
+
 private:
+	void addChildAfter(int index, std::shared_ptr<LuaAstNode> child);
+	void addChildBefore(int index, std::shared_ptr<LuaAstNode> child);
+
 	LuaAstNodeType _type;
 	std::string_view _text;
 	std::weak_ptr<LuaAstNode> _parent;

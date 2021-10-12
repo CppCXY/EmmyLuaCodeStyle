@@ -15,15 +15,18 @@ public:
 
 	LuaParser(std::shared_ptr<LuaTokenParser> tokenParser);
 
-	bool Parse();
+	void BuildAst();
+
+	void BuildAstWithComment();
 
 	std::shared_ptr<LuaAstNode> GetAst();
 
 	std::vector<LuaError>& GetErrors();
 
 	bool HasError() const;
+
+	std::vector<LuaToken>& GetAllComments() { return _tokenParser->GetComments(); }
 private:
-	void buildAstWithComment();
 
 	bool blockFollow(bool withUntil = false);
 

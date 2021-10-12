@@ -25,13 +25,11 @@ std::shared_ptr<LuaParser> LuaParser::LoadFromBuffer(std::string&& buffer)
 {
 	auto tokenParser = std::make_shared<LuaTokenParser>(std::move(buffer));
 	tokenParser->Parse();
-	auto astParser = std::make_shared<LuaParser>(tokenParser);
 
-	astParser->Parse();
-	return astParser;
+	return std::make_shared<LuaParser>(tokenParser);
 }
 
-bool LuaParser::Parse()
+void LuaParser::BuildAst()
 {
 	_chunkAstNode = createAstNode(LuaAstNodeType::Chunk);
 
@@ -43,11 +41,6 @@ bool LuaParser::Parse()
 	{
 		_errors.push_back(tokeError);
 	}
-
-	//在基本ast建立之后会试图将注释插入AST之中
-	buildAstWithComment();
-
-	return true;
 }
 
 std::shared_ptr<LuaAstNode> LuaParser::GetAst()
@@ -65,15 +58,32 @@ bool LuaParser::HasError() const
 	return !_errors.empty();
 }
 
-void LuaParser::buildAstWithComment()
+void LuaParser::BuildAstWithComment()
 {
+	BuildAst();
+
 	auto& comments = _tokenParser->GetComments();
 	// 将注释注入AST中
 	if(!comments.empty())
 	{
 		for(auto& comment: comments)
 		{
-			_chunkAstNode->AddComment(comment);
+			std::shared_ptr<LuaAstNode> commentAst = nullptr;
+
+			if(comment.TokenType == TK_SHORT_COMMENT)
+			{
+				commentAst = createAstNodeFromToken(LuaAstNodeType::ShortComment , comment);
+			}
+			else if(comment.TokenType == TK_LONG_COMMENT)
+			{
+				commentAst = createAstNodeFromToken(LuaAstNodeType::LongComment, comment);
+			}
+			else
+			{
+				commentAst = createAstNodeFromToken(LuaAstNodeType::ShebangComment, comment);
+			}
+
+			_chunkAstNode->AddLeafChild(commentAst);
 		}
 	}
 }
