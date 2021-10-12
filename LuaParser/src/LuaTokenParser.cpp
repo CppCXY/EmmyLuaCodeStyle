@@ -48,7 +48,7 @@ LuaTokenParser::LuaTokenParser(std::string&& source)
 	  _buffIndex(0),
 	  _linenumber(0),
 	  _hasEoz(false),
-	  _eosToken(LuaToken{TK_EOS, "", {}})
+	  _eosToken(LuaToken{TK_EOS, "", TextRange(0,0)})
 {
 	_lineOffsetVec.push_back(0);
 }
@@ -378,6 +378,20 @@ LuaTokenType LuaTokenParser::llex()
 		case EOZ:
 			{
 				return TK_EOS;
+			}
+		case '#':
+			{
+				if(_linenumber == 0 && checkNext1('!'))
+				{
+					// shebang
+					while (!currentIsNewLine() && getCurrentChar() != EOZ)
+					{
+						saveAndNext();
+					}
+
+					return TK_SHEBANG;
+				}
+				// Ë³ÑÓµ½default
 			}
 		default:
 			{
