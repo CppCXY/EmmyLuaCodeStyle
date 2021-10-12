@@ -6,7 +6,8 @@ class MinLineElement: public FormatElement
 {
 public:
 	MinLineElement(int line);
-	~MinLineElement();
 
+	FormatElementType GetType() override;
 
+	int Line;
 };

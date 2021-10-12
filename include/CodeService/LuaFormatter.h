@@ -26,11 +26,8 @@ protected:
 
 	std::shared_ptr<FormatElement> FormatBlock(std::shared_ptr<LuaAstNode> blockNode);
 
-
-
-
 private:
-	bool nextMatch(int currentIndex, LuaAstNodeType type ,std::vector<std::shared_ptr<LuaAstNode>> vec);
+
 
 	std::shared_ptr<LuaParser> _parser;
 	std::shared_ptr<LuaFormatContext> _ctx;

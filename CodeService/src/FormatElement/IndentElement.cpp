@@ -13,12 +13,10 @@ FormatElementType IndentElement::GetType()
 
 void IndentElement::AddChild(std::shared_ptr<FormatElement> child)
 {
-	
 }
 
 void IndentElement::AddChild(std::shared_ptr<LuaAstNode> node)
 {
-	
 }
 
 void IndentElement::KeepLine(int line)
@@ -30,4 +28,3 @@ void IndentElement::MinLine(int line)
 {
 	AddChild(std::make_shared<MinLineElement>(line));
 }
-
