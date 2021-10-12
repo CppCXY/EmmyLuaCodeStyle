@@ -62,6 +62,14 @@ void LuaParser::BuildAstWithComment()
 {
 	BuildAst();
 
+	auto& chunkChildren = _chunkAstNode->GetChildren();
+	if(chunkChildren.empty())
+	{
+		return;
+	}
+
+	auto blockNode = chunkChildren[0];
+
 	auto& comments = _tokenParser->GetComments();
 	// ½«×¢ÊÍ×¢ÈëASTÖÐ
 	if(!comments.empty())
@@ -83,7 +91,7 @@ void LuaParser::BuildAstWithComment()
 				commentAst = createAstNodeFromToken(LuaAstNodeType::ShebangComment, comment);
 			}
 
-			_chunkAstNode->AddLeafChild(commentAst);
+			blockNode->AddLeafChild(commentAst);
 		}
 	}
 }

@@ -26,6 +26,11 @@ public:
 	bool HasError() const;
 
 	std::vector<LuaToken>& GetAllComments() { return _tokenParser->GetComments(); }
+
+	int GetLine(int offset) { return _tokenParser->GetLine(offset); }
+
+	int GetColumn(int offset) { return _tokenParser->GetColumn(offset); }
+
 private:
 
 	bool blockFollow(bool withUntil = false);

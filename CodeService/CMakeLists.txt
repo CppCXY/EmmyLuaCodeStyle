@@ -11,8 +11,22 @@ target_include_directories(CodeService PUBLIC
 	src
 )
 
-target_sources(CodeService PRIVATE
+target_sources(CodeService 
+	PUBLIC
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/LuaFormatter.h	
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/FormatElement.h	
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/IndentElement.h	
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/MinLineElement.h	
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/KeepLineElement.h	
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/FormatElementType.h	
+	#include
+	PRIVATE
 	${CodeService_SOURCE_DIR}/src/CodeService.cpp	
+	${CodeService_SOURCE_DIR}/src/LuaFormatter.cpp	
+
+	${CodeService_SOURCE_DIR}/src/FormatElement/IndentElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/KeepLineElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/MinLineElement.cpp	
 )
 
 target_link_libraries(CodeService LuaParser)
