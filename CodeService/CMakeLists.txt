@@ -13,13 +13,17 @@ target_include_directories(CodeService PUBLIC
 
 target_sources(CodeService 
 	PUBLIC
+	#include
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/LuaFormatter.h	
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/FormatElement.h	
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/IndentElement.h	
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/MinLineElement.h	
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/KeepLineElement.h	
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/FormatElementType.h	
-	#include
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/StatementElement.h	
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/KeepBlankElement.h	
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/ExpressionElement.h
+	
 	PRIVATE
 	${CodeService_SOURCE_DIR}/src/CodeService.cpp	
 	${CodeService_SOURCE_DIR}/src/LuaFormatter.cpp	
@@ -27,6 +31,11 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/IndentElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/KeepLineElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/MinLineElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/StatementElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/TextElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/KeepBlankElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/ExpressionElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/FormatElement.cpp	
 )
 
 target_link_libraries(CodeService LuaParser)

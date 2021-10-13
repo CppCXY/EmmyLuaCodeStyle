@@ -6,6 +6,7 @@
 class FormatElement
 {
 public:
+	FormatElement();
 	virtual ~FormatElement();
 
 	virtual FormatElementType GetType() = 0;

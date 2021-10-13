@@ -60,6 +60,8 @@ enum class LuaAstNodeType
 
 	TableField,
 
+	TableFieldSep,
+
 	FunctionBody,
 
 	ParamList,

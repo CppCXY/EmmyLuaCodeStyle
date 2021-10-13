@@ -1,16 +1,12 @@
 #include <iostream>
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"
+#include "CodeService/LuaFormatter.h"
 
 int main()
 {
 	auto parser = LuaParser::LoadFromBuffer(R"(#! fuck me
---fuckme
----fuckhihihi
-local --fucick
-aa =123 --ffffffffff
-
-
+local t,b =123
 )");
 	parser->BuildAstWithComment();
 
@@ -24,12 +20,15 @@ aa =123 --ffffffffff
 
 	auto comments = parser->GetAllComments();
 
-	for(auto& comment:comments)
+	for (auto& comment : comments)
 	{
 		std::cout << format("comment is \n{}\n", comment.Text);
 	}
 
-	auto ast = parser->GetAst();
+	// auto ast = parser->GetAst();
+	LuaFormatOptions options;
+	LuaFormatter formatter(parser, options);
+	formatter.BuildFormattedElement();
 
 	return 0;
 }

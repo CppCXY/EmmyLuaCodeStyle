@@ -6,4 +6,8 @@ enum class FormatElementType
 	IndentElement,
 	KeepLineElement,
 	MinLineElement,
+	StatementElement,
+	TextElement,
+	KeepBlankElement,
+	ExpressionElement
 };

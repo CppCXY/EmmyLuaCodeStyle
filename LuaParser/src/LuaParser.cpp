@@ -63,7 +63,7 @@ void LuaParser::BuildAstWithComment()
 	BuildAst();
 
 	auto& chunkChildren = _chunkAstNode->GetChildren();
-	if(chunkChildren.empty())
+	if (chunkChildren.empty())
 	{
 		return;
 	}
@@ -72,17 +72,17 @@ void LuaParser::BuildAstWithComment()
 
 	auto& comments = _tokenParser->GetComments();
 	// ½«×¢ÊÍ×¢ÈëASTÖÐ
-	if(!comments.empty())
+	if (!comments.empty())
 	{
-		for(auto& comment: comments)
+		for (auto& comment : comments)
 		{
 			std::shared_ptr<LuaAstNode> commentAst = nullptr;
 
-			if(comment.TokenType == TK_SHORT_COMMENT)
+			if (comment.TokenType == TK_SHORT_COMMENT)
 			{
-				commentAst = createAstNodeFromToken(LuaAstNodeType::ShortComment , comment);
+				commentAst = createAstNodeFromToken(LuaAstNodeType::ShortComment, comment);
 			}
-			else if(comment.TokenType == TK_LONG_COMMENT)
+			else if (comment.TokenType == TK_LONG_COMMENT)
 			{
 				commentAst = createAstNodeFromToken(LuaAstNodeType::LongComment, comment);
 			}
@@ -346,11 +346,11 @@ void LuaParser::localStatement(std::shared_ptr<LuaAstNode> blockNode)
 		checkName(nameDefList);
 		getLocalAttribute(nameDefList);
 	}
-	while (testNext(',', nameDefList));
+	while (testNext(',', nameDefList, LuaAstNodeType::GeneralOperator));
 
 	localStatement->AddChild(nameDefList);
 
-	if (testNext('=', localStatement))
+	if (testNext('=', localStatement, LuaAstNodeType::GeneralOperator))
 	{
 		expressionList(localStatement);
 	}
@@ -383,7 +383,7 @@ void LuaParser::returnStatement(std::shared_ptr<LuaAstNode> blockNode)
 		expressionList(returnStatement);
 	}
 
-	testNext(';', returnStatement);
+	testNext(';', returnStatement, LuaAstNodeType::GeneralOperator);
 
 	blockNode->AddChild(returnStatement);
 }
@@ -436,7 +436,7 @@ void LuaParser::expressionStatement(std::shared_ptr<LuaAstNode> blockNode)
 */
 void LuaParser::assignStatement(std::shared_ptr<LuaAstNode> assignStatementNode)
 {
-	if (testNext(',', assignStatementNode))
+	if (testNext(',', assignStatementNode, LuaAstNodeType::GeneralOperator))
 	{
 		suffixedExpression(assignStatementNode);
 
@@ -444,7 +444,7 @@ void LuaParser::assignStatement(std::shared_ptr<LuaAstNode> assignStatementNode)
 	}
 	else
 	{
-		checkAndNext('=', assignStatementNode);
+		checkAndNext('=', assignStatementNode, LuaAstNodeType::GeneralOperator);
 		expressionList(assignStatementNode);
 	}
 }
@@ -478,9 +478,9 @@ void LuaParser::block(std::shared_ptr<LuaAstNode> parent)
 	parent->AddChild(blockNode);
 }
 
-void LuaParser::checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent)
+void LuaParser::checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType)
 {
-	if (!testNext(what, parent))
+	if (!testNext(what, parent, addType))
 	{
 		auto range = parent->GetTextRange();
 		luaMatchError(format("token {} expected ,(to close {} at", what, who),
@@ -493,7 +493,7 @@ void LuaParser::expressionList(std::shared_ptr<LuaAstNode> parent)
 {
 	auto expressionListNode = createAstNode(LuaAstNodeType::ExpressionList);
 	expression(expressionListNode);
-	while (testNext(',', expressionListNode))
+	while (testNext(',', expressionListNode, LuaAstNodeType::GeneralOperator))
 	{
 		expression(expressionListNode);
 	}
@@ -631,7 +631,7 @@ void LuaParser::simpleExpression(std::shared_ptr<LuaAstNode> expressionNode)
 void LuaParser::tableConstructor(std::shared_ptr<LuaAstNode> expressionNode)
 {
 	auto tableExpression = createAstNode(LuaAstNodeType::TableExpression);
-	checkAndNext('{', tableExpression);
+	checkAndNext('{', tableExpression, LuaAstNodeType::GeneralOperator);
 
 	do
 	{
@@ -641,7 +641,8 @@ void LuaParser::tableConstructor(std::shared_ptr<LuaAstNode> expressionNode)
 		}
 		field(tableExpression);
 	}
-	while (testNext(',', tableExpression) || testNext(';', tableExpression));
+	while (testNext(',', tableExpression, LuaAstNodeType::TableFieldSep) 
+		|| testNext(';', tableExpression, LuaAstNodeType::TableFieldSep));
 
 	checkMatch('}', '{', tableExpression);
 
@@ -721,7 +722,7 @@ void LuaParser::paramList(std::shared_ptr<LuaAstNode> functionBodyNode)
 {
 	auto paramList = createAstNode(LuaAstNodeType::ParamList);
 
-	checkAndNext('(', paramList);
+	checkAndNext('(', paramList, LuaAstNodeType::GeneralOperator);
 
 	bool isVararg = false;
 	if (_tokenParser->Current().TokenType != ')')
@@ -751,10 +752,10 @@ void LuaParser::paramList(std::shared_ptr<LuaAstNode> functionBodyNode)
 				}
 			}
 		}
-		while (!isVararg && testNext(',', paramList));
+		while (!isVararg && testNext(',', paramList, LuaAstNodeType::GeneralOperator));
 	}
 
-	checkAndNext(')', paramList);
+	checkAndNext(')', paramList, LuaAstNodeType::GeneralOperator);
 
 	functionBodyNode->AddChild(paramList);
 }
@@ -894,10 +895,10 @@ LuaAttribute LuaParser::getLocalAttribute(std::shared_ptr<LuaAstNode> nameDefLis
 {
 	auto attribute = createAstNode(LuaAstNodeType::Attribute);
 
-	if (testNext('<', attribute))
+	if (testNext('<', attribute, LuaAstNodeType::GeneralOperator))
 	{
 		auto attributeName = checkName(attribute);
-		checkAndNext('>', attribute);
+		checkAndNext('>', attribute, LuaAstNodeType::GeneralOperator);
 		if (attributeName == "const")
 		{
 			return LuaAttribute::Const;
@@ -1016,11 +1017,11 @@ void LuaParser::checkAndNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent,
 	_tokenParser->Next();
 }
 
-bool LuaParser::testNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent)
+bool LuaParser::testNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType)
 {
 	if (_tokenParser->Current().TokenType == c)
 	{
-		parent->AddChild(createAstNodeFromToken(LuaAstNodeType::KeyWord, _tokenParser->Current()));
+		parent->AddChild(createAstNodeFromToken(addType, _tokenParser->Current()));
 		_tokenParser->Next();
 		return true;
 	}
@@ -1083,15 +1084,15 @@ void LuaParser::forNumber(std::shared_ptr<LuaAstNode> forStatement)
 
 	checkName(forNumberNode);
 
-	checkAndNext('=', forNumberNode);
+	checkAndNext('=', forNumberNode, LuaAstNodeType::GeneralOperator);
 
 	expression(forNumberNode);
 
-	checkAndNext(',', forNumberNode);
+	checkAndNext(',', forNumberNode, LuaAstNodeType::GeneralOperator);
 
 	expression(forNumberNode);
 
-	if (testNext(',', forNumberNode)) // optional step
+	if (testNext(',', forNumberNode, LuaAstNodeType::GeneralOperator)) // optional step
 	{
 		expression(forNumberNode);
 	}
@@ -1110,7 +1111,7 @@ void LuaParser::forList(std::shared_ptr<LuaAstNode> forStatement)
 
 	checkName(nameDefList);
 
-	while (testNext(',', nameDefList))
+	while (testNext(',', nameDefList, LuaAstNodeType::GeneralOperator))
 	{
 		checkName(nameDefList);
 	}

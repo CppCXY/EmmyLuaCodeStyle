@@ -80,7 +80,7 @@ private:
 
 	void block(std::shared_ptr<LuaAstNode> parent);
 
-	void checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent);
+	void checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType = LuaAstNodeType::KeyWord);
 
 	void expressionList(std::shared_ptr<LuaAstNode> parent);
 
@@ -136,7 +136,7 @@ private:
 	 * 如果是就跳过当前，并返回true
 	 * 否则返回false
 	 */
-	bool testNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent);
+	bool testNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType = LuaAstNodeType::KeyWord);
 
 	void codeName(std::shared_ptr<LuaAstNode> parent);
 
