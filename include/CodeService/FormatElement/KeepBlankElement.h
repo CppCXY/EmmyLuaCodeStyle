@@ -6,7 +6,7 @@
 class KeepBlankElement : public FormatElement
 {
 public:
-	KeepBlankElement(int blank);
+	KeepBlankElement(TextRange range, int blank);
 
 	FormatElementType GetType() override;
 

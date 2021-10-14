@@ -2,7 +2,6 @@
 #include <memory>
 #include <sstream>
 #include "LuaParser/LuaParser.h"
-#include "LuaFormatContext.h"
 #include "LuaFormatOptions.h"
 #include "LuaCodeDiagnosis.h"
 #include "FormatElement/FormatElement.h"

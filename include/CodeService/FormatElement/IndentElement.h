@@ -17,6 +17,8 @@ public:
 
 	void MinLine(int line);
 
+	void Serialize(FormatContext& ctx) override;
+
 private:
-	std::vector<FormatElement> _children;
+	std::vector<std::shared_ptr<FormatElement>> _children;
 };

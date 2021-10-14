@@ -15,6 +15,8 @@ public:
 
 	void KeepBlank(int blank);
 
+	void Serialize(FormatContext& ctx) override;
+
 private:
 	std::vector<std::shared_ptr<FormatElement>> _children;
 };

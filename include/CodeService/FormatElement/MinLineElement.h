@@ -2,10 +2,10 @@
 
 #include "FormatElement.h"
 
-class MinLineElement: public FormatElement
+class MinLineElement : public FormatElement
 {
 public:
-	MinLineElement(int line);
+	MinLineElement(TextRange range, int line);
 
 	FormatElementType GetType() override;
 

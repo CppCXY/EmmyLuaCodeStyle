@@ -5,7 +5,7 @@
 class KeepLineElement : public FormatElement
 {
 public:
-	KeepLineElement(int line = -1);
+	KeepLineElement(TextRange range , int line = -1);
 
 	FormatElementType GetType() override;
 

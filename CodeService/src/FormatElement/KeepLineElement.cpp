@@ -1,7 +1,9 @@
 #include "CodeService/FormatElement/KeepLineElement.h"
 
-KeepLineElement::KeepLineElement(int line)
-	: Line(line)
+
+KeepLineElement::KeepLineElement(TextRange range, int line)
+	: FormatElement(range),
+	  Line(line)
 {
 }
 

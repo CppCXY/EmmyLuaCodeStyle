@@ -5,9 +5,12 @@
 
 int main()
 {
-	auto parser = LuaParser::LoadFromBuffer(R"(#! fuck me
+	std::string source = R"(#! fuck
 local t,b =123
-)");
+)";
+	std::cout << "原文:\n" << source;
+	auto parser = LuaParser::LoadFromBuffer(std::move(source));
+
 	parser->BuildAstWithComment();
 
 	auto errors = parser->GetErrors();
@@ -18,17 +21,19 @@ local t,b =123
 		                    err.ErrorRange.EndOffset) << std::endl;
 	}
 
-	auto comments = parser->GetAllComments();
-
-	for (auto& comment : comments)
-	{
-		std::cout << format("comment is \n{}\n", comment.Text);
-	}
+	// auto comments = parser->GetAllComments();
+	//
+	// for (auto& comment : comments)
+	// {
+	// 	std::cout << format("comment is \n{}\n", comment.Text);
+	// }
 
 	// auto ast = parser->GetAst();
 	LuaFormatOptions options;
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
+	std::cout << "格式化结果:\n";
+	std::cout << formatter.GetFormattedText();
 
 	return 0;
 }

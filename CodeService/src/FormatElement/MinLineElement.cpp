@@ -1,7 +1,8 @@
 #include "CodeService/FormatElement/MinLineElement.h"
 
-MinLineElement::MinLineElement(int line)
-	: Line(line)
+MinLineElement::MinLineElement(TextRange range, int line)
+	: FormatElement(range),
+	  Line(line)
 {
 }
 

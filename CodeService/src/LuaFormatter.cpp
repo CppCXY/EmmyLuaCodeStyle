@@ -1,10 +1,14 @@
 #include "CodeService/LuaFormatter.h"
+
+#include <iostream>
+
 #include "CodeService/FormatElement/IndentElement.h"
 #include "CodeService/FormatElement/StatementElement.h"
 #include "CodeService/FormatElement/TextElement.h"
 #include "CodeService/FormatElement/ExpressionElement.h"
+#include "CodeService/FormatElement/FormatContext.h"
 
-bool nextMatch(int currentIndex, LuaAstNodeType type, std::vector<std::shared_ptr<LuaAstNode>> vec)
+bool nextMatch(int currentIndex, LuaAstNodeType type, std::vector<std::shared_ptr<LuaAstNode>>& vec)
 {
 	if (currentIndex >= 0 && (currentIndex + 1) < vec.size())
 	{
@@ -14,7 +18,7 @@ bool nextMatch(int currentIndex, LuaAstNodeType type, std::vector<std::shared_pt
 	return false;
 }
 
-std::shared_ptr<LuaAstNode> nextNode(int currentIndex, std::vector<std::shared_ptr<LuaAstNode>> vec)
+std::shared_ptr<LuaAstNode> nextNode(int currentIndex, std::vector<std::shared_ptr<LuaAstNode>>& vec)
 {
 	if (currentIndex >= 0 && (currentIndex + 1) < vec.size())
 	{
@@ -40,7 +44,12 @@ void LuaFormatter::BuildFormattedElement()
 
 std::string LuaFormatter::GetFormattedText()
 {
-	return {};
+	LuaFormatOptions options;
+	FormatContext ctx(_parser, options);
+
+	_env->Serialize(ctx);
+
+	return ctx.GetText();
 }
 
 void LuaFormatter::AddDiagnosis(TextRange range, std::string_view message)
@@ -74,10 +83,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNode(std::shared_ptr<LuaAstNo
 		}
 	default:
 		{
-			// return std::make_shared<FormatElement>(node);
+			return std::make_shared<TextElement>(node->GetText(), node->GetTextRange());
 		}
 	}
-	return nullptr;
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstNode> blockNode)
@@ -204,6 +212,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
 		switch (node->GetType())
 		{
 		case LuaAstNodeType::Identify:
+			{
+				env->AddChild(node);
+				break;
+			}
 		case LuaAstNodeType::GeneralOperator:
 			{
 				env->AddChild(node);

@@ -1,7 +1,8 @@
 #include "CodeService/FormatElement/KeepBlankElement.h"
 
-KeepBlankElement::KeepBlankElement(int blank)
-	: Blank(blank)
+KeepBlankElement::KeepBlankElement(TextRange range, int blank)
+	: FormatElement(range),
+	  Blank(blank)
 {
 }
 

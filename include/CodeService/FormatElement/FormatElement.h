@@ -2,18 +2,26 @@
 
 #include "LuaParser/LuaAstNode.h"
 #include "FormatElementType.h"
+#include "FormatContext.h"
 
 class FormatElement
 {
 public:
-	FormatElement();
+	explicit  FormatElement(TextRange range);
 	virtual ~FormatElement();
 
 	virtual FormatElementType GetType() = 0;
 
-	virtual void AddChild(std::shared_ptr<LuaAstNode> node) {}
+	virtual TextRange GetTextRange();
 
-	virtual void AddChild(std::shared_ptr<FormatElement> child) {}
+	virtual void AddChild(std::shared_ptr<LuaAstNode> node);
 
-	virtual void Serialize() {}
+	virtual void AddChild(std::shared_ptr<FormatElement> child);
+
+	virtual void Serialize(FormatContext& ctx);
+
+protected:
+	void AddTextRange(TextRange range);
+
+	TextRange _textRange;
 };

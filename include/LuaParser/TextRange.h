@@ -3,7 +3,7 @@
 class TextRange
 {
 public:
-	TextRange(int startOffset, int endOffset);
+	explicit TextRange(int startOffset = 0, int endOffset = 0);
 
 	bool Contain(TextRange& range);
 
