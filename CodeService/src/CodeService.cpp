@@ -6,7 +6,8 @@
 int main()
 {
 	std::string source = R"(#! fuck
-local t,b =123
+local t,b =123 
+	,fffff 
 )";
 	std::cout << "т╜нд:\n" << source;
 	auto parser = LuaParser::LoadFromBuffer(std::move(source));

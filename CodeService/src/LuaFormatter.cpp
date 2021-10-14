@@ -239,6 +239,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_pt
 		switch (node->GetType())
 		{
 		case LuaAstNodeType::Expression:
+			{
+				env->AddChild(node);
+				break;
+			}
 		case LuaAstNodeType::GeneralOperator:
 			{
 				env->AddChild(node);
