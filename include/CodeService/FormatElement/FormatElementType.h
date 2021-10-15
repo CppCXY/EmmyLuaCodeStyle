@@ -9,5 +9,6 @@ enum class FormatElementType
 	StatementElement,
 	TextElement,
 	KeepBlankElement,
-	ExpressionElement
+	ExpressionElement,
+	LineElement,
 };

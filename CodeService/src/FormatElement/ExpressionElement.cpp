@@ -1,7 +1,7 @@
 #include "CodeService/FormatElement/ExpressionElement.h"
-
 #include "CodeService/FormatElement/KeepBlankElement.h"
 #include "CodeService/FormatElement/TextElement.h"
+#include "CodeService/FormatElement/LineElement.h"
 
 ExpressionElement::ExpressionElement()
 	: FormatElement(TextRange(0, 0))
@@ -31,6 +31,13 @@ void ExpressionElement::KeepBlank(int blank)
 		std::make_shared<KeepBlankElement>(TextRange(_textRange.EndOffset, _textRange.EndOffset), blank));
 }
 
+void ExpressionElement::AddLine()
+{
+	_children.push_back(
+		std::make_shared<LineElement>(TextRange(_textRange.EndOffset, _textRange.EndOffset))
+	);
+}
+
 void ExpressionElement::Serialize(FormatContext& ctx)
 {
 	for (int index = 0; index != _children.size(); index++)
@@ -48,10 +55,17 @@ void ExpressionElement::Serialize(FormatContext& ctx)
 				}
 
 				ctx.PrintBlank(1);
+				break;
+			}
+		case FormatElementType::LineElement:
+			{
+				ctx.PrintLine(1);
+				break;
 			}
 		default:
 			{
 				element->Serialize(ctx);
+				break;
 			}
 		}
 	}

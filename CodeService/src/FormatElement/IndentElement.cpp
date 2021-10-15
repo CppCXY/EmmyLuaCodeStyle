@@ -62,17 +62,19 @@ void IndentElement::Serialize(FormatContext& ctx)
 
 					if (index == _children.size() - 1)
 					{
-						secondElementLine = ctx.GetLine(GetTextRange().EndOffset);
+						// secondElementLine = ctx.GetLine(GetTextRange().EndOffset);
+						// 如果是最后一个元素了，那就不往下打印空白了
+						break;
 					}
 					else
 					{
 						secondElementLine = ctx.GetLine(_children[index + 1]->GetTextRange().StartOffset);
 					}
 
-					int line = secondElementLine - firstElementLine;
-					if (line <= 0)
+					int line = secondElementLine - firstElementLine - 1;
+					if (line < 0)
 					{
-						line = 1;
+						line = 0;
 					}
 
 					ctx.PrintLine(line);
@@ -105,20 +107,22 @@ void IndentElement::Serialize(FormatContext& ctx)
 
 				if (index == _children.size() - 1)
 				{
-					secondElementLine = ctx.GetLine(GetTextRange().EndOffset);
+					// secondElementLine = ctx.GetLine(GetTextRange().EndOffset);
+					// 如果是最后一个元素了就不往下打印空行了
+					break;
 				}
 				else
 				{
 					secondElementLine = ctx.GetLine(_children[index + 1]->GetTextRange().StartOffset);
 				}
 
-				int line = secondElementLine - firstElementLine;
+				int line = secondElementLine - firstElementLine - 1;
 				if (line <= minLine)
 				{
 					line = minLine;
 				}
 
-				ctx.PrintLine(minLine);
+				ctx.PrintLine(line);
 				break;
 			}
 		default:

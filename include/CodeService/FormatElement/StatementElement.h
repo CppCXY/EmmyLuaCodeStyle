@@ -9,6 +9,7 @@ class StatementElement : public ExpressionElement
 public:
 	FormatElementType GetType() override;
 
+	void Serialize(FormatContext& ctx) override;
 private:
 	std::vector<std::shared_ptr<FormatElement>> _children;
 	

@@ -7,7 +7,19 @@ int main()
 {
 	std::string source = R"(#! fuck
 local t,b =123 
-	,fffff 
+	,fffff
+
+do call(123) end
+
+
+
+
+for i =1,2,3 do
+	if ff ==123 then
+		hi(123)
+	end
+	end
+
 )";
 	std::cout << "т╜нд:\n" << source;
 	auto parser = LuaParser::LoadFromBuffer(std::move(source));

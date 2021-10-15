@@ -899,6 +899,9 @@ LuaAttribute LuaParser::getLocalAttribute(std::shared_ptr<LuaAstNode> nameDefLis
 	{
 		auto attributeName = checkName(attribute);
 		checkAndNext('>', attribute, LuaAstNodeType::GeneralOperator);
+
+		nameDefList->AddChild(attribute);
+
 		if (attributeName == "const")
 		{
 			return LuaAttribute::Const;

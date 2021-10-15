@@ -15,6 +15,8 @@ public:
 
 	void KeepBlank(int blank);
 
+	void AddLine();
+
 	void Serialize(FormatContext& ctx) override;
 
 private:
