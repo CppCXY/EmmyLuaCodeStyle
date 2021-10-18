@@ -4,11 +4,13 @@ enum class FormatElementType
 {
 	Normal,
 	IndentElement,
-	KeepLineElement,
-	MinLineElement,
 	StatementElement,
 	TextElement,
-	KeepBlankElement,
 	ExpressionElement,
+
+	ControlStart,
+	KeepLineElement,
+	MinLineElement,
+	KeepBlankElement,
 	LineElement,
 };

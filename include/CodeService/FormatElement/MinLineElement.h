@@ -5,9 +5,12 @@
 class MinLineElement : public FormatElement
 {
 public:
-	MinLineElement(TextRange range, int line);
+	MinLineElement(int line);
 
 	FormatElementType GetType() override;
 
-	int Line;
+	void Serialize(FormatContext& ctx, int position, FormatElement* parent) override;
+
+private:
+	int _line;
 };

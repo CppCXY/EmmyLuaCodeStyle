@@ -5,9 +5,13 @@
 class KeepLineElement : public FormatElement
 {
 public:
-	KeepLineElement(TextRange range , int line = -1);
+	explicit KeepLineElement(int line = -1);
 
 	FormatElementType GetType() override;
 
-	int Line;
+	void Serialize(FormatContext& ctx, int position, FormatElement* parent) override;
+private:
+	int getLastValidLine(FormatContext& ctx, int position, FormatElement* parent);
+	int getNextValidLine(FormatContext& ctx, int position, FormatElement* parent);
+	int _line;
 };

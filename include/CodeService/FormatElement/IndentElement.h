@@ -9,16 +9,6 @@ public:
 
 	FormatElementType GetType() override;
 
-	void AddChild(std::shared_ptr<FormatElement> child) override;
+	void Serialize(FormatContext& ctx, int position, FormatElement* parent) override;
 
-	void AddChild(std::shared_ptr<LuaAstNode> node) override;
-
-	void KeepLine(int line = -1);
-
-	void MinLine(int line);
-
-	void Serialize(FormatContext& ctx) override;
-
-private:
-	std::vector<std::shared_ptr<FormatElement>> _children;
 };

@@ -1,8 +1,13 @@
 #include "CodeService/FormatElement/TextElement.h"
 
 TextElement::TextElement(std::string_view text, TextRange range)
-	: Text(text),
+	: _text(text),
 	  FormatElement(range)
+{
+}
+
+TextElement::TextElement(std::shared_ptr<LuaAstNode> node)
+	: TextElement(node->GetText(), node->GetTextRange())
 {
 }
 
@@ -11,7 +16,7 @@ FormatElementType TextElement::GetType()
 	return FormatElementType::TextElement;
 }
 
-void TextElement::Serialize(FormatContext& ctx)
+void TextElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
 {
-	ctx.Print(Text);
+	ctx.Print(_text);
 }

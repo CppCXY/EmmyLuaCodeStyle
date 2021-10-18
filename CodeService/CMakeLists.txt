@@ -22,8 +22,8 @@ target_sources(CodeService
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/FormatElementType.h	
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/StatementElement.h	
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/KeepBlankElement.h	
-	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/ExpressionElement.h
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/LineElement.h
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/ExpressionElement.h
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/FormatContext.h
 	PRIVATE
 	${CodeService_SOURCE_DIR}/src/CodeService.cpp	
@@ -35,10 +35,11 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/StatementElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/TextElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/KeepBlankElement.cpp	
-	${CodeService_SOURCE_DIR}/src/FormatElement/ExpressionElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/FormatElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/LineElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/ExpressionElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/FormatContext.cpp	
+
 )
 
 target_link_libraries(CodeService LuaParser)

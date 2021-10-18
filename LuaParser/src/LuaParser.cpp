@@ -354,6 +354,8 @@ void LuaParser::localStatement(std::shared_ptr<LuaAstNode> blockNode)
 	{
 		expressionList(localStatement);
 	}
+	// 如果有一个分号则加入到localstatement
+	testNext(';', localStatement, LuaAstNodeType::GeneralOperator);
 
 	blockNode->AddChild(localStatement);
 }
@@ -425,6 +427,9 @@ void LuaParser::expressionStatement(std::shared_ptr<LuaAstNode> blockNode)
 	{
 		blockNode->AddChild(expressionStatement);
 	}
+
+	// 如果发现一个分号，会认为分号为该语句的结尾
+	testNext(';', expressionStatement, LuaAstNodeType::GeneralOperator);
 }
 
 /*
@@ -478,7 +483,8 @@ void LuaParser::block(std::shared_ptr<LuaAstNode> parent)
 	parent->AddChild(blockNode);
 }
 
-void LuaParser::checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType)
+void LuaParser::checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent,
+                           LuaAstNodeType addType)
 {
 	if (!testNext(what, parent, addType))
 	{
@@ -641,7 +647,7 @@ void LuaParser::tableConstructor(std::shared_ptr<LuaAstNode> expressionNode)
 		}
 		field(tableExpression);
 	}
-	while (testNext(',', tableExpression, LuaAstNodeType::TableFieldSep) 
+	while (testNext(',', tableExpression, LuaAstNodeType::TableFieldSep)
 		|| testNext(';', tableExpression, LuaAstNodeType::TableFieldSep));
 
 	checkMatch('}', '{', tableExpression);

@@ -1,18 +1,20 @@
 #pragma once
 
 #include "FormatElement.h"
+#include "LuaParser/LuaAstNode.h"
 
 class TextElement : public FormatElement
 {
 public:
-	TextElement(std::string_view text, TextRange range);
+	explicit TextElement(std::string_view text, TextRange range = TextRange());
+
+	explicit TextElement(std::shared_ptr<LuaAstNode> node);
 
 	FormatElementType GetType() override;
 
-	// TextRange
+	void Serialize(FormatContext& ctx, int position,FormatElement* parent) override;
 
-	void Serialize(FormatContext& ctx) override;
-
-	std::string_view Text;
+private:
+	std::string_view _text;
 };
  

@@ -5,7 +5,9 @@
 class LineElement : public FormatElement
 {
 public:
-	LineElement(TextRange range);
+	LineElement();
 
 	FormatElementType GetType() override;
+
+	void Serialize(FormatContext& ctx, int position, FormatElement* parent) override;
 };

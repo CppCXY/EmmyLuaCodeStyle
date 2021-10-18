@@ -1,12 +1,13 @@
 #include "CodeService/LuaFormatter.h"
-
-#include <iostream>
-
 #include "CodeService/FormatElement/IndentElement.h"
 #include "CodeService/FormatElement/StatementElement.h"
 #include "CodeService/FormatElement/TextElement.h"
-#include "CodeService/FormatElement/ExpressionElement.h"
 #include "CodeService/FormatElement/FormatContext.h"
+#include "CodeService/FormatElement/KeepLineElement.h"
+#include "CodeService/FormatElement/MinLineElement.h"
+#include "CodeService/FormatElement/KeepBlankElement.h"
+#include "CodeService/FormatElement/ExpressionElement.h"
+#include "CodeService/FormatElement/LineElement.h"
 
 bool nextMatch(int currentIndex, LuaAstNodeType type, std::vector<std::shared_ptr<LuaAstNode>>& vec)
 {
@@ -47,7 +48,7 @@ std::string LuaFormatter::GetFormattedText()
 	LuaFormatOptions options;
 	FormatContext ctx(_parser, options);
 
-	_env->Serialize(ctx);
+	_env->Serialize(ctx, 0, nullptr);
 
 	return ctx.GetText();
 }
@@ -145,6 +146,15 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNode(std::shared_ptr<LuaAstNo
 		}
 	case LuaAstNodeType::IfStatement:
 		{
+			return FormatIfStatement(node);
+		}
+	case LuaAstNodeType::ExpressionStatement:
+		{
+			return FormatExpressionStatement(node);
+		}
+	case LuaAstNodeType::Expression:
+		{
+			return 
 		}
 	default:
 		{
@@ -177,7 +187,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				// {
 				auto childEnv = FormatNode(statement);
 				indentEnv->AddChild(childEnv);
-				indentEnv->KeepLine();
+				indentEnv->Add<KeepLineElement>();
 				// }
 				break;
 			}
@@ -189,7 +199,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				auto childEnv = FormatNode(statement);
 				indentEnv->AddChild(childEnv);
 
-				indentEnv->MinLine(1);
+				indentEnv->Add<MinLineElement>(1);
 				break;
 			}
 		case LuaAstNodeType::ShortComment:
@@ -203,7 +213,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				auto childEnv = FormatNode(statement);
 				indentEnv->AddChild(childEnv);
 
-				indentEnv->KeepLine();
+				indentEnv->Add<KeepLineElement>();
 				break;
 			}
 		case LuaAstNodeType::FunctionStatement:
@@ -213,11 +223,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 
 				if (nextMatch(index, LuaAstNodeType::FunctionStatement, statements))
 				{
-					indentEnv->KeepLine(1);
+					indentEnv->Add<KeepLineElement>(1);
 				}
 				else
 				{
-					indentEnv->MinLine(1);
+					indentEnv->Add<MinLineElement>(1);
 				}
 				break;
 			}
@@ -225,7 +235,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 			{
 				auto childEnv = FormatNode(statement);
 				indentEnv->AddChild(childEnv);
-				indentEnv->KeepLine();
+				indentEnv->Add<KeepLineElement>();
 			}
 		}
 	}
@@ -244,14 +254,14 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalStatement(std::shared_pt
 		case LuaAstNodeType::KeyWord:
 		case LuaAstNodeType::GeneralOperator:
 			{
-				env->AddChild(node);
-				env->KeepBlank(1);
+				env->Add<TextElement>(node);
+				env->Add<KeepBlankElement>(1);
 				break;
 			}
 		case LuaAstNodeType::NameDefList:
 			{
 				env->AddChild(FormatNode(node));
-				env->KeepBlank(1);
+				env->Add<KeepBlankElement>(1);
 				break;
 			}
 		case LuaAstNodeType::ExpressionList:
@@ -277,14 +287,14 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignment(std::shared_ptr<Lu
 		{
 		case LuaAstNodeType::GeneralOperator:
 			{
-				env->AddChild(node);
-				env->KeepBlank(1);
+				env->Add<TextElement>(node);
+				env->Add<KeepBlankElement>(1);
 				break;
 			}
 		case LuaAstNodeType::NameDefList:
 			{
 				env->AddChild(FormatNode(node));
-				env->KeepBlank(1);
+				env->Add<KeepBlankElement>(1);
 				break;
 			}
 		case LuaAstNodeType::ExpressionList:
@@ -311,13 +321,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
 		{
 		case LuaAstNodeType::Identify:
 			{
-				env->AddChild(node);
+				env->Add<TextElement>(node);
 				break;
 			}
 		case LuaAstNodeType::GeneralOperator:
 			{
-				env->AddChild(node);
-				env->KeepBlank(1);
+				env->Add<TextElement>(node);
+				env->Add<KeepBlankElement>(1);
 				break;
 			}
 		default:
@@ -339,13 +349,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_pt
 		{
 		case LuaAstNodeType::Expression:
 			{
-				env->AddChild(node);
+				env->Add<TextElement>(node);
 				break;
 			}
 		case LuaAstNodeType::GeneralOperator:
 			{
-				env->AddChild(node);
-				env->KeepBlank(1);
+				env->Add<TextElement>(node);
+				env->Add<KeepBlankElement>(1);
 				break;
 			}
 		default:
@@ -359,7 +369,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_pt
 std::shared_ptr<FormatElement> LuaFormatter::FormatComment(std::shared_ptr<LuaAstNode> comment)
 {
 	auto env = std::make_shared<StatementElement>();
-	env->AddChild(comment);
+	env->Add<TextElement>(comment);
 	return env;
 }
 
@@ -374,7 +384,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBreakStatement(std::shared_pt
 		case LuaAstNodeType::KeyWord:
 		case LuaAstNodeType::GeneralOperator:
 			{
-				env->AddChild(child);
+				env->Add<TextElement>(child);
 				break;
 			}
 		default:
@@ -396,12 +406,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatReturnStatement(std::shared_p
 		case LuaAstNodeType::KeyWord:
 		case LuaAstNodeType::GeneralOperator:
 			{
-				env->AddChild(child);
+				env->Add<TextElement>(child);
 				break;
 			}
 		case LuaAstNodeType::ExpressionList:
 			{
-				env->KeepBlank(1);
+				env->Add<KeepBlankElement>(1);
 				env->AddChild(FormatNode(child));
 				break;
 			}
@@ -425,12 +435,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatGotoStatement(std::shared_ptr
 		case LuaAstNodeType::KeyWord:
 		case LuaAstNodeType::GeneralOperator:
 			{
-				env->AddChild(child);
+				env->Add<TextElement>(child);
 				break;
 			}
 		case LuaAstNodeType::Identify:
 			{
-				env->KeepBlank(1);
+				env->Add<KeepBlankElement>(1);
 				env->AddChild(FormatNode(child));
 				break;
 			}
@@ -453,7 +463,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLabelStatement(std::shared_pt
 		{
 		case LuaAstNodeType::GeneralOperator:
 			{
-				env->AddChild(child);
+				env->Add<TextElement>(child);
 				break;
 			}
 		case LuaAstNodeType::Identify:
@@ -472,17 +482,17 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLabelStatement(std::shared_pt
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatIdentify(std::shared_ptr<LuaAstNode> identify)
 {
-	return std::make_shared<TextElement>(identify->GetText(), identify->GetTextRange());
+	return std::make_shared<TextElement>(identify);
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatGeneralOperator(std::shared_ptr<LuaAstNode> general)
 {
-	return std::make_shared<TextElement>(general->GetText(), general->GetTextRange());
+	return std::make_shared<TextElement>(general);
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatKeyWords(std::shared_ptr<LuaAstNode> keywords)
 {
-	return std::make_shared<TextElement>(keywords->GetText(), keywords->GetTextRange());
+	return std::make_shared<TextElement>(keywords);
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatDoStatement(std::shared_ptr<LuaAstNode> doStatement)
@@ -495,17 +505,17 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatDoStatement(std::shared_ptr<L
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				env->AddChild(child);
+				env->Add<TextElement>(child);
 				if (child->GetText() == "do")
 				{
-					env->AddLine();
+					env->Add<LineElement>();
 				}
 				break;
 			}
 		case LuaAstNodeType::Block:
 			{
 				env->AddChild(FormatBlock(child));
-				env->AddLine();
+				env->Add<KeepLineElement>();
 				break;
 			}
 		default:
@@ -528,10 +538,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatWhileStatement(std::shared_pt
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				env->AddChild(child);
+				env->Add<TextElement>(child);
 				if (child->GetText() == "do")
 				{
-					env->AddLine();
+					env->Add<LineElement>();
 				}
 				break;
 			}
@@ -539,13 +549,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatWhileStatement(std::shared_pt
 			{
 				auto expression = FormatNode(child);
 				env->AddChild(expression);
-				env->KeepBlank(1);
+				env->Add<KeepBlankElement>(1);
 				break;
 			}
 		case LuaAstNodeType::Block:
 			{
 				env->AddChild(FormatNode(child));
-				env->AddLine();
+				env->Add<KeepLineElement>();
 				break;
 			}
 		default:
@@ -567,8 +577,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatForStatement(std::shared_ptr<
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				env->AddChild(child);
-				env->KeepBlank(1);
+				env->Add<TextElement>(child);
+				env->Add<KeepBlankElement>(1);
 				break;
 			}
 		case LuaAstNodeType::ForNumber:
@@ -580,8 +590,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatForStatement(std::shared_ptr<
 					case LuaAstNodeType::Identify:
 					case LuaAstNodeType::GeneralOperator:
 						{
-							env->AddChild(forNumberChild);
-							env->KeepBlank(1);
+							env->Add<TextElement>(forNumberChild);
+							env->Add<KeepBlankElement>(1);
 							break;
 						}
 					case LuaAstNodeType::Expression:
@@ -591,7 +601,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatForStatement(std::shared_ptr<
 						}
 					case LuaAstNodeType::ForBody:
 						{
-							env->KeepBlank(1);
+							env->Add<KeepBlankElement>(1);
 							env->AddChild(FormatNode(forNumberChild));
 							break;
 						}
@@ -615,7 +625,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatForStatement(std::shared_ptr<
 					case LuaAstNodeType::ExpressionList:
 						{
 							env->AddChild(FormatNode(forListChild));
-							env->KeepBlank(1);
+							env->Add<KeepBlankElement>(1);
 							break;
 						}
 					default:
@@ -646,17 +656,17 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatForBody(std::shared_ptr<LuaAs
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				env->AddChild(child);
+				env->Add<TextElement>(child);
 				if (child->GetText() == "do")
 				{
-					env->AddLine();
+					env->Add<LineElement>();
 				}
 				break;
 			}
 		case LuaAstNodeType::Block:
 			{
 				env->AddChild(FormatNode(child));
-				env->AddLine();
+				env->Add<KeepLineElement>();
 				break;
 			}
 		default:
@@ -692,18 +702,109 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRepeatStatement(std::shared_p
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				env->AddChild(child);
+				env->Add<TextElement>(child);
 				if (child->GetText() == "repeat")
 				{
-					env->AddLine();
+					env->Add<LineElement>();
 				}
 				break;
 			}
 		case LuaAstNodeType::Block:
 			{
 				env->AddChild(FormatNode(child));
-				env->AddLine();
+				env->Add<KeepLineElement>();
 				break;
+			}
+		default:
+			{
+				DefaultHandle(child, env);
+				break;
+			}
+		}
+	}
+
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<LuaAstNode> ifStatement)
+{
+	auto env = std::make_shared<StatementElement>();
+
+	for (auto child : ifStatement->GetChildren())
+	{
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::KeyWord:
+			{
+				env->Add<TextElement>(child);
+				if (child->GetText() == "then" || child->GetText() == "else")
+				{
+					env->Add<LineElement>();
+				}
+				else if (child->GetText() == "if" || child->GetText() == "elseif")
+				{
+					env->Add<KeepBlankElement>(1);
+				}
+				break;
+			}
+		case LuaAstNodeType::Expression:
+			{
+				env->AddChild(FormatNode(child));
+				env->Add<KeepBlankElement>(1);
+				break;
+			}
+		case LuaAstNodeType::Block:
+			{
+				env->AddChild(FormatNode(child));
+				env->Add<KeepLineElement>();
+				break;
+			}
+		default:
+			{
+				DefaultHandle(child, env);
+				break;
+			}
+		}
+	}
+
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shared_ptr<LuaAstNode> expressionStatement)
+{
+	auto env = std::make_shared<StatementElement>();
+
+	for (auto child : expressionStatement->GetChildren())
+	{
+		switch (child->GetType())
+		{
+			// 目前lua只有调用表达式
+		case LuaAstNodeType::CallExpression:
+			{
+				env->AddChild(FormatNode(child));
+				break;
+			}
+			// default 一般只有一个分号
+		default:
+			{
+				DefaultHandle(child, env);
+			}
+		}
+	}
+
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<LuaAstNode> expression)
+{
+	auto env = std::make_shared<ExpressionElement>();
+
+	for (auto child : expression->GetChildren())
+	{
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::BinaryExpression:
+			{
 			}
 		default:
 			{

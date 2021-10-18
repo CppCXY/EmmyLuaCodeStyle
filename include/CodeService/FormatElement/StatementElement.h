@@ -2,15 +2,14 @@
 
 #include <vector>
 #include "FormatElement.h"
-#include "ExpressionElement.h"
 
-class StatementElement : public ExpressionElement
+class StatementElement : public FormatElement
 {
 public:
 	FormatElementType GetType() override;
 
-	void Serialize(FormatContext& ctx) override;
+	void Serialize(FormatContext& ctx, int position, FormatElement* parent) override;
+
 private:
 	std::vector<std::shared_ptr<FormatElement>> _children;
-	
 };

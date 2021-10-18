@@ -7,21 +7,35 @@
 class FormatElement
 {
 public:
-	explicit  FormatElement(TextRange range);
+	explicit FormatElement(TextRange range = TextRange());
 	virtual ~FormatElement();
 
 	virtual FormatElementType GetType() = 0;
+	/*
+	 * 智能指针在多态方面支持不够方便
+	 */
+	virtual void Serialize(FormatContext& ctx, int position, FormatElement* parent);
 
-	virtual TextRange GetTextRange();
+	void Format(FormatContext& ctx);
 
-	virtual void AddChild(std::shared_ptr<LuaAstNode> node);
+	TextRange GetTextRange();
 
-	virtual void AddChild(std::shared_ptr<FormatElement> child);
+	void AddChild(std::shared_ptr<FormatElement> child);
 
-	virtual void Serialize(FormatContext& ctx);
+	std::vector<std::shared_ptr<FormatElement>>& GetChildren();
+
+	bool HasValidTextRange() const;
+
+	template <class T, class ... ARGS>
+	void Add(ARGS ...args)
+	{
+		AddChild(std::make_shared<T>(std::forward<ARGS>(args)...));
+	}
 
 protected:
 	void AddTextRange(TextRange range);
 
 	TextRange _textRange;
+
+	std::vector<std::shared_ptr<FormatElement>> _children;
 };

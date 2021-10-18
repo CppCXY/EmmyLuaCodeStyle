@@ -6,9 +6,11 @@
 class KeepBlankElement : public FormatElement
 {
 public:
-	KeepBlankElement(TextRange range, int blank);
+	KeepBlankElement(int blank);
 
 	FormatElementType GetType() override;
 
-	int Blank;
+	void Serialize(FormatContext& ctx, int position, FormatElement* parent) override;
+private:
+	int _blank;
 };
