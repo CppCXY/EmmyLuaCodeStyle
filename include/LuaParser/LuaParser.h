@@ -104,9 +104,10 @@ private:
 
 	void suffixedExpression(std::shared_ptr<LuaAstNode> expressionNode);
 
-	void functionCallArgs(std::shared_ptr<LuaAstNode> expressionNode);
+	void functionCallArgs(std::shared_ptr<LuaAstNode>& expressionNode);
 
-	void fieldSel(std::shared_ptr<LuaAstNode> expressionNode);
+	// 该函数会改变入参
+	void fieldSel(std::shared_ptr<LuaAstNode>& expressionNode);
 
 	void yIndex(std::shared_ptr<LuaAstNode> expressionNode);
 

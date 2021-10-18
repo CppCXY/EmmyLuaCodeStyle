@@ -67,6 +67,12 @@ protected:
 
 	std::shared_ptr<FormatElement> FormatExpression(std::shared_ptr<LuaAstNode> expression);
 
+	std::shared_ptr<FormatElement> FormatBinaryExpression(std::shared_ptr<LuaAstNode> binaryExpression);
+
+	std::shared_ptr<FormatElement> FormatUnaryExpression(std::shared_ptr<LuaAstNode> unaryExpression);
+
+	std::shared_ptr<FormatElement> FormatCallExpression(std::shared_ptr<LuaAstNode> callExpression);
+
 	void DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_ptr<FormatElement> envElement);
 private:
 
@@ -76,6 +82,11 @@ private:
 	std::vector<LuaCodeDiagnosis> _diagnosis;
 	std::shared_ptr<FormatElement> _env;
 };
+
+
+
+
+
 
 
 

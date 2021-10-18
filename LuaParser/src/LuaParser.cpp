@@ -784,7 +784,10 @@ void LuaParser::suffixedExpression(std::shared_ptr<LuaAstNode> expressionNode)
 			}
 		case '[':
 			{
-				yIndex(subExpression);
+				auto indexExpr = createAstNode(LuaAstNodeType::IndexExpression);
+				indexExpr->AddChild(subExpression);
+				yIndex(indexExpr);
+				subExpression = indexExpr;
 				break;
 			}
 		case ':':
@@ -807,8 +810,15 @@ void LuaParser::suffixedExpression(std::shared_ptr<LuaAstNode> expressionNode)
 	}
 }
 
-void LuaParser::functionCallArgs(std::shared_ptr<LuaAstNode> expressionNode)
+/*
+ * callexpr -> expression callArg
+ */
+void LuaParser::functionCallArgs(std::shared_ptr<LuaAstNode>& expressionNode)
 {
+	auto callExpression = createAstNode(LuaAstNodeType::CallExpression);
+
+	callExpression->AddChild(expressionNode);
+
 	auto callArgsNode = createAstNode(LuaAstNodeType::CallArgList);
 	switch (_tokenParser->Current().TokenType)
 	{
@@ -843,17 +853,25 @@ void LuaParser::functionCallArgs(std::shared_ptr<LuaAstNode> expressionNode)
 		}
 	}
 
-	expressionNode->AddChild(callArgsNode);
+	callExpression->AddChild(callArgsNode);
+
+	expressionNode = callExpression;
 }
 
 /* fieldsel -> ['.' | ':'] NAME */
-void LuaParser::fieldSel(std::shared_ptr<LuaAstNode> expressionNode)
+void LuaParser::fieldSel(std::shared_ptr<LuaAstNode>& expressionNode)
 {
-	auto tokenNode = createAstNodeFromToken(LuaAstNodeType::IndexOperator, _tokenParser->Current());
-	expressionNode->AddChild(tokenNode);
+	auto indexExpression = createAstNode(LuaAstNodeType::IndexExpression);
+
+	indexExpression->AddChild(expressionNode);
+
+	auto tokenNode = createAstNodeFromCurrentToken(LuaAstNodeType::IndexOperator);
+	indexExpression->AddChild(tokenNode);
 
 	_tokenParser->Next();
-	codeName(expressionNode);
+	codeName(indexExpression);
+
+	expressionNode = indexExpression;
 }
 
 /* index -> '[' expr ']' */
