@@ -5,21 +5,35 @@
 
 int main()
 {
-	std::string source = R"(#! fuck
-local t,b =123 
-	,fffff
+	std::string source = R"(
+-- Cache some library functions and objects.
+local jit = require("jit")
+assert(jit.version_num == 20100, "LuaJIT core/library version mismatch")
+local profile = require("jit.profile")
+local vmdef = require("jit.vmdef")
+local math = math
+local pairs, ipairs, tonumber, floor = pairs, ipairs, tonumber, math.floor
+local sort, format = table.sort, string.format
+local stdout = io.stdout
+local zone  -- Load jit.zone module on demand.
 
-do call(123) end
+-- Output file handle.
+local out 
 
+------------------------------------------------------------------------------
 
+local prof_ud 
+local prof_states, prof_split, prof_min, prof_raw, prof_fmt, prof_depth 
+local prof_ann, prof_count1, prof_count2, prof_samples 
 
+local map_vmmode = {
+    N = "Compiled",
+    I = "Interpreted",
+    C = "C code",
+    G = "Garbage Collector",
+    J = "JIT Compiler",
+}
 
-for i =1,2,3 do
-
-	if ff ==123+456 and   ff then
-		hi(123)
-	end
-	end
 )";
 	std::cout << "т╜нд:\n" << source;
 	auto parser = LuaParser::LoadFromBuffer(std::move(source));
@@ -41,7 +55,7 @@ for i =1,2,3 do
 	// 	std::cout << format("comment is \n{}\n", comment.Text);
 	// }
 
-	// auto ast = parser->GetAst();
+	auto ast = parser->GetAst();
 	LuaFormatOptions options;
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();

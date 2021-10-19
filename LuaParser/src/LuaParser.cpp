@@ -411,25 +411,31 @@ void LuaParser::gotoStatement(std::shared_ptr<LuaAstNode> blockNode)
 }
 
 /* stat -> func | assignment */
+/*
+ * 以上是lua定义
+ * 以下是修改定义
+ * exprstat -> func
+ * assignment -> exprList '=' exprList
+ */
 void LuaParser::expressionStatement(std::shared_ptr<LuaAstNode> blockNode)
 {
 	auto expressionStatement = createAstNode(LuaAstNodeType::ExpressionStatement);
 	suffixedExpression(expressionStatement);
 	if (_tokenParser->Current().TokenType == '=' || _tokenParser->Current().TokenType == ',')
 	{
-		expressionStatement->SetType(LuaAstNodeType::AssignStatement);
-		//赋值表达式
-		assignStatement(expressionStatement);
+		expressionStatement->SetType(LuaAstNodeType::ExpressionList);
 
-		blockNode->AddChild(expressionStatement);
-	}
-	else // call expression
-	{
-		blockNode->AddChild(expressionStatement);
+		auto assignStatementNode = createAstNode(LuaAstNodeType::AssignStatement);
+
+		assignStatement(expressionStatement, assignStatementNode);
+
+		expressionStatement = assignStatementNode;
 	}
 
 	// 如果发现一个分号，会认为分号为该语句的结尾
 	testNext(';', expressionStatement, LuaAstNodeType::GeneralOperator);
+
+	blockNode->AddChild(expressionStatement);
 }
 
 /*
@@ -439,16 +445,18 @@ void LuaParser::expressionStatement(std::shared_ptr<LuaAstNode> blockNode)
 ** assignment -> suffixedexp restassign
 ** restassign -> ',' suffixedexp restassign | '=' explist
 */
-void LuaParser::assignStatement(std::shared_ptr<LuaAstNode> assignStatementNode)
+void LuaParser::assignStatement(std::shared_ptr<LuaAstNode> expressionListNode,
+                                std::shared_ptr<LuaAstNode> assignStatementNode)
 {
-	if (testNext(',', assignStatementNode, LuaAstNodeType::GeneralOperator))
+	if (testNext(',', expressionListNode, LuaAstNodeType::GeneralOperator))
 	{
-		suffixedExpression(assignStatementNode);
+		suffixedExpression(expressionListNode);
 
-		assignStatement(assignStatementNode);
+		assignStatement(expressionListNode, assignStatementNode);
 	}
 	else
 	{
+		assignStatementNode->AddChild(expressionListNode);
 		checkAndNext('=', assignStatementNode, LuaAstNodeType::GeneralOperator);
 		expressionList(assignStatementNode);
 	}
@@ -650,7 +658,7 @@ void LuaParser::tableConstructor(std::shared_ptr<LuaAstNode> expressionNode)
 	while (testNext(',', tableExpression, LuaAstNodeType::TableFieldSep)
 		|| testNext(';', tableExpression, LuaAstNodeType::TableFieldSep));
 
-	checkMatch('}', '{', tableExpression);
+	checkMatch('}', '{', tableExpression, LuaAstNodeType::GeneralOperator);
 
 	expressionNode->AddChild(tableExpression);
 }
@@ -766,11 +774,18 @@ void LuaParser::paramList(std::shared_ptr<LuaAstNode> functionBodyNode)
 	functionBodyNode->AddChild(paramList);
 }
 
+
 /* suffixedexp ->
 	 primaryexp { '.' NAME | '[' exp ']' | ':' NAME funcargs | funcargs } */
+/* 以上是lua原始定义
+ * 下面是修改定义
+ * suffixedexp -> indexexpr | callexpr | primaryexp
+ * indexexpr -> primaryexp { '.' NAME | '[' exp ']' | ':' NAME  }
+ * callexpr -> primaryexp funcargs | indexexpr funcargs
+ */
 void LuaParser::suffixedExpression(std::shared_ptr<LuaAstNode> expressionNode)
 {
-	auto subExpression = createAstNode(LuaAstNodeType::Expression);
+	auto subExpression = createAstNode(LuaAstNodeType::PrimaryExpression);
 
 	primaryExpression(subExpression);
 	for (;;)
@@ -810,9 +825,6 @@ void LuaParser::suffixedExpression(std::shared_ptr<LuaAstNode> expressionNode)
 	}
 }
 
-/*
- * callexpr -> expression callArg
- */
 void LuaParser::functionCallArgs(std::shared_ptr<LuaAstNode>& expressionNode)
 {
 	auto callExpression = createAstNode(LuaAstNodeType::CallExpression);
@@ -885,20 +897,24 @@ void LuaParser::yIndex(std::shared_ptr<LuaAstNode> expressionNode)
 
 void LuaParser::functionName(std::shared_ptr<LuaAstNode> functionNode)
 {
-	auto nameExpression = createAstNode(LuaAstNodeType::NameExpression);
+	auto expression = createAstNode(LuaAstNodeType::PrimaryExpression);
 
-	checkName(nameExpression);
+	checkName(expression);
 
 	while (_tokenParser->Current().TokenType == '.')
 	{
-		fieldSel(nameExpression);
+		fieldSel(expression);
 	}
 	if (_tokenParser->Current().TokenType == ':')
 	{
-		fieldSel(nameExpression);
+		fieldSel(expression);
 	}
 
-	functionNode->AddChild(nameExpression);
+	auto nameExpr = createAstNode(LuaAstNodeType::NameExpression);
+
+	nameExpr->AddChild(expression);
+
+	functionNode->AddChild(nameExpr);
 }
 
 std::string_view LuaParser::checkName(std::shared_ptr<LuaAstNode> parent)
@@ -951,27 +967,27 @@ void LuaParser::check(LuaTokenType c)
 
 
 /* primaryexp -> NAME | '(' expr ')' */
-void LuaParser::primaryExpression(std::shared_ptr<LuaAstNode> expressionNode)
+void LuaParser::primaryExpression(std::shared_ptr<LuaAstNode> primaryExpression)
 {
 	switch (_tokenParser->Current().TokenType)
 	{
 	case '(':
 		{
-			auto leftBreaketToken = createAstNodeFromCurrentToken(LuaAstNodeType::KeyWord);
-			expressionNode->AddChild(leftBreaketToken);
+			auto leftBreaketToken = createAstNodeFromCurrentToken(LuaAstNodeType::GeneralOperator);
+			primaryExpression->AddChild(leftBreaketToken);
 			_tokenParser->Next();
 
-			expression(expressionNode);
-			checkMatch(')', '(', expressionNode);
+			expression(primaryExpression);
+			checkMatch(')', '(', primaryExpression);
 			return;
 		}
 	case TK_NAME:
 		{
-			codeName(expressionNode);
+			codeName(primaryExpression);
 			return;
 		}
 	default:
-		luaError("unexpected symbol", expressionNode);
+		luaError("unexpected symbol", primaryExpression);
 	}
 }
 

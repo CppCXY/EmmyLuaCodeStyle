@@ -41,7 +41,7 @@ enum class LuaAstNodeType
 	AssignStatement,
 
 	Expression,
-	SuffixedExpression,
+	PrimaryExpression,
 	LiteralExpression,
 	ClosureExpression,
 	UnaryExpression,

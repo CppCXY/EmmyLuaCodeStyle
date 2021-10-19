@@ -32,7 +32,6 @@ public:
 	int GetColumn(int offset) { return _tokenParser->GetColumn(offset); }
 
 private:
-
 	bool blockFollow(bool withUntil = false);
 
 	void statementList(std::shared_ptr<LuaAstNode> blockNode);
@@ -65,8 +64,7 @@ private:
 
 	void expressionStatement(std::shared_ptr<LuaAstNode> blockNode);
 
-	// 赋值语句由表达式语句转换而来
-	void assignStatement(std::shared_ptr<LuaAstNode> assignStatementNode);
+	void assignStatement(std::shared_ptr<LuaAstNode> expressionListNode, std::shared_ptr<LuaAstNode> assignStatementNode);
 
 	void forNumber(std::shared_ptr<LuaAstNode> forStatement);
 
@@ -80,7 +78,8 @@ private:
 
 	void block(std::shared_ptr<LuaAstNode> parent);
 
-	void checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType = LuaAstNodeType::KeyWord);
+	void checkMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent,
+	                LuaAstNodeType addType = LuaAstNodeType::KeyWord);
 
 	void expressionList(std::shared_ptr<LuaAstNode> parent);
 
@@ -130,7 +129,8 @@ private:
 	 * 如果是就跳过当前,
 	 * 否则会抛出异常
 	 */
-	void checkAndNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType = LuaAstNodeType::KeyWord);
+	void checkAndNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent,
+	                  LuaAstNodeType addType = LuaAstNodeType::KeyWord);
 
 	/*
 	 * 他是检查当前token的type是否与c相同
@@ -157,7 +157,3 @@ private:
 
 	std::vector<LuaError> _errors;
 };
-
-
-
-

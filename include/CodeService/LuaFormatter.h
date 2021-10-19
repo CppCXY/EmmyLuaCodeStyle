@@ -73,6 +73,28 @@ protected:
 
 	std::shared_ptr<FormatElement> FormatCallExpression(std::shared_ptr<LuaAstNode> callExpression);
 
+	std::shared_ptr<FormatElement> FormatCallArgList(std::shared_ptr<LuaAstNode> callArgList);
+
+	std::shared_ptr<FormatElement> FormatPrimaryExpression(std::shared_ptr<LuaAstNode> primaryExpression);
+
+	std::shared_ptr<FormatElement> FormatFunctionStatement(std::shared_ptr<LuaAstNode> functionStatement);
+
+	std::shared_ptr<FormatElement> FormatNameExpression(std::shared_ptr<LuaAstNode> nameExpression);
+
+	std::shared_ptr<FormatElement> FormatFunctionBody(std::shared_ptr<LuaAstNode> functionBody);
+
+	std::shared_ptr<FormatElement> FormatParamList(std::shared_ptr<LuaAstNode> paramList);
+
+	std::shared_ptr<FormatElement> FormatLocalFunctionStatement(std::shared_ptr<LuaAstNode> localFunctionStatement);
+
+	std::shared_ptr<FormatElement> FormatClosureExpression(std::shared_ptr<LuaAstNode> closureExpression);
+
+	std::shared_ptr<FormatElement> FormatTableExpression(std::shared_ptr<LuaAstNode> tableExpression);
+
+	std::shared_ptr<FormatElement> FormatTableField(std::shared_ptr<LuaAstNode> tableField);
+
+	std::shared_ptr<FormatElement> FormatIndexExpression(std::shared_ptr<LuaAstNode> indexExpression);
+
 	void DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_ptr<FormatElement> envElement);
 private:
 
@@ -82,6 +104,10 @@ private:
 	std::vector<LuaCodeDiagnosis> _diagnosis;
 	std::shared_ptr<FormatElement> _env;
 };
+
+
+
+
 
 
 
