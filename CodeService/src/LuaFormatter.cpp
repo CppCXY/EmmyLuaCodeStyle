@@ -1316,10 +1316,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIn
 				LuaAstNodeType::AssignStatement) && nextChild->GetType() == LuaAstNodeType::Comment
 			&& nextLine == currentLine)
 		{
-			auto& lastStatementEnv = env->GetChildren().back();
-
-			lastStatementEnv->Add<KeepBlankElement>(1);
-			lastStatementEnv->Add<TextElement>(nextChild);
+			auto lastStatementEnv = env->LastValidElement();
+			if (lastStatementEnv) {
+				lastStatementEnv->Add<KeepBlankElement>(1);
+				lastStatementEnv->Add<TextElement>(nextChild);
+			}
+			//else 应该不存在这种情况
 		}
 		else
 		{

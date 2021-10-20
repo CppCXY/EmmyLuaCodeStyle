@@ -48,7 +48,7 @@ int KeepLineElement::getLastValidLine(FormatContext& ctx, int position, FormatEl
 int KeepLineElement::getNextValidLine(FormatContext& ctx, int position, FormatElement* parent)
 {
 	auto& siblings = parent->GetChildren();
-	for (int index = position + 1; index < siblings.size(); index--)
+	for (std::size_t index = position + 1; index < siblings.size(); index++)
 	{
 		if (siblings[index]->HasValidTextRange())
 		{

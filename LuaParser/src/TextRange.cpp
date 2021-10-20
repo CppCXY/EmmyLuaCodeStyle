@@ -1,8 +1,8 @@
 #include "LuaParser/TextRange.h"
 
-TextRange::TextRange(int startOffset, int endOffset)
-	: StartOffset(startOffset),
-	  EndOffset(endOffset)
+TextRange::TextRange(std::size_t startOffset, std::size_t endOffset)
+	: StartOffset(static_cast<int>(startOffset)),
+	EndOffset(static_cast<int>(endOffset))
 {
 }
 

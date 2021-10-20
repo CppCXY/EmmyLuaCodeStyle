@@ -72,7 +72,7 @@ int FormatContext::GetColumn(int offset)
 	return _parser->GetColumn(offset);
 }
 
-int FormatContext::GetCharacterCount() const
+std::size_t FormatContext::GetCharacterCount() const
 {
 	return _characterCount;
 }

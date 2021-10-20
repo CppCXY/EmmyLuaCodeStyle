@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cstdlib>
+
 class TextRange
 {
 public:
-	explicit TextRange(int startOffset = 0, int endOffset = 0);
+	explicit TextRange(std::size_t startOffset = 0, std::size_t endOffset = 0);
 
 	bool Contain(TextRange& range);
 

@@ -17,7 +17,8 @@ TextRange FormatElement::GetTextRange()
 
 void FormatElement::AddChild(std::shared_ptr<FormatElement> child)
 {
-	if (static_cast<int>(child->GetType()) < static_cast<int>(FormatElementType::ControlStart)) {
+	if (static_cast<int>(child->GetType()) < static_cast<int>(FormatElementType::ControlStart))
+	{
 		const auto range = child->GetTextRange();
 		AddTextRange(range);
 	}
@@ -32,6 +33,19 @@ std::vector<std::shared_ptr<FormatElement>>& FormatElement::GetChildren()
 bool FormatElement::HasValidTextRange() const
 {
 	return !(_textRange.StartOffset == 0 && _textRange.EndOffset == 0);
+}
+
+std::shared_ptr<FormatElement> FormatElement::LastValidElement() const
+{
+	for (auto it = _children.rbegin(); it != _children.rend(); it++)
+	{
+		if (static_cast<int>((*it)->GetType()) < static_cast<int>(FormatElementType::ControlStart))
+		{
+			return *it;
+		}
+	}
+
+	return nullptr;
 }
 
 void FormatElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)

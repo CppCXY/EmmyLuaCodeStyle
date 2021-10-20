@@ -602,6 +602,7 @@ void LuaTokenParser::readLongString(std::size_t sep)
 					saveAndNext();
 					return;
 				}
+				break;
 			}
 		case '\n':
 		case '\r':

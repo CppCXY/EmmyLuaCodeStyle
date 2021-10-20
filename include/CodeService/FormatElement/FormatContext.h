@@ -32,7 +32,7 @@ public:
 
 	int GetColumn(int offset);
 
-	int GetCharacterCount() const;
+	std::size_t GetCharacterCount() const;
 
 	std::string GetText();
 
@@ -42,6 +42,6 @@ private:
 	std::stringstream _os;
 	LuaFormatOptions _options;
 
-	int _characterCount;
+	std::size_t _characterCount;
 	std::shared_ptr<LuaParser> _parser;
 };

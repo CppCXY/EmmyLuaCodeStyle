@@ -26,6 +26,8 @@ public:
 
 	bool HasValidTextRange() const;
 
+	std::shared_ptr<FormatElement> LastValidElement() const;
+
 	template <class T, class ... ARGS>
 	void Add(ARGS ...args)
 	{

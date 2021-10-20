@@ -92,6 +92,7 @@ void LuaAstNode::AddLeafChild(std::shared_ptr<LuaAstNode> child)
 		return AddChild(child);
 	}
 
+	// 因为std::size_t 没法低于0
 	for (int index = _children.size() - 1; index >= 0; index--)
 	{
 		auto& currentChild = _children[index];
