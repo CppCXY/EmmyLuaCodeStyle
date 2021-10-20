@@ -14,6 +14,7 @@ public:
 
 	void Serialize(FormatContext& ctx, int position,FormatElement* parent) override;
 
+	std::string_view GetText() const;
 private:
 	std::string_view _text;
 };

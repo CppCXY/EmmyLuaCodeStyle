@@ -76,19 +76,19 @@ void LuaParser::BuildAstWithComment()
 	{
 		for (auto& comment : comments)
 		{
-			std::shared_ptr<LuaAstNode> commentAst = nullptr;
+			std::shared_ptr<LuaAstNode> commentAst = createAstNode(LuaAstNodeType::Comment);
 
 			if (comment.TokenType == TK_SHORT_COMMENT)
 			{
-				commentAst = createAstNodeFromToken(LuaAstNodeType::ShortComment, comment);
+				commentAst->AddChild(createAstNodeFromToken(LuaAstNodeType::ShortComment, comment));
 			}
 			else if (comment.TokenType == TK_LONG_COMMENT)
 			{
-				commentAst = createAstNodeFromToken(LuaAstNodeType::LongComment, comment);
+				commentAst->AddChild(createAstNodeFromToken(LuaAstNodeType::LongComment, comment));
 			}
 			else
 			{
-				commentAst = createAstNodeFromToken(LuaAstNodeType::ShebangComment, comment);
+				commentAst->AddChild(createAstNodeFromToken(LuaAstNodeType::ShebangComment, comment));
 			}
 
 			blockNode->AddLeafChild(commentAst);

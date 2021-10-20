@@ -7,10 +7,12 @@ enum class FormatElementType
 	StatementElement,
 	TextElement,
 	ExpressionElement,
+	AlignmentLayoutElement,
 
 	ControlStart,
 	KeepLineElement,
 	MinLineElement,
 	KeepBlankElement,
 	LineElement,
+	AlignmentElement,
 };

@@ -1,13 +1,15 @@
 #pragma once
 
-#include <vector>
 #include "FormatElement.h"
 
-class StatementElement : public FormatElement
+class AlignmentElement : public FormatElement
 {
 public:
+	AlignmentElement(int alignmentPosition);
 	FormatElementType GetType() override;
 
 	void Serialize(FormatContext& ctx, int position, FormatElement* parent) override;
 
+private:
+	int _alignmentPosition;
 };

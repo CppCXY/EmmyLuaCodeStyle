@@ -6,34 +6,11 @@
 int main()
 {
 	std::string source = R"(
--- Cache some library functions and objects.
-local jit = require("jit")
-assert(jit.version_num == 20100, "LuaJIT core/library version mismatch")
-local profile = require("jit.profile")
-local vmdef = require("jit.vmdef")
-local math = math
-local pairs, ipairs, tonumber, floor = pairs, ipairs, tonumber, math.floor
-local sort, format = table.sort, string.format
-local stdout = io.stdout
-local zone  -- Load jit.zone module on demand.
-
--- Output file handle.
-local out 
-
-------------------------------------------------------------------------------
-
-local prof_ud 
-local prof_states, prof_split, prof_min, prof_raw, prof_fmt, prof_depth 
-local prof_ann, prof_count1, prof_count2, prof_samples 
-
-local map_vmmode = {
-    N = "Compiled",
-    I = "Interpreted",
-    C = "C code",
-    G = "Garbage Collector",
-    J = "JIT Compiler",
-}
-
+local aa       = 123 --jgoiwjgw
+local dd  = 445   --0swgfwkgwp
+	--fuck me
+aa = 890  --12313
+local c<cccc> =123
 )";
 	std::cout << "т╜нд:\n" << source;
 	auto parser = LuaParser::LoadFromBuffer(std::move(source));

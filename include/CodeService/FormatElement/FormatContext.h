@@ -32,6 +32,8 @@ public:
 
 	int GetColumn(int offset);
 
+	int GetCharacterCount() const;
+
 	std::string GetText();
 
 private:

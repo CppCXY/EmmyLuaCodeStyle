@@ -85,6 +85,8 @@ enum class LuaAstNodeType
 
 	Error,
 
+	Comment,
+
 	ShortComment,
 
 	LongComment,

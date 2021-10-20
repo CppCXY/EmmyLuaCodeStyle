@@ -55,7 +55,7 @@ LuaTokenParser::LuaTokenParser(std::string&& source)
 
 bool LuaTokenParser::Parse()
 {
-	// bool lastIsShortComment = false;
+
 	while (true)
 	{
 		auto type = llex();
@@ -63,30 +63,6 @@ bool LuaTokenParser::Parse()
 
 		if (!text.empty())
 		{
-			// if (type == TK_SHORT_COMMENT)
-			// {
-			// 	if (lastIsShortComment && !_commentTokens.empty())
-			// 	{
-			// 		auto& lastComment = _commentTokens.back();
-			//
-			// 		auto endLine = GetLine(lastComment.TextRange.EndOffset);
-			// 		auto currentLine = GetLine(_buffStart);
-			//
-			// 		if (currentLine - endLine == 1)
-			// 		{
-			// 			lastIsShortComment = true;
-			// 			lastComment.TextRange.EndOffset = _buffIndex;
-			// 			lastComment.Text = std::string_view(GetSource().data() + lastComment.TextRange.StartOffset,
-			// 			                                    lastComment.TextRange.EndOffset - lastComment.TextRange.
-			// 			                                    StartOffset + 1);
-			// 			lastComment.TokenType = TK_LONG_COMMENT
-			// 			continue;
-			// 		}
-			// 	}
-			// 	lastIsShortComment = true;
-			// 	_commentTokens.emplace_back(type, text, TextRange(_buffStart, _buffIndex));
-			// 	continue;
-			// }
 			if (type == TK_LONG_COMMENT || type == TK_SHEBANG || type == TK_SHORT_COMMENT)
 			{
 				_commentTokens.emplace_back(type, text, TextRange(_buffStart, _buffIndex));
@@ -95,7 +71,6 @@ bool LuaTokenParser::Parse()
 			{
 				_tokens.emplace_back(type, text, TextRange(_buffStart, _buffIndex));
 			}
-			// lastIsShortComment = false;
 		}
 		else
 		{

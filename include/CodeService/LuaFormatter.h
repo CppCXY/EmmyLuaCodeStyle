@@ -96,6 +96,11 @@ protected:
 	std::shared_ptr<FormatElement> FormatIndexExpression(std::shared_ptr<LuaAstNode> indexExpression);
 
 	void DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_ptr<FormatElement> envElement);
+
+	// 以下是特殊格式化规则
+	std::shared_ptr<FormatElement> FormatAlignStatement(int& currentIndex, std::vector<std::shared_ptr<LuaAstNode>>& vec);
+	
+
 private:
 
 	std::shared_ptr<LuaParser> _parser;

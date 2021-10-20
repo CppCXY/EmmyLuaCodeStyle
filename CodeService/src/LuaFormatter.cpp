@@ -8,6 +8,7 @@
 #include "CodeService/FormatElement/KeepBlankElement.h"
 #include "CodeService/FormatElement/ExpressionElement.h"
 #include "CodeService/FormatElement/LineElement.h"
+#include "CodeService/FormatElement/AlignmentLayoutElement.h"
 
 bool nextMatch(int currentIndex, LuaAstNodeType type, std::vector<std::shared_ptr<LuaAstNode>>& vec)
 {
@@ -82,9 +83,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNode(std::shared_ptr<LuaAstNo
 		{
 			return FormatExpressionList(node);
 		}
-	case LuaAstNodeType::LongComment:
-	case LuaAstNodeType::ShortComment:
-	case LuaAstNodeType::ShebangComment:
+	case LuaAstNodeType::Comment:
 		{
 			return FormatComment(node);
 		}
@@ -226,7 +225,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 
 	auto statements = blockNode->GetChildren();
 
-	for (std::size_t index = 0; index != statements.size(); index++)
+	for (int index = 0; index < statements.size(); index++)
 	{
 		auto statement = statements[index];
 		switch (statement->GetType())
@@ -234,18 +233,18 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::AssignStatement:
 		case LuaAstNodeType::LocalStatement:
 			{
-				// if (nextMatch(index, LuaAstNodeType::AssignStatement, statements)
-				// 	|| nextMatch(index, LuaAstNodeType::LocalStatement, statements)
-				// 	|| nextMatch(index, LuaAstNodeType::ShortComment, statements))
-				// {
-				// 	// AttemptAlignment()
-				// }
-				// else
-				// {
-				auto childEnv = FormatNode(statement);
-				indentEnv->AddChild(childEnv);
-				indentEnv->Add<KeepLineElement>();
-				// }
+				if (nextMatch(index, LuaAstNodeType::AssignStatement, statements)
+					|| nextMatch(index, LuaAstNodeType::LocalStatement, statements)
+					|| nextMatch(index, LuaAstNodeType::Comment, statements))
+				{
+					indentEnv->AddChild(FormatAlignStatement(index, statements));
+				}
+				else
+				{
+					auto childEnv = FormatNode(statement);
+					indentEnv->AddChild(childEnv);
+					indentEnv->Add<KeepLineElement>();
+				}
 				break;
 			}
 		case LuaAstNodeType::RepeatStatement:
@@ -259,20 +258,18 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				indentEnv->Add<MinLineElement>(1);
 				break;
 			}
-		case LuaAstNodeType::ShortComment:
-		case LuaAstNodeType::LongComment:
-		case LuaAstNodeType::ShebangComment:
+		case LuaAstNodeType::Comment:
 		case LuaAstNodeType::BreakStatement:
 		case LuaAstNodeType::ReturnStatement:
 		case LuaAstNodeType::GotoStatement:
 		case LuaAstNodeType::ExpressionStatement:
 			{
-				auto childEnv = FormatNode(statement);
-				indentEnv->AddChild(childEnv);
+				indentEnv->AddChild(FormatNode(statement));
 
 				indentEnv->Add<KeepLineElement>();
 				break;
 			}
+		case LuaAstNodeType::LocalFunctionStatement:
 		case LuaAstNodeType::FunctionStatement:
 			{
 				auto childEnv = FormatNode(statement);
@@ -427,6 +424,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatComment(std::shared_ptr<LuaAs
 {
 	auto env = std::make_shared<StatementElement>();
 	env->Add<TextElement>(comment);
+
 	return env;
 }
 
@@ -858,17 +856,17 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<Lu
 
 	for (auto child : expression->GetChildren())
 	{
-		switch (child->GetType())
-		{
-			// case LuaAstNodeType::BinaryExpression:
-			// 	{
-			// 	}
-		default:
-			{
-				DefaultHandle(child, env);
-				break;
-			}
-		}
+		// switch (child->GetType())
+		// {
+		// 	// case LuaAstNodeType::BinaryExpression:
+		// 	// 	{
+		// 	// 	}
+		// default:
+		// 	{
+		DefaultHandle(child, env);
+		// 		break;
+		// 	}
+		// }
 	}
 
 	return env;
@@ -1127,7 +1125,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatClosureExpression(std::shared
 		case LuaAstNodeType::KeyWord:
 			{
 				env->Add<TextElement>(child);
-				env->Add<KeepBlankElement>(1);
 				break;
 			}
 		case LuaAstNodeType::FunctionBody:
@@ -1238,7 +1235,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 		{
 		case LuaAstNodeType::GeneralOperator:
 			{
-				if(child->GetText() == "=")
+				if (child->GetText() == "=")
 				{
 					env->Add<KeepBlankElement>(1);
 					env->Add<TextElement>(child);
@@ -1286,4 +1283,57 @@ void LuaFormatter::DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_p
 {
 	auto childEnv = FormatNode(node);
 	envElement->AddChild(childEnv);
+}
+
+std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIndex,
+                                                                  std::vector<std::shared_ptr<LuaAstNode>>& vec)
+{
+	auto env = std::make_shared<AlignmentLayoutElement>();
+
+	env->AddChild(FormatNode(vec[currentIndex++]));
+	// 这里需要越界判断吗
+	auto currentChild = vec[currentIndex];
+
+	while (currentChild->GetType() == LuaAstNodeType::AssignStatement
+		|| currentChild->GetType() == LuaAstNodeType::LocalStatement
+		|| currentChild->GetType() == LuaAstNodeType::Comment)
+	{
+		auto lastChild = vec[currentIndex - 1];
+		int lastLine = _parser->GetLine(lastChild->GetTextRange().EndOffset);
+		int currentLine = _parser->GetLine(currentChild->GetTextRange().StartOffset);
+		// 这个规则是下一个连续的赋值/local/注释语句如果和上一个赋值/local/注释语句 间距2行以上，则不认为是连续
+		if (currentLine - lastLine > 2)
+		{
+			break;
+		}
+
+		// 检查是否会是内联注释 比如 local t = 123 -- inline comment
+		if ((lastChild->GetType() == LuaAstNodeType::LocalStatement || lastChild->GetType() ==
+				LuaAstNodeType::AssignStatement) && currentChild->GetType() == LuaAstNodeType::Comment
+			&& currentLine == lastLine)
+		{
+			auto& lastStatementEnv = env->GetChildren().back();
+
+			lastStatementEnv->Add<KeepBlankElement>(1);
+			lastStatementEnv->Add<TextElement>(currentChild);
+		}
+		else
+		{
+			env->AddChild(FormatNode(currentChild));
+		}
+
+		if ((++currentIndex) >= vec.size())
+		{
+			break;
+		}
+
+		currentChild = vec[currentIndex];
+	}
+	// 如果不是和下文语句连续，则返回本身
+	if (env->GetChildren().size() == 1)
+	{
+		return env->GetChildren()[0];
+	}
+
+	return env;
 }

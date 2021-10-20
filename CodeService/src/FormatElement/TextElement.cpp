@@ -20,3 +20,8 @@ void TextElement::Serialize(FormatContext& ctx, int position, FormatElement* par
 {
 	ctx.Print(_text);
 }
+
+std::string_view TextElement::GetText() const
+{
+	return _text;
+}
