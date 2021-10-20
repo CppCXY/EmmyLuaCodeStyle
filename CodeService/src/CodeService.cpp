@@ -10,7 +10,13 @@ local aa       = 123 --jgoiwjgw
 local dd  = 445   --0swgfwkgwp
 	--fuck me
 aa = 890  --12313
-local c<cccc> =123
+
+local c<const> =123
+
+
+local cc  =123
+local ddd  = 123
+
 )";
 	std::cout << "т╜нд:\n" << source;
 	auto parser = LuaParser::LoadFromBuffer(std::move(source));

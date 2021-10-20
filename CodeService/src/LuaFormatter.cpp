@@ -243,8 +243,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				{
 					auto childEnv = FormatNode(statement);
 					indentEnv->AddChild(childEnv);
-					indentEnv->Add<KeepLineElement>();
 				}
+				indentEnv->Add<KeepLineElement>();
 				break;
 			}
 		case LuaAstNodeType::RepeatStatement:
@@ -1290,44 +1290,51 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIn
 {
 	auto env = std::make_shared<AlignmentLayoutElement>();
 
-	env->AddChild(FormatNode(vec[currentIndex++]));
-	// 这里需要越界判断吗
-	auto currentChild = vec[currentIndex];
+	env->AddChild(FormatNode(vec[currentIndex]));
 
-	while (currentChild->GetType() == LuaAstNodeType::AssignStatement
-		|| currentChild->GetType() == LuaAstNodeType::LocalStatement
-		|| currentChild->GetType() == LuaAstNodeType::Comment)
+	if (currentIndex + 1 >= vec.size())
 	{
-		auto lastChild = vec[currentIndex - 1];
-		int lastLine = _parser->GetLine(lastChild->GetTextRange().EndOffset);
-		int currentLine = _parser->GetLine(currentChild->GetTextRange().StartOffset);
+		return env->GetChildren()[0];
+	}
+	auto nextChild = vec[currentIndex + 1];
+
+	while (nextChild->GetType() == LuaAstNodeType::AssignStatement
+		|| nextChild->GetType() == LuaAstNodeType::LocalStatement
+		|| nextChild->GetType() == LuaAstNodeType::Comment)
+	{
+		auto currentChild = vec[currentIndex];
+		int currentLine = _parser->GetLine(currentChild->GetTextRange().EndOffset);
+		int nextLine = _parser->GetLine(nextChild->GetTextRange().StartOffset);
 		// 这个规则是下一个连续的赋值/local/注释语句如果和上一个赋值/local/注释语句 间距2行以上，则不认为是连续
-		if (currentLine - lastLine > 2)
+		if (nextLine - currentLine > 2)
 		{
 			break;
 		}
 
 		// 检查是否会是内联注释 比如 local t = 123 -- inline comment
-		if ((lastChild->GetType() == LuaAstNodeType::LocalStatement || lastChild->GetType() ==
-				LuaAstNodeType::AssignStatement) && currentChild->GetType() == LuaAstNodeType::Comment
-			&& currentLine == lastLine)
+		if ((currentChild->GetType() == LuaAstNodeType::LocalStatement || currentChild->GetType() ==
+				LuaAstNodeType::AssignStatement) && nextChild->GetType() == LuaAstNodeType::Comment
+			&& nextLine == currentLine)
 		{
 			auto& lastStatementEnv = env->GetChildren().back();
 
 			lastStatementEnv->Add<KeepBlankElement>(1);
-			lastStatementEnv->Add<TextElement>(currentChild);
+			lastStatementEnv->Add<TextElement>(nextChild);
 		}
 		else
 		{
-			env->AddChild(FormatNode(currentChild));
+			env->AddChild(FormatNode(nextChild));
+			env->Add<KeepLineElement>();
 		}
 
-		if ((++currentIndex) >= vec.size())
+		currentIndex++;
+
+		if ((currentIndex + 1) >= vec.size())
 		{
 			break;
 		}
 
-		currentChild = vec[currentIndex];
+		nextChild = vec[currentIndex + 1];
 	}
 	// 如果不是和下文语句连续，则返回本身
 	if (env->GetChildren().size() == 1)
