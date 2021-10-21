@@ -1,7 +1,8 @@
 #include "CodeService/FormatElement/IndentElement.h"
 
-IndentElement::IndentElement()
-	: FormatElement(TextRange(0,0))
+IndentElement::IndentElement(int specialIndent)
+	: FormatElement(TextRange(0, 0)),
+	  _specialIndent(specialIndent)
 {
 }
 
@@ -12,7 +13,7 @@ FormatElementType IndentElement::GetType()
 
 void IndentElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
 {
-	ctx.AddIndent();
+	ctx.AddIndent(_specialIndent);
 
 	FormatElement::Serialize(ctx, position, parent);
 

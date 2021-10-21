@@ -8,6 +8,8 @@ enum class FormatElementType
 	TextElement,
 	ExpressionElement,
 	AlignmentLayoutElement,
+	KeepLayoutElement,
+	AlignToFirstElement,
 
 	ControlStart,
 	KeepLineElement,
@@ -15,4 +17,5 @@ enum class FormatElementType
 	KeepBlankElement,
 	LineElement,
 	AlignmentElement,
+	AlignToElement,
 };

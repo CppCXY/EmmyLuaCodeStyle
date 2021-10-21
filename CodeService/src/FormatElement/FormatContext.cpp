@@ -5,7 +5,6 @@ FormatContext::FormatContext(std::shared_ptr<LuaParser> parser, LuaFormatOptions
 	  _characterCount(0),
 	  _parser(parser)
 {
-
 }
 
 void FormatContext::Print(std::string_view text)
@@ -37,17 +36,32 @@ void FormatContext::PrintBlank(int blank)
 	}
 }
 
-void FormatContext::AddIndent()
+void FormatContext::AddIndent(int specialIndent)
 {
-	if(_indentStack.empty())
+	int newIndent = 0;
+	if (specialIndent == -1)
 	{
-		_indentStack.push({ 0, "" });
-		return ;
+		if (_indentStack.empty())
+		{
+			_indentStack.push({0, ""});
+			return;
+		}
+
+		auto& topIndent = _indentStack.top();
+		newIndent = _options.Indent + topIndent.Indent;
+
+		std::string indentString;
+		indentString.reserve(_options.IndentString.size() * newIndent);
+		for (int i = 0; i != newIndent; i++)
+		{
+			indentString.append(_options.IndentString);
+		}
+		_indentStack.push({newIndent, std::move(indentString)});
 	}
-
-	auto& topIndent = _indentStack.top();
-	int newIndent = _options.Indent + topIndent.Indent;
-
+	else
+	{
+		newIndent = specialIndent;
+	}
 	std::string indentString;
 	indentString.reserve(_options.IndentString.size() * newIndent);
 	for (int i = 0; i != newIndent; i++)
@@ -75,6 +89,16 @@ int FormatContext::GetColumn(int offset)
 std::size_t FormatContext::GetCharacterCount() const
 {
 	return _characterCount;
+}
+
+std::size_t FormatContext::GetCurrentIndent() const
+{
+	if(_indentStack.empty())
+	{
+		return 0;
+	}
+
+	return _indentStack.top().Indent;
 }
 
 std::string FormatContext::GetText()

@@ -98,7 +98,10 @@ protected:
 	void DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_ptr<FormatElement> envElement);
 
 	// 以下是特殊格式化规则
-	std::shared_ptr<FormatElement> FormatAlignStatement(int& currentIndex, std::vector<std::shared_ptr<LuaAstNode>>& vec);
+	// 规则1 连续赋值语句会试图检测并对齐等号
+	std::shared_ptr<FormatElement> FormatAlignStatement(int& currentIndex,const std::vector<std::shared_ptr<LuaAstNode>>& vec);
+
+	std::shared_ptr<FormatElement> FormatAlignTableField(int& currentIndex,const std::vector<std::shared_ptr<LuaAstNode>>& vec);
 	
 
 private:

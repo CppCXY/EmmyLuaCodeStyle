@@ -2,14 +2,14 @@
 
 #include "FormatElement.h"
 
-class IndentElement : public FormatElement
+class AlignToFirstElement : public FormatElement
 {
 public:
-	IndentElement(int specialIndent = -1);
+	AlignToFirstElement(int lowestIndent);
 
 	FormatElementType GetType() override;
 
 	void Serialize(FormatContext& ctx, int position, FormatElement* parent) override;
 private:
-	int _specialIndent;
+	int _lowestIndent;
 };

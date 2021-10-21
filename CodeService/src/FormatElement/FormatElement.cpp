@@ -50,7 +50,7 @@ std::shared_ptr<FormatElement> FormatElement::LastValidElement() const
 
 void FormatElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
 {
-	for (int i = 0; i != _children.size(); i++)
+	for (std::size_t i = 0; i != _children.size(); i++)
 	{
 		_children[i]->Serialize(ctx, i, this);
 	}

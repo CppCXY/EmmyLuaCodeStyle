@@ -1,6 +1,7 @@
 #include "LuaParser/LuaParser.h"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include "LuaDefine.h"
 #include "LuaTokenTypeDetail.h"
 #include "LuaParser/LuaOperatorType.h"
@@ -8,13 +9,13 @@
 
 std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 {
-	std::fstream fin(std::string(filename), std::ios::in);
+	std::fstream fin(std::string(filename), std::ios::in | std::ios::binary);
 
 	if (fin.is_open())
 	{
 		std::stringstream s;
 		s << fin.rdbuf();
-
+		std::cout << s.str() << std::endl;
 		return LoadFromBuffer(s.str());
 	}
 

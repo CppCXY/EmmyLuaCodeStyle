@@ -23,8 +23,8 @@ public:
 	void PrintLine(int line);
 
 	void PrintBlank(int blank);
-	// void
-	void AddIndent();
+
+	void AddIndent(int specialIndent = -1);
 
 	void RecoverIndent();
 
@@ -33,6 +33,8 @@ public:
 	int GetColumn(int offset);
 
 	std::size_t GetCharacterCount() const;
+
+	std::size_t GetCurrentIndent() const;
 
 	std::string GetText();
 

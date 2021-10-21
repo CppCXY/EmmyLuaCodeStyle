@@ -2,22 +2,29 @@
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"
 #include "CodeService/LuaFormatter.h"
+#include <fstream>
 
 int main()
 {
-	std::string source = R"(
-local aa       = 123 --jgoiwjgw
-local dd  = 445   --0swgfwkgwp
-	--fuck me
-aa = 890  --12313
+		std::string source = R"(
+local t = 123
+print(t)
 
-local c<const> =123
+---@class ccc :
+local t = {
+	--xixixi
+	---hofowjfpw
+	--wl;jgfo2jg
+	deee  = "1231", 
 
 
-local cc  =123
-local ddd  = 123
+    eeee = 12313131, --mfuck
+    --hhoh
 
-)";
+    __12313ffwfw = 1231
+}
+	
+	)";
 	std::cout << "原文:\n" << source;
 	auto parser = LuaParser::LoadFromBuffer(std::move(source));
 
@@ -42,8 +49,13 @@ local ddd  = 123
 	LuaFormatOptions options;
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
-	std::cout << "格式化结果:\n";
+	std::cout << "\n格式化结果:\n";
 	std::cout << formatter.GetFormattedText();
+
+	// std::ofstream f(R"(C:\Users\zc\Desktop\learn\UI\UILogin\UILoginReference2.lua)", std::ios::out);
+
+	// auto s = formatter.GetFormattedText();
+	// f.write(s.c_str(), s.size());
 
 	return 0;
 }
