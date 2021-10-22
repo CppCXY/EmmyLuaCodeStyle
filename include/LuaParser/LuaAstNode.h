@@ -7,7 +7,7 @@
 #include "TextRange.h"
 #include "LuaToken.h"
 
-class LuaAstNode : std::enable_shared_from_this<LuaAstNode>
+class LuaAstNode
 {
 public:
 	LuaAstNode(LuaAstNodeType type, const char* source);
@@ -18,7 +18,7 @@ public:
 
 	std::string_view GetText() const;
 
-	const std::vector<std::shared_ptr<LuaAstNode>>& GetChildren() const;
+	const std::vector<std::shared_ptr<LuaAstNode>>& GetChildren();
 
 	void AddChild(std::shared_ptr<LuaAstNode> child);
 
@@ -35,7 +35,6 @@ private:
 
 	LuaAstNodeType _type;
 	std::string_view _text;
-	std::weak_ptr<LuaAstNode> _parent;
 
 	const char* _source;
 	TextRange _textRange;

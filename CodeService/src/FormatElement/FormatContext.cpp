@@ -20,7 +20,7 @@ void FormatContext::Print(std::string_view text)
 
 void FormatContext::PrintLine(int line)
 {
-	for (int i = 0; i != line; i++)
+	for (int i = 0; i < line; i++)
 	{
 		_os << _options.LineSeperater;
 		_characterCount = 0;
@@ -29,7 +29,7 @@ void FormatContext::PrintLine(int line)
 
 void FormatContext::PrintBlank(int blank)
 {
-	for (int i = 0; i != blank; i ++)
+	for (int i = 0; i < blank; i ++)
 	{
 		_os << " ";
 		_characterCount++;

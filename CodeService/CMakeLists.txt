@@ -27,8 +27,9 @@ target_sources(CodeService
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/AlignmentLayoutElement.h
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/ExpressionElement.h
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/FormatContext.h
-	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/KeepLayoutElement.h
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/LongExpressionLayoutElement.h
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/AlignToFirstElement.h
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/KeepElement.h
 	
 	PRIVATE
 	${CodeService_SOURCE_DIR}/src/CodeService.cpp	
@@ -46,8 +47,9 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/ExpressionElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/FormatContext.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignmentLayoutElement.cpp	
-	${CodeService_SOURCE_DIR}/src/FormatElement/KeepLayoutElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/LongExpressionLayoutElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignToFirstElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/KeepElement.cpp	
 )
 
 target_link_libraries(CodeService LuaParser)

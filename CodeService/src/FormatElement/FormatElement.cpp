@@ -25,6 +25,14 @@ void FormatElement::AddChild(std::shared_ptr<FormatElement> child)
 	_children.push_back(child);
 }
 
+void FormatElement::AddChildren(std::vector<std::shared_ptr<FormatElement>>& children)
+{
+	for(auto child:children)
+	{
+		AddChild(child);
+	}
+}
+
 std::vector<std::shared_ptr<FormatElement>>& FormatElement::GetChildren()
 {
 	return _children;

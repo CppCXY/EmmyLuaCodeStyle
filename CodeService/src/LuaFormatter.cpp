@@ -10,7 +10,8 @@
 #include "CodeService/FormatElement/LineElement.h"
 #include "CodeService/FormatElement/AlignmentLayoutElement.h"
 #include "CodeService/FormatElement/AlignToFirstElement.h"
-#include "CodeService/FormatElement/KeepLayoutElement.h"
+#include "CodeService/FormatElement/KeepElement.h"
+#include "CodeService/FormatElement/LongExpressionLayoutElement.h"
 
 bool nextMatch(int currentIndex, LuaAstNodeType type, const std::vector<std::shared_ptr<LuaAstNode>>& vec)
 {
@@ -861,47 +862,36 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 	return env;
 }
 
+/*
+ * 表达式本身具有很大的复杂性
+ * 如果表达式换行了，缩进多少又是很复杂的问题
+ */
 std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<LuaAstNode> expression)
 {
 	auto env = std::make_shared<ExpressionElement>();
 
-	for (auto child : expression->GetChildren())
+	auto& children = expression->GetChildren();
+	for (int i = 0; i != children.size(); i++)
 	{
-		// switch (child->GetType())
-		// {
-		// 	// case LuaAstNodeType::BinaryExpression:
-		// 	// 	{
-		// 	// 	}
-		// default:
-		// 	{
-		DefaultHandle(child, env);
-		// 		break;
-		// 	}
-		// }
-	}
+		auto current = children[i];
 
-	return env;
-}
+		env->AddChild(FormatNode(current));
 
-std::shared_ptr<FormatElement> LuaFormatter::FormatBinaryExpression(std::shared_ptr<LuaAstNode> binaryExpression)
-{
-	auto env = std::make_shared<ExpressionElement>();
+		auto next = nextNode(i, children);
 
-	for (auto child : binaryExpression->GetChildren())
-	{
-		switch (child->GetType())
+		if (next)
 		{
-		case LuaAstNodeType::BinaryOperator:
+			auto nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
+			auto currentLine = _parser->GetLine(current->GetTextRange().EndOffset);
+
+			if (currentLine == nextLine)
 			{
 				env->Add<KeepBlankElement>(1);
-				env->Add<TextElement>(child);
-				env->Add<KeepBlankElement>(1);
-				break;
 			}
-		default:
+			else
 			{
-				DefaultHandle(child, env);
-				break;
+				env->Add<LineElement>();
+				env->Add<KeepLineElement>();
 			}
 		}
 	}
@@ -909,23 +899,39 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBinaryExpression(std::shared_
 	return env;
 }
 
+std::shared_ptr<FormatElement> LuaFormatter::FormatBinaryExpression(std::shared_ptr<LuaAstNode> binaryExpression)
+{
+	return FormatExpression(binaryExpression);
+}
+
 std::shared_ptr<FormatElement> LuaFormatter::FormatUnaryExpression(std::shared_ptr<LuaAstNode> unaryExpression)
 {
 	auto env = std::make_shared<ExpressionElement>();
 
-	for (auto child : unaryExpression->GetChildren())
+	auto& children = unaryExpression->GetChildren();
+	for (int i = 0; i != children.size(); i++)
 	{
-		switch (child->GetType())
+		auto current = children[i];
+
+		env->AddChild(FormatNode(current));
+		auto next = nextNode(i, children);
+
+		if (next)
 		{
-		case LuaAstNodeType::UnaryOperator:
+			auto nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
+			auto currentLine = _parser->GetLine(current->GetTextRange().EndOffset);
+
+			if (currentLine == nextLine)
 			{
-				env->Add<TextElement>(child);
-				break;
+				if (current->GetText() != "not")
+				{
+					env->Add<KeepBlankElement>(1);
+				}
 			}
-		default:
+			else
 			{
-				DefaultHandle(child, env);
-				break;
+				env->Add<LineElement>();
+				env->Add<KeepLineElement>();
 			}
 		}
 	}
@@ -1067,23 +1073,50 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameExpression(std::shared_pt
 std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<LuaAstNode> paramList)
 {
 	auto env = std::make_shared<ExpressionElement>();
-
-	for (auto child : paramList->GetChildren())
+	auto& children = paramList->GetChildren();
+	auto alignToFirst = std::make_shared<AlignToFirstElement>(_options.Indent);
+	for (int i = 0; i != children.size(); i++)
 	{
+		auto child = children[i];
 		switch (child->GetType())
 		{
 		case LuaAstNodeType::GeneralOperator:
 			{
-				env->Add<TextElement>(child);
 				if (child->GetText() == ",")
 				{
-					env->Add<KeepBlankElement>(1);
+					alignToFirst->Add<TextElement>(child);
+					alignToFirst->Add<KeepElement>(1);
+				}
+				else if (child->GetText() == ")")
+				{
+					alignToFirst->Add<TextElement>(child);
+					env->AddChild(alignToFirst);
+				}
+				else
+				{
+					env->Add<TextElement>(child);
+					env->Add<KeepElement>(0);
 				}
 				break;
 			}
-		case LuaAstNodeType::Identify:
+		case LuaAstNodeType::Param:
 			{
-				env->Add<TextElement>(child);
+				alignToFirst->Add<TextElement>(child);
+				if (nextMatch(i, LuaAstNodeType::Comment, children))
+				{
+					alignToFirst->Add<KeepElement>(1);
+				}
+				else
+				{
+					alignToFirst->Add<KeepElement>(0);
+				}
+
+				break;
+			}
+		case LuaAstNodeType::Comment:
+			{
+				alignToFirst->Add<TextElement>(child);
+				alignToFirst->Add<KeepElement>(1);
 				break;
 			}
 		default:
@@ -1092,6 +1125,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 			}
 		}
 	}
+
+
 	return env;
 }
 
@@ -1099,20 +1134,64 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatFunctionBody(std::shared_ptr<
 {
 	auto env = std::make_shared<ExpressionElement>();
 
-	for (auto child : functionBody->GetChildren())
+	auto& children = functionBody->GetChildren();
+
+	for (int i = 0; i < children.size(); i++)
 	{
+		auto child = children[i];
 		switch (child->GetType())
 		{
 		case LuaAstNodeType::ParamList:
 			{
 				env->AddChild(FormatNode(child));
-				env->Add<LineElement>();
+
+				auto nextChild = nextNode(i, children);
+				//存在一个特殊规则如果 functionBody 只有一行代码，则会试图考虑不换行
+				if(nextChild && nextChild->GetType() == LuaAstNodeType::Block)
+				{
+					auto range = functionBody->GetTextRange();
+					if (_parser->GetLine(range.StartOffset) == _parser->GetLine(range.EndOffset))
+					{
+						env->Add<KeepElement>(1);
+						auto block = FormatNode(nextChild);
+						for(auto blockChild : block->GetChildren())
+						{
+							auto shortExpression = std::make_shared<ExpressionElement>();
+							shortExpression->AddChildren(blockChild->GetChildren());
+							env->AddChild(shortExpression);
+							env->Add<KeepElement>(1);
+						}
+						i++;
+					}
+					else
+					{
+						env->Add<LineElement>();
+					}
+				}
+				else
+				{
+					env->Add<KeepElement>(1);
+				}
 				break;
 			}
+		case LuaAstNodeType::Comment:
+			{
+				env->AddChild(FormatNode(child));
+				env->Add<KeepElement>(1);
+				break;
+			}
+			
 		case LuaAstNodeType::Block:
 			{
 				env->AddChild(FormatNode(child));
 				env->Add<KeepLineElement>();
+
+				break;
+			}
+		case LuaAstNodeType::KeyWord:
+			{
+				env->Add<TextElement>(child);
+				env->Add<KeepElement>(0);
 				break;
 			}
 		default:

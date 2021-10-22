@@ -30,7 +30,7 @@ std::string_view LuaAstNode::GetText() const
 	return _text;
 }
 
-const std::vector<std::shared_ptr<LuaAstNode>>& LuaAstNode::GetChildren() const
+const std::vector<std::shared_ptr<LuaAstNode>>& LuaAstNode::GetChildren()
 {
 	return _children;
 }
@@ -69,6 +69,7 @@ void LuaAstNode::AddChild(std::shared_ptr<LuaAstNode> child)
 			_textRange.EndOffset = child->_textRange.EndOffset;
 		}
 	}
+
 	_children.push_back(child);
 	_text = std::string_view(_source + _textRange.StartOffset, _textRange.EndOffset - _textRange.StartOffset + 1);
 }

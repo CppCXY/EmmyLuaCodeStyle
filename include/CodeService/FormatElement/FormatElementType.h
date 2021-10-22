@@ -18,4 +18,5 @@ enum class FormatElementType
 	LineElement,
 	AlignmentElement,
 	AlignToElement,
+	KeepElement,
 };

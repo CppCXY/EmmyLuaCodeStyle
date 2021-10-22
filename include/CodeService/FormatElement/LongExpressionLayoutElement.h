@@ -2,7 +2,7 @@
 
 #include "FormatElement.h"
 
-class KeepLayoutElement : public FormatElement
+class LongExpressionLayoutElement : public FormatElement
 {
 public:
 	FormatElementType GetType() override;

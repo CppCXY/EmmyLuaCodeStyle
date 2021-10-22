@@ -22,6 +22,8 @@ public:
 
 	void AddChild(std::shared_ptr<FormatElement> child);
 
+	void AddChildren(std::vector<std::shared_ptr<FormatElement>>& children);
+
 	std::vector<std::shared_ptr<FormatElement>>& GetChildren();
 
 	bool HasValidTextRange() const;
@@ -33,6 +35,7 @@ public:
 	{
 		AddChild(std::make_shared<T>(std::forward<ARGS>(args)...));
 	}
+
 
 protected:
 	void AddTextRange(TextRange range);

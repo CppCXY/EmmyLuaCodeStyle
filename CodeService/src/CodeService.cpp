@@ -7,23 +7,9 @@
 int main()
 {
 		std::string source = R"(
-local t = 123
-print(t)
 
----@class ccc :
-local t = {
-	--xixixi
-	---hofowjfpw
-	--wl;jgfo2jg
-	deee  = "1231", 
-
-
-    eeee = 12313131, --mfuck
-    --hhoh
-
-    __12313ffwfw = 1231
-}
-	
+function f(aaa,bbb)
+	return aaa<bbb --[[hahah]] end
 	)";
 	std::cout << "т╜нд:\n" << source;
 	auto parser = LuaParser::LoadFromBuffer(std::move(source));
