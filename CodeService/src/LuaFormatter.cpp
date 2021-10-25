@@ -780,15 +780,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRepeatStatement(std::shared_p
 				else
 				{
 					env->Add<TextElement>(child);
+					env->Add<KeepBlankElement>(1);
 				}
 				break;
 			}
-			// case LuaAstNodeType::Block:
-			// 	{
-			// 		env->AddChild(FormatNode(child));
-			// 		env->Add<KeepLineElement>();
-			// 		break;
-			// 	}
+
 		default:
 			{
 				DefaultHandle(child, env);

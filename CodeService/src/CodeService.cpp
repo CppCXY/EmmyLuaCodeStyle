@@ -7,11 +7,7 @@
 int main()
 {
 		std::string source = R"(
-if fuck then
-
-else end
-
-function ff() local t =123;return x < y; end
+repeat fuck = 123 until false
 
 	)";
 	std::cout << "原文:\n" << source;
