@@ -20,6 +20,11 @@ void KeepLineElement::Serialize(FormatContext& ctx, int position, FormatElement*
 		int lastElementLine = getLastValidLine(ctx, position, parent);
 		int nextElementLine = getNextValidLine(ctx, position, parent);
 
+		if(nextElementLine == -1)
+		{
+			return;
+		}
+
 		line = nextElementLine - lastElementLine - 1;
 		if (line < 0)
 		{
@@ -56,5 +61,5 @@ int KeepLineElement::getNextValidLine(FormatContext& ctx, int position, FormatEl
 		}
 	}
 
-	return ctx.GetLine(parent->GetTextRange().EndOffset);
+	return -1;
 }

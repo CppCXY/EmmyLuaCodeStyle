@@ -102,8 +102,10 @@ protected:
 	std::shared_ptr<FormatElement> FormatAlignStatement(int& currentIndex,const std::vector<std::shared_ptr<LuaAstNode>>& vec);
 
 	std::shared_ptr<FormatElement> FormatAlignTableField(int& currentIndex,const std::vector<std::shared_ptr<LuaAstNode>>& vec);
-	
-
+	//他的意思其实是格式化任意节点加上Block，可选的接受一个end
+	std::shared_ptr<FormatElement> FormatNodeAndBlockOrEnd(int& currentIndex, const std::vector<std::shared_ptr<LuaAstNode>>& vec);
+	//当前索引必须是已经消耗过的索引
+	std::shared_ptr<FormatElement> FormatBlockFromParent(int& currentIndex, const std::vector<std::shared_ptr<LuaAstNode>>& vec);
 private:
 
 	std::shared_ptr<LuaParser> _parser;

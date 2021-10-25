@@ -7,9 +7,12 @@
 int main()
 {
 		std::string source = R"(
+if fuck then
 
-function f(aaa,bbb)
-	return aaa<bbb --[[hahah]] end
+else end
+
+function ff() local t =123;return x < y; end
+
 	)";
 	std::cout << "原文:\n" << source;
 	auto parser = LuaParser::LoadFromBuffer(std::move(source));

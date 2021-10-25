@@ -49,14 +49,6 @@ void FormatContext::AddIndent(int specialIndent)
 
 		auto& topIndent = _indentStack.top();
 		newIndent = _options.Indent + topIndent.Indent;
-
-		std::string indentString;
-		indentString.reserve(_options.IndentString.size() * newIndent);
-		for (int i = 0; i != newIndent; i++)
-		{
-			indentString.append(_options.IndentString);
-		}
-		_indentStack.push({newIndent, std::move(indentString)});
 	}
 	else
 	{

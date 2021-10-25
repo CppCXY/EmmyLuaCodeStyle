@@ -254,6 +254,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::DoStatement:
 		case LuaAstNodeType::ForStatement:
 		case LuaAstNodeType::WhileStatement:
+		case LuaAstNodeType::IfStatement:
 			{
 				auto childEnv = FormatNode(statement);
 				indentEnv->AddChild(childEnv);
@@ -276,8 +277,23 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::GotoStatement:
 		case LuaAstNodeType::ExpressionStatement:
 			{
-				indentEnv->AddChild(FormatNode(statement));
+				auto statEnv = FormatNode(statement);
 
+
+				if (nextMatch(index, LuaAstNodeType::Comment, statements))
+				{
+					auto next = statements[index + 1];
+					int currentLine = _parser->GetLine(statement->GetTextRange().EndOffset);
+					int nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
+
+					if (currentLine == nextLine)
+					{
+						statEnv->Add<KeepBlankElement>(1);
+						statEnv->Add<TextElement>(next);
+						index++;
+					}
+				}
+				indentEnv->AddChild(statEnv);
 				indentEnv->Add<KeepLineElement>();
 				break;
 			}
@@ -565,50 +581,36 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatKeyWords(std::shared_ptr<LuaA
 std::shared_ptr<FormatElement> LuaFormatter::FormatDoStatement(std::shared_ptr<LuaAstNode> doStatement)
 {
 	auto env = std::make_shared<StatementElement>();
-
-	for (auto child : doStatement->GetChildren())
-	{
-		switch (child->GetType())
-		{
-		case LuaAstNodeType::KeyWord:
-			{
-				env->Add<TextElement>(child);
-				if (child->GetText() == "do")
-				{
-					env->Add<LineElement>();
-				}
-				break;
-			}
-		case LuaAstNodeType::Block:
-			{
-				env->AddChild(FormatBlock(child));
-				env->Add<KeepLineElement>();
-				break;
-			}
-		default:
-			{
-				DefaultHandle(child, env);
-				break;
-			}
-		}
-	}
-
+	auto& children = doStatement->GetChildren();
+	int i = 0;
+	env->AddChild(FormatNodeAndBlockOrEnd(i, children));
 	return env;
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatWhileStatement(std::shared_ptr<LuaAstNode> whileStatement)
 {
 	auto env = std::make_shared<StatementElement>();
-	for (auto child : whileStatement->GetChildren())
+	auto& children = whileStatement->GetChildren();
+	for (int i = 0; i < children.size(); i++)
 	{
+		auto child = children[i];
 		switch (child->GetType())
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				env->Add<TextElement>(child);
 				if (child->GetText() == "do")
 				{
-					env->Add<LineElement>();
+					env->AddChild(FormatNodeAndBlockOrEnd(i, children));
+					env->Add<KeepLineElement>();
+				}
+				else if (child->GetText() == "while")
+				{
+					env->Add<TextElement>(child);
+					env->Add<KeepBlankElement>(1);
+				}
+				else
+				{
+					env->Add<TextElement>(child);
 				}
 				break;
 			}
@@ -617,12 +619,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatWhileStatement(std::shared_pt
 				auto expression = FormatNode(child);
 				env->AddChild(expression);
 				env->Add<KeepBlankElement>(1);
-				break;
-			}
-		case LuaAstNodeType::Block:
-			{
-				env->AddChild(FormatNode(child));
-				env->Add<KeepLineElement>();
 				break;
 			}
 		default:
@@ -717,16 +713,22 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatForStatement(std::shared_ptr<
 std::shared_ptr<FormatElement> LuaFormatter::FormatForBody(std::shared_ptr<LuaAstNode> forBody)
 {
 	auto env = std::make_shared<ExpressionElement>();
-	for (auto child : forBody->GetChildren())
+	auto& children = forBody->GetChildren();
+	for (int i = 0; i < children.size(); i++)
 	{
+		auto child = children[i];
 		switch (child->GetType())
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				env->Add<TextElement>(child);
 				if (child->GetText() == "do")
 				{
-					env->Add<LineElement>();
+					env->AddChild(FormatNodeAndBlockOrEnd(i, children));
+					env->Add<KeepLineElement>();
+				}
+				else
+				{
+					env->Add<TextElement>(child);
 				}
 				break;
 			}
@@ -762,26 +764,31 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAttribute(std::shared_ptr<Lua
 std::shared_ptr<FormatElement> LuaFormatter::FormatRepeatStatement(std::shared_ptr<LuaAstNode> repeatStatement)
 {
 	auto env = std::make_shared<StatementElement>();
-
-	for (auto child : repeatStatement->GetChildren())
+	auto& children = repeatStatement->GetChildren();
+	for (int i = 0; i < children.size(); i++)
 	{
+		auto child = children[i];
 		switch (child->GetType())
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				env->Add<TextElement>(child);
 				if (child->GetText() == "repeat")
 				{
-					env->Add<LineElement>();
+					env->AddChild(FormatNodeAndBlockOrEnd(i, children));
+					env->Add<KeepLineElement>();
+				}
+				else
+				{
+					env->Add<TextElement>(child);
 				}
 				break;
 			}
-		case LuaAstNodeType::Block:
-			{
-				env->AddChild(FormatNode(child));
-				env->Add<KeepLineElement>();
-				break;
-			}
+			// case LuaAstNodeType::Block:
+			// 	{
+			// 		env->AddChild(FormatNode(child));
+			// 		env->Add<KeepLineElement>();
+			// 		break;
+			// 	}
 		default:
 			{
 				DefaultHandle(child, env);
@@ -796,22 +803,29 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRepeatStatement(std::shared_p
 std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<LuaAstNode> ifStatement)
 {
 	auto env = std::make_shared<StatementElement>();
-
-	for (auto child : ifStatement->GetChildren())
+	auto& children = ifStatement->GetChildren();
+	for (int i = 0; i < children.size(); i++)
 	{
+		auto child = children[i];
 		switch (child->GetType())
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				env->Add<TextElement>(child);
 				if (child->GetText() == "then" || child->GetText() == "else")
 				{
-					env->Add<LineElement>();
+					env->AddChild(FormatNodeAndBlockOrEnd(i, children));
+					env->Add<KeepLineElement>();
 				}
 				else if (child->GetText() == "if" || child->GetText() == "elseif")
 				{
+					env->Add<TextElement>(child);
 					env->Add<KeepBlankElement>(1);
 				}
+				else // 然而end是在 formatkeyAndBlockAndEnd 中完成的
+				{
+					env->Add<TextElement>(child);
+				}
+
 				break;
 			}
 		case LuaAstNodeType::Expression:
@@ -820,12 +834,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 				env->Add<KeepBlankElement>(1);
 				break;
 			}
-		case LuaAstNodeType::Block:
-			{
-				env->AddChild(FormatNode(child));
-				env->Add<KeepLineElement>();
-				break;
-			}
+			// case LuaAstNodeType::Block:
+			// 	{
+			// 		env->AddChild(FormatNode(child));
+			// 		env->Add<KeepLineElement>();
+			// 		break;
+			// 	}
 		default:
 			{
 				DefaultHandle(child, env);
@@ -1132,75 +1146,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatFunctionBody(std::shared_ptr<LuaAstNode> functionBody)
 {
-	auto env = std::make_shared<ExpressionElement>();
-
-	auto& children = functionBody->GetChildren();
-
-	for (int i = 0; i < children.size(); i++)
-	{
-		auto child = children[i];
-		switch (child->GetType())
-		{
-		case LuaAstNodeType::ParamList:
-			{
-				env->AddChild(FormatNode(child));
-
-				auto nextChild = nextNode(i, children);
-				//存在一个特殊规则如果 functionBody 只有一行代码，则会试图考虑不换行
-				if(nextChild && nextChild->GetType() == LuaAstNodeType::Block)
-				{
-					auto range = functionBody->GetTextRange();
-					if (_parser->GetLine(range.StartOffset) == _parser->GetLine(range.EndOffset))
-					{
-						env->Add<KeepElement>(1);
-						auto block = FormatNode(nextChild);
-						for(auto blockChild : block->GetChildren())
-						{
-							auto shortExpression = std::make_shared<ExpressionElement>();
-							shortExpression->AddChildren(blockChild->GetChildren());
-							env->AddChild(shortExpression);
-							env->Add<KeepElement>(1);
-						}
-						i++;
-					}
-					else
-					{
-						env->Add<LineElement>();
-					}
-				}
-				else
-				{
-					env->Add<KeepElement>(1);
-				}
-				break;
-			}
-		case LuaAstNodeType::Comment:
-			{
-				env->AddChild(FormatNode(child));
-				env->Add<KeepElement>(1);
-				break;
-			}
-			
-		case LuaAstNodeType::Block:
-			{
-				env->AddChild(FormatNode(child));
-				env->Add<KeepLineElement>();
-
-				break;
-			}
-		case LuaAstNodeType::KeyWord:
-			{
-				env->Add<TextElement>(child);
-				env->Add<KeepElement>(0);
-				break;
-			}
-		default:
-			{
-				DefaultHandle(child, env);
-			}
-		}
-	}
-	return env;
+	int index = 0;
+	return FormatNodeAndBlockOrEnd(index, functionBody->GetChildren());
 }
 
 
@@ -1259,7 +1206,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalFunctionStatement(
 		default:
 			{
 				DefaultHandle(child, env);
-			} 
+			}
 		}
 	}
 	return env;
@@ -1456,7 +1403,18 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIn
 		}
 		else
 		{
-			env->AddChild(FormatNode(nextChild));
+			if (nextChild->GetType() == LuaAstNodeType::Comment)
+			{
+				auto comment = FormatNode(nextChild);
+				auto commentStatement = std::make_shared<StatementElement>();
+				commentStatement->AddChild(comment);
+				env->AddChild(commentStatement);
+			}
+			else
+			{
+				env->AddChild(FormatNode(nextChild));
+			}
+
 			env->Add<KeepLineElement>();
 		}
 
@@ -1562,4 +1520,126 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(int& currentI
 	}
 
 	return env;
+}
+
+std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(int& currentIndex,
+                                                                     const std::vector<std::shared_ptr<LuaAstNode>>&
+                                                                     vec)
+{
+	auto env = std::make_shared<ExpressionElement>();
+	auto keyNode = vec[currentIndex];
+	env->AddChild(FormatNode(keyNode));
+
+	if (nextMatch(currentIndex, LuaAstNodeType::Comment, vec))
+	{
+		auto comment = nextNode(currentIndex, vec);
+		int currentLine = _parser->GetLine(keyNode->GetTextRange().EndOffset);
+		int nextLine = _parser->GetLine(comment->GetTextRange().StartOffset);
+
+		// 认为是内联注释
+		if (nextLine == currentLine)
+		{
+			env->Add<KeepBlankElement>(1);
+			env->Add<TextElement>(comment);
+		}
+		currentIndex++;
+	}
+
+	bool blockExist = false;
+	auto block = FormatBlockFromParent(currentIndex, vec);
+
+
+	if (!block->GetChildren().empty())
+	{
+		blockExist = true;
+		if (_parser->GetLine(keyNode->GetTextRange().StartOffset) != _parser->GetLine(block->GetTextRange().EndOffset))
+		{
+			env->Add<KeepElement>(1);
+
+			env->AddChild(block);
+			env->Add<KeepElement>(1, true);
+		}
+		else
+		{
+			env->Add<KeepBlankElement>(1);
+
+			for (auto blockChild : block->GetChildren())
+			{
+				auto shortExpression = std::make_shared<ExpressionElement>();
+				shortExpression->AddChildren(blockChild->GetChildren());
+				env->AddChild(shortExpression);
+				env->Add<KeepBlankElement>(1);
+			}
+		}
+	}
+	else
+	{
+		env->Add<KeepElement>(1);
+	}
+
+	if (nextMatch(currentIndex, LuaAstNodeType::KeyWord, vec))
+	{
+		auto next = vec[currentIndex + 1];
+		if (next->GetText() == "end")
+		{
+			env->Add<TextElement>(next);
+			currentIndex++;
+		}
+		else if (!blockExist)
+		{
+			env->Add<LineElement>();
+		}
+	}
+	else // 下一个不是关键词那能是什么那就换个行吧
+	{
+		env->Add<LineElement>();
+	}
+
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(int& currentIndex,
+                                                                   const std::vector<std::shared_ptr<LuaAstNode>>& vec)
+{
+	std::shared_ptr<LuaAstNode> block = nullptr;
+	std::vector<std::shared_ptr<LuaAstNode>> comments;
+
+	for (; currentIndex < vec.size(); currentIndex++)
+	{
+		if (nextMatch(currentIndex, LuaAstNodeType::Comment, vec))
+		{
+			comments.push_back(nextNode(currentIndex, vec));
+		}
+		else if (nextMatch(currentIndex, LuaAstNodeType::Block, vec))
+		{
+			block = nextNode(currentIndex, vec);
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	if (block)
+	{
+		for (auto comment : comments)
+		{
+			block->AddLeafChild(comment);
+		}
+
+		return FormatBlock(block);
+	}
+	else
+	{
+		auto indentElement = std::make_shared<IndentElement>();
+		for (auto comment : comments)
+		{
+			auto commentStatement = std::make_shared<StatementElement>();
+			commentStatement->Add<TextElement>(comment);
+			indentElement->AddChild(commentStatement);
+			indentElement->Add<KeepLineElement>();
+		}
+
+		return indentElement;
+	}
 }
