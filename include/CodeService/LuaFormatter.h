@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <memory>
 #include <sstream>
 #include "LuaParser/LuaParser.h"
@@ -97,8 +97,8 @@ protected:
 
 	void DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_ptr<FormatElement> envElement);
 
-	// ÒÔÏÂÊÇÌØÊâ¸ñÊ½»¯¹æÔò
-	// ¹æÔò1 Á¬Ğø¸³ÖµÓï¾ä»áÊÔÍ¼¼ì²â²¢¶ÔÆëµÈºÅ
+	// ä»¥ä¸‹æ˜¯ç‰¹æ®Šæ ¼å¼åŒ–è§„åˆ™
+	// è§„åˆ™1 è¿ç»­èµ‹å€¼è¯­å¥ä¼šè¯•å›¾æ£€æµ‹å¹¶å¯¹é½ç­‰å·
 	std::shared_ptr<FormatElement> FormatAlignStatement(int& currentIndex,const std::vector<std::shared_ptr<LuaAstNode>>& vec);
 
 	std::shared_ptr<FormatElement> FormatAlignTableField(int& currentIndex,const std::vector<std::shared_ptr<LuaAstNode>>& vec);

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "KeepLineElement.h"
 
@@ -6,8 +6,8 @@ class KeepElement : public KeepLineElement
 {
 public:
 	/*
-	 * @param keepBlank ±íÊ¾Èç¹ûÏÂÒ»¸öÔªËØºÍµ±Ç°ÔªËØÔÚÍ¬Ò»ĞĞÔò±£³Ö¼¸¸ö¿Õ¸ñ
-	 * @remark Èç¹ûÏÂÒ»¸öÔªËØºÍµ±Ç°ÔªËØÔÚ²»Í¬ĞĞÔò»»ĞĞ
+	 * @param keepBlank è¡¨ç¤ºå¦‚æœä¸‹ä¸€ä¸ªå…ƒç´ å’Œå½“å‰å…ƒç´ åœ¨åŒä¸€è¡Œåˆ™ä¿æŒå‡ ä¸ªç©ºæ ¼
+	 * @remark å¦‚æœä¸‹ä¸€ä¸ªå…ƒç´ å’Œå½“å‰å…ƒç´ åœ¨ä¸åŒè¡Œåˆ™æ¢è¡Œ
 	 */
 	KeepElement(int keepBlank);
 

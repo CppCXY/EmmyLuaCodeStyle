@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 #ifdef MSVC
 #include <format>
 
 using std::format;
 
-#else // gcc ÔõÃ´»¹Ã»ÊµÏÖformat°¡
+#else // gcc æ€ä¹ˆè¿˜æ²¡å®ç°formatå•Š
 #include <string>
 #include <string_view>
 #include <vector>
@@ -48,8 +48,8 @@ std::string toFormatString(T t)
 
 
 /*
- * Ö±µ½¸ÃÏîÄ¿·¢ÆğÊ±,gccÒÀÈ»Ã»ÓĞÍê³ÉC++20 format ÊµÏÖ
- * ×Ô¼ºĞ´Ò»¸ö
+ * ç›´åˆ°è¯¥é¡¹ç›®å‘èµ·æ—¶,gccä¾ç„¶æ²¡æœ‰å®ŒæˆC++20 format å®ç°
+ * è‡ªå·±å†™ä¸€ä¸ª
  */
 template <class... ARGS>
 std::string format(std::string_view fmt, ARGS ... args)
@@ -70,7 +70,7 @@ std::string format(std::string_view fmt, ARGS ... args)
 
 	std::size_t rightBraceBegin = 0;
 
-	// Èç¹ûÔÚ±í´ïÊ½ÖĞ³öÏÖ×ó´óÀ¨ºÅ
+	// å¦‚æœåœ¨è¡¨è¾¾å¼ä¸­å‡ºç°å·¦å¤§æ‹¬å·
 	std::size_t exprLeftCount = 0;
 
 
@@ -99,7 +99,7 @@ std::string format(std::string_view fmt, ARGS ... args)
 		{
 			if (ch == '{')
 			{
-				// ÈÏÎªÊÇ×óË«´óÀ¨ºÅ×ªÒåÎª¿É¼ûµÄ'{'
+				// è®¤ä¸ºæ˜¯å·¦åŒå¤§æ‹¬å·è½¬ä¹‰ä¸ºå¯è§çš„'{'
 				if (index == leftBraceBegin + 1)
 				{
 					replaceExpresses.emplace_back("{", leftBraceBegin, index, false);
@@ -112,7 +112,7 @@ std::string format(std::string_view fmt, ARGS ... args)
 			}
 			else if (ch == '}')
 			{
-				// ÈÏÎªÊÇ±í´ïÊ½ÄÚµÄ´óÀ¨ºÅ
+				// è®¤ä¸ºæ˜¯è¡¨è¾¾å¼å†…çš„å¤§æ‹¬å·
 				if (exprLeftCount > 0)
 				{
 					exprLeftCount--;
@@ -135,7 +135,7 @@ std::string format(std::string_view fmt, ARGS ... args)
 			}
 			else
 			{
-				//ÈÏÎª×óÓÒ´óÀ¨ºÅÊ§Åä£¬Ö®Ç°µÄ²»×ö´¦Àí£¬ÍË¸ñÒ»Î»»ØÈ¥ÖØĞÂÅĞ¶Ï
+				//è®¤ä¸ºå·¦å³å¤§æ‹¬å·å¤±é…ï¼Œä¹‹å‰çš„ä¸åšå¤„ç†ï¼Œé€€æ ¼ä¸€ä½å›å»é‡æ–°åˆ¤æ–­
 				index--;
 			}
 			state = ParseState::Normal;
@@ -152,7 +152,7 @@ std::string format(std::string_view fmt, ARGS ... args)
 	}
 	else
 	{
-		// Æ´½Ó×Ö·û´®
+		// æ‹¼æ¥å­—ç¬¦ä¸²
 		std:size_t replaceCount = 0;
 		std::size_t start = 0;
 		for (std::size_t index = 0; index != replaceExpresses.size(); index++)

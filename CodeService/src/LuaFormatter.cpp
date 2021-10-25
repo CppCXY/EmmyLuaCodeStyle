@@ -1,4 +1,4 @@
-#include "CodeService/LuaFormatter.h"
+ï»¿#include "CodeService/LuaFormatter.h"
 #include "CodeService/FormatElement/IndentElement.h"
 #include "CodeService/FormatElement/StatementElement.h"
 #include "CodeService/FormatElement/TextElement.h"
@@ -845,13 +845,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 	{
 		switch (child->GetType())
 		{
-			// Ä¿Ç°±í´ïÊ½Óï¾äÉÏÖ»ÓĞµ÷ÓÃ±í´ïÊ½
+			// ç›®å‰è¡¨è¾¾å¼è¯­å¥ä¸Šåªæœ‰è°ƒç”¨è¡¨è¾¾å¼
 		case LuaAstNodeType::CallExpression:
 			{
 				env->AddChild(FormatNode(child));
 				break;
 			}
-			// default Ò»°ãÖ»ÓĞÒ»¸ö·ÖºÅ
+			// default ä¸€èˆ¬åªæœ‰ä¸€ä¸ªåˆ†å·
 		default:
 			{
 				DefaultHandle(child, env);
@@ -863,8 +863,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 }
 
 /*
- * ±í´ïÊ½±¾Éí¾ßÓĞºÜ´óµÄ¸´ÔÓĞÔ
- * Èç¹û±í´ïÊ½»»ĞĞÁË£¬Ëõ½ø¶àÉÙÓÖÊÇºÜ¸´ÔÓµÄÎÊÌâ
+ * è¡¨è¾¾å¼æœ¬èº«å…·æœ‰å¾ˆå¤§çš„å¤æ‚æ€§
+ * å¦‚æœè¡¨è¾¾å¼æ¢è¡Œäº†ï¼Œç¼©è¿›å¤šå°‘åˆæ˜¯å¾ˆå¤æ‚çš„é—®é¢˜
  */
 std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<LuaAstNode> expression)
 {
@@ -1146,7 +1146,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatFunctionBody(std::shared_ptr<
 				env->AddChild(FormatNode(child));
 
 				auto nextChild = nextNode(i, children);
-				//´æÔÚÒ»¸öÌØÊâ¹æÔòÈç¹û functionBody Ö»ÓĞÒ»ĞĞ´úÂë£¬Ôò»áÊÔÍ¼¿¼ÂÇ²»»»ĞĞ
+				//å­˜åœ¨ä¸€ä¸ªç‰¹æ®Šè§„åˆ™å¦‚æœ functionBody åªæœ‰ä¸€è¡Œä»£ç ï¼Œåˆ™ä¼šè¯•å›¾è€ƒè™‘ä¸æ¢è¡Œ
 				if(nextChild && nextChild->GetType() == LuaAstNodeType::Block)
 				{
 					auto range = functionBody->GetTextRange();
@@ -1259,14 +1259,14 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalFunctionStatement(
 		default:
 			{
 				DefaultHandle(child, env);
-			}
+			} 
 		}
 	}
 	return env;
 }
 
 /*
- * ±í±í´ïÊ½ÓĞ¼¸ÖÖ³£¼ûµÄÅÅ°æĞĞÎª
+ * è¡¨è¡¨è¾¾å¼æœ‰å‡ ç§å¸¸è§çš„æ’ç‰ˆè¡Œä¸º
  * print {
  *	aaa,bbb,ddd,eee
  *  ffff = 123,
@@ -1275,9 +1275,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalFunctionStatement(
  * }
  * 
  * local t = { a,b,c,d
- *			   e,f,g,i }
+ *			   e,f,g,i } 
  *
- * call {
+ * call { 
  * aa   = 1,
  * bbbb = 2,
  * dddd = 3,
@@ -1435,13 +1435,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIn
 		auto currentChild = vec[currentIndex];
 		int currentLine = _parser->GetLine(currentChild->GetTextRange().EndOffset);
 		int nextLine = _parser->GetLine(nextChild->GetTextRange().StartOffset);
-		// Õâ¸ö¹æÔòÊÇÏÂÒ»¸öÁ¬ĞøµÄ¸³Öµ/local/×¢ÊÍÓï¾äÈç¹ûºÍÉÏÒ»¸ö¸³Öµ/local/×¢ÊÍÓï¾ä ¼ä¾à2ĞĞÒÔÉÏ£¬Ôò²»ÈÏÎªÊÇÁ¬Ğø
+		// è¿™ä¸ªè§„åˆ™æ˜¯ä¸‹ä¸€ä¸ªè¿ç»­çš„èµ‹å€¼/local/æ³¨é‡Šè¯­å¥å¦‚æœå’Œä¸Šä¸€ä¸ªèµ‹å€¼/local/æ³¨é‡Šè¯­å¥ é—´è·2è¡Œä»¥ä¸Šï¼Œåˆ™ä¸è®¤ä¸ºæ˜¯è¿ç»­
 		if (nextLine - currentLine > 2)
 		{
 			break;
 		}
 
-		// ¼ì²éÊÇ·ñ»áÊÇÄÚÁª×¢ÊÍ ±ÈÈç local t = 123 -- inline comment
+		// æ£€æŸ¥æ˜¯å¦ä¼šæ˜¯å†…è”æ³¨é‡Š æ¯”å¦‚ local t = 123 -- inline comment
 		if ((currentChild->GetType() == LuaAstNodeType::LocalStatement || currentChild->GetType() ==
 				LuaAstNodeType::AssignStatement) && nextChild->GetType() == LuaAstNodeType::Comment
 			&& nextLine == currentLine)
@@ -1452,7 +1452,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIn
 				lastStatementEnv->Add<KeepBlankElement>(1);
 				lastStatementEnv->Add<TextElement>(nextChild);
 			}
-			//else Ó¦¸Ã²»´æÔÚÕâÖÖÇé¿ö
+			//else åº”è¯¥ä¸å­˜åœ¨è¿™ç§æƒ…å†µ
 		}
 		else
 		{
@@ -1469,7 +1469,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIn
 
 		nextChild = vec[currentIndex + 1];
 	}
-	// Èç¹û²»ÊÇºÍÏÂÎÄÓï¾äÁ¬Ğø£¬Ôò·µ»Ø±¾Éí
+	// å¦‚æœä¸æ˜¯å’Œä¸‹æ–‡è¯­å¥è¿ç»­ï¼Œåˆ™è¿”å›æœ¬èº«
 	if (env->GetChildren().size() == 1)
 	{
 		return env->GetChildren()[0];
@@ -1500,10 +1500,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(int& currentI
 		int nextLine = _parser->GetLine(nextChild->GetTextRange().StartOffset);
 		if (nextLine == currentLine)
 		{
-			// ¼ì²éÊÇ·ñ»áÊÇÄÚÁª×¢ÊÍ
-			// ±ÈÈç t = 123, -- inline comment
-			// »òÕß c = 456 --fff
-			// »òÕß ddd = 123 --[[ffff]] ,
+			// æ£€æŸ¥æ˜¯å¦ä¼šæ˜¯å†…è”æ³¨é‡Š
+			// æ¯”å¦‚ t = 123, -- inline comment
+			// æˆ–è€… c = 456 --fff
+			// æˆ–è€… ddd = 123 --[[ffff]] ,
 			if ((currentChild->GetType() == LuaAstNodeType::TableField || currentChild->GetType() ==
 				LuaAstNodeType::TableFieldSep) && nextChild->GetType() == LuaAstNodeType::Comment)
 			{
@@ -1513,7 +1513,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(int& currentI
 			else if ((currentChild->GetType() == LuaAstNodeType::TableFieldSep) && nextChild->GetType() ==
 				LuaAstNodeType::TableField)
 			{
-				// ´ËÊ±ÈÏÎªtable ²»Ó¦¸Ã¿¼ÂÇ¶ÔÆëµ½µÈºÅ
+				// æ­¤æ—¶è®¤ä¸ºtable ä¸åº”è¯¥è€ƒè™‘å¯¹é½åˆ°ç­‰å·
 				alignToEq = false;
 				env->Add<KeepBlankElement>(1);
 				env->AddChild(FormatNode(nextChild));
@@ -1546,7 +1546,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(int& currentI
 		nextChild = vec[currentIndex + 1];
 	}
 
-	// ÈÏÎªtableField ¿ÉÒÔ(µ«²»ÊÇ±ØĞëÕâÑù×ö)°´ÕÕµÈºÅ¶ÔÆë
+	// è®¤ä¸ºtableField å¯ä»¥(ä½†ä¸æ˜¯å¿…é¡»è¿™æ ·åš)æŒ‰ç…§ç­‰å·å¯¹é½
 	if (alignToEq)
 	{
 		auto newEnv = std::make_shared<AlignToFirstElement>(_options.Indent);

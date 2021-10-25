@@ -1,10 +1,9 @@
-#include "LuaParser/LuaAstNode.h"
+ï»¿#include "LuaParser/LuaAstNode.h"
 #include "LuaParser/LuaParseException.h"
 
 LuaAstNode::LuaAstNode(LuaAstNodeType type, const char* source)
 	: _type(type),
 	  _text(source, 0),
-	  _parent(),
 	  _source(source),
 	  _textRange(0, 0)
 {
@@ -93,7 +92,7 @@ void LuaAstNode::AddLeafChild(std::shared_ptr<LuaAstNode> child)
 		return AddChild(child);
 	}
 
-	// ÒòÎªstd::size_t Ã»·¨µÍÓÚ0
+	// å› ä¸ºstd::size_t æ²¡æ³•ä½äº0
 	for (int index = _children.size() - 1; index >= 0; index--)
 	{
 		auto& currentChild = _children[index];
@@ -105,12 +104,12 @@ void LuaAstNode::AddLeafChild(std::shared_ptr<LuaAstNode> child)
 		}
 		else if (childTextRange.StartOffset > currentChildTextRange.EndOffset)
 		{
-			//´ËÊ±Ò»¶¨ÔÚ×Ó½Úµã¿ÕÏ¶
+			//æ­¤æ—¶ä¸€å®šåœ¨å­èŠ‚ç‚¹ç©ºéš™
 			return addChildAfter(index, child);
 		}
 		else if (index == 0)
 		{
-			//´ËÊ±ÔÚËùÓĞ×Ó½ÚµãÖ®Ç°
+			//æ­¤æ—¶åœ¨æ‰€æœ‰å­èŠ‚ç‚¹ä¹‹å‰
 			return addChildBefore(index, child);
 		}
 	}

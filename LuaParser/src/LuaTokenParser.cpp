@@ -1,4 +1,4 @@
-#include "LuaParser/LuaTokenParser.h"
+ï»¿#include "LuaParser/LuaTokenParser.h"
 #include <limits>
 #include "LuaDefine.h"
 #include "LuaTokenTypeDetail.h"
@@ -385,7 +385,7 @@ LuaTokenType LuaTokenParser::llex()
 		case '#':
 			{
 				saveAndNext();
-				// Ö»ÈÏÎªµÚÒ»ĞĞµÄ²ÅÊÇshebang
+				// åªè®¤ä¸ºç¬¬ä¸€è¡Œçš„æ‰æ˜¯shebang
 				if (_linenumber == 0 && getCurrentChar() == '!')
 				{
 					// shebang

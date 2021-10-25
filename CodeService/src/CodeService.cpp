@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"
 #include "CodeService/LuaFormatter.h"
@@ -11,7 +11,7 @@ int main()
 function f(aaa,bbb)
 	return aaa<bbb --[[hahah]] end
 	)";
-	std::cout << "Ô­ÎÄ:\n" << source;
+	std::cout << "åŽŸæ–‡:\n" << source;
 	auto parser = LuaParser::LoadFromBuffer(std::move(source));
 
 	parser->BuildAstWithComment();
@@ -35,7 +35,7 @@ function f(aaa,bbb)
 	LuaFormatOptions options;
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
-	std::cout << "\n¸ñÊ½»¯½á¹û:\n";
+	std::cout << "\næ ¼å¼åŒ–ç»“æžœ:\n";
 	std::cout << formatter.GetFormattedText();
 
 	// std::ofstream f(R"(C:\Users\zc\Desktop\learn\UI\UILogin\UILoginReference2.lua)", std::ios::out);

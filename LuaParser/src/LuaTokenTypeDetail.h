@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 const int FIRST_RESERVED = UCHAR_MAX + 1;
 
@@ -44,7 +44,7 @@ enum LuaTokenTypeDetail : int
 	TK_NAME,
 	TK_STRING,
 	// custom
-	TK_SHORT_COMMENT,// ¶Ì×¢ÊÍ
-	TK_LONG_COMMENT, //³¤×¢ÊÍ
+	TK_SHORT_COMMENT,// çŸ­æ³¨é‡Š
+	TK_LONG_COMMENT, //é•¿æ³¨é‡Š
 	TK_SHEBANG, //shebang
 };

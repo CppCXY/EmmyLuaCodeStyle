@@ -1,4 +1,4 @@
-#include "LuaParser/LuaParser.h"
+ï»¿#include "LuaParser/LuaParser.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -72,7 +72,7 @@ void LuaParser::BuildAstWithComment()
 	auto blockNode = chunkChildren[0];
 
 	auto& comments = _tokenParser->GetComments();
-	// ½«×¢ÊÍ×¢ÈëASTÖĞ
+	// å°†æ³¨é‡Šæ³¨å…¥ASTä¸­
 	if (!comments.empty())
 	{
 		for (auto& comment : comments)
@@ -260,7 +260,7 @@ void LuaParser::doStatement(std::shared_ptr<LuaAstNode> blockNode)
 /* forstat -> FOR (fornum | forlist) END */
 void LuaParser::forStatement(std::shared_ptr<LuaAstNode> blockNode)
 {
-	// forstatement Ö»ÓĞÒ»¸ö for µÄtoken ½Úµã ¼ÓÉÏ forNumber»òÕßforList ½Úµã
+	// forstatement åªæœ‰ä¸€ä¸ª for çš„token èŠ‚ç‚¹ åŠ ä¸Š forNumberæˆ–è€…forList èŠ‚ç‚¹
 	auto forStatement = createAstNode(LuaAstNodeType::ForStatement);
 
 	checkAndNext(TK_FOR, forStatement);
@@ -355,7 +355,7 @@ void LuaParser::localStatement(std::shared_ptr<LuaAstNode> blockNode)
 	{
 		expressionList(localStatement);
 	}
-	// Èç¹ûÓĞÒ»¸ö·ÖºÅÔò¼ÓÈëµ½localstatement
+	// å¦‚æœæœ‰ä¸€ä¸ªåˆ†å·åˆ™åŠ å…¥åˆ°localstatement
 	testNext(';', localStatement, LuaAstNodeType::GeneralOperator);
 
 	blockNode->AddChild(localStatement);
@@ -371,7 +371,7 @@ void LuaParser::LabelStatement(std::shared_ptr<LuaAstNode> blockNode)
 
 	checkAndNext(TK_DBCOLON, labelStatement);
 
-	//ÈÏÎªlabelÊÇµ¥¶ÀµÄÓï¾ä
+	//è®¤ä¸ºlabelæ˜¯å•ç‹¬çš„è¯­å¥
 	blockNode->AddChild(labelStatement);
 }
 
@@ -413,8 +413,8 @@ void LuaParser::gotoStatement(std::shared_ptr<LuaAstNode> blockNode)
 
 /* stat -> func | assignment */
 /*
- * ÒÔÉÏÊÇlua¶¨Òå
- * ÒÔÏÂÊÇĞŞ¸Ä¶¨Òå
+ * ä»¥ä¸Šæ˜¯luaå®šä¹‰
+ * ä»¥ä¸‹æ˜¯ä¿®æ”¹å®šä¹‰
  * exprstat -> func
  * assignment -> exprList '=' exprList
  */
@@ -433,7 +433,7 @@ void LuaParser::expressionStatement(std::shared_ptr<LuaAstNode> blockNode)
 		expressionStatement = assignStatementNode;
 	}
 
-	// Èç¹û·¢ÏÖÒ»¸ö·ÖºÅ£¬»áÈÏÎª·ÖºÅÎª¸ÃÓï¾äµÄ½áÎ²
+	// å¦‚æœå‘ç°ä¸€ä¸ªåˆ†å·ï¼Œä¼šè®¤ä¸ºåˆ†å·ä¸ºè¯¥è¯­å¥çš„ç»“å°¾
 	testNext(';', expressionStatement, LuaAstNodeType::GeneralOperator);
 
 	blockNode->AddChild(expressionStatement);
@@ -518,9 +518,9 @@ void LuaParser::expressionList(std::shared_ptr<LuaAstNode> parent)
 
 void LuaParser::expression(std::shared_ptr<LuaAstNode> parent)
 {
-	// ËùÓĞ¾ßÌå±í´ïÊ½Ê÷¶¼ÔÚ±í´ïÊ½½ÚµãÏÂ
-	// ÀıÈç µ¥Ò»Ôª±í´ïÊ½ ×÷Îª ±í´ïÊ½½ÚµãµÄÒ»¸öchild
-	// ¸´ÔÓ±í´ïÊ½µÄ¶¥²ãÒ²×÷Îª±í´ïÊ½½ÚµãµÄchild
+	// æ‰€æœ‰å…·ä½“è¡¨è¾¾å¼æ ‘éƒ½åœ¨è¡¨è¾¾å¼èŠ‚ç‚¹ä¸‹
+	// ä¾‹å¦‚ å•ä¸€å…ƒè¡¨è¾¾å¼ ä½œä¸º è¡¨è¾¾å¼èŠ‚ç‚¹çš„ä¸€ä¸ªchild
+	// å¤æ‚è¡¨è¾¾å¼çš„é¡¶å±‚ä¹Ÿä½œä¸ºè¡¨è¾¾å¼èŠ‚ç‚¹çš„child
 	auto expressionNode = createAstNode(LuaAstNodeType::Expression);
 	subexpression(expressionNode, 0);
 
@@ -532,7 +532,7 @@ void LuaParser::expression(std::shared_ptr<LuaAstNode> parent)
 */
 void LuaParser::subexpression(std::shared_ptr<LuaAstNode> expressionNode, int limit)
 {
-	// ¼ÙÉè¶¼ÊÇ¶şÔª±í´ïÊ½
+	// å‡è®¾éƒ½æ˜¯äºŒå…ƒè¡¨è¾¾å¼
 	auto binaryExpression = createAstNode(LuaAstNodeType::BinaryExpression);
 
 	UnOpr uop = getUnaryOperator(_tokenParser->Current().TokenType);
@@ -778,8 +778,8 @@ void LuaParser::paramList(std::shared_ptr<LuaAstNode> functionBodyNode)
 
 /* suffixedexp ->
 	 primaryexp { '.' NAME | '[' exp ']' | ':' NAME funcargs | funcargs } */
-/* ÒÔÉÏÊÇluaÔ­Ê¼¶¨Òå
- * ÏÂÃæÊÇĞŞ¸Ä¶¨Òå
+/* ä»¥ä¸Šæ˜¯luaåŸå§‹å®šä¹‰
+ * ä¸‹é¢æ˜¯ä¿®æ”¹å®šä¹‰
  * suffixedexp -> indexexpr | callexpr | primaryexp
  * indexexpr -> primaryexp { '.' NAME | '[' exp ']' | ':' NAME  }
  * callexpr -> primaryexp funcargs | indexexpr funcargs

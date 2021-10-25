@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "LuaParser/LuaAstNode.h"
 #include "FormatElementType.h"
@@ -12,7 +12,7 @@ public:
 
 	virtual FormatElementType GetType() = 0;
 	/*
-	 * ÖÇÄÜÖ¸ÕëÔÚ¶àÌ¬·½ÃæÖ§³Ö²»¹»·½±ã
+	 * æ™ºèƒ½æŒ‡é’ˆåœ¨å¤šæ€æ–¹é¢æ”¯æŒä¸å¤Ÿæ–¹ä¾¿
 	 */
 	virtual void Serialize(FormatContext& ctx, int position, FormatElement* parent);
 
