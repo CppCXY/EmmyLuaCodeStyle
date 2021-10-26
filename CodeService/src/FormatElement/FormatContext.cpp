@@ -3,16 +3,17 @@
 FormatContext::FormatContext(std::shared_ptr<LuaParser> parser, LuaFormatOptions& options)
 	: _options(options),
 	  _characterCount(0),
-	  _parser(parser)
+	  _parser(parser),
+	  _linebreakIndent(0)
 {
 }
 
 void FormatContext::Print(std::string_view text)
 {
-	auto& indentPair = _indentStack.top();
-	if (_characterCount < indentPair.Indent)
+	auto& indentState = _indentStack.top();
+	if (_characterCount < indentState.Indent)
 	{
-		PrintBlank(indentPair.Indent - _characterCount);
+		PrintBlank(indentState.Indent - _characterCount);
 	}
 	_os << text;
 	_characterCount += text.size();
@@ -25,6 +26,15 @@ void FormatContext::PrintLine(int line)
 		_os << _options.LineSeperater;
 		_characterCount = 0;
 	}
+
+	if(_indentStack.top().Type == IndentStateType::ActiveIfLineBreak)
+	{
+		// ¸´ÖÆ
+		auto topIndent = _indentStack.top();
+		_indentStack.pop();
+
+		AddIndent(topIndent.WaitActiveIndent);
+	}
 }
 
 void FormatContext::PrintBlank(int blank)
@@ -36,31 +46,42 @@ void FormatContext::PrintBlank(int blank)
 	}
 }
 
-void FormatContext::AddIndent(int specialIndent)
+void FormatContext::AddIndent(int specialIndent, IndentStateType type)
 {
-	int newIndent = 0;
-	if (specialIndent == -1)
+	if (type == IndentStateType::Normal)
 	{
-		if (_indentStack.empty())
+		int newIndent = 0;
+		if (specialIndent == -1)
 		{
-			_indentStack.push({0, ""});
-			return;
-		}
+			if (_indentStack.empty())
+			{
+				_indentStack.push({0, 0, "", type});
+				return;
+			}
 
-		auto& topIndent = _indentStack.top();
-		newIndent = _options.Indent + topIndent.Indent;
+			auto& topIndent = _indentStack.top();
+			newIndent = _options.Indent + topIndent.Indent;
+		}
+		else
+		{
+			newIndent = specialIndent;
+		}
+		std::string indentString;
+		indentString.reserve(_options.IndentString.size() * newIndent);
+		for (int i = 0; i != newIndent; i++)
+		{
+			indentString.append(_options.IndentString);
+		}
+		_indentStack.push({newIndent, 0, std::move(indentString), type});
 	}
-	else
+	else if(type == IndentStateType::ActiveIfLineBreak)
 	{
-		newIndent = specialIndent;
+		// ¸´ÖÆ
+		auto topIndent = _indentStack.top();
+		topIndent.WaitActiveIndent = specialIndent;
+		topIndent.Type = type;
+		_indentStack.push(topIndent);
 	}
-	std::string indentString;
-	indentString.reserve(_options.IndentString.size() * newIndent);
-	for (int i = 0; i != newIndent; i++)
-	{
-		indentString.append(_options.IndentString);
-	}
-	_indentStack.push({newIndent, std::move(indentString)});
 }
 
 void FormatContext::RecoverIndent()
@@ -85,7 +106,7 @@ std::size_t FormatContext::GetCharacterCount() const
 
 std::size_t FormatContext::GetCurrentIndent() const
 {
-	if(_indentStack.empty())
+	if (_indentStack.empty())
 	{
 		return 0;
 	}

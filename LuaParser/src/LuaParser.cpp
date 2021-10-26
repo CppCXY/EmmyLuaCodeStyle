@@ -420,23 +420,31 @@ void LuaParser::gotoStatement(std::shared_ptr<LuaAstNode> blockNode)
  */
 void LuaParser::expressionStatement(std::shared_ptr<LuaAstNode> blockNode)
 {
-	auto expressionStatement = createAstNode(LuaAstNodeType::ExpressionStatement);
-	suffixedExpression(expressionStatement);
+	auto expression = createAstNode(LuaAstNodeType::Expression);
+	suffixedExpression(expression);
 	if (_tokenParser->Current().TokenType == '=' || _tokenParser->Current().TokenType == ',')
 	{
-		expressionStatement->SetType(LuaAstNodeType::ExpressionList);
+		expression->SetType(LuaAstNodeType::ExpressionList);
 
 		auto assignStatementNode = createAstNode(LuaAstNodeType::AssignStatement);
 
-		assignStatement(expressionStatement, assignStatementNode);
+		assignStatement(expression, assignStatementNode);
 
-		expressionStatement = assignStatementNode;
+		// 如果发现一个分号，会认为分号为该语句的结尾
+		testNext(';', assignStatementNode, LuaAstNodeType::GeneralOperator);
+
+		blockNode->AddChild(assignStatementNode);
 	}
+	else
+	{
+		auto expressionStatement = createAstNode(LuaAstNodeType::ExpressionStatement);
 
-	// 如果发现一个分号，会认为分号为该语句的结尾
-	testNext(';', expressionStatement, LuaAstNodeType::GeneralOperator);
+		expressionStatement->AddChild(expression);
 
-	blockNode->AddChild(expressionStatement);
+		testNext(';', expressionStatement, LuaAstNodeType::GeneralOperator);
+
+		blockNode->AddChild(expressionStatement);
+	}
 }
 
 /*

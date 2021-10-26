@@ -10,10 +10,18 @@
 class FormatContext
 {
 public:
-	struct IndentPair
+	enum class IndentStateType
 	{
-		int Indent;
-		std::string IndentString;
+		Normal,
+		ActiveIfLineBreak,
+	};
+
+	struct IndentState
+	{
+		int Indent = 0;
+		int WaitActiveIndent = 0;
+		std::string IndentString = "";
+		IndentStateType Type = IndentStateType::Normal;
 	};
 
 	FormatContext(std::shared_ptr<LuaParser> parser ,LuaFormatOptions& options);
@@ -24,7 +32,7 @@ public:
 
 	void PrintBlank(int blank);
 
-	void AddIndent(int specialIndent = -1);
+	void AddIndent(int specialIndent = -1, IndentStateType type = IndentStateType::Normal);
 
 	void RecoverIndent();
 
@@ -38,12 +46,17 @@ public:
 
 	std::string GetText();
 
+	void SetIndentIfLineBreak(int indent);
+
+	void ClearIndentIfLineBreak();
+
 private:
-	std::stack<IndentPair, std::vector<IndentPair>> _indentStack;
+	std::stack<IndentState, std::vector<IndentState>> _indentStack;
 	std::map<int, std::string> _indentMap;
 	std::stringstream _os;
 	LuaFormatOptions _options;
 
 	std::size_t _characterCount;
 	std::shared_ptr<LuaParser> _parser;
+	int _linebreakIndent;
 };

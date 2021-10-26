@@ -7,7 +7,13 @@
 int main()
 {
 		std::string source = R"(
-repeat fuck = 123 until false
+if aaa and bbbb
+	or not(ccc(fuck) == fffwfw) then
+
+	end
+
+	active:bbbbb()
+	.ccccdefef()
 
 	)";
 	std::cout << "原文:\n" << source;

@@ -878,7 +878,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
  */
 std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<LuaAstNode> expression)
 {
-	auto env = std::make_shared<ExpressionElement>();
+	auto env = std::make_shared<LongExpressionLayoutElement>();
 
 	auto& children = expression->GetChildren();
 	for (int i = 0; i != children.size(); i++)
@@ -886,24 +886,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<Lu
 		auto current = children[i];
 
 		env->AddChild(FormatNode(current));
-
-		auto next = nextNode(i, children);
-
-		if (next)
-		{
-			auto nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
-			auto currentLine = _parser->GetLine(current->GetTextRange().EndOffset);
-
-			if (currentLine == nextLine)
-			{
-				env->Add<KeepBlankElement>(1);
-			}
-			else
-			{
-				env->Add<LineElement>();
-				env->Add<KeepLineElement>();
-			}
-		}
+		env->Add<KeepElement>(1);
 	}
 
 	return env;
@@ -911,39 +894,36 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<Lu
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatBinaryExpression(std::shared_ptr<LuaAstNode> binaryExpression)
 {
-	return FormatExpression(binaryExpression);
+	auto env = std::make_shared<ExpressionElement>();
+	auto& children = binaryExpression->GetChildren();
+	for (int i = 0; i != children.size(); i++)
+	{
+		auto current = children[i];
+
+		env->AddChild(FormatNode(current));
+		env->Add<KeepElement>(1);
+	}
+
+	return env;
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatUnaryExpression(std::shared_ptr<LuaAstNode> unaryExpression)
 {
 	auto env = std::make_shared<ExpressionElement>();
 
-	auto& children = unaryExpression->GetChildren();
-	for (int i = 0; i != children.size(); i++)
+	for (auto child : unaryExpression->GetChildren())
 	{
-		auto current = children[i];
 
-		env->AddChild(FormatNode(current));
-		auto next = nextNode(i, children);
-
-		if (next)
+		env->AddChild(FormatNode(child));
+		if (child->GetType() == LuaAstNodeType::GeneralOperator)
 		{
-			auto nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
-			auto currentLine = _parser->GetLine(current->GetTextRange().EndOffset);
-
-			if (currentLine == nextLine)
+			if(child->GetText() != "not")
 			{
-				if (current->GetText() != "not")
-				{
-					env->Add<KeepBlankElement>(1);
-				}
-			}
-			else
-			{
-				env->Add<LineElement>();
-				env->Add<KeepLineElement>();
+				env->Add<KeepElement>(0);
+				continue;
 			}
 		}
+		env->Add<KeepElement>(1);
 	}
 
 	return env;
@@ -1335,18 +1315,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 
 	for (auto child : indexExpression->GetChildren())
 	{
-		switch (child->GetType())
-		{
-		case LuaAstNodeType::IndexOperator:
-			{
-				env->AddChild(FormatNode(child));
-				break;
-			}
-		default:
-			{
-				DefaultHandle(child, env);
-			}
-		}
+		DefaultHandle(child, env);
+		env->Add<KeepElement>(0);
 	}
 	return env;
 }
