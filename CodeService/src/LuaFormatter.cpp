@@ -421,6 +421,16 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
 	return env;
 }
 
+/*
+ * 表达式列表的格式化应该要求在换行后保持一致的缩进
+ * 例如 local aaa = bbb,
+ *				cccc,eeee
+ *				     ,fff
+ * 应当格式化为:
+ * local aaa = bbb,
+ *     cccc,eeee
+ *	   ,fff
+ */
 std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_ptr<LuaAstNode> expressionList)
 {
 	auto env = std::make_shared<ExpressionElement>();
@@ -432,16 +442,18 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_pt
 		case LuaAstNodeType::Expression:
 			{
 				env->AddChild(FormatNode(node));
+				env->Add<KeepElement>(0);
 				break;
 			}
 		case LuaAstNodeType::GeneralOperator:
 			{
 				env->Add<TextElement>(node);
-				env->Add<KeepBlankElement>(1);
+				env->Add<KeepElement>(1);
 				break;
 			}
 		default:
 			DefaultHandle(node, env);
+			env->Add<KeepElement>(1);
 		}
 	}
 
@@ -875,6 +887,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 /*
  * 表达式本身具有很大的复杂性
  * 如果表达式换行了，缩进多少又是很复杂的问题
+ *
  */
 std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<LuaAstNode> expression)
 {
@@ -913,11 +926,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatUnaryExpression(std::shared_p
 
 	for (auto child : unaryExpression->GetChildren())
 	{
-
 		env->AddChild(FormatNode(child));
 		if (child->GetType() == LuaAstNodeType::GeneralOperator)
 		{
-			if(child->GetText() != "not")
+			if (child->GetText() != "not")
 			{
 				env->Add<KeepElement>(0);
 				continue;
@@ -963,24 +975,26 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 	{
 		switch (child->GetType())
 		{
+		case LuaAstNodeType::KeyWord:
+		case LuaAstNodeType::ExpressionList:
+			{
+				env->Add<TextElement>(child);
+				env->Add<KeepElement>(0);
+				break;
+			}
 		case LuaAstNodeType::GeneralOperator:
 			{
 				env->Add<TextElement>(child);
 				if (child->GetText() == ",")
 				{
-					env->Add<KeepBlankElement>(1);
+					env->Add<KeepElement>(1);
 				}
-				break;
-			}
-		case LuaAstNodeType::Expression:
-		case LuaAstNodeType::Identify:
-			{
-				env->AddChild(FormatNode(child));
 				break;
 			}
 		default:
 			{
 				DefaultHandle(child, env);
+				env->Add<KeepElement>(1);
 			}
 		}
 	}

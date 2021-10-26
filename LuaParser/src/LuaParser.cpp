@@ -15,7 +15,6 @@ std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 	{
 		std::stringstream s;
 		s << fin.rdbuf();
-		std::cout << s.str() << std::endl;
 		return LoadFromBuffer(s.str());
 	}
 
@@ -845,7 +844,7 @@ void LuaParser::functionCallArgs(std::shared_ptr<LuaAstNode>& expressionNode)
 	{
 	case '(':
 		{
-			auto tokenNode = createAstNodeFromToken(LuaAstNodeType::KeyWord, _tokenParser->Current());
+			auto tokenNode = createAstNodeFromCurrentToken(LuaAstNodeType::GeneralOperator);
 			callArgsNode->AddChild(tokenNode);
 			_tokenParser->Next();
 			if (_tokenParser->Current().TokenType != ')')
@@ -853,7 +852,7 @@ void LuaParser::functionCallArgs(std::shared_ptr<LuaAstNode>& expressionNode)
 				expressionList(callArgsNode);
 			}
 
-			checkMatch(')', '(', callArgsNode);
+			checkMatch(')', '(', callArgsNode, LuaAstNodeType::GeneralOperator);
 			break;
 		}
 	case '{':
@@ -863,7 +862,7 @@ void LuaParser::functionCallArgs(std::shared_ptr<LuaAstNode>& expressionNode)
 		}
 	case TK_STRING:
 		{
-			auto stringNode = createAstNodeFromToken(LuaAstNodeType::LiteralExpression, _tokenParser->Current());
+			auto stringNode = createAstNodeFromCurrentToken(LuaAstNodeType::LiteralExpression);
 			callArgsNode->AddChild(stringNode);
 			_tokenParser->Next();
 			break;

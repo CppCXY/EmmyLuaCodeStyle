@@ -6,19 +6,19 @@
 
 int main()
 {
-		std::string source = R"(
-if aaa and bbbb
-	or not(ccc(fuck) == fffwfw) then
+// 	std::string source = R"(
+// 		ff("12313", --131231
+// 	function()
+//
+// 	end)
+//
+//
+//
+// 	)";
+// 	std::cout << "原文:\n" << source;
+	// auto parser = LuaParser::LoadFromBuffer(std::move(source));
 
-	end
-
-	active:bbbbb()
-	.ccccdefef()
-
-	)";
-	std::cout << "原文:\n" << source;
-	auto parser = LuaParser::LoadFromBuffer(std::move(source));
-
+	auto parser = LuaParser::LoadFromFile(R"(C:\Users\zc\Desktop\learn\mobdebug\mobdebug.lua)");
 	parser->BuildAstWithComment();
 
 	auto errors = parser->GetErrors();
@@ -40,13 +40,13 @@ if aaa and bbbb
 	LuaFormatOptions options;
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
-	std::cout << "\n格式化结果:\n";
-	std::cout << formatter.GetFormattedText();
+	// std::cout << "\n格式化结果:\n";
+	// std::cout << formatter.GetFormattedText();
 
-	// std::ofstream f(R"(C:\Users\zc\Desktop\learn\UI\UILogin\UILoginReference2.lua)", std::ios::out);
-
-	// auto s = formatter.GetFormattedText();
-	// f.write(s.c_str(), s.size());
+	std::ofstream f(R"(C:\Users\zc\Desktop\learn\formatmobdebug.lua)", std::ios::out| std::ios::binary);
+	
+	auto s = formatter.GetFormattedText();
+	f.write(s.c_str(), s.size());
 
 	return 0;
 }
