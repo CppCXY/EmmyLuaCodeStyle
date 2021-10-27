@@ -7,7 +7,24 @@ FormatElementType LongExpressionLayoutElement::GetType()
 
 void LongExpressionLayoutElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
 {
-	ctx.AddIndent(-1, FormatContext::IndentStateType::ActiveIfLineBreak);
-	FormatElement::Serialize(ctx, position, parent);
-	ctx.RecoverIndent();
+	bool hasIndent = false;
+	for (std::size_t i = 0; i != _children.size(); i++)
+	{
+		auto child = _children[i];
+
+		child->Serialize(ctx, i, this);
+
+		if(child->GetType() == FormatElementType::KeepElement)
+		{
+			if(ctx.GetCharacterCount() == 0 && !hasIndent)
+			{
+				hasIndent = true;
+				ctx.AddIndent();
+			}
+		}
+	}
+
+	if (hasIndent) {
+		ctx.RecoverIndent();
+	}
 }

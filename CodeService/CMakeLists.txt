@@ -2,7 +2,7 @@
 
 project(CodeService)
 
-add_executable(CodeService)
+add_library(CodeService STATIC)
 
 add_dependencies(CodeService LuaParser)
 
@@ -32,7 +32,7 @@ target_sources(CodeService
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/KeepElement.h
 	
 	PRIVATE
-	${CodeService_SOURCE_DIR}/src/CodeService.cpp	
+	#${CodeService_SOURCE_DIR}/src/CodeService.cpp	
 	${CodeService_SOURCE_DIR}/src/LuaFormatter.cpp	
 
 	${CodeService_SOURCE_DIR}/src/FormatElement/IndentElement.cpp	

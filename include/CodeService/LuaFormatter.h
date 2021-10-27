@@ -65,17 +65,9 @@ protected:
 
 	std::shared_ptr<FormatElement> FormatExpressionStatement(std::shared_ptr<LuaAstNode> expressionStatement);
 
-	std::shared_ptr<FormatElement> FormatExpression(std::shared_ptr<LuaAstNode> expression);
-
-	std::shared_ptr<FormatElement> FormatBinaryExpression(std::shared_ptr<LuaAstNode> binaryExpression);
-
-	std::shared_ptr<FormatElement> FormatUnaryExpression(std::shared_ptr<LuaAstNode> unaryExpression);
-
 	std::shared_ptr<FormatElement> FormatCallExpression(std::shared_ptr<LuaAstNode> callExpression);
 
 	std::shared_ptr<FormatElement> FormatCallArgList(std::shared_ptr<LuaAstNode> callArgList);
-
-	std::shared_ptr<FormatElement> FormatPrimaryExpression(std::shared_ptr<LuaAstNode> primaryExpression);
 
 	std::shared_ptr<FormatElement> FormatFunctionStatement(std::shared_ptr<LuaAstNode> functionStatement);
 
@@ -93,8 +85,6 @@ protected:
 
 	std::shared_ptr<FormatElement> FormatTableField(std::shared_ptr<LuaAstNode> tableField);
 
-	std::shared_ptr<FormatElement> FormatIndexExpression(std::shared_ptr<LuaAstNode> indexExpression);
-
 	void DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_ptr<FormatElement> envElement);
 
 	// 以下是特殊格式化规则
@@ -106,6 +96,17 @@ protected:
 	std::shared_ptr<FormatElement> FormatNodeAndBlockOrEnd(int& currentIndex, const std::vector<std::shared_ptr<LuaAstNode>>& vec);
 	//当前索引必须是已经消耗过的索引
 	std::shared_ptr<FormatElement> FormatBlockFromParent(int& currentIndex, const std::vector<std::shared_ptr<LuaAstNode>>& vec);
+
+	// 以下是表达式相关，表达式会联合布局
+	std::shared_ptr<FormatElement> FormatExpression(std::shared_ptr<LuaAstNode> expression, std::shared_ptr<FormatElement> env = nullptr);
+
+	std::shared_ptr<FormatElement> FormatBinaryExpression(std::shared_ptr<LuaAstNode> binaryExpression, std::shared_ptr<FormatElement> env);
+
+	std::shared_ptr<FormatElement> FormatUnaryExpression(std::shared_ptr<LuaAstNode> unaryExpression, std::shared_ptr<FormatElement> env);
+
+	std::shared_ptr<FormatElement> FormatPrimaryExpression(std::shared_ptr<LuaAstNode> primaryExpression, std::shared_ptr<FormatElement> env);
+
+	std::shared_ptr<FormatElement> FormatIndexExpression(std::shared_ptr<LuaAstNode> indexExpression, std::shared_ptr<FormatElement> env);
 private:
 
 	std::shared_ptr<LuaParser> _parser;

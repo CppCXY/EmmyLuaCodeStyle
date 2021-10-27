@@ -12,4 +12,7 @@ endif ()
 
 add_subdirectory(LuaParser)
 add_subdirectory(CodeService)
+add_subdirectory(3rd/lua-5.4.3)
+add_subdirectory(CodeFormatLib)
+add_subdirectory(CodeFormat)
 

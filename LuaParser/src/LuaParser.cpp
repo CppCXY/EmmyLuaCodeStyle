@@ -1,15 +1,19 @@
 ﻿#include "LuaParser/LuaParser.h"
 #include <fstream>
 #include <sstream>
-#include <iostream>
+#include <filesystem>
 #include "LuaDefine.h"
 #include "LuaTokenTypeDetail.h"
 #include "LuaParser/LuaOperatorType.h"
 #include "Util/format.h"
 
+using namespace std::filesystem;
+
 std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 {
-	std::fstream fin(std::string(filename), std::ios::in | std::ios::binary);
+	path filePath(filename);
+	std::string realPath = filePath.string();
+	std::fstream fin(realPath, std::ios::in | std::ios::binary);
 
 	if (fin.is_open())
 	{
