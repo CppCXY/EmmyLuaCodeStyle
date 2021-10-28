@@ -7,8 +7,8 @@ class LuaParserException : std::exception
 {
 public:
 	// ºÊ»›gcc
-	LuaParserException(std::string_view message)
-		: exception(std::string(message).c_str())
+	LuaParserException(const char* message)
+		: exception(message)
 	{
 	}
 };
