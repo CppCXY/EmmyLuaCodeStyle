@@ -427,11 +427,13 @@ void LuaParser::expressionStatement(std::shared_ptr<LuaAstNode> blockNode)
 	suffixedExpression(expression);
 	if (_tokenParser->Current().TokenType == '=' || _tokenParser->Current().TokenType == ',')
 	{
-		expression->SetType(LuaAstNodeType::ExpressionList);
+		auto expressionList = createAstNode(LuaAstNodeType::ExpressionList);
+
+		expressionList->AddChild(expression);
 
 		auto assignStatementNode = createAstNode(LuaAstNodeType::AssignStatement);
 
-		assignStatement(expression, assignStatementNode);
+		assignStatement(expressionList, assignStatementNode);
 
 		// 如果发现一个分号，会认为分号为该语句的结尾
 		testNext(';', assignStatementNode, LuaAstNodeType::GeneralOperator);
@@ -462,7 +464,10 @@ void LuaParser::assignStatement(std::shared_ptr<LuaAstNode> expressionListNode,
 {
 	if (testNext(',', expressionListNode, LuaAstNodeType::GeneralOperator))
 	{
-		suffixedExpression(expressionListNode);
+		auto expression = createAstNode(LuaAstNodeType::Expression);
+		suffixedExpression(expression);
+
+		expressionListNode->AddChild(expression);
 
 		assignStatement(expressionListNode, assignStatementNode);
 	}

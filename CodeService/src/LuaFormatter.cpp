@@ -1637,11 +1637,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 		case LuaAstNodeType::PrimaryExpression:
 			{
 				FormatSubExpressionNode(child, env);
-				
+
 				auto next = nextNode(index, children);
-				if(next && next->GetType() == LuaAstNodeType::CallArgList)
+				if (next && next->GetType() == LuaAstNodeType::CallArgList)
 				{
-					if(next->GetChildren().size() == 1)
+					if (next->GetChildren().size() == 1)
 					{
 						env->Add<KeepElement>(1);
 					}
