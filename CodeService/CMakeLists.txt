@@ -30,6 +30,7 @@ target_sources(CodeService
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/LongExpressionLayoutElement.h
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/AlignToFirstElement.h
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/KeepElement.h
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/SubExpressionElement.h
 	
 	PRIVATE
 	#${CodeService_SOURCE_DIR}/src/CodeService.cpp	
@@ -50,6 +51,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/LongExpressionLayoutElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignToFirstElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/KeepElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/SubExpressionElement.cpp	
 )
 
 target_link_libraries(CodeService LuaParser)

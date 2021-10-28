@@ -1,30 +1,46 @@
 #include "CodeService/FormatElement/LongExpressionLayoutElement.h"
 
+LongExpressionLayoutElement::LongExpressionLayoutElement()
+	: _hasIndent(false)
+{
+}
+
 FormatElementType LongExpressionLayoutElement::GetType()
 {
-	return FormatElementType::KeepLayoutElement;
+	return FormatElementType::LongExpressionLayoutElement;
 }
 
 void LongExpressionLayoutElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
 {
-	bool hasIndent = false;
-	for (std::size_t i = 0; i != _children.size(); i++)
+	SerializeSubExpression(ctx, this);
+	if (_hasIndent)
 	{
-		auto child = _children[i];
+		ctx.RecoverIndent();
+	}
+}
 
-		child->Serialize(ctx, i, this);
+void LongExpressionLayoutElement::SerializeSubExpression(FormatContext& ctx, FormatElement* parent)
+{
+	auto& children = parent->GetChildren();
+	for (std::size_t i = 0; i != children.size(); i++)
+	{
+		auto child = children[i];
 
-		if(child->GetType() == FormatElementType::KeepElement)
+		if (child->GetType() == FormatElementType::SubExpressionElement)
 		{
-			if(ctx.GetCharacterCount() == 0 && !hasIndent)
+			SerializeSubExpression(ctx, child.get());
+		}
+		else
+		{
+			child->Serialize(ctx, i, parent);
+		}
+		if (child->GetType() == FormatElementType::KeepElement)
+		{
+			if (ctx.GetCharacterCount() == 0 && !_hasIndent)
 			{
-				hasIndent = true;
+				_hasIndent = true;
 				ctx.AddIndent();
 			}
 		}
-	}
-
-	if (hasIndent) {
-		ctx.RecoverIndent();
 	}
 }

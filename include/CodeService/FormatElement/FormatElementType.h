@@ -10,6 +10,8 @@ enum class FormatElementType
 	AlignmentLayoutElement,
 	KeepLayoutElement,
 	AlignToFirstElement,
+	SubExpressionElement,
+	LongExpressionLayoutElement,
 
 	ControlStart,
 	KeepLineElement,
