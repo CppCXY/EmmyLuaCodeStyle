@@ -13,9 +13,9 @@ LuaAstNode::LuaAstNode(LuaAstNodeType type, LuaToken& token)
 	: LuaAstNode(type, nullptr)
 {
 	auto text = token.Text;
-	const char* source = text.data() - token.TextRange.StartOffset;
+	const char* source = text.data() - token.LuaTextRange.StartOffset;
 	_source = source;
-	_textRange = token.TextRange;
+	_textRange = token.LuaTextRange;
 	_text = token.Text;
 }
 

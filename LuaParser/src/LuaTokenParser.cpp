@@ -114,7 +114,7 @@ int LuaTokenParser::LastValidOffset()
 {
 	if (!_tokens.empty())
 	{
-		return _tokens.back().TextRange.EndOffset;
+		return _tokens.back().LuaTextRange.EndOffset;
 	}
 	return 0;
 }

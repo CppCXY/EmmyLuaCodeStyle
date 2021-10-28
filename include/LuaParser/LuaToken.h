@@ -11,11 +11,11 @@ public:
 	LuaToken(LuaTokenType type, std::string_view text, TextRange range)
 		: TokenType(type),
 		  Text(text),
-		  TextRange(range)
+		  LuaTextRange(range)
 	{
 	}
 
 	LuaTokenType TokenType;
 	std::string_view Text;
-	TextRange TextRange;
+	TextRange LuaTextRange;
 };
