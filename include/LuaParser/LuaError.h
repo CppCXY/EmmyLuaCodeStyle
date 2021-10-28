@@ -1,6 +1,8 @@
 #pragma once
 
+#include <string>
 #include "TextRange.h"
+
 
 class LuaError
 {
