@@ -8,7 +8,6 @@
 
 #include "LuaToken.h"
 #include "LuaTokenType.h"
-#include "LuaParseException.h"
 
 /*
  * token 解析来自于lua 源代码,实现上非常接近但细节处并不相同

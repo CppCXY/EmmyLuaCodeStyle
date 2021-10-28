@@ -1,5 +1,4 @@
 ﻿#include "LuaParser/LuaAstNode.h"
-#include "LuaParser/LuaParseException.h"
 
 LuaAstNode::LuaAstNode(LuaAstNodeType type, const char* source)
 	: _type(type),
@@ -43,7 +42,8 @@ void LuaAstNode::AddChild(std::shared_ptr<LuaAstNode> child)
 
 	if (child->_source != _source)
 	{
-		throw LuaParserException("child source not match parent source");
+		return;
+		// throw LuaParserException("child source not match parent source");
 	}
 
 	if (_textRange.StartOffset == 0 && _textRange.EndOffset == 0)
@@ -134,7 +134,8 @@ void LuaAstNode::addChildBefore(int index, std::shared_ptr<LuaAstNode> child)
 	{
 		if (child->_source != _source)
 		{
-			throw LuaParserException("child source not match parent source");
+			return;
+			// throw LuaParserException("child source not match parent source");
 		}
 
 		if (_textRange.StartOffset == 0 && _textRange.EndOffset == 0)

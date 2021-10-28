@@ -14,7 +14,6 @@ target_sources(LuaParser PUBLIC
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaToken.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenType.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenParser.h
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaParseException.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaParser.h
 
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaAstNode.h

@@ -665,7 +665,9 @@ void LuaTokenParser::incLinenumber()
 
 	if (++_linenumber >= std::numeric_limits<int>::max())
 	{
-		throw LuaParserException("chunk has too many lines");
+		return;
+		// luaError("")
+		// throw LuaParserException("chunk has too many lines");
 	}
 
 	_lineOffsetVec.push_back(static_cast<int>(_currentParseIndex));
