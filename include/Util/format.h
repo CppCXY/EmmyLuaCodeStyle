@@ -18,9 +18,9 @@ class FormatReplaceExpress
 public:
 	FormatReplaceExpress(std::string_view expr, std::size_t startIndex, std::size_t endIndex, bool needReplace)
 		: Expr(expr),
-		StartIndex(startIndex),
-		EndIndex(endIndex),
-		NeedReplace(needReplace)
+		  StartIndex(startIndex),
+		  EndIndex(endIndex),
+		  NeedReplace(needReplace)
 	{
 	}
 
@@ -48,19 +48,26 @@ std::string toFormatString(T t)
 	}
 }
 #else
-#include <sstream>
+
 template <class T>
-std::string toFormatString(T t)
+inline std::string toFormatString(T t)
 {
-	std::stringstream s;
-	s << t;
-	return s.str();
+	return std::to_string(t);
 }
 
+template <>
+inline std::string toFormatString(std::string t)
+{
+	return t;
+}
+
+template <>
+inline std::string toFormatString(std::string_view t)
+{
+	return std::string(t);
+}
 
 #endif
-
-
 
 
 /*
@@ -70,7 +77,7 @@ std::string toFormatString(T t)
 template <class... ARGS>
 std::string format(std::string_view fmt, ARGS ... args)
 {
-	std::vector<std::string> argVec = { toFormatString<ARGS>(args)... };
+	std::vector<std::string> argVec = {toFormatString<ARGS>(args)...};
 
 	enum class ParseState
 	{
@@ -97,66 +104,66 @@ std::string format(std::string_view fmt, ARGS ... args)
 		switch (state)
 		{
 		case ParseState::Normal:
-		{
-			if (ch == '{')
 			{
-				state = ParseState::LeftBrace;
-				leftBraceBegin = index;
-				exprLeftCount = 0;
-			}
-			else if (ch == '}')
-			{
-				state = ParseState::RightBrace;
-				rightBraceBegin = index;
-			}
-			break;
-		}
-		case ParseState::LeftBrace:
-		{
-			if (ch == '{')
-			{
-				// 认为是左双大括号转义为可见的'{'
-				if (index == leftBraceBegin + 1)
+				if (ch == '{')
 				{
-					replaceExpresses.emplace_back("{", leftBraceBegin, index, false);
+					state = ParseState::LeftBrace;
+					leftBraceBegin = index;
+					exprLeftCount = 0;
+				}
+				else if (ch == '}')
+				{
+					state = ParseState::RightBrace;
+					rightBraceBegin = index;
+				}
+				break;
+			}
+		case ParseState::LeftBrace:
+			{
+				if (ch == '{')
+				{
+					// 认为是左双大括号转义为可见的'{'
+					if (index == leftBraceBegin + 1)
+					{
+						replaceExpresses.emplace_back("{", leftBraceBegin, index, false);
+						state = ParseState::Normal;
+					}
+					else
+					{
+						exprLeftCount++;
+					}
+				}
+				else if (ch == '}')
+				{
+					// 认为是表达式内的大括号
+					if (exprLeftCount > 0)
+					{
+						exprLeftCount--;
+						continue;
+					}
+
+					replaceExpresses.emplace_back(fmt.substr(leftBraceBegin + 1, index - leftBraceBegin - 1),
+					                              leftBraceBegin, index, true);
+
+
 					state = ParseState::Normal;
+				}
+				break;
+			}
+		case ParseState::RightBrace:
+			{
+				if (ch == '}' && (index == rightBraceBegin + 1))
+				{
+					replaceExpresses.emplace_back("}", rightBraceBegin, index, false);
 				}
 				else
 				{
-					exprLeftCount++;
+					//认为左右大括号失配，之前的不做处理，退格一位回去重新判断
+					index--;
 				}
-			}
-			else if (ch == '}')
-			{
-				// 认为是表达式内的大括号
-				if (exprLeftCount > 0)
-				{
-					exprLeftCount--;
-					continue;
-				}
-
-				replaceExpresses.emplace_back(fmt.substr(leftBraceBegin + 1, index - leftBraceBegin - 1),
-					leftBraceBegin, index, true);
-
-
 				state = ParseState::Normal;
+				break;
 			}
-			break;
-		}
-		case ParseState::RightBrace:
-		{
-			if (ch == '}' && (index == rightBraceBegin + 1))
-			{
-				replaceExpresses.emplace_back("}", rightBraceBegin, index, false);
-			}
-			else
-			{
-				//认为左右大括号失配，之前的不做处理，退格一位回去重新判断
-				index--;
-			}
-			state = ParseState::Normal;
-			break;
-		}
 		}
 	}
 
@@ -169,7 +176,7 @@ std::string format(std::string_view fmt, ARGS ... args)
 	else
 	{
 		// 拼接字符串
-		std:size_t replaceCount = 0;
+	std:size_t replaceCount = 0;
 		std::size_t start = 0;
 		for (std::size_t index = 0; index != replaceExpresses.size(); index++)
 		{
@@ -205,4 +212,3 @@ std::string format(std::string_view fmt, ARGS ... args)
 	return message.str();
 }
 #endif
-
