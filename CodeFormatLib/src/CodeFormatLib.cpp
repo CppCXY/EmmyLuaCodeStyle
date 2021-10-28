@@ -4,7 +4,7 @@
 #ifdef MSVC
 #define EXPORT    __declspec(dllexport)
 #else
-#define EXPORT    extern
+#define EXPORT   
 #endif
 
 
