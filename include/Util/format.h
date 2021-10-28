@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#ifdef MSVC
+
+#if defined(MSVC) && _MSVC_LANG > 202002L
 #include <format>
 
 using std::format;
@@ -29,6 +30,7 @@ public:
 	bool NeedReplace;
 };
 
+#if __cplusplus > 202002L || _MSVC_LANG > 202002L
 template <class T>
 std::string toFormatString(T t)
 {
@@ -45,6 +47,20 @@ std::string toFormatString(T t)
 		return std::to_string(t);
 	}
 }
+#else
+#include <sstream>
+template <class T>
+std::string toFormatString(T t)
+{
+	std::stringstream s;
+	s << t;
+	return s.str();
+}
+
+
+#endif
+
+
 
 
 /*
@@ -189,3 +205,4 @@ std::string format(std::string_view fmt, ARGS ... args)
 	return message.str();
 }
 #endif
+
