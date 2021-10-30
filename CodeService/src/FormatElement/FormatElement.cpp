@@ -56,17 +56,17 @@ std::shared_ptr<FormatElement> FormatElement::LastValidElement() const
 	return nullptr;
 }
 
-void FormatElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
+void FormatElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	for (std::size_t i = 0; i != _children.size(); i++)
 	{
-		_children[i]->Serialize(ctx, i, this);
+		_children[i]->Serialize(ctx, i, *this);
 	}
 }
 
 void FormatElement::Format(FormatContext& ctx)
 {
-	return Serialize(ctx, 0, nullptr);
+	return Serialize(ctx, 0, *this);
 }
 
 void FormatElement::AddTextRange(TextRange range)

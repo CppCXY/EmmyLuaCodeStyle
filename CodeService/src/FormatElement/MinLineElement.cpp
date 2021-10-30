@@ -11,7 +11,7 @@ FormatElementType MinLineElement::GetType()
 	return FormatElementType::MinLineElement;
 }
 
-void MinLineElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
+void MinLineElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	auto minLine = 0;
 	if (_line > 0)
@@ -19,7 +19,7 @@ void MinLineElement::Serialize(FormatContext& ctx, int position, FormatElement* 
 		minLine = _line;
 	}
 
-	auto& siblings = parent->GetChildren();
+	auto& siblings = parent.GetChildren();
 
 	int firstElementLine = 0;
 	int secondElementLine = 0;

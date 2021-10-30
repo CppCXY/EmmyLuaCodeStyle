@@ -11,7 +11,7 @@ FormatElementType KeepBlankElement::GetType()
 	return FormatElementType::KeepBlankElement;
 }
 
-void KeepBlankElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
+void KeepBlankElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	ctx.PrintBlank(_blank);
 }

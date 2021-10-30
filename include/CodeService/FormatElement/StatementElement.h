@@ -8,6 +8,6 @@ class StatementElement : public FormatElement
 public:
 	FormatElementType GetType() override;
 
-	void Serialize(FormatContext& ctx, int position, FormatElement* parent) override;
+	void Serialize(FormatContext& ctx, int position, FormatElement& parent) override;
 
 };

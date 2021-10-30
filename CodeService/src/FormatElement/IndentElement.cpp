@@ -11,7 +11,7 @@ FormatElementType IndentElement::GetType()
 	return FormatElementType::IndentElement;
 }
 
-void IndentElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
+void IndentElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	ctx.AddIndent(_specialIndent);
 

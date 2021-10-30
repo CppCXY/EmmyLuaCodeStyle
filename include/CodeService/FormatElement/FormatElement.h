@@ -14,7 +14,7 @@ public:
 	/*
 	 * 智能指针在多态方面支持不够方便
 	 */
-	virtual void Serialize(FormatContext& ctx, int position, FormatElement* parent);
+	virtual void Serialize(FormatContext& ctx, int position, FormatElement& parent);
 
 	void Format(FormatContext& ctx);
 

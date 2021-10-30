@@ -53,7 +53,7 @@ std::string LuaFormatter::GetFormattedText()
 	LuaFormatOptions options;
 	FormatContext ctx(_parser, options);
 
-	_env->Serialize(ctx, 0, nullptr);
+	_env->Format(ctx);
 
 	return ctx.GetText();
 }

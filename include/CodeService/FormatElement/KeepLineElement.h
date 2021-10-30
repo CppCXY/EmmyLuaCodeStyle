@@ -9,10 +9,10 @@ public:
 
 	FormatElementType GetType() override;
 
-	void Serialize(FormatContext& ctx, int position, FormatElement* parent) override;
+	void Serialize(FormatContext& ctx, int position, FormatElement& parent) override;
 protected:
-	int getLastValidLine(FormatContext& ctx, int position, FormatElement* parent);
-	int getNextValidLine(FormatContext& ctx, int position, FormatElement* parent);
+	int getLastValidLine(FormatContext& ctx, int position, FormatElement& parent);
+	int getNextValidLine(FormatContext& ctx, int position, FormatElement& parent);
 private:
 	int _line;
 };

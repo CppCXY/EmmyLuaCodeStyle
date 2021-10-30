@@ -10,7 +10,7 @@ FormatElementType AlignToFirstElement::GetType()
 	return FormatElementType::AlignToFirstElement;
 }
 
-void AlignToFirstElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
+void AlignToFirstElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	for (int i = 0; i != _children.size(); i++)
 	{
@@ -37,7 +37,7 @@ void AlignToFirstElement::Serialize(FormatContext& ctx, int position, FormatElem
 			}
 		}
 
-		_children[i]->Serialize(ctx, i, this);
+		_children[i]->Serialize(ctx, i, *this);
 
 		if(i == _children.size() - 1)
 		{

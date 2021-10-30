@@ -12,7 +12,7 @@ FormatElementType KeepLineElement::GetType()
 	return FormatElementType::KeepLineElement;
 }
 
-void KeepLineElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
+void KeepLineElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	int line = _line;
 	if (_line == -1)
@@ -35,9 +35,9 @@ void KeepLineElement::Serialize(FormatContext& ctx, int position, FormatElement*
 	ctx.PrintLine(line);
 }
 
-int KeepLineElement::getLastValidLine(FormatContext& ctx, int position, FormatElement* parent)
+int KeepLineElement::getLastValidLine(FormatContext& ctx, int position, FormatElement& parent)
 {
-	auto& siblings = parent->GetChildren();
+	auto& siblings = parent.GetChildren();
 	for (int index = position - 1; index >= 0; index--)
 	{
 		if(siblings[index]->HasValidTextRange())
@@ -47,12 +47,12 @@ int KeepLineElement::getLastValidLine(FormatContext& ctx, int position, FormatEl
 	}
 
 	// 那么一定是往上找不到有效范围元素
-	return ctx.GetLine(parent->GetTextRange().StartOffset);
+	return ctx.GetLine(parent.GetTextRange().StartOffset);
 }
 
-int KeepLineElement::getNextValidLine(FormatContext& ctx, int position, FormatElement* parent)
+int KeepLineElement::getNextValidLine(FormatContext& ctx, int position, FormatElement& parent)
 {
-	auto& siblings = parent->GetChildren();
+	auto& siblings = parent.GetChildren();
 	for (std::size_t index = position + 1; index < siblings.size(); index++)
 	{
 		if (siblings[index]->HasValidTextRange())

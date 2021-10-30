@@ -9,10 +9,10 @@ public:
 
 	FormatElementType GetType() override;
 
-	void Serialize(FormatContext& ctx, int position, FormatElement* parent) override;
+	void Serialize(FormatContext& ctx, int position, FormatElement& parent) override;
 
 private:
-	void SerializeSubExpression(FormatContext& ctx, FormatElement* parent);
+	void SerializeSubExpression(FormatContext& ctx, FormatElement& parent);
 
 	bool _hasIndent;
 };

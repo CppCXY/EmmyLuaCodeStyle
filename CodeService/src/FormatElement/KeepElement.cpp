@@ -12,7 +12,7 @@ FormatElementType KeepElement::GetType()
 	return FormatElementType::KeepElement;
 }
 
-void KeepElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
+void KeepElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	int lastElementLine = getLastValidLine(ctx, position, parent);
 	int nextElementLine = getNextValidLine(ctx, position, parent);

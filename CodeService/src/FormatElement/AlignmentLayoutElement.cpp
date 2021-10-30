@@ -21,7 +21,7 @@ FormatElementType AlignmentLayoutElement::GetType()
 	return FormatElementType::AlignmentLayoutElement;
 }
 
-void AlignmentLayoutElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
+void AlignmentLayoutElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	int eqAlignedPosition = 0;
 	bool firstContainEq = true;
@@ -49,7 +49,7 @@ void AlignmentLayoutElement::Serialize(FormatContext& ctx, int position, FormatE
 						auto lastValidIndex = FindLastValidChildIndex(index, statChildren);
 						if (lastValidIndex == -1)
 						{
-							return normalSerialize(ctx, position, this);
+							return normalSerialize(ctx, position, *this);
 						}
 						auto lastStatChild = statChildren[lastValidIndex];
 						auto lastPosition = ctx.GetColumn(lastStatChild->GetTextRange().EndOffset);
@@ -57,7 +57,7 @@ void AlignmentLayoutElement::Serialize(FormatContext& ctx, int position, FormatE
 
 						if (eqPosition - lastPosition <= 2)
 						{
-							return normalSerialize(ctx, position, this);
+							return normalSerialize(ctx, position, *this);
 						}
 					}
 
@@ -70,10 +70,10 @@ void AlignmentLayoutElement::Serialize(FormatContext& ctx, int position, FormatE
 		}
 	}
 
-	return alignmentSerialize(ctx, position, this, eqAlignedPosition);
+	return alignmentSerialize(ctx, position, *this, eqAlignedPosition);
 }
 
-void AlignmentLayoutElement::alignmentSerialize(FormatContext& ctx, int position, FormatElement* parent, int eqPosition)
+void AlignmentLayoutElement::alignmentSerialize(FormatContext& ctx, int position, FormatElement& parent, int eqPosition)
 {
 	for (auto statChild : _children)
 	{
@@ -98,7 +98,7 @@ void AlignmentLayoutElement::alignmentSerialize(FormatContext& ctx, int position
 	return normalSerialize(ctx, position, parent);
 }
 
-void AlignmentLayoutElement::normalSerialize(FormatContext& ctx, int position, FormatElement* parent)
+void AlignmentLayoutElement::normalSerialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	FormatElement::Serialize(ctx, position, parent);
 }

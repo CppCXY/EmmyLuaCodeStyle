@@ -11,7 +11,7 @@ FormatElementType AlignmentElement::GetType()
 	return FormatElementType::AlignmentElement;
 }
 
-void AlignmentElement::Serialize(FormatContext& ctx, int position, FormatElement* parent)
+void AlignmentElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	int blank = _alignmentPosition - ctx.GetCharacterCount();
 	if (blank > 0)
