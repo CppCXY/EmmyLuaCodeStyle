@@ -127,7 +127,7 @@ int LuaTokenParser::GetLine(int offset)
 		return 0;
 	}
 
-	int maxLine = _lineOffsetVec.size() - 1;
+	int maxLine = static_cast<int>(_lineOffsetVec.size()) - 1;
 	int targetLine = maxLine;
 	int upperLine = maxLine;
 	int lowestLine = 0;

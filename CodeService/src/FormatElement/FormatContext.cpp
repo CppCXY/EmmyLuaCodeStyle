@@ -13,7 +13,7 @@ void FormatContext::Print(std::string_view text)
 	auto& indentState = _indentStack.top();
 	if (_characterCount < indentState.Indent)
 	{
-		PrintBlank(indentState.Indent - _characterCount);
+		PrintBlank(indentState.Indent - static_cast<int>(_characterCount));
 	}
 	_os << text;
 	_characterCount += text.size();

@@ -93,7 +93,7 @@ void LuaAstNode::AddLeafChild(std::shared_ptr<LuaAstNode> child)
 	}
 
 	// 因为std::size_t 没法低于0
-	for (int index = _children.size() - 1; index >= 0; index--)
+	for (int index = static_cast<int>(_children.size()) - 1; index >= 0; index--)
 	{
 		auto& currentChild = _children[index];
 		auto currentChildTextRange = currentChild->GetTextRange();
@@ -117,7 +117,7 @@ void LuaAstNode::AddLeafChild(std::shared_ptr<LuaAstNode> child)
 
 void LuaAstNode::addChildAfter(int index, std::shared_ptr<LuaAstNode> child)
 {
-	if (index == (_children.size() - 1))
+	if (index == static_cast<int>(_children.size() - 1))
 	{
 		AddChild(child);
 	}

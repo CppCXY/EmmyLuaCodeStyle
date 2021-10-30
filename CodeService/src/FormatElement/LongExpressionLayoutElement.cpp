@@ -22,7 +22,7 @@ void LongExpressionLayoutElement::Serialize(FormatContext& ctx, int position, Fo
 void LongExpressionLayoutElement::SerializeSubExpression(FormatContext& ctx, FormatElement& parent)
 {
 	auto& children = parent.GetChildren();
-	for (std::size_t i = 0; i != children.size(); i++)
+	for (int i = 0; i < static_cast<int>(children.size()); i++)
 	{
 		auto child = children[i];
 

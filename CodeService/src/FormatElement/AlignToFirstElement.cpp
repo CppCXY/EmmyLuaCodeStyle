@@ -20,7 +20,7 @@ void AlignToFirstElement::Serialize(FormatContext& ctx, int position, FormatElem
 			auto indentCount = ctx.GetCurrentIndent();
 			if (writeCount > indentCount)
 			{
-				ctx.AddIndent(writeCount);
+				ctx.AddIndent(static_cast<int>(writeCount));
 			}
 			else
 			{
@@ -32,7 +32,7 @@ void AlignToFirstElement::Serialize(FormatContext& ctx, int position, FormatElem
 				}
 				else
 				{
-					ctx.AddIndent(indentCount);
+					ctx.AddIndent(static_cast<int>(indentCount));
 				}
 			}
 		}
