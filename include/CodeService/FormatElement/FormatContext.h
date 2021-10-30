@@ -13,13 +13,13 @@ public:
 	enum class IndentStateType
 	{
 		Normal,
-		ActiveIfLineBreak,
+		// ActiveIfLineBreak,
 	};
 
 	struct IndentState
 	{
 		int Indent = 0;
-		int WaitActiveIndent = 0;
+		// int WaitActiveIndent = 0;
 		std::string IndentString = "";
 		IndentStateType Type = IndentStateType::Normal;
 	};
@@ -31,6 +31,8 @@ public:
 	void PrintLine(int line);
 
 	void PrintBlank(int blank);
+
+	void PrintIndent(int indent, const std::string& indentString);
 
 	void AddIndent(int specialIndent = -1, IndentStateType type = IndentStateType::Normal);
 
@@ -46,9 +48,6 @@ public:
 
 	std::string GetText();
 
-	void SetIndentIfLineBreak(int indent);
-
-	void ClearIndentIfLineBreak();
 
 private:
 	std::stack<IndentState, std::vector<IndentState>> _indentStack;
