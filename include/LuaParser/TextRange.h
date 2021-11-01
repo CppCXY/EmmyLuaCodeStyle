@@ -11,6 +11,6 @@ public:
 
 	bool Between(TextRange& leftRange, TextRange& rightRange);
 
-	int StartOffset = 0;
-	int EndOffset = 0;
+	int StartOffset;
+	int EndOffset;
 };

@@ -27,9 +27,9 @@ public:
 
 	std::vector<LuaToken>& GetAllComments() { return _tokenParser->GetComments(); }
 
-	int GetLine(int offset) { return _tokenParser->GetLine(offset); }
+	int GetLine(int offset) const { return _tokenParser->GetLine(offset); }
 
-	int GetColumn(int offset) { return _tokenParser->GetColumn(offset); }
+	int GetColumn(int offset) const { return _tokenParser->GetColumn(offset); }
 
 private:
 	bool blockFollow(bool withUntil = false);
@@ -93,9 +93,9 @@ private:
 
 	void field(std::shared_ptr<LuaAstNode> tableExpressionNode);
 
-	void listField(std::shared_ptr<LuaAstNode> tableExpressionNode);
+	void listField(std::shared_ptr<LuaAstNode> tableFieldNode);
 
-	void rectField(std::shared_ptr<LuaAstNode> tableExpressionNode);
+	void rectField(std::shared_ptr<LuaAstNode> tableFieldNode);
 
 	void functionBody(std::shared_ptr<LuaAstNode> closureExpression);
 
@@ -118,7 +118,7 @@ private:
 
 	void check(LuaTokenType c);
 
-	void primaryExpression(std::shared_ptr<LuaAstNode> expressionNode);
+	void primaryExpression(std::shared_ptr<LuaAstNode> primaryExpression);
 
 	UnOpr getUnaryOperator(LuaTokenType op);
 
@@ -127,7 +127,7 @@ private:
 	/*
 	 * 他是检查当前token的type是否与c相同
 	 * 如果是就跳过当前,
-	 * 否则会抛出异常
+	 * 否则会生成错误
 	 */
 	void checkAndNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent,
 	                  LuaAstNodeType addType = LuaAstNodeType::KeyWord);

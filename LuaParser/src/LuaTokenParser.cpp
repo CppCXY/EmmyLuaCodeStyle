@@ -114,7 +114,7 @@ int LuaTokenParser::LastValidOffset()
 {
 	if (!_tokens.empty())
 	{
-		return _tokens.back().LuaTextRange.EndOffset;
+		return _tokens.back().Range.EndOffset;
 	}
 	return 0;
 }
@@ -129,7 +129,7 @@ int LuaTokenParser::GetLine(int offset)
 
 	int maxLine = static_cast<int>(_lineOffsetVec.size()) - 1;
 	int targetLine = maxLine;
-	int upperLine = maxLine;
+	int upperLine = maxLine; 
 	int lowestLine = 0;
 
 	while (true)

@@ -978,7 +978,7 @@ void LuaParser::check(LuaTokenType c)
 {
 	if (_tokenParser->Current().TokenType != c)
 	{
-		luaMatchError(format("{} expected", c), _tokenParser->Current().LuaTextRange);
+		luaMatchError(format("{} expected", c), _tokenParser->Current().Range);
 	}
 }
 
