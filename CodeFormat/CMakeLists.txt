@@ -17,3 +17,9 @@ target_sources(CodeFormat
 )
 
 target_link_libraries(CodeFormat CodeService)
+
+install(
+    TARGETS CodeFormat
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
