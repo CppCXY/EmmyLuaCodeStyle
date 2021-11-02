@@ -28,7 +28,8 @@ jobs:
                 mkdir build
                 cd build
                 cmake ..
-                cmake --build . --config Release --target install
+                cmake --build . --config Release 
+                cmake --install --config Release --prefix "install"
            
         - name: Upload
           uses: actions/upload-artifact@v2
@@ -53,7 +54,8 @@ jobs:
             mkdir build
             cd build
             cmake ..
-            cmake --build . --config Release --target install
+            cmake --build . --config Release 
+            cmake --install --config Release --prefix "install"
            
 
         - name: Upload
@@ -81,7 +83,8 @@ jobs:
                 mkdir build
                 cd build
                 cmake ..
-                cmake --build . --config Release --target install
+                cmake --build . --config Release 
+                cmake --install --config Release --prefix "install"
            
         - name: Upload
           uses: actions/upload-artifact@v2
