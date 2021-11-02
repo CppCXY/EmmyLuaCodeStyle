@@ -29,7 +29,7 @@ jobs:
                 cd build
                 cmake ..
                 cmake --build . --config Release 
-                cmake --install --config Release --prefix "install"
+                cmake --install --config Release 
            
         - name: Upload
           uses: actions/upload-artifact@v2
@@ -55,7 +55,7 @@ jobs:
             cd build
             cmake ..
             cmake --build . --config Release 
-            cmake --install --config Release --prefix "install"
+            cmake --install --config Release
            
 
         - name: Upload
@@ -84,7 +84,7 @@ jobs:
                 cd build
                 cmake ..
                 cmake --build . --config Release 
-                cmake --install --config Release --prefix "install"
+                cmake --install --config Release
            
         - name: Upload
           uses: actions/upload-artifact@v2
