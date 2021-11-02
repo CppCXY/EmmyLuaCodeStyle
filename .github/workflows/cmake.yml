@@ -29,14 +29,15 @@ jobs:
                 cd build
                 cmake ..
                 cmake --build . --config Release
-                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact
+                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/windows
                 
            
         - name: Upload
           uses: actions/upload-artifact@v2
           with: 
-            name: CodeFormat
-            path: ${{ github.workspace }}/artifact/bin/*
+            name: CodeFormat windows
+            path: ${{ github.workspace }}/artifact/windows/bin/*
+            
 
     build-linux:
         # The CMake configure and build commands are platform agnostic and should work equally
@@ -56,13 +57,13 @@ jobs:
             cd build
             cmake ..
             cmake --build . --config Release
-            cmake --install . --config Release --prefix ${{ github.workspace }}/artifact
+            cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/linux
            
 
         - name: Upload
           uses: actions/upload-artifact@v2
           with: 
-            name: CodeFormat
+            name: CodeFormat linux
             path: ${{ github.workspace }}/artifact/bin/*
 
      
@@ -85,11 +86,11 @@ jobs:
                 cd build
                 cmake ..
                 cmake --build . --config Release
-                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact
+                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/dartwin
              
            
         - name: Upload
           uses: actions/upload-artifact@v2
           with: 
-            name: CodeFormat
-            path: ${{ github.workspace }}/artifact/bin/*
+            name: CodeFormat macosx
+            path: ${{ github.workspace }}/artifact/dartwin/bin/*
