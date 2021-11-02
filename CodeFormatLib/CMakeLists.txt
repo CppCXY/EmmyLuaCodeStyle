@@ -19,4 +19,8 @@ target_sources(CodeFormatLib
 	${CodeFormatLib_SOURCE_DIR}/src/CodeFormatLib.cpp
 )
 
+if(NOT WIN32)
+    target_compile_options(CodeFormatLib PUBLIC -fPIC)
+endif()
+
 target_link_libraries(CodeFormatLib CodeService lua54)
