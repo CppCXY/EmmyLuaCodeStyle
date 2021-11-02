@@ -28,14 +28,15 @@ jobs:
                 mkdir build
                 cd build
                 cmake ..
-                cmake --build . --config Release --target install
+                cmake --build . --config Release
+                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact
                 
            
         - name: Upload
           uses: actions/upload-artifact@v2
           with: 
             name: CodeFormat
-            path: build/install/bin
+            path: ${{ github.workspace }}/artifact/bin/CodeFormat.exe
 
     build-linux:
         # The CMake configure and build commands are platform agnostic and should work equally
@@ -54,14 +55,15 @@ jobs:
             mkdir build
             cd build
             cmake ..
-            cmake --build . --config Release --target install
+            cmake --build . --config Release
+            cmake --install . --config Release --prefix ${{ github.workspace }}/artifact
            
 
         - name: Upload
           uses: actions/upload-artifact@v2
           with: 
             name: CodeFormat
-            path: build/install/bin
+            path: ${{ github.workspace }}/artifact/bin/CodeFormat.exe
 
      
       
@@ -82,11 +84,12 @@ jobs:
                 mkdir build
                 cd build
                 cmake ..
-                cmake --build . --config Release --target install
+                cmake --build . --config Release
+                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact
              
            
         - name: Upload
           uses: actions/upload-artifact@v2
           with: 
             name: CodeFormat
-            path: build/install/bin
+            path: ${{ github.workspace }}/artifact/bin/CodeFormat.exe
