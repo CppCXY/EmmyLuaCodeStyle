@@ -36,7 +36,7 @@ jobs:
           uses: actions/upload-artifact@v2
           with: 
             name: CodeFormat
-            path: ${{ github.workspace }}/artifact/bin/CodeFormat.exe
+            path: ${{ github.workspace }}/artifact/bin/*
 
     build-linux:
         # The CMake configure and build commands are platform agnostic and should work equally
@@ -63,7 +63,7 @@ jobs:
           uses: actions/upload-artifact@v2
           with: 
             name: CodeFormat
-            path: ${{ github.workspace }}/artifact/bin/CodeFormat.exe
+            path: ${{ github.workspace }}/artifact/bin/*
 
      
       
@@ -92,4 +92,4 @@ jobs:
           uses: actions/upload-artifact@v2
           with: 
             name: CodeFormat
-            path: ${{ github.workspace }}/artifact/bin/CodeFormat.exe
+            path: ${{ github.workspace }}/artifact/bin/*
