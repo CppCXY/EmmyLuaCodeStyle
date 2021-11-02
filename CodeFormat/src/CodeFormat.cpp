@@ -1,8 +1,10 @@
 #include <iostream>
+#include <cstring>
+#include <fstream>
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"
 #include "CodeService/LuaFormatter.h"
-#include <fstream>
+
 
 int main(int argc, char** argv)
 {
