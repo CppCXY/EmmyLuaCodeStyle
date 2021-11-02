@@ -12,7 +12,7 @@
 #include "CodeService/FormatElement/AlignToFirstElement.h"
 #include "CodeService/FormatElement/KeepElement.h"
 #include "CodeService/FormatElement/LongExpressionLayoutElement.h"
-#include "CodeService/FormatElement/SubexpressionElement.h"
+#include "CodeService/FormatElement/SubExpressionElement.h"
 
 bool nextMatch(int currentIndex, LuaAstNodeType type, const std::vector<std::shared_ptr<LuaAstNode>>& vec)
 {

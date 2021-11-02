@@ -1,4 +1,4 @@
-#include "CodeService/FormatElement/SubexpressionElement.h"
+#include "CodeService/FormatElement/SubExpressionElement.h"
 
 FormatElementType SubExpressionElement::GetType()
 {
