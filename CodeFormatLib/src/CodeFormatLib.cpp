@@ -23,8 +23,6 @@ int format(lua_State* L)
 		auto parser = LuaParser::LoadFromBuffer(std::move(buffer));
 		parser->BuildAstWithComment();
 
-		auto ast = parser->GetAst();
-
 		if (!parser->GetErrors().empty())
 		{
 			lua_pushboolean(L, false);

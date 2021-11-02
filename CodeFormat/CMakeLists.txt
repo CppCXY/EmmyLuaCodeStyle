@@ -11,7 +11,7 @@ target_include_directories(CodeFormat PUBLIC
 	src
 )
 
-target_sources(CodeService 
+target_sources(CodeFormat
 	PUBLIC
 	${CodeFormat_SOURCE_DIR}/src/CodeFormat.cpp
 )

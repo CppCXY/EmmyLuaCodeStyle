@@ -6,23 +6,34 @@
 
 int main(int argc, char** argv)
 {
-	if(argc < 2)
+	if(argc < 3)
 	{
 		return -1;
 	}
 
-	auto parser = LuaParser::LoadFromFile(argv[1]);
+	std::shared_ptr<LuaParser> parser = nullptr;
+
+	std::string cmdOption = argv[1];
+	if(cmdOption == "-f")
+	{
+		parser = LuaParser::LoadFromFile(argv[1]);
+	}
+	else if(cmdOption == "-b")
+	{
+		std::size_t size = std::stoll(argv[2]);
+
+		std::string buffer;
+		buffer.resize(size);
+		std::cin.get(buffer.data(), size, EOF);
+		auto realSize = strnlen(buffer.data(), size);
+		buffer.resize(realSize);
+		parser = LuaParser::LoadFromBuffer(std::move(buffer));
+	}
+
 	parser->BuildAstWithComment();
 
-	// auto errors = parser->GetErrors();
-	//
-	// for (auto& err : errors)
-	// {
-	// 	std::cout << format("error: {} , textRange({},{})", err.ErrorMessage, err.ErrorRange.StartOffset,
-	// 	                    err.ErrorRange.EndOffset) << std::endl;
-	// }
-	auto ast = parser->GetAst();
 	LuaFormatOptions options;
+	options.LineSeperater = "\n";
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
 	std::cout << formatter.GetFormattedText();

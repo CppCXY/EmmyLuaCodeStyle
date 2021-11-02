@@ -50,8 +50,7 @@ void LuaFormatter::BuildFormattedElement()
 
 std::string LuaFormatter::GetFormattedText()
 {
-	LuaFormatOptions options;
-	FormatContext ctx(_parser, options);
+	FormatContext ctx(_parser, _options);
 
 	_env->Format(ctx);
 
