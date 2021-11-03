@@ -25,7 +25,7 @@ jobs:
         - name: Upload
           uses: actions/upload-artifact@v2
           with: 
-            name: CodeFormat${{ matrix.os }}
+            name: CodeFormat_$GITHUB_RUNNER_OS
             path: ${{ github.workspace }}/artifact/bin/*
             
 
