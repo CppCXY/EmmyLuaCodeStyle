@@ -19,13 +19,13 @@ jobs:
                 cd build
                 cmake ..
                 cmake --build . --config Release
-                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact
+                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/$GITHUB_RUNNER_OS
                 
            
         - name: Upload
           uses: actions/upload-artifact@v2
           with: 
-            name: CodeFormat_$GITHUB_RUNNER_OS
-            path: ${{ github.workspace }}/artifact/bin/*
+            name: CodeFormat
+            path: ${{ github.workspace }}/artifact/
             
 
