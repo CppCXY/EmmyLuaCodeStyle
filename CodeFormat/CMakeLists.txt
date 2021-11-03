@@ -25,5 +25,5 @@ endif()
 install(
     TARGETS CodeFormat
     LIBRARY DESTINATION lib
-    RUNTIME DESTINATION /
+    RUNTIME DESTINATION bin
 )
