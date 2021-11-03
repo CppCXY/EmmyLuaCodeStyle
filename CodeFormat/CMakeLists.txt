@@ -18,7 +18,7 @@ target_sources(CodeFormat
 
 target_link_libraries(CodeFormat CodeService)
 
-if(NOT WIN32)
+if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 	target_link_libraries(CodeFormat -static-libstdc++ -static-libgcc)	
 endif()
 
