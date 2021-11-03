@@ -18,6 +18,10 @@ target_sources(CodeFormat
 
 target_link_libraries(CodeFormat CodeService)
 
+if(NOT WIN32)
+	target_link_libraries(CodeFormat -static-libstdc++ -static-libgcc)	
+endif()
+
 install(
     TARGETS CodeFormat
     LIBRARY DESTINATION lib
