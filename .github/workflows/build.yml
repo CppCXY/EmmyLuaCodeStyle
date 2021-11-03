@@ -1,0 +1,34 @@
+name: Build
+
+on: push
+
+jobs:
+    build:
+        runs-on: ${{ matrix.os}}
+        strategy:
+          matrix:
+            os: [windows-latest, ubuntu-latest, macos-latest]
+            upload: [windows, linux, macosx]
+        steps:
+        - uses: actions/checkout@v2
+          with:
+            ref: refs/heads/master
+        - name: Build
+            # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+            # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+          run: | 
+                mkdir build
+                cd build
+                cmake ..
+                cmake --build . --config Release
+                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact
+                
+           
+        - name: Upload
+          uses: actions/upload-artifact@v2
+          with: 
+            name: ${{ matrix.upload }}
+            path: ${{ github.workspace }}/artifact/bin/*
+            
+
+    
