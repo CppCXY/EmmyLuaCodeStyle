@@ -19,11 +19,11 @@ target_sources(CodeFormat
 target_link_libraries(CodeFormat CodeService)
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-	target_link_libraries(CodeFormat -static-libstdc++ -static-libgcc)	
+	target_link_libraries(CodeFormat -static -static-libstdc++ -static-libgcc)	
 endif()
 
 install(
     TARGETS CodeFormat
     LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
+    RUNTIME DESTINATION /
 )
