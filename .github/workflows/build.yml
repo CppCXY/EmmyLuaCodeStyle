@@ -19,7 +19,7 @@ jobs:
                 cd build
                 cmake ..
                 cmake --build . --config Release
-                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/${{ github.runner.os }}
+                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/"$GITHUB_RUNNER_OS"
                 
            
         - name: Upload
