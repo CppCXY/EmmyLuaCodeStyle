@@ -3,29 +3,29 @@ name: Build
 on: push
 
 jobs:
-    build:
-        runs-on: ${{ matrix.os }}
-        strategy:
-          fail-fast: false
-          matrix:
-            os: [windows-latest, ubuntu-latest, macos-latest]
-        steps:
-        - uses: actions/checkout@v2
-          with:
-            ref: refs/heads/master
-        - name: Build
-          run: | 
-                mkdir build
-                cd build
-                cmake ..
-                cmake --build . --config Release
-                cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/"$GITHUB_RUNNER_OS"
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: refs/heads/master
+    - name: Build
+      run: | 
+            mkdir build
+            cd build
+            cmake ..
+            cmake --build . --config Release
+            cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/${{ runner.os }}/
                 
-           
-        - name: Upload
-          uses: actions/upload-artifact@v2
-          with: 
-            name: CodeFormat
-            path: ${{ github.workspace }}/artifact/
+          
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with: 
+        name: CodeFormat
+        path: ${{ github.workspace }}/artifact/
             
 
