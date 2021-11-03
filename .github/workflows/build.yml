@@ -4,18 +4,16 @@ on: push
 
 jobs:
     build:
-        runs-on: ${{ matrix.os}}
+        runs-on: ${{ matrix.os }}
         strategy:
+          fail-fast: false
           matrix:
             os: [windows-latest, ubuntu-latest, macos-latest]
-            upload: [windows, linux, macosx]
         steps:
         - uses: actions/checkout@v2
           with:
             ref: refs/heads/master
         - name: Build
-            # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-            # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
           run: | 
                 mkdir build
                 cd build
@@ -27,8 +25,7 @@ jobs:
         - name: Upload
           uses: actions/upload-artifact@v2
           with: 
-            name: ${{ matrix.upload }}
+            name: CodeFormat${{ matrix.os }}
             path: ${{ github.workspace }}/artifact/bin/*
             
 
-    
