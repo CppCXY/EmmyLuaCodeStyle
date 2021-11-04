@@ -57,15 +57,6 @@ std::string LuaFormatter::GetFormattedText()
 	return ctx.GetText();
 }
 
-void LuaFormatter::AddDiagnosis(TextRange range, std::string_view message)
-{
-}
-
-std::vector<LuaCodeDiagnosis>& LuaFormatter::GetDiagnosis()
-{
-	return _diagnosis;
-}
-
 std::shared_ptr<FormatElement> LuaFormatter::FormatNode(std::shared_ptr<LuaAstNode> node)
 {
 	switch (node->GetType())

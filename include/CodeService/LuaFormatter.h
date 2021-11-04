@@ -3,7 +3,6 @@
 #include <sstream>
 #include "LuaParser/LuaParser.h"
 #include "LuaFormatOptions.h"
-#include "LuaCodeDiagnosis.h"
 #include "FormatElement/FormatElement.h"
 
 class LuaFormatter
@@ -15,10 +14,6 @@ public:
 	void BuildFormattedElement();
 
 	std::string GetFormattedText();
-
-	void AddDiagnosis(TextRange range, std::string_view message);
-
-	std::vector<LuaCodeDiagnosis>& GetDiagnosis();
 
 protected:
 	std::shared_ptr<FormatElement> FormatNode(std::shared_ptr<LuaAstNode> node);
@@ -112,9 +107,7 @@ protected:
 private:
 
 	std::shared_ptr<LuaParser> _parser;
-	// std::shared_ptr<LuaFormatContext> _ctx;
 	LuaFormatOptions _options;
-	std::vector<LuaCodeDiagnosis> _diagnosis;
 	std::shared_ptr<FormatElement> _env;
 };
 
