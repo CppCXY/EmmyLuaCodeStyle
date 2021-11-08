@@ -32,8 +32,8 @@ local t = 123 --local
 print("hello",
     "iiiiii") --call
 
-function fff(aaa,bbb,
-             eeee,fff,dddd)
+function fff(aaa, bbb,
+             eeee, fff, dddd)
 
 end    
 ```
@@ -90,8 +90,24 @@ local d = {
 ```
 该语句也是合法，但是格式化不会采取对齐到等号的算法。
 
+### 长表达式列表
 
+考察如下lua语句
+```lua
+local aaa = 13131, bbbb,
+    ccc, 123131, ddddd,
+    eeee, fff
 
+return aaa , bbb, dddd
+    or cccc
+
+if aaa and bbb 
+    or ccc() then
+
+end
+
+```
+长表达式列表的排版采用一个比较普适的原则，延续行多一个缩进。
 
 
 ## 格式化选项
