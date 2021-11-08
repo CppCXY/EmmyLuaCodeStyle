@@ -18,7 +18,15 @@ std::string IOSession::Handle(std::string_view msg)
 
 	parser.Parse(msg);
 
-	_service.Dispatch(parser.GetRequestMethod() , parser.GetRequest());
+	auto request = parser.GetRequest();
+
+	if (request)
+	{
+		auto response = _service.Dispatch(parser.GetMethod(), request);
+		if (response) {
+			return parser.SerializeProtocol(response);
+		}
+	}
 
 	return "";
 }

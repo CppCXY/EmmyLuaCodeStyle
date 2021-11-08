@@ -234,7 +234,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				auto childEnv = FormatNode(statement);
 				indentEnv->AddChild(childEnv);
 
-				indentEnv->Add<MinLineElement>(1);
+				indentEnv->Add<MinLineElement>(_options.BlockStatementKeepMinLine);
 				break;
 			}
 		case LuaAstNodeType::Comment:
@@ -253,8 +253,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::ExpressionStatement:
 			{
 				auto statEnv = FormatNode(statement);
-
-
 				if (nextMatch(index, LuaAstNodeType::Comment, statements))
 				{
 					auto next = statements[index + 1];
@@ -863,16 +861,40 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<LuaAstNode> callArgList)
 {
 	auto env = std::make_shared<ExpressionElement>();
-
-	for (auto child : callArgList->GetChildren())
+	auto& children = callArgList->GetChildren();
+	for (auto child : children)
 	{
 		switch (child->GetType())
 		{
 		case LuaAstNodeType::KeyWord:
-		case LuaAstNodeType::ExpressionList:
 			{
 				env->AddChild(FormatNode(child));
 				env->Add<KeepElement>(0);
+				break;
+			}
+		case LuaAstNodeType::ExpressionList:
+			{
+				auto exprListEnv = FormatNode(child);
+				if (_options.AlignCallArgs)
+				{
+					auto alignToFirstEnv = std::make_shared<AlignToFirstElement>(_options.Indent);
+					alignToFirstEnv->AddChildren(exprListEnv->GetChildren());
+					env->AddChild(alignToFirstEnv);
+				}
+				else
+				{
+					env->AddChild(exprListEnv);
+				}
+
+				if (_options.BlankBetweenCallArgsAndBracket)
+				{
+					env->Add<KeepElement>(1);
+				}
+				else
+				{
+					env->Add<KeepElement>(0);
+				}
+
 				break;
 			}
 		case LuaAstNodeType::GeneralOperator:
@@ -881,6 +903,14 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 				if (child->GetText() == ",")
 				{
 					env->Add<KeepElement>(1);
+				}
+				else if (child->GetText() == "(" && _options.BlankBetweenCallArgsAndBracket && children.size() > 2)
+				{
+					env->Add<KeepElement>(1);
+				}
+				else
+				{
+					env->Add<KeepElement>(0);
 				}
 				break;
 			}

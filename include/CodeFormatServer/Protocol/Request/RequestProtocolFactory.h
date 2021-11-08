@@ -18,5 +18,5 @@ public:
 	void Initialize();
 
 private:
-	std::map<std::string, MakeHandle> _handle;
+	std::map<std::string, MakeHandle, std::less<>> _handle;
 };

@@ -4,9 +4,9 @@
 class JsonRequestProtocol
 {
 public:
-	JsonRequestProtocol(nlohmann::json param);
+	JsonRequestProtocol();
 
 	virtual ~JsonRequestProtocol();
-	virtual void Initialize();
+	virtual void Initialize(nlohmann::json param) = 0;
 };
 

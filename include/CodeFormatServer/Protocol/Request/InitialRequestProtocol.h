@@ -4,10 +4,7 @@
 class InitializeRequestProtocol : public JsonRequestProtocol
 {
 public:
-	void ParseFrom(nlohmann::json param) override;
-
-	
-
-
-
+	InitializeRequestProtocol();
+	void Initialize(nlohmann::json param) override;
 };
+

@@ -93,19 +93,19 @@ void ProtocolBuffer::Reset()
 
 bool ProtocolBuffer::TryParseHead()
 {
-	enum ParseState
+	enum class ParseState
 	{
 		HeadStart,
 		CRLF,
 		CRLF_CRLF
-	} state = HeadStart;
+	} state = ParseState::HeadStart;
 
 	std::string_view text(_buffer.data() + _startIndex, _writeIndex - _startIndex);
 	for (std::size_t index = 0; index < text.size();)
 	{
 		switch (state)
 		{
-		case HeadStart:
+		case ParseState::HeadStart:
 			{
 				std::size_t colonPosition = text.find_first_of(":", index);
 				if (colonPosition == std::string_view::npos)
@@ -129,27 +129,29 @@ bool ProtocolBuffer::TryParseHead()
 					_contentLength = std::stoi(std::string(lengthStr));
 				}
 				index = lineEndPosition + 2;
-				state = CRLF;
+				state = ParseState::CRLF;
 				break;
 			}
-		case CRLF:
+		case ParseState::CRLF:
 			{
 				if ((text.size() - 1 > index) && text[index] == '\r' && text[index + 1] == '\n')
 				{
 					index += 2;
-					state = CRLF_CRLF;
+					state = ParseState::CRLF_CRLF;
 				}
 				else
 				{
-					state = HeadStart;
+					state = ParseState::HeadStart;
 				}
 				break;
 			}
-		case CRLF_CRLF:
+		case ParseState::CRLF_CRLF:
 			{
 				_bodyStartIndex = index;
 				return true;
 			}
 		}
 	}
+
+	return true;
 }

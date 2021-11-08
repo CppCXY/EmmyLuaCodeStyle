@@ -35,9 +35,9 @@ int main(int argc, char** argv)
 	parser->BuildAstWithComment();
 
 	LuaFormatOptions options;
-	options.LineSeperater = "\n";
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
-	std::cout << formatter.GetFormattedText();
+	auto formattedText = formatter.GetFormattedText();
+	std::cout.write(formattedText.data(), formattedText.size());
 	return 0;
 }

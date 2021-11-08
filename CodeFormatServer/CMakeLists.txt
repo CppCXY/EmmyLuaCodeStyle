@@ -45,6 +45,6 @@ target_sources(CodeFormatServer
 
 target_link_libraries(CodeFormatServer PUBLIC CodeService)
 
-if(WIN32)
-	target_link_libraries(CodeFormatServer PUBLIC -lwsock32 -lws2_32)
-endif()
+#if(WIN32)
+#	target_link_libraries(CodeFormatServer PUBLIC -lwsock32 -lws2_32)
+#endif()
