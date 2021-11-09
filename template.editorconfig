@@ -10,7 +10,7 @@ align_table_field_to_first_field = true
 continuous_assign_statement_align_to_equal_sign = true
 continuous_assign_table_field_align_to_equal_sign = true
 # 可选值 CRLF|LF
-line_separator = CRLF  
+line_separator = CRLF
 
 # 以下配置均支持三种值
 # minLine:${数值}   
