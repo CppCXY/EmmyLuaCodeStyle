@@ -34,7 +34,8 @@ int main(int argc, char** argv)
 	LuaFormatOptions options;
 	if(argc >= 5)
 	{
-		if(argv[3] == "-c")
+		std::string configOption = argv[3];
+		if(configOption == "-c")
 		{
 			options = LuaFormatOptions::ParseFromEditorConfig(argv[4]);
 		}

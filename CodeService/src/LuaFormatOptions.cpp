@@ -52,7 +52,7 @@ LuaFormatOptions LuaFormatOptions::ParseFromEditorConfig(std::string_view filena
 	bool luaSectionFounded = false;
 	std::regex comment = std::regex(R"(^\s*(;|#))");
 	std::regex luaSection = std::regex(R"(^\s*\[\s*([\w\.\*]+)\s*\]\s*$)");
-	std::regex valueRegex = std::regex(R"(^\s*([\w\d_]+)\s*=\s*(.*)\s*$)");
+	std::regex valueRegex = std::regex(R"(^\s*([\w\d_]+)\s*=\s*([\w\:\._]+)\s*$)");
 	std::map<std::string, std::string> optionMap;
 
 	for (auto& line : lines)
