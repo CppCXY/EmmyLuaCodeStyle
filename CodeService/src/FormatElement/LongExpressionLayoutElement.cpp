@@ -1,7 +1,8 @@
 #include "CodeService/FormatElement/LongExpressionLayoutElement.h"
 
-LongExpressionLayoutElement::LongExpressionLayoutElement()
-	: _hasIndent(false)
+LongExpressionLayoutElement::LongExpressionLayoutElement(int continuationIndent)
+	: _hasContinuation(false),
+	  _continuationIndent(continuationIndent)
 {
 }
 
@@ -13,7 +14,7 @@ FormatElementType LongExpressionLayoutElement::GetType()
 void LongExpressionLayoutElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	SerializeSubExpression(ctx, *this);
-	if (_hasIndent)
+	if (_hasContinuation)
 	{
 		ctx.RecoverIndent();
 	}
@@ -36,10 +37,10 @@ void LongExpressionLayoutElement::SerializeSubExpression(FormatContext& ctx, For
 		}
 		if (child->GetType() == FormatElementType::KeepElement)
 		{
-			if (ctx.GetCharacterCount() == 0 && !_hasIndent)
+			if (ctx.GetCharacterCount() == 0 && !_hasContinuation)
 			{
-				_hasIndent = true;
-				ctx.AddIndent();
+				_hasContinuation = true;
+				ctx.AddIndent(static_cast<int>(ctx.GetCurrentIndent()) + _continuationIndent);
 			}
 		}
 	}

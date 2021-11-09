@@ -1,0 +1,28 @@
+[*.lua]
+use_tab = false
+indent = 4
+continuation_indent = 4
+align_call_args = false
+keep_one_space_between_call_args_and_bracket = false
+align_function_define_params = true
+keep_one_space_between_table_and_bracket = true
+align_table_field_to_first_field = true
+continuous_assign_statement_align_to_equal_sign = true
+continuous_assign_table_field_align_to_equal_sign = true
+# 可选值 CRLF|LF
+line_separator = CRLF  
+
+# 以下配置均支持三种值
+# minLine:${数值}   
+# keepLine   
+# KeepLine:${数值}
+
+keep_line_after_if_statement = minLine:1
+keep_line_after_do_statement = minLine:1
+keep_line_after_while_statement = minLine:1
+keep_line_after_repeat_statement = minLine:1
+keep_line_after_for_statement = minLine:1
+keep_line_after_local_or_assign_statement = keepLine
+keep_line_after_function_define_statement = keepLine:1
+
+

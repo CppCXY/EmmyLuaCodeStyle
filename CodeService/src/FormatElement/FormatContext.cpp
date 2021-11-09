@@ -23,7 +23,7 @@ void FormatContext::PrintLine(int line)
 {
 	for (int i = 0; i < line; i++)
 	{
-		_os << _options.LineSeperater;
+		_os << _options.line_separator;
 		_characterCount = 0;
 	}
 }
@@ -49,7 +49,7 @@ void FormatContext::PrintIndent(int indent, const std::string& indentString)
 
 void FormatContext::AddIndent(int specialIndent, IndentStateType type)
 {
-	if (!_options.UseTabIndent)
+	if (!_options.use_tab)
 	{
 		int newIndent = 0;
 		if (specialIndent == -1)
@@ -61,7 +61,7 @@ void FormatContext::AddIndent(int specialIndent, IndentStateType type)
 			}
 
 			auto& topIndent = _indentStack.top();
-			newIndent = _options.Indent + topIndent.Indent;
+			newIndent = _options.indent + topIndent.Indent;
 		}
 		else
 		{
@@ -128,4 +128,9 @@ std::size_t FormatContext::GetCurrentIndent() const
 std::string FormatContext::GetText()
 {
 	return _os.str();
+}
+
+const LuaFormatOptions& FormatContext::GetOptions()
+{
+	return _options;
 }

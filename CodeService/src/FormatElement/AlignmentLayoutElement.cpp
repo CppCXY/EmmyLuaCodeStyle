@@ -69,7 +69,7 @@ void AlignmentLayoutElement::Serialize(FormatContext& ctx, int position, FormatE
 			}
 		}
 	}
-
+	
 	return alignmentSerialize(ctx, position, *this, eqAlignedPosition);
 }
 

@@ -31,10 +31,17 @@ int main(int argc, char** argv)
 		buffer.resize(realSize);
 		parser = LuaParser::LoadFromBuffer(std::move(buffer));
 	}
+	LuaFormatOptions options;
+	if(argc >= 5)
+	{
+		if(argv[3] == "-c")
+		{
+			options = LuaFormatOptions::ParseFromEditorConfig(argv[4]);
+		}
+	}
 
 	parser->BuildAstWithComment();
 
-	LuaFormatOptions options;
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
 	auto formattedText = formatter.GetFormattedText();

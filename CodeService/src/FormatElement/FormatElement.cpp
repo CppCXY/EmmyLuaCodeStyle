@@ -9,6 +9,11 @@ FormatElement::~FormatElement()
 {
 }
 
+FormatElementType FormatElement::GetType()
+{
+	return FormatElementType::FormatElement;
+}
+
 TextRange FormatElement::GetTextRange()
 {
 	return _textRange;

@@ -1,65 +1,74 @@
-#pragma once
+ï»¿#pragma once
+
+#include <string>
+#include <string_view>
+#include <memory>
+#include <map>
+
+class FormatElement;
 
 class LuaFormatOptions
 {
 public:
+	static LuaFormatOptions ParseFromEditorConfig(std::string_view filename);
+	static LuaFormatOptions ParseOptionsFromMap(std::map<std::string, std::string>& optionMap);
+	LuaFormatOptions();
 	/*
-	 * ÎÒ·´¶ÔÕâÖÖ·ç¸ñ
-	 * µ«ÎÒÒÀÈ»ÊµÏÖËû
-	 */ 
-	bool UseTabIndent = false;
+	 * æˆ‘åå¯¹è¿™ç§é£æ ¼
+	 * ä½†æˆ‘ä¾ç„¶å®ç°ä»–
+	 */
+	bool use_tab = false;
 
 	/*
-	 * Ëõ½øµÄ¿Õ°×Êı
-	 */ 
-	int Indent = 4;
+	 * ç¼©è¿›çš„ç©ºç™½æ•°
+	 */
+	int indent = 4;
 
 	/*
-	 * µ÷ÓÃ²ÎÊı¶ÔÆëµ½µÚÒ»¸ö²ÎÊı£¬¾­¹ıÊµ¼ÊÌåÑéÕâÖÖ·ç¸ñÔÚvscodeÉÏ»áÒòÎª´¹Ö±¶ÔÆëÏßµÄ±ê×¢¶øÏÔµÃ¼«ÎªÄÑ¿´
+	 * å»¶ç»­è¡Œç¼©è¿›
+	 */
+	int continuation_indent = 4;
+
+	/*
+	 * è°ƒç”¨å‚æ•°å¯¹é½åˆ°ç¬¬ä¸€ä¸ªå‚æ•°ï¼Œç»è¿‡å®é™…ä½“éªŒè¿™ç§é£æ ¼åœ¨vscodeä¸Šä¼šå› ä¸ºå‚ç›´å¯¹é½çº¿çš„æ ‡æ³¨è€Œæ˜¾å¾—æä¸ºéš¾çœ‹
 	 * 
 	 */
-	bool AlignCallArgs = false;
+	bool align_call_args = false;
 
 	/*
-	 * º¯Êıµ÷ÓÃµÄÀ¨ºÅºÍ²ÎÊıÖ®¼ä±£³ÖÒ»¸ö¿Õ¸ñ
+	 * å‡½æ•°è°ƒç”¨çš„æ‹¬å·å’Œå‚æ•°ä¹‹é—´ä¿æŒä¸€ä¸ªç©ºæ ¼
 	 *
 	 */
-	bool BlankBetweenCallArgsAndBracket = false;
+	bool keep_one_space_between_call_args_and_bracket = false;
 
 	/*
-	 * º¯Êı¶¨ÒåµÄ²ÎÊı±£³Ö¶ÔÆëµ½µÚÒ»¸ö²ÎÊı
-	 * º¯ÊıµÄ¶¨ÒåÍ¨³£²»»áÌ«³¤£¬ÕâÖÖÄ¬ÈÏĞĞÎªÊÇ¿ÉÒÔ½ÓÊÜµÄ
+	 * å‡½æ•°å®šä¹‰çš„å‚æ•°ä¿æŒå¯¹é½åˆ°ç¬¬ä¸€ä¸ªå‚æ•°
+	 * å‡½æ•°çš„å®šä¹‰é€šå¸¸ä¸ä¼šå¤ªé•¿ï¼Œè¿™ç§é»˜è®¤è¡Œä¸ºæ˜¯å¯ä»¥æ¥å—çš„
 	 */
-	bool AlignFunctionDefineParams = true;
+	bool align_function_define_params = true;
 
 	/*
-	 * ±íµÄ´óÀ¨ºÅºÍ±íÏîÖ®¼ä±£³ÖÒ»¸ö¿Õ¸ñ
-	 * ¾­¹ıÊµ¼ÊÌåÑéÕâÖÖ·½Ê½±È½ÏÃÀ¹Û
+	 * è¡¨çš„å¤§æ‹¬å·å’Œè¡¨é¡¹ä¹‹é—´ä¿æŒä¸€ä¸ªç©ºæ ¼
+	 * ç»è¿‡å®é™…ä½“éªŒè¿™ç§æ–¹å¼æ¯”è¾ƒç¾è§‚
 	 */
-	bool BlankBetweenTableFieldsAndBracket = true;
+	bool keep_one_space_between_table_and_bracket = true;
 
 	/*
-	 * ±íÄÚÃ¿Ò»¸ö±íÏî¶ÔÆëµ½µÚÒ»¸ö±íÏî
+	 * è¡¨å†…æ¯ä¸€ä¸ªè¡¨é¡¹å¯¹é½åˆ°ç¬¬ä¸€ä¸ªè¡¨é¡¹
 	 */
-	bool AlignTableFieldToFirst = true;
+	bool align_table_field_to_first_field = true;
 
-	/*
-	 * Õâ¿ÉÌ«´ÀÁË
-	 */
-	// bool KeepSingleQuote = false;
-	// bool KeepDoubleQuote = false;
-	// bool KeepTableFieldSepComma = false;
-	// bool KeepTableFieldSepSemicolon = false;
+	bool continuous_assign_statement_align_to_equal_sign = true;
 
-	/*
-	 * °üº¬Óï¾ä¿éµÄÓï¾äºÍÏÂÒ»¸öÓï¾äÖ®¼ä±£³Ö×îĞ¡1ĞĞ
-	 */
-	int BlockStatementKeepMinLine = 1;
+	bool continuous_assign_table_field_align_to_equal_sign = true;
 
-	// ÕâÖ»ÊÇ³õÊ¼»¯Ê±µÄÄ¬ÈÏÑ¡Ïî£¬ÔÚlinuxÉÏÒÀÈ»¿ÉÒÔ±£³Ö \r\n
-#ifdef _WINDOWS
-	std::string LineSeperater = "\r\n";
-#else
-	std::string LineSeperater = "\n";
-#endif
+	std::string line_separator = "\r\n";
+
+	std::shared_ptr<FormatElement> keep_line_after_if_statement;
+	std::shared_ptr<FormatElement> keep_line_after_do_statement;
+	std::shared_ptr<FormatElement> keep_line_after_while_statement;
+	std::shared_ptr<FormatElement> keep_line_after_repeat_statement;
+	std::shared_ptr<FormatElement> keep_line_after_for_statement;
+	std::shared_ptr<FormatElement> keep_line_after_local_or_assign_statement;
+	std::shared_ptr<FormatElement> keep_line_after_function_define_statement;
 };

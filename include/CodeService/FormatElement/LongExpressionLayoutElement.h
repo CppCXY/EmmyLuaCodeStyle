@@ -5,7 +5,7 @@
 class LongExpressionLayoutElement : public FormatElement
 {
 public:
-	LongExpressionLayoutElement();
+	LongExpressionLayoutElement(int continuationIndent);
 
 	FormatElementType GetType() override;
 
@@ -14,5 +14,6 @@ public:
 private:
 	void SerializeSubExpression(FormatContext& ctx, FormatElement& parent);
 
-	bool _hasIndent;
+	bool _hasContinuation;
+	int _continuationIndent;
 };

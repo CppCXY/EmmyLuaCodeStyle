@@ -81,7 +81,7 @@ local aaa = 13131, bbbb,
     ccc, 123131, ddddd,
     eeee, fff
 
-return aaa , bbb, dddd
+return aaa, bbb, dddd
     or cccc
 
 if aaa and bbb 
@@ -168,8 +168,9 @@ local c = {
 
 通常项目内为了保持代码风格统一需要十分详尽的格式化配置，另一方面默认的格式化选项，可能不符合每个人的审美。这里逐步介绍所有的格式化选项和效果
 
-这里所指的格式化选项仅仅是对于项目CodeFormat 的基本参数
+该项目支持从editorconfig文件读取配置来配置格式化选项
 
+完整的配置参考本项目自带的template.editorconfig
 
 待续
 ## License

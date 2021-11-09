@@ -12,7 +12,7 @@ FormatElementType AlignToFirstElement::GetType()
 
 void AlignToFirstElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
-	for (int i = 0; i != _children.size(); i++)
+	for (int i = 0; i != static_cast<int>(_children.size()); i++)
 	{
 		if (i == 0)
 		{

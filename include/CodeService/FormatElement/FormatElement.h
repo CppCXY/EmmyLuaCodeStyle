@@ -10,7 +10,7 @@ public:
 	explicit FormatElement(TextRange range = TextRange());
 	virtual ~FormatElement();
 
-	virtual FormatElementType GetType() = 0;
+	virtual FormatElementType GetType();
 	/*
 	 * 智能指针在多态方面支持不够方便
 	 */

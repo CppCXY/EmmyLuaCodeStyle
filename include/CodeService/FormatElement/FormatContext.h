@@ -24,7 +24,7 @@ public:
 		IndentStateType Type = IndentStateType::Normal;
 	};
 
-	FormatContext(std::shared_ptr<LuaParser> parser ,LuaFormatOptions& options);
+	FormatContext(std::shared_ptr<LuaParser> parser, LuaFormatOptions& options);
 
 	void Print(std::string_view text);
 
@@ -48,6 +48,7 @@ public:
 
 	std::string GetText();
 
+	const LuaFormatOptions& GetOptions();
 
 private:
 	std::stack<IndentState, std::vector<IndentState>> _indentStack;

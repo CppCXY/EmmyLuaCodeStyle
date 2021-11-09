@@ -2,7 +2,7 @@
 
 enum class FormatElementType
 {
-	Normal,
+	FormatElement,
 	IndentElement,
 	StatementElement,
 	TextElement,

@@ -222,19 +222,37 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 					auto childEnv = FormatNode(statement);
 					indentEnv->AddChild(childEnv);
 				}
-				indentEnv->Add<KeepLineElement>();
+				indentEnv->AddChild(_options.keep_line_after_local_or_assign_statement);
 				break;
 			}
 		case LuaAstNodeType::RepeatStatement:
+			{
+				indentEnv->AddChild(FormatNode(statement));
+				indentEnv->AddChild(_options.keep_line_after_repeat_statement);
+				break;
+			}
 		case LuaAstNodeType::DoStatement:
+			{
+				indentEnv->AddChild(FormatNode(statement));
+				indentEnv->AddChild(_options.keep_line_after_do_statement);
+				break;
+			}
 		case LuaAstNodeType::ForStatement:
+			{
+				indentEnv->AddChild(FormatNode(statement));
+				indentEnv->AddChild(_options.keep_line_after_for_statement);
+				break;
+			}
 		case LuaAstNodeType::WhileStatement:
+			{
+				indentEnv->AddChild(FormatNode(statement));
+				indentEnv->AddChild(_options.keep_line_after_while_statement);
+				break;
+			}
 		case LuaAstNodeType::IfStatement:
 			{
-				auto childEnv = FormatNode(statement);
-				indentEnv->AddChild(childEnv);
-
-				indentEnv->Add<MinLineElement>(_options.BlockStatementKeepMinLine);
+				indentEnv->AddChild(FormatNode(statement));
+				indentEnv->AddChild(_options.keep_line_after_if_statement);
 				break;
 			}
 		case LuaAstNodeType::Comment:
@@ -273,17 +291,17 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::LocalFunctionStatement:
 		case LuaAstNodeType::FunctionStatement:
 			{
-				auto childEnv = FormatNode(statement);
-				indentEnv->AddChild(childEnv);
+				indentEnv->AddChild(FormatNode(statement));
 
-				if (nextMatch(index, LuaAstNodeType::FunctionStatement, statements))
-				{
-					indentEnv->Add<KeepLineElement>(1);
-				}
-				else
-				{
-					indentEnv->Add<MinLineElement>(1);
-				}
+				// if (nextMatch(index, LuaAstNodeType::FunctionStatement, statements))
+				// {
+				// 	indentEnv->Add<KeepLineElement>(1);
+				// }
+				// else
+				// {
+				// 	indentEnv->Add<MinLineElement>(1);
+				// }
+				indentEnv->AddChild(_options.keep_line_after_function_define_statement);
 				break;
 			}
 		default:
@@ -406,7 +424,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
  */
 std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_ptr<LuaAstNode> expressionList)
 {
-	auto env = std::make_shared<LongExpressionLayoutElement>();
+	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent);
 
 	for (auto node : expressionList->GetChildren())
 	{
@@ -875,9 +893,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 		case LuaAstNodeType::ExpressionList:
 			{
 				auto exprListEnv = FormatNode(child);
-				if (_options.AlignCallArgs)
+				if (_options.align_call_args)
 				{
-					auto alignToFirstEnv = std::make_shared<AlignToFirstElement>(_options.Indent);
+					auto alignToFirstEnv = std::make_shared<AlignToFirstElement>(_options.continuation_indent);
 					alignToFirstEnv->AddChildren(exprListEnv->GetChildren());
 					env->AddChild(alignToFirstEnv);
 				}
@@ -886,7 +904,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 					env->AddChild(exprListEnv);
 				}
 
-				if (_options.BlankBetweenCallArgsAndBracket)
+				if (_options.keep_one_space_between_call_args_and_bracket)
 				{
 					env->Add<KeepElement>(1);
 				}
@@ -904,7 +922,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 				{
 					env->Add<KeepElement>(1);
 				}
-				else if (child->GetText() == "(" && _options.BlankBetweenCallArgsAndBracket && children.size() > 2)
+				else if (child->GetText() == "(" && _options.keep_one_space_between_call_args_and_bracket && children.
+					size() > 2)
 				{
 					env->Add<KeepElement>(1);
 				}
@@ -971,9 +990,20 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameExpression(std::shared_pt
 std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<LuaAstNode> paramList)
 {
 	auto env = std::make_shared<ExpressionElement>();
+
+	std::shared_ptr<FormatElement> paramListLayoutEnv = nullptr;
+
+	if (_options.align_function_define_params)
+	{
+		paramListLayoutEnv = std::make_shared<AlignToFirstElement>(_options.continuation_indent);
+	}
+	else
+	{
+		paramListLayoutEnv = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent);
+	}
+
 	auto& children = paramList->GetChildren();
-	auto alignToFirst = std::make_shared<AlignToFirstElement>(_options.Indent);
-	for (int i = 0; i != children.size(); i++)
+	for (int i = 0; i < static_cast<int>(children.size()); i++)
 	{
 		auto child = children[i];
 		switch (child->GetType())
@@ -982,13 +1012,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 			{
 				if (child->GetText() == ",")
 				{
-					alignToFirst->Add<TextElement>(child);
-					alignToFirst->Add<KeepElement>(1);
+					paramListLayoutEnv->Add<TextElement>(child);
+					paramListLayoutEnv->Add<KeepElement>(1);
 				}
 				else if (child->GetText() == ")")
 				{
-					alignToFirst->Add<TextElement>(child);
-					env->AddChild(alignToFirst);
+					paramListLayoutEnv->Add<TextElement>(child);
+					env->AddChild(paramListLayoutEnv);
 				}
 				else
 				{
@@ -999,22 +1029,22 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 			}
 		case LuaAstNodeType::Param:
 			{
-				alignToFirst->Add<TextElement>(child);
+				paramListLayoutEnv->Add<TextElement>(child);
 				if (nextMatch(i, LuaAstNodeType::Comment, children))
 				{
-					alignToFirst->Add<KeepElement>(1);
+					paramListLayoutEnv->Add<KeepElement>(1);
 				}
 				else
 				{
-					alignToFirst->Add<KeepElement>(0);
+					paramListLayoutEnv->Add<KeepElement>(0);
 				}
 
 				break;
 			}
 		case LuaAstNodeType::Comment:
 			{
-				alignToFirst->Add<TextElement>(child);
-				alignToFirst->Add<KeepElement>(1);
+				paramListLayoutEnv->Add<TextElement>(child);
+				paramListLayoutEnv->Add<KeepElement>(1);
 				break;
 			}
 		default:
@@ -1142,10 +1172,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 							break;
 						}
 
-						env->Add<KeepElement>(1);
+						env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
 						index++;
 						env->AddChild(FormatAlignTableField(index, children));
-						env->Add<KeepElement>(1);
+						env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
 					}
 				}
 				else if (child->GetText() == "}")
@@ -1204,7 +1234,15 @@ void LuaFormatter::DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_p
 std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIndex,
                                                                   const std::vector<std::shared_ptr<LuaAstNode>>& vec)
 {
-	auto env = std::make_shared<AlignmentLayoutElement>();
+	std::shared_ptr<FormatElement> env = nullptr;
+	if(_options.continuous_assign_statement_align_to_equal_sign)
+	{
+		env = std::make_shared<AlignmentLayoutElement>();
+	}
+	else
+	{
+		env = std::make_shared<ExpressionElement>();
+	}
 
 	env->AddChild(FormatNode(vec[currentIndex]));
 
@@ -1278,14 +1316,22 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIn
 std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(int& currentIndex,
                                                                    const std::vector<std::shared_ptr<LuaAstNode>>& vec)
 {
-	auto env = std::make_shared<AlignToFirstElement>(_options.Indent);
+	std::shared_ptr<FormatElement> env = nullptr;
+	if (_options.align_table_field_to_first_field) {
+		env = std::make_shared<AlignToFirstElement>(_options.indent);
+	}
+	else
+	{
+		env = std::make_shared<LongExpressionLayoutElement>(_options.indent);
+	}
 
 	env->AddChild(FormatNode(vec[currentIndex]));
 
-	if (currentIndex + 1 >= vec.size())
+	if (currentIndex + 1 >= static_cast<int>(vec.size()))
 	{
 		return env;
 	}
+
 	auto nextChild = vec[currentIndex + 1];
 	bool alignToEq = true;
 	while (nextChild->GetType() == LuaAstNodeType::TableField
@@ -1335,7 +1381,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(int& currentI
 
 		currentIndex++;
 
-		if ((currentIndex + 1) >= vec.size())
+		if ((currentIndex + 1) >= static_cast<int>(vec.size()))
 		{
 			break;
 		}
@@ -1344,9 +1390,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(int& currentI
 	}
 
 	// 认为tableField 可以(但不是必须这样做)按照等号对齐
-	if (alignToEq)
+	if (alignToEq && _options.continuous_assign_table_field_align_to_equal_sign)
 	{
-		auto newEnv = std::make_shared<AlignToFirstElement>(_options.Indent);
+		auto newEnv = std::make_shared<AlignToFirstElement>(_options.indent);
 		auto alignmentLayoutElement = std::make_shared<AlignmentLayoutElement>();
 		for (auto child : env->GetChildren())
 		{
@@ -1531,7 +1577,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<Lu
 {
 	if (env == nullptr)
 	{
-		env = std::make_shared<LongExpressionLayoutElement>();
+		env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent);
 	}
 
 	auto& children = expression->GetChildren();

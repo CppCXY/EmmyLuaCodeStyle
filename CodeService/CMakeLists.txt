@@ -52,7 +52,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignToFirstElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/KeepElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/SubExpressionElement.cpp	
-
+	${CodeService_SOURCE_DIR}/src/LuaFormatOptions.cpp
 	${CodeService_SOURCE_DIR}/src/LuaCodeDiagnosis.cpp
 )
 
