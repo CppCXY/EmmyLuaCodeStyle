@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 	std::string cmdOption = argv[1];
 	if(cmdOption == "-f")
 	{
-		parser = LuaParser::LoadFromFile(argv[1]);
+		parser = LuaParser::LoadFromFile(argv[2]);
 	}
 	else if(cmdOption == "-b")
 	{
@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 			options = LuaFormatOptions::ParseFromEditorConfig(argv[4]);
 		}
 	}
-
+	options.continuous_assign_table_field_align_to_equal_sign = false;
 	parser->BuildAstWithComment();
 
 	LuaFormatter formatter(parser, options);

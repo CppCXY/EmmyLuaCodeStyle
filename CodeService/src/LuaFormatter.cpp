@@ -1235,7 +1235,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIn
                                                                   const std::vector<std::shared_ptr<LuaAstNode>>& vec)
 {
 	std::shared_ptr<FormatElement> env = nullptr;
-	if(_options.continuous_assign_statement_align_to_equal_sign)
+	if (_options.continuous_assign_statement_align_to_equal_sign)
 	{
 		env = std::make_shared<AlignmentLayoutElement>();
 	}
@@ -1317,12 +1317,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(int& currentI
                                                                    const std::vector<std::shared_ptr<LuaAstNode>>& vec)
 {
 	std::shared_ptr<FormatElement> env = nullptr;
-	if (_options.align_table_field_to_first_field) {
+	if (_options.align_table_field_to_first_field)
+	{
 		env = std::make_shared<AlignToFirstElement>(_options.indent);
 	}
 	else
 	{
-		env = std::make_shared<LongExpressionLayoutElement>(_options.indent);
+		env = std::make_shared<IndentElement>();
 	}
 
 	env->AddChild(FormatNode(vec[currentIndex]));

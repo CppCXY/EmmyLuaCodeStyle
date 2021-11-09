@@ -120,6 +120,12 @@ LuaFormatOptions LuaFormatOptions::ParseOptionsFromMap(std::map<std::string, std
 			optionMap["keep_one_space_between_call_args_and_bracket"] == "true";
 	}
 
+	if(optionMap.count("keep_one_space_between_table_and_bracket"))
+	{
+		options.keep_one_space_between_table_and_bracket =
+			optionMap["keep_one_space_between_table_and_bracket"] == "true";
+	}
+
 	if (optionMap.count("align_table_field_to_first_field"))
 	{
 		options.align_table_field_to_first_field = optionMap["align_table_field_to_first_field"] == "true";
