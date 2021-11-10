@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 			options = LuaFormatOptions::ParseFromEditorConfig(argv[4]);
 		}
 	}
-	options.continuous_assign_table_field_align_to_equal_sign = false;
+
 	parser->BuildAstWithComment();
 
 	LuaFormatter formatter(parser, options);
