@@ -8,8 +8,9 @@ public:
 	FormatElementType GetType() override;
 
 	void Serialize(FormatContext& ctx, int position, FormatElement& parent) override;
-
+	void Diagnosis(FormatContext& ctx, int position, FormatElement& parent) override;
 private:
+	int getAlignPosition(FormatContext& ctx, int position, FormatElement& parent);
 	void alignmentSerialize(FormatContext& ctx, int position, FormatElement& parent, int eqPosition);
-	void normalSerialize(FormatContext& ctx, int position, FormatElement& parent);
+	void alignmentDiagnosis(FormatContext& ctx, int position, FormatElement& parent, int eqPosition);
 };

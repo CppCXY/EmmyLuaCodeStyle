@@ -1,5 +1,6 @@
 #include "CodeService/FormatElement/AlignmentElement.h"
 #include "CodeService/FormatElement/StatementElement.h"
+#include "Util/format.h"
 
 AlignmentElement::AlignmentElement(int alignmentPosition)
 	: _alignmentPosition(alignmentPosition)
@@ -17,5 +18,21 @@ void AlignmentElement::Serialize(FormatContext& ctx, int position, FormatElement
 	if (blank > 0)
 	{
 		ctx.PrintBlank(blank);
+	}
+}
+
+void AlignmentElement::Diagnosis(FormatContext& ctx, int position, FormatElement& parent)
+{
+	int nextOffset = getNextValidOffset(ctx, position, parent);
+	if (nextOffset == -1)
+	{
+		return;
+	}
+
+	auto character = ctx.GetColumn(nextOffset);
+	if (character != _alignmentPosition)
+	{
+		ctx.PushDiagnosis(format("'=' should align to character {}", _alignmentPosition),
+		                  TextRange(nextOffset, nextOffset));
 	}
 }
