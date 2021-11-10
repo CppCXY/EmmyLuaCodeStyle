@@ -8,7 +8,7 @@
 
 int main(int argc, char** argv)
 {
-	if(argc < 3)
+	if (argc < 3)
 	{
 		return -1;
 	}
@@ -16,11 +16,11 @@ int main(int argc, char** argv)
 	std::shared_ptr<LuaParser> parser = nullptr;
 
 	std::string cmdOption = argv[1];
-	if(cmdOption == "-f")
+	if (cmdOption == "-f")
 	{
 		parser = LuaParser::LoadFromFile(argv[2]);
 	}
-	else if(cmdOption == "-b")
+	else if (cmdOption == "-b")
 	{
 		std::size_t size = std::stoll(argv[2]);
 
@@ -32,10 +32,10 @@ int main(int argc, char** argv)
 		parser = LuaParser::LoadFromBuffer(std::move(buffer));
 	}
 	LuaFormatOptions options;
-	if(argc >= 5)
+	if (argc >= 5)
 	{
 		std::string configOption = argv[3];
-		if(configOption == "-c")
+		if (configOption == "-c")
 		{
 			options = LuaFormatOptions::ParseFromEditorConfig(argv[4]);
 		}
@@ -45,7 +45,15 @@ int main(int argc, char** argv)
 
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
+
 	auto formattedText = formatter.GetFormattedText();
 	std::cout.write(formattedText.data(), formattedText.size());
+
+	// auto diagnosis = formatter.GetDiagnosisInfos();
+	// for (auto& d : diagnosis)
+	// {
+	// 	std::cout << format("{} in {}:{}", d.Message, d.Range.StartOffset, d.Range.EndOffset) << std::endl;
+	// }
+
 	return 0;
 }

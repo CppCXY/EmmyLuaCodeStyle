@@ -1,4 +1,5 @@
 #include "CodeService/FormatElement/MinLineElement.h"
+#include "Util/format.h"
 
 MinLineElement::MinLineElement(int line)
 	: FormatElement(TextRange()),
@@ -19,35 +20,43 @@ void MinLineElement::Serialize(FormatContext& ctx, int position, FormatElement& 
 		minLine = _line;
 	}
 
-	auto& siblings = parent.GetChildren();
+	int lastElementLine = getLastValidLine(ctx, position, parent);
+	int nextElementLine = getNextValidLine(ctx, position, parent);
 
-	int firstElementLine = 0;
-	int secondElementLine = 0;
-	if (position == 0)
+	if (nextElementLine == -1)
 	{
-		firstElementLine = ctx.GetLine(GetTextRange().StartOffset);
-	}
-	else
-	{
-		firstElementLine = ctx.GetLine(siblings[position - 1]->GetTextRange().EndOffset);
-	}
-
-	if (position == siblings.size() - 1)
-	{
-		// secondElementLine = ctx.GetLine(GetTextRange().EndOffset);
-		// 如果是最后一个元素了就不往下打印空行了
 		return;
 	}
-	else
-	{
-		secondElementLine = ctx.GetLine(siblings[position + 1]->GetTextRange().StartOffset);
-	}
 
-	int line = secondElementLine - firstElementLine - 1;
+	int line = nextElementLine - lastElementLine - 1;
+
 	if (line <= minLine)
 	{
 		line = minLine;
 	}
 
 	ctx.PrintLine(line);
+}
+
+void MinLineElement::Diagnosis(FormatContext& ctx, int position, FormatElement& parent)
+{
+	if(_line <= 0)
+	{
+		return;
+	}
+	int lastElementOffset = getLastValidOffset(ctx, position, parent);
+	int nextElementOffset = getNextValidOffset(ctx, position, parent);
+
+	int lastElementLine = ctx.GetLine(lastElementOffset);
+	int nextElementLine = nextElementOffset == -1 ? -1 : ctx.GetLine(nextElementOffset);
+
+	if (nextElementLine == -1)
+	{
+		return;
+	}
+
+	if (_line > (nextElementLine - lastElementLine - 1))
+	{
+		ctx.PushDiagnosis(format("need at least {} line", _line), TextRange(lastElementOffset, nextElementOffset));
+	}
 }

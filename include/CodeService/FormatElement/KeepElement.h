@@ -2,7 +2,7 @@
 
 #include "KeepLineElement.h"
 
-class KeepElement : public KeepLineElement
+class KeepElement : public FormatElement
 {
 public:
 	/*
@@ -14,6 +14,7 @@ public:
 	FormatElementType GetType() override;
 
 	void Serialize(FormatContext& ctx, int position, FormatElement& parent) override;
+	void Diagnosis(FormatContext& ctx, int position, FormatElement& parent) override;
 private:
 	int _keepBlank;
 	bool _hasLinebreak;

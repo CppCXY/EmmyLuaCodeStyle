@@ -33,7 +33,6 @@ target_sources(CodeService
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/SubExpressionElement.h
 	
 	PRIVATE
-	#${CodeService_SOURCE_DIR}/src/CodeService.cpp	
 	${CodeService_SOURCE_DIR}/src/LuaFormatter.cpp	
 
 	${CodeService_SOURCE_DIR}/src/FormatElement/IndentElement.cpp	
@@ -53,7 +52,6 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/KeepElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/SubExpressionElement.cpp	
 	${CodeService_SOURCE_DIR}/src/LuaFormatOptions.cpp
-	${CodeService_SOURCE_DIR}/src/LuaCodeDiagnosis.cpp
 )
 
 target_link_libraries(CodeService LuaParser)

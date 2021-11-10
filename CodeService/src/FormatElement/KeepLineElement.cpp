@@ -1,5 +1,5 @@
 #include "CodeService/FormatElement/KeepLineElement.h"
-
+#include "Util/format.h"
 
 KeepLineElement::KeepLineElement(int line)
 	: FormatElement(),
@@ -15,12 +15,12 @@ FormatElementType KeepLineElement::GetType()
 void KeepLineElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
 	int line = _line;
-	if (_line == -1)
+	if (line == -1)
 	{
 		int lastElementLine = getLastValidLine(ctx, position, parent);
 		int nextElementLine = getNextValidLine(ctx, position, parent);
 
-		if(nextElementLine == -1)
+		if (nextElementLine == -1)
 		{
 			return;
 		}
@@ -35,31 +35,24 @@ void KeepLineElement::Serialize(FormatContext& ctx, int position, FormatElement&
 	ctx.PrintLine(line);
 }
 
-int KeepLineElement::getLastValidLine(FormatContext& ctx, int position, FormatElement& parent)
+void KeepLineElement::Diagnosis(FormatContext& ctx, int position, FormatElement& parent)
 {
-	auto& siblings = parent.GetChildren();
-	for (int index = position - 1; index >= 0; index--)
+	if (_line != -1)
 	{
-		if(siblings[index]->HasValidTextRange())
+		int lastElementOffset = getLastValidOffset(ctx, position, parent);
+		int nextElementOffset = getNextValidOffset(ctx, position, parent);
+
+		int lastElementLine = ctx.GetLine(lastElementOffset);
+		int nextElementLine = nextElementOffset == -1 ? -1 : ctx.GetLine(nextElementOffset);
+
+		if (nextElementLine == -1)
 		{
-			return ctx.GetLine(siblings[index]->GetTextRange().EndOffset);
+			return;
+		}
+
+		if (_line != (nextElementLine - lastElementLine - 1))
+		{
+			ctx.PushDiagnosis(format("need {} line", _line), TextRange(lastElementOffset, nextElementOffset));
 		}
 	}
-
-	// 那么一定是往上找不到有效范围元素
-	return ctx.GetLine(parent.GetTextRange().StartOffset);
-}
-
-int KeepLineElement::getNextValidLine(FormatContext& ctx, int position, FormatElement& parent)
-{
-	auto& siblings = parent.GetChildren();
-	for (std::size_t index = position + 1; index < siblings.size(); index++)
-	{
-		if (siblings[index]->HasValidTextRange())
-		{
-			return ctx.GetLine(siblings[index]->GetTextRange().StartOffset);
-		}
-	}
-
-	return -1;
 }

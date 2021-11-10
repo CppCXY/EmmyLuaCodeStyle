@@ -57,6 +57,15 @@ std::string LuaFormatter::GetFormattedText()
 	return ctx.GetText();
 }
 
+std::vector<LuaDiagnosisInfo> LuaFormatter::GetDiagnosisInfos()
+{
+	FormatContext ctx(_parser, _options);
+
+	_env->DiagnosisCodeStyle(ctx);
+
+	return ctx.GetDiagnosisInfos();
+}
+
 std::shared_ptr<FormatElement> LuaFormatter::FormatNode(std::shared_ptr<LuaAstNode> node)
 {
 	switch (node->GetType())

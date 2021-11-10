@@ -4,6 +4,7 @@
 #include "LuaParser/LuaParser.h"
 #include "LuaFormatOptions.h"
 #include "FormatElement/FormatElement.h"
+#include "LuaDiagnosisInfo.h"
 
 class LuaFormatter
 {
@@ -14,6 +15,8 @@ public:
 	void BuildFormattedElement();
 
 	std::string GetFormattedText();
+
+	std::vector<LuaDiagnosisInfo> GetDiagnosisInfos();
 
 protected:
 	std::shared_ptr<FormatElement> FormatNode(std::shared_ptr<LuaAstNode> node);

@@ -6,6 +6,7 @@
 #include <map>
 #include "CodeService/LuaFormatOptions.h"
 #include "LuaParser/LuaParser.h"
+#include "CodeService/LuaDiagnosisInfo.h"
 
 class FormatContext
 {
@@ -19,7 +20,6 @@ public:
 	struct IndentState
 	{
 		int Indent = 0;
-		// int WaitActiveIndent = 0;
 		std::string IndentString = "";
 		IndentStateType Type = IndentStateType::Normal;
 	};
@@ -38,6 +38,8 @@ public:
 
 	void RecoverIndent();
 
+	void PushDiagnosis(std::string_view message, TextRange range);
+
 	int GetLine(int offset);
 
 	int GetColumn(int offset);
@@ -47,6 +49,8 @@ public:
 	std::size_t GetCurrentIndent() const;
 
 	std::string GetText();
+
+	std::vector<LuaDiagnosisInfo> GetDiagnosisInfos();
 
 	const LuaFormatOptions& GetOptions();
 
@@ -59,4 +63,5 @@ private:
 	std::size_t _characterCount;
 	std::shared_ptr<LuaParser> _parser;
 	int _linebreakIndent;
+	std::vector<LuaDiagnosisInfo> _diagnosisInfos;
 };

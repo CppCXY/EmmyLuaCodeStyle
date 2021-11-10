@@ -100,6 +100,11 @@ void FormatContext::RecoverIndent()
 	_indentStack.pop();
 }
 
+void FormatContext::PushDiagnosis(std::string_view message, TextRange range)
+{
+	_diagnosisInfos.push_back(LuaDiagnosisInfo{std::string(message), range});
+}
+
 int FormatContext::GetLine(int offset)
 {
 	return _parser->GetLine(offset);
@@ -128,6 +133,11 @@ std::size_t FormatContext::GetCurrentIndent() const
 std::string FormatContext::GetText()
 {
 	return _os.str();
+}
+
+std::vector<LuaDiagnosisInfo> FormatContext::GetDiagnosisInfos()
+{
+	return _diagnosisInfos;
 }
 
 const LuaFormatOptions& FormatContext::GetOptions()

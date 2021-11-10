@@ -16,7 +16,14 @@ public:
 	 */
 	virtual void Serialize(FormatContext& ctx, int position, FormatElement& parent);
 
+	/*
+	 * 智能指针在多态方面支持不够方便
+	 */
+	virtual void Diagnosis(FormatContext& ctx, int position, FormatElement& parent);
+
 	void Format(FormatContext& ctx);
+
+	void DiagnosisCodeStyle(FormatContext& ctx);
 
 	TextRange GetTextRange();
 
@@ -38,7 +45,13 @@ public:
 
 
 protected:
-	void AddTextRange(TextRange range);
+	void addTextRange(TextRange range);
+
+	int getLastValidLine(FormatContext& ctx, int position, FormatElement& parent);
+	int getNextValidLine(FormatContext& ctx, int position, FormatElement& parent);
+
+	int getLastValidOffset(FormatContext& ctx, int position, FormatElement& parent);
+	int getNextValidOffset(FormatContext& ctx, int position, FormatElement& parent);
 
 	TextRange _textRange;
 
