@@ -51,8 +51,11 @@ public:
 			return false;
 		}
 
-		_shortMap.insert({std::string(shortName),std::string(name)});
-		_args.insert({ std::string(name), CommandLineOption("", std::string(description), type)});
+		_shortMap.insert({std::string(shortName), std::string(name)});
+		_args.insert({
+			std::string(name),
+			CommandLineOption{"", std::string(description), type}
+		});
 		return true;
 	}
 
