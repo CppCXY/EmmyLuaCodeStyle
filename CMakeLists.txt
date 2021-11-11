@@ -15,6 +15,8 @@ endif ()
 
 add_subdirectory(LuaParser)
 add_subdirectory(CodeService)
+add_subdirectory(Util)
+
 if(BuildAsLuaLib)
 	add_subdirectory(CodeFormatLib)
 endif()

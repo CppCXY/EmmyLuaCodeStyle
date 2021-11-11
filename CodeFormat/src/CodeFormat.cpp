@@ -4,25 +4,35 @@
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"
 #include "CodeService/LuaFormatter.h"
-
+#include "Util/CommandLine.h"
 
 int main(int argc, char** argv)
 {
-	if (argc < 3)
+	CommandLine cmd;
+
+	cmd.AddTarget("format");
+	cmd.AddTarget("diagnosis");
+
+	cmd.Add<std::string>("file", "f", "Specify the input file");
+	cmd.Add<int>("stdin", "i", "Read from stdin and specify read size");
+	cmd.Add<std::string>("config", "c",
+	                     "Specify editorconfig file, it decides on the effect of formatting or diagnosis");
+
+	if (!cmd.Parse(argc, argv))
 	{
+		cmd.PrintUsage();
 		return -1;
 	}
 
 	std::shared_ptr<LuaParser> parser = nullptr;
 
-	std::string cmdOption = argv[1];
-	if (cmdOption == "-f")
+	if (!cmd.Get<std::string>("file").empty())
 	{
 		parser = LuaParser::LoadFromFile(argv[2]);
 	}
-	else if (cmdOption == "-b")
+	else if (cmd.Get<int>("stdin") != 0)
 	{
-		std::size_t size = std::stoll(argv[2]);
+		std::size_t size = cmd.Get<int>("stdin");
 
 		std::string buffer;
 		buffer.resize(size);
@@ -31,14 +41,11 @@ int main(int argc, char** argv)
 		buffer.resize(realSize);
 		parser = LuaParser::LoadFromBuffer(std::move(buffer));
 	}
+
 	LuaFormatOptions options;
-	if (argc >= 5)
+	if (!cmd.Get<std::string>("config").empty())
 	{
-		std::string configOption = argv[3];
-		if (configOption == "-c")
-		{
-			options = LuaFormatOptions::ParseFromEditorConfig(argv[4]);
-		}
+		options = LuaFormatOptions::ParseFromEditorConfig(cmd.Get<std::string>("config"));
 	}
 
 	parser->BuildAstWithComment();
@@ -46,15 +53,19 @@ int main(int argc, char** argv)
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
 
-	// auto formattedText = formatter.GetFormattedText();
-	// std::cout.write(formattedText.data(), formattedText.size());
-
-	auto diagnosis = formatter.GetDiagnosisInfos();
-	for (auto& d : diagnosis)
+	if (cmd.GetTarget() == "format")
 	{
-		std::cout << format("{} in {}:{} to {}:{}", d.Message, d.Range.Start.Line, d.Range.Start.Character,
-		                    d.Range.End.Line, d.Range.End.Character) << std::endl;
+		auto formattedText = formatter.GetFormattedText();
+		std::cout.write(formattedText.data(), formattedText.size());
 	}
-
+	else if (cmd.GetTarget() == "diagnosis")
+	{
+		auto diagnosis = formatter.GetDiagnosisInfos();
+		for (auto& d : diagnosis)
+		{
+			std::cout << format("{} from {}:{} to {}:{}", d.Message, d.Range.Start.Line, d.Range.Start.Character,
+			                    d.Range.End.Line, d.Range.End.Character) << std::endl;
+		}
+	}
 	return 0;
 }
