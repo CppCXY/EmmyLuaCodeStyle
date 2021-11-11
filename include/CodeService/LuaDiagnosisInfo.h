@@ -1,11 +1,16 @@
 #pragma once
 
 #include <string>
-#include "LuaParser/TextRange.h"
 
 class LuaDiagnosisPosition
 {
 public:
+	LuaDiagnosisPosition(int line, int character)
+		: Line(line),
+		  Character(character)
+	{
+	}
+
 	int Line = 0;
 	int Character = 0;
 };
@@ -13,6 +18,12 @@ public:
 class LuaDiagnosisRange
 {
 public:
+	LuaDiagnosisRange(LuaDiagnosisPosition start, LuaDiagnosisPosition end)
+		: Start(start),
+		  End(end)
+	{
+	}
+
 	LuaDiagnosisPosition Start;
 	LuaDiagnosisPosition End;
 };
