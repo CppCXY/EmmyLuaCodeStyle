@@ -11,7 +11,7 @@ public:
 
 	void Serialize(FormatContext& ctx, int position, FormatElement& parent) override;
 
-	void Diagnosis(FormatContext& ctx, int position, FormatElement& parent) override;
+	void Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent) override;
 
 private:
 	int _line;

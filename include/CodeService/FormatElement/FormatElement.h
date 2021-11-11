@@ -3,6 +3,7 @@
 #include "LuaParser/LuaAstNode.h"
 #include "FormatElementType.h"
 #include "FormatContext.h"
+#include "DiagnosisContext.h"
 
 class FormatElement
 {
@@ -19,11 +20,11 @@ public:
 	/*
 	 * 智能指针在多态方面支持不够方便
 	 */
-	virtual void Diagnosis(FormatContext& ctx, int position, FormatElement& parent);
+	virtual void Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent);
 
 	void Format(FormatContext& ctx);
 
-	void DiagnosisCodeStyle(FormatContext& ctx);
+	void DiagnosisCodeStyle(DiagnosisContext& ctx);
 
 	TextRange GetTextRange();
 
@@ -50,8 +51,8 @@ protected:
 	int getLastValidLine(FormatContext& ctx, int position, FormatElement& parent);
 	int getNextValidLine(FormatContext& ctx, int position, FormatElement& parent);
 
-	int getLastValidOffset(FormatContext& ctx, int position, FormatElement& parent);
-	int getNextValidOffset(FormatContext& ctx, int position, FormatElement& parent);
+	int getLastValidOffset(int position, FormatElement& parent);
+	int getNextValidOffset(int position, FormatElement& parent);
 
 	TextRange _textRange;
 

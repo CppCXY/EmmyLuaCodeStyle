@@ -38,25 +38,25 @@ void MinLineElement::Serialize(FormatContext& ctx, int position, FormatElement& 
 	ctx.PrintLine(line);
 }
 
-void MinLineElement::Diagnosis(FormatContext& ctx, int position, FormatElement& parent)
+void MinLineElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
 {
 	if(_line <= 0)
 	{
 		return;
 	}
-	int lastElementOffset = getLastValidOffset(ctx, position, parent);
-	int nextElementOffset = getNextValidOffset(ctx, position, parent);
+	int lastOffset = getLastValidOffset(position, parent);
+	int nextOffset = getNextValidOffset(position, parent);
 
-	int lastElementLine = ctx.GetLine(lastElementOffset);
-	int nextElementLine = nextElementOffset == -1 ? -1 : ctx.GetLine(nextElementOffset);
-
-	if (nextElementLine == -1)
+	if (nextOffset == -1)
 	{
 		return;
 	}
 
+	int lastElementLine = ctx.GetLine(lastOffset);
+	int nextElementLine = nextOffset == -1 ? -1 : ctx.GetLine(nextOffset);
+
 	if (_line > (nextElementLine - lastElementLine - 1))
 	{
-		ctx.PushDiagnosis(format("need at least {} line", _line), TextRange(lastElementOffset, nextElementOffset));
+		ctx.PushDiagnosis(format("need at least {} line", _line), TextRange(lastOffset, nextOffset));
 	}
 }

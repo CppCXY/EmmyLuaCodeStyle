@@ -46,14 +46,15 @@ int main(int argc, char** argv)
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
 
-	auto formattedText = formatter.GetFormattedText();
-	std::cout.write(formattedText.data(), formattedText.size());
+	// auto formattedText = formatter.GetFormattedText();
+	// std::cout.write(formattedText.data(), formattedText.size());
 
-	// auto diagnosis = formatter.GetDiagnosisInfos();
-	// for (auto& d : diagnosis)
-	// {
-	// 	std::cout << format("{} in {}:{}", d.Message, d.Range.StartOffset, d.Range.EndOffset) << std::endl;
-	// }
+	auto diagnosis = formatter.GetDiagnosisInfos();
+	for (auto& d : diagnosis)
+	{
+		std::cout << format("{} in {}:{} to {}:{}", d.Message, d.Range.Start.Line, d.Range.Start.Character,
+		                    d.Range.End.Line, d.Range.End.Character) << std::endl;
+	}
 
 	return 0;
 }

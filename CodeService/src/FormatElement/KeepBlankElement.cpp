@@ -17,20 +17,21 @@ void KeepBlankElement::Serialize(FormatContext& ctx, int position, FormatElement
 	ctx.PrintBlank(_blank);
 }
 
-void KeepBlankElement::Diagnosis(FormatContext& ctx, int position, FormatElement& parent)
+void KeepBlankElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
 {
-	int lastElementLine = getLastValidLine(ctx, position, parent);
-	int nextElementLine = getNextValidLine(ctx, position, parent);
+	int lastOffset = getLastValidOffset(position, parent);
+	int nextOffset = getNextValidOffset(position, parent);
 
-	if (nextElementLine == -1)
+	if (nextOffset == -1)
 	{
 		return;
 	}
 
+	int lastElementLine = ctx.GetLine(lastOffset);
+	int nextElementLine = ctx.GetLine(nextOffset);
+
 	if (nextElementLine == lastElementLine)
 	{
-		int lastOffset = getLastValidOffset(ctx, position, parent);
-		int nextOffset = getNextValidOffset(ctx, position, parent);
 		if (nextOffset - lastOffset - 1 != _blank)
 		{
 			ctx.PushDiagnosis(format("must keep {} space", _blank), TextRange(lastOffset, nextOffset));

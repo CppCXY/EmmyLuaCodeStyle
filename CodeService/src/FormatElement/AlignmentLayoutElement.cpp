@@ -23,7 +23,7 @@ FormatElementType AlignmentLayoutElement::GetType()
 
 void AlignmentLayoutElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
-	auto eqPosition = getAlignPosition(ctx, position, parent);
+	auto eqPosition = getAlignPosition(ctx.GetParser());
 
 	if (eqPosition != -1)
 	{
@@ -35,9 +35,9 @@ void AlignmentLayoutElement::Serialize(FormatContext& ctx, int position, FormatE
 	}
 }
 
-void AlignmentLayoutElement::Diagnosis(FormatContext& ctx, int position, FormatElement& parent)
+void AlignmentLayoutElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
 {
-	auto eqPosition = getAlignPosition(ctx, position, parent);
+	auto eqPosition = getAlignPosition(ctx.GetParser());
 
 	if (eqPosition != -1)
 	{
@@ -49,7 +49,7 @@ void AlignmentLayoutElement::Diagnosis(FormatContext& ctx, int position, FormatE
 	}
 }
 
-int AlignmentLayoutElement::getAlignPosition(FormatContext& ctx, int position, FormatElement& parent)
+int AlignmentLayoutElement::getAlignPosition(std::shared_ptr<LuaParser> luaParser)
 {
 	int eqAlignedPosition = 0;
 	bool firstContainEq = true;
@@ -70,7 +70,7 @@ int AlignmentLayoutElement::getAlignPosition(FormatContext& ctx, int position, F
 				auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
 				if (textElement->GetText() == "=")
 				{
-					int eqPosition = ctx.GetColumn(textElement->GetTextRange().StartOffset);
+					int eqPosition = luaParser->GetColumn(textElement->GetTextRange().StartOffset);
 					if (firstContainEq && index > 0)
 					{
 						firstContainEq = false;
@@ -80,7 +80,7 @@ int AlignmentLayoutElement::getAlignPosition(FormatContext& ctx, int position, F
 							return -1;
 						}
 						auto lastStatChild = statChildren[lastValidIndex];
-						auto lastPosition = ctx.GetColumn(lastStatChild->GetTextRange().EndOffset);
+						auto lastPosition = luaParser->GetColumn(lastStatChild->GetTextRange().EndOffset);
 
 
 						if (eqPosition - lastPosition <= 2)
@@ -126,7 +126,7 @@ void AlignmentLayoutElement::alignmentSerialize(FormatContext& ctx, int position
 	return FormatElement::Serialize(ctx, position, parent);
 }
 
-void AlignmentLayoutElement::alignmentDiagnosis(FormatContext& ctx, int position, FormatElement& parent, int eqPosition)
+void AlignmentLayoutElement::alignmentDiagnosis(DiagnosisContext& ctx, int position, FormatElement& parent, int eqPosition)
 {
 	for (auto statChild : _children)
 	{

@@ -3,8 +3,8 @@
 FormatContext::FormatContext(std::shared_ptr<LuaParser> parser, LuaFormatOptions& options)
 	: _options(options),
 	  _characterCount(0),
-	  _parser(parser),
-	  _linebreakIndent(0)
+	  _parser(parser)
+
 {
 }
 
@@ -47,7 +47,7 @@ void FormatContext::PrintIndent(int indent, const std::string& indentString)
 	}
 }
 
-void FormatContext::AddIndent(int specialIndent, IndentStateType type)
+void FormatContext::AddIndent(int specialIndent)
 {
 	if (!_options.use_tab)
 	{
@@ -56,7 +56,7 @@ void FormatContext::AddIndent(int specialIndent, IndentStateType type)
 		{
 			if (_indentStack.empty())
 			{
-				_indentStack.push({0, "", type});
+				_indentStack.push({0, ""});
 				return;
 			}
 
@@ -67,7 +67,7 @@ void FormatContext::AddIndent(int specialIndent, IndentStateType type)
 		{
 			newIndent = specialIndent;
 		}
-		_indentStack.push({newIndent, " ", type});
+		_indentStack.push({newIndent, " "});
 	}
 	else //这个算法可能会有问题
 	{
@@ -76,7 +76,7 @@ void FormatContext::AddIndent(int specialIndent, IndentStateType type)
 		{
 			if (_indentStack.empty())
 			{
-				_indentStack.push({0, "", type});
+				_indentStack.push({0, ""});
 				return;
 			}
 
@@ -91,18 +91,13 @@ void FormatContext::AddIndent(int specialIndent, IndentStateType type)
 			newIndent = std::max(1, specialIndent / 8);
 		}
 		std::string indentString = "\t";
-		_indentStack.push({newIndent, "\t", type});
+		_indentStack.push({newIndent, "\t"});
 	}
 }
 
 void FormatContext::RecoverIndent()
 {
 	_indentStack.pop();
-}
-
-void FormatContext::PushDiagnosis(std::string_view message, TextRange range)
-{
-	_diagnosisInfos.push_back(LuaDiagnosisInfo{std::string(message), range});
 }
 
 int FormatContext::GetLine(int offset)
@@ -135,12 +130,7 @@ std::string FormatContext::GetText()
 	return _os.str();
 }
 
-std::vector<LuaDiagnosisInfo> FormatContext::GetDiagnosisInfos()
+std::shared_ptr<LuaParser> FormatContext::GetParser()
 {
-	return _diagnosisInfos;
-}
-
-const LuaFormatOptions& FormatContext::GetOptions()
-{
-	return _options;
+	return _parser;
 }

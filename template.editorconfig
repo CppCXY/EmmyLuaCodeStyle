@@ -25,4 +25,7 @@ keep_line_after_for_statement = minLine:1
 keep_line_after_local_or_assign_statement = keepLine
 keep_line_after_function_define_statement = keepLine:1
 
-
+# 以下是代码风格诊断选项
+# 代码风格诊断会以格式化选项为基础
+# 并提供其他的风格诊断
+max_line_length = 120

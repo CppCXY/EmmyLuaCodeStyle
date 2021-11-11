@@ -120,7 +120,7 @@ LuaFormatOptions LuaFormatOptions::ParseOptionsFromMap(std::map<std::string, std
 			optionMap["keep_one_space_between_call_args_and_bracket"] == "true";
 	}
 
-	if(optionMap.count("keep_one_space_between_table_and_bracket"))
+	if (optionMap.count("keep_one_space_between_table_and_bracket"))
 	{
 		options.keep_one_space_between_table_and_bracket =
 			optionMap["keep_one_space_between_table_and_bracket"] == "true";
@@ -154,6 +154,11 @@ LuaFormatOptions LuaFormatOptions::ParseOptionsFromMap(std::map<std::string, std
 		{
 			options.line_separator = "\n";
 		}
+	}
+
+	if (optionMap.count("max_line_length"))
+	{
+		options.max_line_length = std::stoi(optionMap["max_line_length"]);
 	}
 
 	std::vector<std::pair<std::string, std::shared_ptr<FormatElement>&>> fieldList = {

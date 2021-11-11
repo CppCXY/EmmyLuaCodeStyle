@@ -35,12 +35,12 @@ void KeepLineElement::Serialize(FormatContext& ctx, int position, FormatElement&
 	ctx.PrintLine(line);
 }
 
-void KeepLineElement::Diagnosis(FormatContext& ctx, int position, FormatElement& parent)
+void KeepLineElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
 {
 	if (_line != -1)
 	{
-		int lastElementOffset = getLastValidOffset(ctx, position, parent);
-		int nextElementOffset = getNextValidOffset(ctx, position, parent);
+		int lastElementOffset = getLastValidOffset(position, parent);
+		int nextElementOffset = getNextValidOffset(position, parent);
 
 		int lastElementLine = ctx.GetLine(lastElementOffset);
 		int nextElementLine = nextElementOffset == -1 ? -1 : ctx.GetLine(nextElementOffset);

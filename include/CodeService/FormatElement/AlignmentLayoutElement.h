@@ -8,9 +8,9 @@ public:
 	FormatElementType GetType() override;
 
 	void Serialize(FormatContext& ctx, int position, FormatElement& parent) override;
-	void Diagnosis(FormatContext& ctx, int position, FormatElement& parent) override;
+	void Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent) override;
 private:
-	int getAlignPosition(FormatContext& ctx, int position, FormatElement& parent);
+	int getAlignPosition(std::shared_ptr<LuaParser> luaParser);
 	void alignmentSerialize(FormatContext& ctx, int position, FormatElement& parent, int eqPosition);
-	void alignmentDiagnosis(FormatContext& ctx, int position, FormatElement& parent, int eqPosition);
+	void alignmentDiagnosis(DiagnosisContext& ctx, int position, FormatElement& parent, int eqPosition);
 };

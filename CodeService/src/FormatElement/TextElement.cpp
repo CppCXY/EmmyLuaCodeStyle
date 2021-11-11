@@ -21,6 +21,18 @@ void TextElement::Serialize(FormatContext& ctx, int position, FormatElement& par
 	ctx.Print(_text);
 }
 
+void TextElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
+{
+	int character = ctx.GetColumn(_textRange.EndOffset);
+	ctx.SetCharacterCount(character);
+
+	if (character > ctx.GetOptions().max_line_length)
+	{
+		auto line = ctx.GetLine(_textRange.EndOffset);
+		ctx.SetLineMaxLength(line, character);
+	}
+}
+
 std::string_view TextElement::GetText() const
 {
 	return _text;

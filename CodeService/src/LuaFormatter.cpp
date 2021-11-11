@@ -59,7 +59,7 @@ std::string LuaFormatter::GetFormattedText()
 
 std::vector<LuaDiagnosisInfo> LuaFormatter::GetDiagnosisInfos()
 {
-	FormatContext ctx(_parser, _options);
+	DiagnosisContext ctx(_parser, _options);
 
 	_env->DiagnosisCodeStyle(ctx);
 
@@ -1306,12 +1306,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIn
 
 		currentIndex++;
 
-		if ((currentIndex + 1) >= vec.size())
+		if (static_cast<std::size_t>(currentIndex) + 1 >= vec.size())
 		{
 			break;
 		}
 
-		nextChild = vec[currentIndex + 1];
+		nextChild = vec[static_cast<std::size_t>(currentIndex) + 1];
 	}
 	// 如果不是和下文语句连续，则返回本身
 	if (env->GetChildren().size() == 1)

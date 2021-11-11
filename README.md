@@ -468,6 +468,9 @@ keep_line_after_function_define_statement = keepLine:1
 
     表示和下一行保持n行间距
 
+## 代码风格诊断
+
+待续
 
 ## License
 

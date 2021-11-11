@@ -21,9 +21,9 @@ void AlignmentElement::Serialize(FormatContext& ctx, int position, FormatElement
 	}
 }
 
-void AlignmentElement::Diagnosis(FormatContext& ctx, int position, FormatElement& parent)
+void AlignmentElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
 {
-	int nextOffset = getNextValidOffset(ctx, position, parent);
+	int nextOffset = getNextValidOffset(position, parent);
 	if (nextOffset == -1)
 	{
 		return;

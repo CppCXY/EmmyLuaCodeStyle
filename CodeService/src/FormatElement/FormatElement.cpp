@@ -69,7 +69,7 @@ void FormatElement::Serialize(FormatContext& ctx, int position, FormatElement& p
 	}
 }
 
-void FormatElement::Diagnosis(FormatContext& ctx, int position, FormatElement& parent)
+void FormatElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
 {
 	for (int i = 0; i < static_cast<int>(_children.size()); i++)
 	{
@@ -82,7 +82,7 @@ void FormatElement::Format(FormatContext& ctx)
 	return Serialize(ctx, 0, *this);
 }
 
-void FormatElement::DiagnosisCodeStyle(FormatContext& ctx)
+void FormatElement::DiagnosisCodeStyle(DiagnosisContext& ctx)
 {
 	return Diagnosis(ctx, 0, *this);
 }
@@ -108,12 +108,12 @@ void FormatElement::addTextRange(TextRange range)
 
 int FormatElement::getLastValidLine(FormatContext& ctx, int position, FormatElement& parent)
 {
-	return ctx.GetLine(getLastValidOffset(ctx, position, parent));
+	return ctx.GetLine(getLastValidOffset(position, parent));
 }
 
 int FormatElement::getNextValidLine(FormatContext& ctx, int position, FormatElement& parent)
 {
-	auto offset = getNextValidOffset(ctx, position, parent);
+	auto offset = getNextValidOffset(position, parent);
 	if (offset != -1)
 	{
 		return ctx.GetLine(offset);
@@ -124,7 +124,7 @@ int FormatElement::getNextValidLine(FormatContext& ctx, int position, FormatElem
 	}
 }
 
-int FormatElement::getNextValidOffset(FormatContext& ctx, int position, FormatElement& parent)
+int FormatElement::getNextValidOffset(int position, FormatElement& parent)
 {
 	auto& siblings = parent.GetChildren();
 	for (std::size_t index = position + 1; index < siblings.size(); index++)
@@ -138,7 +138,7 @@ int FormatElement::getNextValidOffset(FormatContext& ctx, int position, FormatEl
 	return -1;
 }
 
-int FormatElement::getLastValidOffset(FormatContext& ctx, int position, FormatElement& parent)
+int FormatElement::getLastValidOffset(int position, FormatElement& parent)
 {
 	auto& siblings = parent.GetChildren();
 	for (int index = position - 1; index >= 0; index--)
