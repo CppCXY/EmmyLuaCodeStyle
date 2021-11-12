@@ -3,8 +3,7 @@
 #include <cstdlib>
 #include <string_view>
 #include <memory>
-#include "CodeFormatServer/Protocol/Request/JsonRequestProtocol.h"
-#include "CodeFormatServer/Protocol/JsonResponseProtocol.h"
+#include "CodeFormatServer/VSCode.h"
 
 class ProtocolParser
 {
@@ -13,13 +12,13 @@ public:
 
 	void Parse(std::string_view msg);
 
-	std::shared_ptr<JsonRequestProtocol> GetRequest();
+	std::shared_ptr<vscode::Serializable> GetParam();
 
 	std::string_view GetMethod();
 
-	std::string SerializeProtocol(std::shared_ptr<JsonResponseProtocol> response);
+	std::string SerializeProtocol(std::shared_ptr<vscode::Serializable> result);
 private:
 	int _id;
 	std::string _method;
-	std::shared_ptr<JsonRequestProtocol> _request;
+	std::shared_ptr<vscode::Serializable> _param;
 };

@@ -18,13 +18,13 @@ std::string IOSession::Handle(std::string_view msg)
 
 	parser.Parse(msg);
 
-	auto request = parser.GetRequest();
+	auto param = parser.GetParam();
 
-	if (request)
+	if (param)
 	{
-		auto response = _service.Dispatch(parser.GetMethod(), request);
-		if (response) {
-			return parser.SerializeProtocol(response);
+		auto result = _service.Dispatch(parser.GetMethod(), param);
+		if (result) {
+			return parser.SerializeProtocol(result);
 		}
 	}
 

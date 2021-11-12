@@ -6,10 +6,10 @@ class IOSession
 {
 public:
 	IOSession();
-	~IOSession();
+	virtual ~IOSession();
 
 	virtual void Run() = 0;
-
+	// virtual void Write();
 protected:
 	std::string Handle(std::string_view msg);
 private:

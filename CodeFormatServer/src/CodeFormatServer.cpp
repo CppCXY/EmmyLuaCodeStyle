@@ -19,7 +19,6 @@ int main(int argc, char** argv)
             LanguageClient::GetInstance().SetSession(std::make_shared<SocketIOSession>(std::move(socket)));
             LanguageClient::GetInstance().Run();
         }
-        
     }
     else
     {

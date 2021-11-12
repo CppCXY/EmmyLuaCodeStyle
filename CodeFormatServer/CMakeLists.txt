@@ -37,10 +37,8 @@ target_sources(CodeFormatServer
 	#protocol
 	${CodeFormatServer_SOURCE_DIR}/src/Protocol/ProtocolParser.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Protocol/ProtocolBuffer.cpp
-	# protocol/request
-	${CodeFormatServer_SOURCE_DIR}/src/Protocol/Request/JsonRequestProtocol.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/Protocol/Request/RequestProtocolFactory.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/Protocol/Request/InitializeRequestProtocol.cpp
+
+	${CodeFormatServer_SOURCE_DIR}/src/VSCode.cpp
 )
 
 target_link_libraries(CodeFormatServer PUBLIC CodeService)

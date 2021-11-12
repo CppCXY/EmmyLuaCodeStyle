@@ -1,4 +1,7 @@
 #include "CodeFormatServer/Session/SocketIOSession.h"
+
+#include <iostream>
+
 #include "CodeFormatServer/Protocol/ProtocolParser.h"
 #include "CodeFormatServer/Protocol/ProtocolBuffer.h"
 using namespace asio::ip;
@@ -36,9 +39,11 @@ void SocketIOSession::Run()
 		while (true);
 
 		std::string result = Handle(protocolBuffer.ReadOneProtocol());
-		protocolBuffer.Reset();
 
-		asio::write(_socket, asio::buffer(result));
+		protocolBuffer.Reset();
+		if (!result.empty()) {
+			asio::write(_socket, asio::buffer(result));
+		}
 	}
 endLoop:
 	return;
