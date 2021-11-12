@@ -23,7 +23,9 @@ private:
 
 	std::shared_ptr<vscode::Serializable> OnDidChange(std::shared_ptr<vscode::DidChangeTextDocumentParams> param);
 
-	// std::shared_ptr<JsonResponseProtocol> OnDocumentFormatting(std::shared_ptr<FormatRequestProtocol> request);
+	std::shared_ptr<vscode::Serializable> OnDidOpen(std::shared_ptr<vscode::DidOpenTextDocumentParam> param);
+	
+	std::shared_ptr<vscode::Serializable> OnFormatting(std::shared_ptr<vscode::DocumentFormattingParams> param);
 
 	std::map<std::string, MessageHandle, std::less<>> _handles;
 };

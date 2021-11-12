@@ -21,7 +21,8 @@ bool LanguageService::Initialize()
 
 	_handles["initialize"] = DynamicBind(OnInitialize, vscode::InitializeParams);
 	_handles["textDocument/didChange"] = DynamicBind(OnDidChange, vscode::DidChangeTextDocumentParams);
-
+	_handles["textDocument/didOpen"] = DynamicBind(OnDidOpen, vscode::DidOpenTextDocumentParam);
+	_handles["textDocument/formatting"] = DynamicBind(OnFormatting, vscode::DocumentFormattingParams);
 	return true;
 }
 
@@ -49,36 +50,52 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 	std::shared_ptr<vscode::DidChangeTextDocumentParams> param)
 {
-	LuaFormatOptions options;
+	for (auto& content : param->contentChanges)
+	{
+		LanguageClient::GetInstance().CacheFile(param->textDocument.uri, content.text);
 
-	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(param->contentChanges[0].text));
+		LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
+	}
+	return nullptr;
+}
+
+std::shared_ptr<vscode::Serializable> LanguageService::OnDidOpen(
+	std::shared_ptr<vscode::DidOpenTextDocumentParam> param)
+{
+	LanguageClient::GetInstance().CacheFile(param->textDocument.uri, param->textDocument.text);
+	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
+
+	return nullptr;
+}
+
+std::shared_ptr<vscode::Serializable> LanguageService::OnFormatting(
+	std::shared_ptr<vscode::DocumentFormattingParams> param)
+{
+	auto text = LanguageClient::GetInstance().GetFile(param->textDocument.uri);
+
+	auto lastOffset = text.size();
+
+	auto result = std::make_shared<vscode::DocumentFormattingResult>();
+
+	if (text.empty())
+	{
+		result->hasError = true;
+		return result;
+	}
+
+	auto& options = LanguageClient::GetInstance().GetOptions();
+
+	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(text));
 	parser->BuildAstWithComment();
 
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
 
-	auto diagnosisInfos = formatter.GetDiagnosisInfos();
-
-	auto vscodeDiagnosis = std::make_shared<vscode::PublishDiagnosticsParams>();
-	vscodeDiagnosis->uri = param->textDocument.uri;
-
-	for (auto diagnosisInfo : diagnosisInfos)
-	{
-		auto& diagnosis = vscodeDiagnosis->diagnostics.emplace_back();
-		diagnosis.message = diagnosisInfo.Message;
-		diagnosis.range = vscode::Range(
-			vscode::Position(
-				diagnosisInfo.Range.Start.Line,
-				diagnosisInfo.Range.Start.Character
-			),
-			vscode::Position(
-				diagnosisInfo.Range.End.Line,
-				diagnosisInfo.Range.End.Character
-			));
-		diagnosis.severity = vscode::DiagnosticSeverity::Warning;
-	}
-
-	LanguageClient::GetInstance().SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
-
-	return nullptr;
+	auto& edit = result->edits.emplace_back();
+	edit.newText = formatter.GetFormattedText();
+	edit.range = vscode::Range(
+		vscode::Position(0, 0),
+		vscode::Position(parser->GetLine(lastOffset), parser->GetColumn(lastOffset))
+	);
+	return result;
 }

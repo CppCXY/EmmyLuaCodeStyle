@@ -1,4 +1,7 @@
 #include "CodeFormatServer/LanguageClient.h"
+
+#include "CodeService/LuaFormatter.h"
+#include "LuaParser/LuaParser.h"
 #include "Util/format.h"
 
 LanguageClient& LanguageClient::GetInstance()
@@ -24,7 +27,7 @@ void LanguageClient::SendNotification(std::string_view method, std::shared_ptr<v
 	json["method"] = method;
 	json["params"] = param->Serialize();
 
-	if(_session)
+	if (_session)
 	{
 		auto dumpResult = json.dump();
 		std::string message = format("Content-Length:{}\r\n\r\n", dumpResult.size());
@@ -34,10 +37,71 @@ void LanguageClient::SendNotification(std::string_view method, std::shared_ptr<v
 	}
 }
 
+void LanguageClient::CacheFile(const std::string& uri, std::string text)
+{
+	_fileMap[uri] = std::move(text);
+}
+
+void LanguageClient::DiagnosticFile(const std::string& uri)
+{
+	auto it = _fileMap.find(uri);
+	if (it == _fileMap.end())
+	{
+		return;
+	}
+
+	std::string text = it->second;
+
+	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(text));
+	parser->BuildAstWithComment();
+
+	LuaFormatter formatter(parser, _options);
+	formatter.BuildFormattedElement();
+
+	auto diagnosisInfos = formatter.GetDiagnosisInfos();
+
+	auto vscodeDiagnosis = std::make_shared<vscode::PublishDiagnosticsParams>();
+	vscodeDiagnosis->uri = uri;
+
+	for (auto diagnosisInfo : diagnosisInfos)
+	{
+		auto& diagnosis = vscodeDiagnosis->diagnostics.emplace_back();
+		diagnosis.message = diagnosisInfo.Message;
+		diagnosis.range = vscode::Range(
+			vscode::Position(
+				diagnosisInfo.Range.Start.Line,
+				diagnosisInfo.Range.Start.Character
+			),
+			vscode::Position(
+				diagnosisInfo.Range.End.Line,
+				diagnosisInfo.Range.End.Character
+			));
+		diagnosis.severity = vscode::DiagnosticSeverity::Warning;
+	}
+
+	SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
+}
+
+std::string LanguageClient::GetFile(const std::string& uri)
+{
+	auto it = _fileMap.find(uri);
+	if(it != _fileMap.end())
+	{
+		return it->second;
+	}
+
+	return "";
+}
+
 void LanguageClient::Run()
 {
 	if (_session)
 	{
 		_session->Run();
 	}
+}
+
+LuaFormatOptions& LanguageClient::GetOptions()
+{
+	return _options;
 }

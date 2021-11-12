@@ -47,7 +47,7 @@ private:
 	std::stack<IndentState, std::vector<IndentState>> _indentStack;
 	std::map<int, std::string> _indentMap;
 	std::stringstream _os;
-	LuaFormatOptions _options;
+	LuaFormatOptions& _options;
 
 	std::size_t _characterCount;
 	std::shared_ptr<LuaParser> _parser;

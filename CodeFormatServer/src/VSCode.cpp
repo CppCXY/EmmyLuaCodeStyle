@@ -23,6 +23,14 @@ std::shared_ptr<vscode::Serializable> vscode::MakeFromRequest(std::string_view m
 	{
 		return MakeRequestObject<DidChangeTextDocumentParams>(json);
 	}
+	else if (method == "textDocument/didOpen")
+	{
+		return MakeRequestObject<DidOpenTextDocumentParam>(json);
+	}
+	else if (method == "textDocument/formatting")
+	{
+		return MakeRequestObject<DocumentFormattingParams>(json);
+	}
 
 	return nullptr;
 }
@@ -116,6 +124,15 @@ nlohmann::json vscode::TextDocument::Serialize()
 void vscode::TextDocument::Deserialize(nlohmann::json json)
 {
 	uri = json["uri"];
+}
+
+nlohmann::json vscode::TextEdit::Serialize()
+{
+	auto object = nlohmann::json::object();
+	object["range"] = range.Serialize();
+	object["newText"] = newText;
+
+	return object;
 }
 
 nlohmann::json vscode::PublishDiagnosticsParams::Serialize()
@@ -235,4 +252,41 @@ void vscode::DidChangeTextDocumentParams::Deserialize(nlohmann::json json)
 	}
 
 	textDocument.Deserialize(json["textDocument"]);
+}
+
+void vscode::TextDocumentItem::Deserialize(nlohmann::json json)
+{
+	uri = json["uri"];
+
+	languageId = json["languageId"];
+
+	text = json["text"];
+}
+
+void vscode::DidOpenTextDocumentParam::Deserialize(nlohmann::json json)
+{
+	textDocument.Deserialize(json["textDocument"]);
+}
+
+void vscode::DocumentFormattingParams::Deserialize(nlohmann::json json)
+{
+	textDocument.Deserialize(json["textDocument"]);
+}
+
+nlohmann::json vscode::DocumentFormattingResult::Serialize()
+{
+	if(hasError)
+	{
+		return nullptr;
+	}
+	else
+	{
+		auto array = nlohmann::json::array();
+		for(auto& edit: edits)
+		{
+			array.push_back(edit.Serialize());
+		}
+
+		return array;
+	}
 }

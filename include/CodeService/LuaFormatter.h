@@ -110,7 +110,7 @@ protected:
 private:
 
 	std::shared_ptr<LuaParser> _parser;
-	LuaFormatOptions _options;
+	LuaFormatOptions& _options;
 	std::shared_ptr<FormatElement> _env;
 };
 

@@ -39,7 +39,7 @@ public:
 
 private:
 	std::stack<int, std::vector<int>> _indentStack;
-	LuaFormatOptions _options;
+	LuaFormatOptions& _options;
 
 	std::size_t _characterCount;
 	std::shared_ptr<LuaParser> _parser;
