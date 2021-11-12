@@ -19,12 +19,18 @@ std::shared_ptr<vscode::Serializable> vscode::MakeFromRequest(std::string_view m
 	{
 		return MakeRequestObject<InitializeParams>(json);
 	}
-	else if(method == "textDocument/didChange")
+	else if (method == "textDocument/didChange")
 	{
 		return MakeRequestObject<DidChangeTextDocumentParams>(json);
 	}
 
 	return nullptr;
+}
+
+vscode::Position::Position(uint64_t _line, uint64_t _character)
+	: line(_line),
+	  character(_character)
+{
 }
 
 nlohmann::json vscode::Position::Serialize()
@@ -40,6 +46,12 @@ void vscode::Position::Deserialize(nlohmann::json json)
 {
 	line = json["line"];
 	character = json["character"];
+}
+
+vscode::Range::Range(Position _start, Position _end)
+	: start(_start),
+	  end(_end)
+{
 }
 
 nlohmann::json vscode::Range::Serialize()
@@ -72,6 +84,10 @@ void vscode::Location::Deserialize(nlohmann::json json)
 	uri = json["uri"];
 }
 
+vscode::Diagnostic::Diagnostic()
+{
+}
+
 nlohmann::json vscode::Diagnostic::Serialize()
 {
 	auto object = nlohmann::json::object();
@@ -100,6 +116,23 @@ nlohmann::json vscode::TextDocument::Serialize()
 void vscode::TextDocument::Deserialize(nlohmann::json json)
 {
 	uri = json["uri"];
+}
+
+nlohmann::json vscode::PublishDiagnosticsParams::Serialize()
+{
+	auto object = nlohmann::json::object();
+	object["uri"] = uri;
+
+	auto array = nlohmann::json::array();
+
+	for(auto& diagnositc: diagnostics)
+	{
+		array.push_back(diagnositc.Serialize());
+	}
+
+	object["diagnostics"] = array;
+
+	return object;
 }
 
 void vscode::PublishDiagnosticsParams::Deserialize(nlohmann::json json)

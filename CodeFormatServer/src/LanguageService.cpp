@@ -2,6 +2,7 @@
 #include "CodeFormatServer/VSCode.h"
 #include "CodeService/LuaFormatOptions.h"
 #include "CodeService/LuaFormatter.h"
+#include "CodeFormatServer/LanguageClient.h"
 
 using namespace std::placeholders;
 
@@ -25,7 +26,7 @@ bool LanguageService::Initialize()
 }
 
 std::shared_ptr<vscode::Serializable> LanguageService::Dispatch(std::string_view method,
-	std::shared_ptr<vscode::Serializable> param)
+                                                                std::shared_ptr<vscode::Serializable> param)
 {
 	auto it = _handles.find(method);
 	if (it != _handles.end())
@@ -49,15 +50,35 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 	std::shared_ptr<vscode::DidChangeTextDocumentParams> param)
 {
 	LuaFormatOptions options;
-	
+
 	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(param->contentChanges[0].text));
 	parser->BuildAstWithComment();
 
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
 
-	auto diagnosis = formatter.GetDiagnosisInfos();
+	auto diagnosisInfos = formatter.GetDiagnosisInfos();
 
+	auto vscodeDiagnosis = std::make_shared<vscode::PublishDiagnosticsParams>();
+	vscodeDiagnosis->uri = param->textDocument.uri;
 
+	for (auto diagnosisInfo : diagnosisInfos)
+	{
+		auto& diagnosis = vscodeDiagnosis->diagnostics.emplace_back();
+		diagnosis.message = diagnosisInfo.Message;
+		diagnosis.range = vscode::Range(
+			vscode::Position(
+				diagnosisInfo.Range.Start.Line,
+				diagnosisInfo.Range.Start.Character
+			),
+			vscode::Position(
+				diagnosisInfo.Range.End.Line,
+				diagnosisInfo.Range.End.Character
+			));
+		diagnosis.severity = vscode::DiagnosticSeverity::Warning;
+	}
 
+	LanguageClient::GetInstance().SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
+
+	return nullptr;
 }

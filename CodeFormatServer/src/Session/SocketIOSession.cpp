@@ -38,13 +38,20 @@ void SocketIOSession::Run()
 		}
 		while (true);
 
-		std::string result = Handle(protocolBuffer.ReadOneProtocol());
+		do {
+			std::string result = Handle(protocolBuffer.ReadOneProtocol());
 
-		protocolBuffer.Reset();
-		if (!result.empty()) {
-			asio::write(_socket, asio::buffer(result));
-		}
+			protocolBuffer.Reset();
+			if (!result.empty()) {
+				Send(result);
+			}
+		} while (protocolBuffer.CanReadOneProtocol());
 	}
 endLoop:
 	return;
+}
+
+void SocketIOSession::Send(std::string_view content)
+{
+	asio::write(_socket, asio::buffer(content));
 }

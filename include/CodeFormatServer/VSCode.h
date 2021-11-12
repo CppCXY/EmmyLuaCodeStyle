@@ -4,169 +4,167 @@
 #include <vector>
 
 #include <nlohmann/json.hpp>
-
-#include "VSCode.h"
-#include "VSCode.h"
-#include "VSCode.h"
-
 // 命名风格和vscode一样
 
-namespace vscode {
-
-class Serializable
+namespace vscode
 {
-public:
-	virtual ~Serializable();
-
-	virtual nlohmann::json Serialize()
+	class Serializable
 	{
-		auto object = nlohmann::json::object();
-		return object;
-	}
+	public:
+		virtual ~Serializable();
 
-	virtual void Deserialize(nlohmann::json json)
-	{
+		virtual nlohmann::json Serialize()
+		{
+			auto object = nlohmann::json::object();
+			return object;
+		}
+
+		virtual void Deserialize(nlohmann::json json)
+		{
+		};
 	};
-};
 
-std::shared_ptr<Serializable> MakeFromRequest(std::string_view method, nlohmann::json json);
+	std::shared_ptr<Serializable> MakeFromRequest(std::string_view method, nlohmann::json json);
 
-class Position : public Serializable
-{
-public:
-	uint64_t line;
-	uint64_t character;
+	class Position : public Serializable
+	{
+	public:
+		Position(uint64_t _line = 0, uint64_t _character = 0);
 
-	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
-};
+		uint64_t line;
+		uint64_t character;
 
-class Range : public Serializable
-{
-public:
-	Position start;
-	Position end;
+		nlohmann::json Serialize() override;
+		void Deserialize(nlohmann::json json) override;
+	};
 
-	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
-};
+	class Range : public Serializable
+	{
+	public:
+		Range(Position _start = Position(0, 0), Position _end = Position(0, 0));
+		Position start;
+		Position end;
 
-class Location : public Serializable
-{
-public:
-	std::string uri;
-	Range range;
+		nlohmann::json Serialize() override;
+		void Deserialize(nlohmann::json json) override;
+	};
 
-	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
-};
+	class Location : public Serializable
+	{
+	public:
+		std::string uri;
+		Range range;
 
-enum class DiagnosticSeverity
-{
-	Error = 1,
-	Warning = 2,
-	Information = 3,
-	Hint = 4
-};
+		nlohmann::json Serialize() override;
+		void Deserialize(nlohmann::json json) override;
+	};
 
-class Diagnostic : public Serializable
-{
-public:
-	Range range;
-	DiagnosticSeverity severity;
-	std::string message;
+	enum class DiagnosticSeverity
+	{
+		Error = 1,
+		Warning = 2,
+		Information = 3,
+		Hint = 4
+	};
 
-	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
-};
+	class Diagnostic : public Serializable
+	{
+	public:
+		Diagnostic();
+		Range range;
+		DiagnosticSeverity severity;
+		std::string message;
 
-class TextDocument : public Serializable
-{
-public:
-	std::string uri;
+		nlohmann::json Serialize() override;
+		void Deserialize(nlohmann::json json) override;
+	};
 
-	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
-};
+	class TextDocument : public Serializable
+	{
+	public:
+		std::string uri;
 
-class PublishDiagnosticsParams : public Serializable
-{
-public:
-	std::string uri;
+		nlohmann::json Serialize() override;
+		void Deserialize(nlohmann::json json) override;
+	};
 
-	std::vector<Diagnostic> diagnostics;
+	class PublishDiagnosticsParams : public Serializable
+	{
+	public:
+		std::string uri;
 
-	void Deserialize(nlohmann::json json) override;
-};
+		std::vector<Diagnostic> diagnostics;
 
-enum class TextDocumentSyncKind
-{
-	None = 0,
-	Full = 1,
-	Incremental = 2
-};
+		nlohmann::json Serialize() override;
+		void Deserialize(nlohmann::json json) override;
+	};
 
-class TextDocumentSyncOptions : public Serializable
-{
-public:
-	bool openClose = false;
-	TextDocumentSyncKind change = TextDocumentSyncKind::None;
+	enum class TextDocumentSyncKind
+	{
+		None = 0,
+		Full = 1,
+		Incremental = 2
+	};
 
-	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
-};
+	class TextDocumentSyncOptions : public Serializable
+	{
+	public:
+		bool openClose = false;
+		TextDocumentSyncKind change = TextDocumentSyncKind::None;
 
-class ServerCapabilities : public Serializable
-{
-public:
-	TextDocumentSyncOptions textDocumentSync;
-	bool documentFormattingProvider;
+		nlohmann::json Serialize() override;
+		void Deserialize(nlohmann::json json) override;
+	};
 
-	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
-};
+	class ServerCapabilities : public Serializable
+	{
+	public:
+		TextDocumentSyncOptions textDocumentSync;
+		bool documentFormattingProvider;
 
-class InitializeParams : public Serializable
-{
-public:
-	std::string rootUri;
-	std::string rootPath;
-	std::string locale;
+		nlohmann::json Serialize() override;
+		void Deserialize(nlohmann::json json) override;
+	};
 
-	nlohmann::json initializationOptions;
-	// 其他参数忽略
+	class InitializeParams : public Serializable
+	{
+	public:
+		std::string rootUri;
+		std::string rootPath;
+		std::string locale;
 
-	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
-};
+		nlohmann::json initializationOptions;
+		// 其他参数忽略
 
-
-class InitializeResult : public Serializable
-{
-public:
-	ServerCapabilities capabilities;
-
-	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
-};
-
-class TextDocumentContentChangeEvent: public Serializable
-{
-public:
-	std::string text;
-
-	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
-};
-
-class DidChangeTextDocumentParams : public Serializable
-{
-public:
-	TextDocument textDocument;
-	std::vector<TextDocumentContentChangeEvent> contentChanges;
-
-	void Deserialize(nlohmann::json json) override;
-};
+		nlohmann::json Serialize() override;
+		void Deserialize(nlohmann::json json) override;
+	};
 
 
+	class InitializeResult : public Serializable
+	{
+	public:
+		ServerCapabilities capabilities;
+
+		nlohmann::json Serialize() override;
+		void Deserialize(nlohmann::json json) override;
+	};
+
+	class TextDocumentContentChangeEvent : public Serializable
+	{
+	public:
+		std::string text;
+
+		nlohmann::json Serialize() override;
+		void Deserialize(nlohmann::json json) override;
+	};
+
+	class DidChangeTextDocumentParams : public Serializable
+	{
+	public:
+		TextDocument textDocument;
+		std::vector<TextDocumentContentChangeEvent> contentChanges;
+
+		void Deserialize(nlohmann::json json) override;
+	};
 }

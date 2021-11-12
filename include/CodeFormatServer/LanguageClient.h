@@ -12,6 +12,8 @@ public:
 
 	std::shared_ptr<IOSession> GetSession();
 
+	void SendNotification(std::string_view method, std::shared_ptr<vscode::Serializable> param);
+
 	void Run();
 private:
 	std::shared_ptr<IOSession> _session;
