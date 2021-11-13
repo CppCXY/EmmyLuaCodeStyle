@@ -33,6 +33,6 @@ void AlignmentElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElem
 	if (character != _alignmentPosition)
 	{
 		ctx.PushDiagnosis(format("'=' should align to character {}", _alignmentPosition),
-		                  TextRange(nextOffset, nextOffset));
+		                  TextRange(nextOffset, nextOffset + 1));
 	}
 }

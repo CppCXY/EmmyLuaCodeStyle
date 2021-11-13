@@ -35,8 +35,12 @@ void IndentElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement
 			auto character = ctx.GetColumn(range.StartOffset);
 			if (character != static_cast<int>(ctx.GetCurrentIndent()))
 			{
-				ctx.PushDiagnosis(format("Incorrect indentation {}", character),
-				                  TextRange(range.StartOffset, range.StartOffset));
+				auto line = ctx.GetLine(range.StartOffset);
+				ctx.PushDiagnosis(format("incorrect indentation {}, here need {} indent",
+				                         character, ctx.GetCurrentIndent()),
+				                  LuaDiagnosisPosition(line, 0),
+				                  LuaDiagnosisPosition(line, character)
+				);
 			}
 		}
 

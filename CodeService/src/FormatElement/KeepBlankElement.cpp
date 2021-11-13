@@ -34,7 +34,7 @@ void KeepBlankElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElem
 	{
 		if (nextOffset - lastOffset - 1 != _blank)
 		{
-			ctx.PushDiagnosis(format("must keep {} space", _blank), TextRange(lastOffset, nextOffset));
+			ctx.PushDiagnosis(format("here need keep {} space", _blank), TextRange(lastOffset, nextOffset));
 		}
 	}
 }
