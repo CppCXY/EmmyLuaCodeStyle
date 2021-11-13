@@ -43,6 +43,12 @@ target_sources(CodeFormatServer
 
 target_link_libraries(CodeFormatServer PUBLIC CodeService)
 
-#if(WIN32)
-#	target_link_libraries(CodeFormatServer PUBLIC -lwsock32 -lws2_32)
-#endif()
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+	target_link_libraries(CodeFormatServer PUBLIC pthread)
+endif()
+
+install(
+    TARGETS CodeFormatServer
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)

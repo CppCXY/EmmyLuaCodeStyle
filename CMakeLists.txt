@@ -26,6 +26,5 @@ if(BuildCodeFormat)
 endif()
 
 if(BuildCodeFormatServer)
-	#add_subdirectory(CodeFormatServer)
+	add_subdirectory(CodeFormatServer)
 endif()
-add_subdirectory(CodeFormatServer)
