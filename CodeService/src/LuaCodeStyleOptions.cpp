@@ -1,4 +1,4 @@
-#include "CodeService/LuaFormatOptions.h"
+#include "CodeService/LuaCodeStyleOptions.h"
 #include <fstream>
 #include <filesystem>
 #include <regex>
@@ -32,7 +32,7 @@ static std::vector<std::string> Split(std::string_view source, std::string_view 
 	return result;
 }
 
-LuaFormatOptions LuaFormatOptions::ParseFromEditorConfig(std::string_view filename)
+std::shared_ptr<LuaCodeStyleOptions> LuaCodeStyleOptions::ParseFromEditorConfig(std::string_view filename)
 {
 	std::filesystem::path filePath(filename);
 	std::string realPath = filePath.string();
@@ -91,55 +91,55 @@ LuaFormatOptions LuaFormatOptions::ParseFromEditorConfig(std::string_view filena
 	return ParseOptionsFromMap(optionMap);
 }
 
-LuaFormatOptions LuaFormatOptions::ParseOptionsFromMap(std::map<std::string, std::string>& optionMap)
+std::shared_ptr<LuaCodeStyleOptions> LuaCodeStyleOptions::ParseOptionsFromMap(std::map<std::string, std::string>& optionMap)
 {
-	LuaFormatOptions options;
+	auto options = std::make_shared<LuaCodeStyleOptions>();
 	if (optionMap.count("use_tab"))
 	{
-		options.use_tab = optionMap["use_tab"] == "true";
+		options->use_tab = optionMap["use_tab"] == "true";
 	}
 
 	if (optionMap.count("indent"))
 	{
-		options.indent = std::stoi(optionMap["indent"]);
+		options->indent = std::stoi(optionMap["indent"]);
 	}
 
 	if (optionMap.count("continuation_indent"))
 	{
-		options.continuation_indent = std::stoi(optionMap["indent"]);
+		options->continuation_indent = std::stoi(optionMap["indent"]);
 	}
 
 	if (optionMap.count("align_call_args"))
 	{
-		options.align_call_args = optionMap["align_call_args"] == "true";
+		options->align_call_args = optionMap["align_call_args"] == "true";
 	}
 
 	if (optionMap.count("keep_one_space_between_call_args_and_bracket"))
 	{
-		options.keep_one_space_between_call_args_and_bracket =
+		options->keep_one_space_between_call_args_and_bracket =
 			optionMap["keep_one_space_between_call_args_and_bracket"] == "true";
 	}
 
 	if (optionMap.count("keep_one_space_between_table_and_bracket"))
 	{
-		options.keep_one_space_between_table_and_bracket =
+		options->keep_one_space_between_table_and_bracket =
 			optionMap["keep_one_space_between_table_and_bracket"] == "true";
 	}
 
 	if (optionMap.count("align_table_field_to_first_field"))
 	{
-		options.align_table_field_to_first_field = optionMap["align_table_field_to_first_field"] == "true";
+		options->align_table_field_to_first_field = optionMap["align_table_field_to_first_field"] == "true";
 	}
 
 	if (optionMap.count("continuous_assign_statement_align_to_equal_sign"))
 	{
-		options.continuous_assign_statement_align_to_equal_sign =
+		options->continuous_assign_statement_align_to_equal_sign =
 			optionMap["continuous_assign_statement_align_to_equal_sign"] == "true";
 	}
 
 	if (optionMap.count("continuous_assign_table_field_align_to_equal_sign"))
 	{
-		options.continuous_assign_table_field_align_to_equal_sign =
+		options->continuous_assign_table_field_align_to_equal_sign =
 			optionMap["continuous_assign_table_field_align_to_equal_sign"] == "true";
 	}
 
@@ -148,27 +148,27 @@ LuaFormatOptions LuaFormatOptions::ParseOptionsFromMap(std::map<std::string, std
 		auto lineSeparatorSymbol = optionMap["line_separator"];
 		if (lineSeparatorSymbol == "CRLF")
 		{
-			options.line_separator = "\r\n";
+			options->line_separator = "\r\n";
 		}
 		else if (lineSeparatorSymbol == "LF")
 		{
-			options.line_separator = "\n";
+			options->line_separator = "\n";
 		}
 	}
 
 	if (optionMap.count("max_line_length"))
 	{
-		options.max_line_length = std::stoi(optionMap["max_line_length"]);
+		options->max_line_length = std::stoi(optionMap["max_line_length"]);
 	}
 
 	std::vector<std::pair<std::string, std::shared_ptr<FormatElement>&>> fieldList = {
-		{"keep_line_after_if_statement", options.keep_line_after_if_statement},
-		{"keep_line_after_do_statement", options.keep_line_after_do_statement},
-		{"keep_line_after_while_statement", options.keep_line_after_while_statement},
-		{"keep_line_after_repeat_statement", options.keep_line_after_repeat_statement},
-		{"keep_line_after_for_statement", options.keep_line_after_for_statement},
-		{"keep_line_after_local_or_assign_statement", options.keep_line_after_local_or_assign_statement},
-		{"keep_line_after_function_define_statement", options.keep_line_after_function_define_statement}
+		{"keep_line_after_if_statement", options->keep_line_after_if_statement},
+		{"keep_line_after_do_statement", options->keep_line_after_do_statement},
+		{"keep_line_after_while_statement", options->keep_line_after_while_statement},
+		{"keep_line_after_repeat_statement", options->keep_line_after_repeat_statement},
+		{"keep_line_after_for_statement", options->keep_line_after_for_statement},
+		{"keep_line_after_local_or_assign_statement", options->keep_line_after_local_or_assign_statement},
+		{"keep_line_after_function_define_statement", options->keep_line_after_function_define_statement}
 	};
 	std::regex minLineRegex = std::regex(R"(minLine:\s*(\d+))");
 	std::regex keepLineRegex = std::regex(R"(keepLine:\s*(\d+))");
@@ -199,7 +199,7 @@ LuaFormatOptions LuaFormatOptions::ParseOptionsFromMap(std::map<std::string, std
 	return options;
 }
 
-LuaFormatOptions::LuaFormatOptions()
+LuaCodeStyleOptions::LuaCodeStyleOptions()
 	:
 	keep_line_after_if_statement(std::make_shared<MinLineElement>(1)),
 	keep_line_after_do_statement(std::make_shared<MinLineElement>(1)),

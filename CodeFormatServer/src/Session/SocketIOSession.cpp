@@ -41,7 +41,9 @@ void SocketIOSession::Run()
 		while (true);
 
 		do {
-			std::string result = Handle(protocolBuffer.ReadOneProtocol());
+			auto content = protocolBuffer.ReadOneProtocol();
+			// std::cout << content << std::endl;
+			std::string result = Handle(content);
 
 			protocolBuffer.Reset();
 			if (!result.empty()) {

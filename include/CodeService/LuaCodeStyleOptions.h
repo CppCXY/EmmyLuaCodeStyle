@@ -7,12 +7,12 @@
 
 class FormatElement;
 
-class LuaFormatOptions
+class LuaCodeStyleOptions
 {
 public:
-	static LuaFormatOptions ParseFromEditorConfig(std::string_view filename);
-	static LuaFormatOptions ParseOptionsFromMap(std::map<std::string, std::string>& optionMap);
-	LuaFormatOptions();
+	static std::shared_ptr<LuaCodeStyleOptions> ParseFromEditorConfig(std::string_view filename);
+	static std::shared_ptr<LuaCodeStyleOptions> ParseOptionsFromMap(std::map<std::string, std::string>& optionMap);
+	LuaCodeStyleOptions();
 	/*
 	 * 我反对这种风格
 	 * 但我依然实现他

@@ -3,13 +3,13 @@
 #include <stack>
 
 #include "CodeService/LuaDiagnosisInfo.h"
-#include "CodeService/LuaFormatOptions.h"
+#include "CodeService/LuaCodeStyleOptions.h"
 #include "LuaParser/LuaParser.h"
 
 class DiagnosisContext
 {
 public:
-	DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaFormatOptions& options);
+	DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options);
 
 	void AddIndent(int specialIndent = -1);
 
@@ -33,13 +33,13 @@ public:
 
 	std::vector<LuaDiagnosisInfo> GetDiagnosisInfos();
 
-	const LuaFormatOptions& GetOptions();
+	const LuaCodeStyleOptions& GetOptions();
 
 	std::shared_ptr<LuaParser> GetParser();
 
 private:
 	std::stack<int, std::vector<int>> _indentStack;
-	LuaFormatOptions& _options;
+	LuaCodeStyleOptions& _options;
 
 	std::size_t _characterCount;
 	std::shared_ptr<LuaParser> _parser;

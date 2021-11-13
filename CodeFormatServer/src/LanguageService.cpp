@@ -1,6 +1,6 @@
 #include "CodeFormatServer/LanguageService.h"
 #include "CodeFormatServer/VSCode.h"
-#include "CodeService/LuaFormatOptions.h"
+#include "CodeService/LuaCodeStyleOptions.h"
 #include "CodeService/LuaFormatter.h"
 #include "CodeFormatServer/LanguageClient.h"
 
@@ -24,6 +24,7 @@ bool LanguageService::Initialize()
 	_handles["textDocument/didOpen"] = DynamicBind(OnDidOpen, vscode::DidOpenTextDocumentParams);
 	_handles["textDocument/formatting"] = DynamicBind(OnFormatting, vscode::DocumentFormattingParams);
 	_handles["textDocument/didClose"] = DynamicBind(OnClose, vscode::DidCloseTextDocumentParams);
+	_handles["updateEditorConfig"] = DynamicBind(OnEditorConfigUpdate, vscode::EditorConfigUpdateParams);
 	return true;
 }
 
@@ -45,6 +46,13 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 	result->capabilities.documentFormattingProvider = true;
 	result->capabilities.textDocumentSync.change = vscode::TextDocumentSyncKind::Full;
 	result->capabilities.textDocumentSync.openClose = true;
+
+	auto& configFiles = param->initializationOptions.configFiles;
+	for (auto& configFile : configFiles)
+	{
+		LanguageClient::GetInstance().UpdateOptions(configFile.workspace, configFile.path);
+	}
+
 	return result;
 }
 
@@ -84,18 +92,18 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnFormatting(
 		return result;
 	}
 
-	auto& options = LanguageClient::GetInstance().GetOptions();
+	auto options = LanguageClient::GetInstance().GetOptions(param->textDocument.uri);
 
 	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(text));
 	parser->BuildAstWithComment();
 
-	if(parser->HasError())
+	if (parser->HasError())
 	{
 		result->hasError = true;
 		return result;
 	}
 
-	LuaFormatter formatter(parser, options);
+	LuaFormatter formatter(parser, *options);
 	formatter.BuildFormattedElement();
 
 	auto& edit = result->edits.emplace_back();
@@ -111,6 +119,27 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnClose(
 	std::shared_ptr<vscode::DidCloseTextDocumentParams> param)
 {
 	LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
+
+	return nullptr;
+}
+
+std::shared_ptr<vscode::Serializable> LanguageService::OnEditorConfigUpdate(
+	std::shared_ptr<vscode::EditorConfigUpdateParams> param)
+{
+	switch (param->type)
+	{
+	case vscode::EditorConfigUpdateType::Created:
+	case vscode::EditorConfigUpdateType::Changed:
+		{
+			LanguageClient::GetInstance().UpdateOptions(param->source.workspace, param->source.path);
+			break;
+		}
+	case vscode::EditorConfigUpdateType::Delete:
+		{
+			LanguageClient::GetInstance().RemoveOptions(param->source.workspace);
+			break;
+		}
+	}
 
 	return nullptr;
 }

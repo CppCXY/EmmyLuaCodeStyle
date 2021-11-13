@@ -136,6 +136,17 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
+class EditorConfigSource;
+
+class InitializationOptions : public Serializable
+{
+public:
+	std::vector<std::string> workspaceFolders;
+	std::vector<EditorConfigSource> configFiles;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
 class InitializeParams : public Serializable
 {
 public:
@@ -143,13 +154,10 @@ public:
 	std::string rootPath;
 	std::string locale;
 
-	nlohmann::json initializationOptions;
+	InitializationOptions initializationOptions;
 	// 其他参数忽略
-
-	nlohmann::json Serialize() override;
 	void Deserialize(nlohmann::json json) override;
 };
-
 
 class InitializeResult : public Serializable
 {
@@ -206,7 +214,7 @@ public:
 };
 
 // 该类并非language server protocol 接口
-class DocumentFormattingResult: public Serializable
+class DocumentFormattingResult : public Serializable
 {
 public:
 	std::vector<TextEdit> edits;
@@ -216,7 +224,7 @@ public:
 	nlohmann::json Serialize() override;
 };
 
-class DidCloseTextDocumentParams: public Serializable
+class DidCloseTextDocumentParams : public Serializable
 {
 public:
 	TextDocument textDocument;
@@ -224,4 +232,29 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
+enum class EditorConfigUpdateType
+{
+	Created,
+	Changed,
+	Delete
+};
+
+class EditorConfigSource : public Serializable
+{
+public:
+	std::string uri;
+	std::string path;
+	std::string workspace;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+class EditorConfigUpdateParams : public Serializable
+{
+public:
+	EditorConfigUpdateType type;
+	EditorConfigSource source;
+
+	void Deserialize(nlohmann::json json) override;
+};
 }

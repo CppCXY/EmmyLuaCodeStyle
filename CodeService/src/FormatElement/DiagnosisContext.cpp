@@ -2,7 +2,7 @@
 
 #include "Util/format.h"
 
-DiagnosisContext::DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaFormatOptions& options)
+DiagnosisContext::DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options)
 	: _parser(parser),
 	  _options(options)
 {
@@ -118,7 +118,7 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 	return _diagnosisInfos;
 }
 
-const LuaFormatOptions& DiagnosisContext::GetOptions()
+const LuaCodeStyleOptions& DiagnosisContext::GetOptions()
 {
 	return _options;
 }

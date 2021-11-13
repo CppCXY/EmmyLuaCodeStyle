@@ -35,7 +35,7 @@ std::shared_ptr<LuaAstNode> nextNode(int currentIndex, const std::vector<std::sh
 }
 
 
-LuaFormatter::LuaFormatter(std::shared_ptr<LuaParser> luaParser, LuaFormatOptions& options)
+LuaFormatter::LuaFormatter(std::shared_ptr<LuaParser> luaParser, LuaCodeStyleOptions& options)
 	: _parser(luaParser),
 	  _options(options)
 {

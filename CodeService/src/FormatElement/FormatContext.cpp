@@ -1,6 +1,6 @@
 #include "CodeService/FormatElement/FormatContext.h"
 
-FormatContext::FormatContext(std::shared_ptr<LuaParser> parser, LuaFormatOptions& options)
+FormatContext::FormatContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options)
 	: _options(options),
 	  _characterCount(0),
 	  _parser(parser)

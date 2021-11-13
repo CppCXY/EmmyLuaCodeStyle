@@ -42,10 +42,10 @@ int main(int argc, char** argv)
 		parser = LuaParser::LoadFromBuffer(std::move(buffer));
 	}
 
-	LuaFormatOptions options;
+	LuaCodeStyleOptions options;
 	if (!cmd.Get<std::string>("config").empty())
 	{
-		options = LuaFormatOptions::ParseFromEditorConfig(cmd.Get<std::string>("config"));
+		options = LuaCodeStyleOptions::ParseFromEditorConfig(cmd.Get<std::string>("config"));
 	}
 
 	parser->BuildAstWithComment();

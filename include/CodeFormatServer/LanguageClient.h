@@ -2,12 +2,14 @@
 
 #include <memory>
 #include "Session/IOSession.h"
-#include "CodeService/LuaFormatOptions.h"
+#include "CodeService/LuaCodeStyleOptions.h"
 
 class LanguageClient
 {
 public:
 	static LanguageClient& GetInstance();
+
+	LanguageClient();
 
 	void SetSession(std::shared_ptr<IOSession> session);
 
@@ -25,11 +27,17 @@ public:
 
 	void Run();
 
-	LuaFormatOptions& GetOptions();
+	std::shared_ptr<LuaCodeStyleOptions> GetOptions(std::string_view uri);
+
+	void UpdateOptions(std::string_view workspaceUri, std::string_view configPath);
+
+	void RemoveOptions(std::string_view workspaceUri);
 private:
 	std::shared_ptr<IOSession> _session;
 	// uri µ½file textµÄÓ³Éä
 	std::map<std::string, std::string, std::less<>> _fileMap;
 
-	LuaFormatOptions _options;
+	std::vector<std::pair<std::string, std::shared_ptr<LuaCodeStyleOptions>>> _optionsVector;
+
+	std::shared_ptr<LuaCodeStyleOptions> _defaultOptions;
 };

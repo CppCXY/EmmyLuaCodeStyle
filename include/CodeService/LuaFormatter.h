@@ -2,14 +2,14 @@
 #include <memory>
 #include <sstream>
 #include "LuaParser/LuaParser.h"
-#include "LuaFormatOptions.h"
+#include "LuaCodeStyleOptions.h"
 #include "FormatElement/FormatElement.h"
 #include "LuaDiagnosisInfo.h"
 
 class LuaFormatter
 {
 public:
-	LuaFormatter(std::shared_ptr<LuaParser> luaParser, LuaFormatOptions& options);
+	LuaFormatter(std::shared_ptr<LuaParser> luaParser, LuaCodeStyleOptions& options);
 	~LuaFormatter() = default;
 
 	void BuildFormattedElement();
@@ -110,7 +110,7 @@ protected:
 private:
 
 	std::shared_ptr<LuaParser> _parser;
-	LuaFormatOptions& _options;
+	LuaCodeStyleOptions& _options;
 	std::shared_ptr<FormatElement> _env;
 };
 

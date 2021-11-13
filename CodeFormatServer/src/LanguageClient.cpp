@@ -10,6 +10,11 @@ LanguageClient& LanguageClient::GetInstance()
 	return instance;
 }
 
+LanguageClient::LanguageClient()
+	: _defaultOptions(std::make_shared<LuaCodeStyleOptions>())
+{
+}
+
 void LanguageClient::SetSession(std::shared_ptr<IOSession> session)
 {
 	_session = session;
@@ -63,14 +68,16 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 
 	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(text));
 
-	if(parser->HasError())
+	if (parser->HasError())
 	{
 		return;
 	}
 
+	auto options = GetOptions(uri);
+
 	parser->BuildAstWithComment();
 
-	LuaFormatter formatter(parser, _options);
+	LuaFormatter formatter(parser, *options);
 	formatter.BuildFormattedElement();
 
 	auto diagnosisInfos = formatter.GetDiagnosisInfos();
@@ -100,7 +107,7 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 std::string LanguageClient::GetFile(std::string_view uri)
 {
 	auto it = _fileMap.find(uri);
-	if(it != _fileMap.end())
+	if (it != _fileMap.end())
 	{
 		return it->second;
 	}
@@ -116,7 +123,49 @@ void LanguageClient::Run()
 	}
 }
 
-LuaFormatOptions& LanguageClient::GetOptions()
+std::shared_ptr<LuaCodeStyleOptions> LanguageClient::GetOptions(std::string_view uri)
 {
-	return _options;
+	std::size_t matchLength = 0;
+	std::shared_ptr<LuaCodeStyleOptions> options = _defaultOptions;
+	for (auto it = _optionsVector.begin(); it != _optionsVector.end(); it++)
+	{
+		if (uri.starts_with(it->first) && it->first.size() > matchLength)
+		{
+			matchLength = it->first.size();
+			options = it->second;
+		}
+	}
+
+	return options;
 }
+
+void LanguageClient::UpdateOptions(std::string_view workspaceUri, std::string_view configPath)
+{
+	for (auto& pair : _optionsVector)
+	{
+		if (pair.first == workspaceUri)
+		{
+			pair.second = LuaCodeStyleOptions::ParseFromEditorConfig(configPath);
+			return;
+		}
+	}
+
+	_optionsVector.push_back({std::string(workspaceUri), LuaCodeStyleOptions::ParseFromEditorConfig(configPath)});
+}
+
+void LanguageClient::RemoveOptions(std::string_view workspaceUri)
+{
+	for (auto it = _optionsVector.begin(); it != _optionsVector.end(); it++)
+	{
+		if (it->first == workspaceUri)
+		{
+			_optionsVector.erase(it);
+			break;
+		}
+	}
+}
+
+// LuaCodeStyleOptions& LanguageClient::GetOptions()
+// {
+// 	return _optionsVector;
+// }

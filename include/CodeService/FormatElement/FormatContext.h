@@ -4,7 +4,7 @@
 #include <vector>
 #include <stack>
 #include <map>
-#include "CodeService/LuaFormatOptions.h"
+#include "CodeService/LuaCodeStyleOptions.h"
 #include "LuaParser/LuaParser.h"
 #include "CodeService/LuaDiagnosisInfo.h"
 
@@ -17,7 +17,7 @@ public:
 		std::string IndentString = "";
 	};
 
-	FormatContext(std::shared_ptr<LuaParser> parser, LuaFormatOptions& options);
+	FormatContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options);
 
 	void Print(std::string_view text);
 
@@ -47,7 +47,7 @@ private:
 	std::stack<IndentState, std::vector<IndentState>> _indentStack;
 	std::map<int, std::string> _indentMap;
 	std::stringstream _os;
-	LuaFormatOptions& _options;
+	LuaCodeStyleOptions& _options;
 
 	std::size_t _characterCount;
 	std::shared_ptr<LuaParser> _parser;
