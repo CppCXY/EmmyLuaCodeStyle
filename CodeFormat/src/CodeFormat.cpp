@@ -6,6 +6,17 @@
 #include "CodeService/LuaFormatter.h"
 #include "Util/CommandLine.h"
 
+// https://stackoverflow.com/questions/1598985/c-read-binary-stdin
+#ifdef _WIN32
+# include <io.h>
+# include <fcntl.h>
+# define SET_BINARY_MODE() _setmode(_fileno(stdin), _O_BINARY);\
+	_setmode(_fileno(stdout), _O_BINARY)
+#else
+# define SET_BINARY_MODE() ((void)0)
+#endif
+
+
 int main(int argc, char** argv)
 {
 	CommandLine cmd;
@@ -32,6 +43,7 @@ int main(int argc, char** argv)
 	}
 	else if (cmd.Get<int>("stdin") != 0)
 	{
+		SET_BINARY_MODE();
 		std::size_t size = cmd.Get<int>("stdin");
 
 		std::string buffer;
@@ -42,7 +54,7 @@ int main(int argc, char** argv)
 		parser = LuaParser::LoadFromBuffer(std::move(buffer));
 	}
 
-	LuaCodeStyleOptions options;
+	std::shared_ptr<LuaCodeStyleOptions> options;
 	if (!cmd.Get<std::string>("config").empty())
 	{
 		options = LuaCodeStyleOptions::ParseFromEditorConfig(cmd.Get<std::string>("config"));
@@ -50,7 +62,7 @@ int main(int argc, char** argv)
 
 	parser->BuildAstWithComment();
 
-	LuaFormatter formatter(parser, options);
+	LuaFormatter formatter(parser, *options);
 	formatter.BuildFormattedElement();
 
 	if (cmd.GetTarget() == "format")
