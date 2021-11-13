@@ -4,6 +4,16 @@
 #include "CodeFormatServer/Session/SocketIOSession.h"
 #include "CodeFormatServer/Session/StandardIOSession.h"
 
+// https://stackoverflow.com/questions/1598985/c-read-binary-stdin
+#ifdef _WIN32
+# include <io.h>
+# include <fcntl.h>
+# define SET_BINARY_MODE() _setmode(_fileno(stdin), _O_BINARY);\
+	_setmode(_fileno(stdout), _O_BINARY)
+#else
+# define SET_BINARY_MODE() ((void)0)
+#endif
+
 using namespace asio::ip;
 
 int main(int argc, char** argv)
@@ -22,8 +32,9 @@ int main(int argc, char** argv)
     }
     else
     {
-        // LanguageClient::GetInstance().SetSession(std::make_shared<StandardIOSession>());
-        // LanguageClient::GetInstance().Run();
+        SET_BINARY_MODE();
+        LanguageClient::GetInstance().SetSession(std::make_shared<StandardIOSession>());
+        LanguageClient::GetInstance().Run();
     }
 
    

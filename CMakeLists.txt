@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 option(BuildAsLuaLib "Build for lua dll" OFF)
 option(BuildCodeFormat "Build CodeFormat" ON)
-option(BuildCodeFormatServer "Build CodeFormatServer" OFF)
+option(BuildCodeFormatServer "Build CodeFormatServer" ON)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_definitions(-DMSVC)
@@ -26,5 +26,6 @@ if(BuildCodeFormat)
 endif()
 
 if(BuildCodeFormatServer)
-	add_subdirectory(CodeFormatServer)
+	#add_subdirectory(CodeFormatServer)
 endif()
+add_subdirectory(CodeFormatServer)

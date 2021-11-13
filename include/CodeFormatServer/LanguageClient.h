@@ -15,11 +15,13 @@ public:
 
 	void SendNotification(std::string_view method, std::shared_ptr<vscode::Serializable> param);
 
-	void CacheFile(const std::string& uri, std::string text);
+	void CacheFile(std::string_view uri, std::string text);
 
-	void DiagnosticFile(const std::string& uri);
+	void ReleaseFile(std::string_view uri);
 
-	std::string GetFile(const std::string& uri);
+	void DiagnosticFile(const std::string_view uri);
+
+	std::string GetFile(const std::string_view uri);
 
 	void Run();
 

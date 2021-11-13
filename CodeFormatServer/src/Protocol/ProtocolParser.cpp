@@ -12,7 +12,6 @@ ProtocolParser::ProtocolParser()
 
 void ProtocolParser::Parse(std::string_view msg)
 {
-	std::cout << msg << std::endl;
 	auto jsonMessage = nlohmann::json::parse(msg);
 	if (jsonMessage["id"].is_number())
 	{

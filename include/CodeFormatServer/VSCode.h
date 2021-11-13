@@ -189,7 +189,7 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
-class DidOpenTextDocumentParam : public Serializable
+class DidOpenTextDocumentParams : public Serializable
 {
 public:
 	TextDocumentItem textDocument;
@@ -214,6 +214,14 @@ public:
 	bool hasError = false;
 
 	nlohmann::json Serialize() override;
+};
+
+class DidCloseTextDocumentParams: public Serializable
+{
+public:
+	TextDocument textDocument;
+
+	void Deserialize(nlohmann::json json) override;
 };
 
 }

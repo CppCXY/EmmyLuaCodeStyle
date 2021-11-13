@@ -18,6 +18,8 @@ void SocketIOSession::Run()
 	{
 		asio::error_code code;
 		std::size_t readSize = 0;
+
+
 		do
 		{
 			char* writableCursor = protocolBuffer.GetWritableCursor();

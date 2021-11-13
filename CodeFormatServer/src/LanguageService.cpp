@@ -21,8 +21,9 @@ bool LanguageService::Initialize()
 
 	_handles["initialize"] = DynamicBind(OnInitialize, vscode::InitializeParams);
 	_handles["textDocument/didChange"] = DynamicBind(OnDidChange, vscode::DidChangeTextDocumentParams);
-	_handles["textDocument/didOpen"] = DynamicBind(OnDidOpen, vscode::DidOpenTextDocumentParam);
+	_handles["textDocument/didOpen"] = DynamicBind(OnDidOpen, vscode::DidOpenTextDocumentParams);
 	_handles["textDocument/formatting"] = DynamicBind(OnFormatting, vscode::DocumentFormattingParams);
+	_handles["textDocument/didClose"] = DynamicBind(OnClose, vscode::DidCloseTextDocumentParams);
 	return true;
 }
 
@@ -60,7 +61,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 }
 
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidOpen(
-	std::shared_ptr<vscode::DidOpenTextDocumentParam> param)
+	std::shared_ptr<vscode::DidOpenTextDocumentParams> param)
 {
 	LanguageClient::GetInstance().CacheFile(param->textDocument.uri, param->textDocument.text);
 	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
@@ -88,6 +89,12 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnFormatting(
 	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(text));
 	parser->BuildAstWithComment();
 
+	if(parser->HasError())
+	{
+		result->hasError = true;
+		return result;
+	}
+
 	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
 
@@ -98,4 +105,12 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnFormatting(
 		vscode::Position(parser->GetLine(lastOffset), parser->GetColumn(lastOffset))
 	);
 	return result;
+}
+
+std::shared_ptr<vscode::Serializable> LanguageService::OnClose(
+	std::shared_ptr<vscode::DidCloseTextDocumentParams> param)
+{
+	LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
+
+	return nullptr;
 }

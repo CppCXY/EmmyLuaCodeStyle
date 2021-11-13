@@ -5,5 +5,7 @@
 class StandardIOSession: public IOSession
 {
 public:
-	
+
+	void Run() override;
+	void Send(std::string_view content) override;
 };

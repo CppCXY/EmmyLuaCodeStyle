@@ -37,12 +37,21 @@ void LanguageClient::SendNotification(std::string_view method, std::shared_ptr<v
 	}
 }
 
-void LanguageClient::CacheFile(const std::string& uri, std::string text)
+void LanguageClient::CacheFile(std::string_view uri, std::string text)
 {
-	_fileMap[uri] = std::move(text);
+	_fileMap[std::string(uri)] = std::move(text);
 }
 
-void LanguageClient::DiagnosticFile(const std::string& uri)
+void LanguageClient::ReleaseFile(std::string_view uri)
+{
+	auto it = _fileMap.find(uri);
+	if (it != _fileMap.end())
+	{
+		_fileMap.erase(it);
+	}
+}
+
+void LanguageClient::DiagnosticFile(std::string_view uri)
 {
 	auto it = _fileMap.find(uri);
 	if (it == _fileMap.end())
@@ -53,6 +62,12 @@ void LanguageClient::DiagnosticFile(const std::string& uri)
 	std::string text = it->second;
 
 	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(text));
+
+	if(parser->HasError())
+	{
+		return;
+	}
+
 	parser->BuildAstWithComment();
 
 	LuaFormatter formatter(parser, _options);
@@ -82,7 +97,7 @@ void LanguageClient::DiagnosticFile(const std::string& uri)
 	SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
 }
 
-std::string LanguageClient::GetFile(const std::string& uri)
+std::string LanguageClient::GetFile(std::string_view uri)
 {
 	auto it = _fileMap.find(uri);
 	if(it != _fileMap.end())

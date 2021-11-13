@@ -25,11 +25,15 @@ std::shared_ptr<vscode::Serializable> vscode::MakeFromRequest(std::string_view m
 	}
 	else if (method == "textDocument/didOpen")
 	{
-		return MakeRequestObject<DidOpenTextDocumentParam>(json);
+		return MakeRequestObject<DidOpenTextDocumentParams>(json);
 	}
 	else if (method == "textDocument/formatting")
 	{
 		return MakeRequestObject<DocumentFormattingParams>(json);
+	}
+	else if (method == "textDocument/didClose")
+	{
+		return MakeRequestObject<DidCloseTextDocumentParams>(json);
 	}
 
 	return nullptr;
@@ -263,7 +267,7 @@ void vscode::TextDocumentItem::Deserialize(nlohmann::json json)
 	text = json["text"];
 }
 
-void vscode::DidOpenTextDocumentParam::Deserialize(nlohmann::json json)
+void vscode::DidOpenTextDocumentParams::Deserialize(nlohmann::json json)
 {
 	textDocument.Deserialize(json["textDocument"]);
 }
@@ -289,4 +293,9 @@ nlohmann::json vscode::DocumentFormattingResult::Serialize()
 
 		return array;
 	}
+}
+
+void vscode::DidCloseTextDocumentParams::Deserialize(nlohmann::json json)
+{
+	textDocument.Deserialize(json["textDocument"]);
 }
