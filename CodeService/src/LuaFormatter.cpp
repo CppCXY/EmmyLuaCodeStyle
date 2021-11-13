@@ -1460,10 +1460,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(int& curren
 
 			for (auto blockChild : block->GetChildren())
 			{
-				auto shortExpression = std::make_shared<ExpressionElement>();
-				shortExpression->AddChildren(blockChild->GetChildren());
-				env->AddChild(shortExpression);
-				env->Add<KeepBlankElement>(1);
+				if (blockChild->HasValidTextRange()) {
+					auto shortExpression = std::make_shared<ExpressionElement>();
+					shortExpression->AddChildren(blockChild->GetChildren());
+					env->AddChild(shortExpression);
+					env->Add<KeepBlankElement>(1);
+				}
 			}
 		}
 	}
