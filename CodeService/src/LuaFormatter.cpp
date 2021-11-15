@@ -843,12 +843,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 				env->Add<KeepBlankElement>(1);
 				break;
 			}
-			// case LuaAstNodeType::Block:
-			// 	{
-			// 		env->AddChild(FormatNode(child));
-			// 		env->Add<KeepLineElement>();
-			// 		break;
-			// 	}
+		// case LuaAstNodeType::Block:
+		// 	{
+		// 		env->AddChild(FormatNode(child));
+		// 		env->Add<KeepLineElement>();
+		// 		break;
+		// 	}
 		default:
 			{
 				DefaultHandle(child, env);
@@ -868,13 +868,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 	{
 		switch (child->GetType())
 		{
-			// 目前表达式语句上只有调用表达式
+		// 目前表达式语句上只有调用表达式
 		case LuaAstNodeType::CallExpression:
 			{
 				env->AddChild(FormatNode(child));
 				break;
 			}
-			// default 一般只有一个分号
+		// default 一般只有一个分号
 		default:
 			{
 				DefaultHandle(child, env);
@@ -1289,6 +1289,16 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIn
 		}
 		else
 		{
+			if ((currentChild->GetType() == LuaAstNodeType::LocalStatement || currentChild->GetType() ==
+				LuaAstNodeType::AssignStatement))
+			{
+				env->AddChild(_options.keep_line_after_local_or_assign_statement);
+			}
+			else
+			{
+				env->Add<KeepLineElement>();
+			}
+
 			if (nextChild->GetType() == LuaAstNodeType::Comment)
 			{
 				auto comment = FormatNode(nextChild);
@@ -1300,8 +1310,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(int& currentIn
 			{
 				env->AddChild(FormatNode(nextChild));
 			}
-
-			env->Add<KeepLineElement>();
 		}
 
 		currentIndex++;
@@ -1460,7 +1468,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(int& curren
 
 			for (auto blockChild : block->GetChildren())
 			{
-				if (blockChild->HasValidTextRange()) {
+				if (blockChild->HasValidTextRange())
+				{
 					auto shortExpression = std::make_shared<ExpressionElement>();
 					shortExpression->AddChildren(blockChild->GetChildren());
 					env->AddChild(shortExpression);

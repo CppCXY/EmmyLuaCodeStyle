@@ -42,13 +42,13 @@ void KeepLineElement::Diagnosis(DiagnosisContext& ctx, int position, FormatEleme
 		int lastElementOffset = getLastValidOffset(position, parent);
 		int nextElementOffset = getNextValidOffset(position, parent);
 
-		int lastElementLine = ctx.GetLine(lastElementOffset);
-		int nextElementLine = nextElementOffset == -1 ? -1 : ctx.GetLine(nextElementOffset);
-
-		if (nextElementLine == -1)
+		if (nextElementOffset == -1)
 		{
 			return;
 		}
+
+		int lastElementLine = ctx.GetLine(lastElementOffset);
+		int nextElementLine = ctx.GetLine(nextElementOffset);
 
 		if (_line != (nextElementLine - lastElementLine - 1))
 		{
