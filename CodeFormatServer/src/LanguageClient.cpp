@@ -67,6 +67,9 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 	auto options = GetOptions(uri);
 	if(!options->enable_check_codestyle)
 	{
+		auto vscodeDiagnosis = std::make_shared<vscode::PublishDiagnosticsParams>();
+		vscodeDiagnosis->uri = uri;
+		SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
 		return;
 	}
 
