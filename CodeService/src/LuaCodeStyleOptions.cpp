@@ -163,7 +163,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaCodeStyleOptions::ParseOptionsFromMap(st
 
 	if (optionMap.count("enable_check_codestyle"))
 	{
-		options->enable_check_codestyle = std::stoi(optionMap["enable_check_codestyle"]);
+		options->enable_check_codestyle = optionMap["enable_check_codestyle"] == "true";
 	}
 
 	std::vector<std::pair<std::string, std::shared_ptr<FormatElement>&>> fieldList = {
