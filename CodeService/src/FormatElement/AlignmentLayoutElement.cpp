@@ -107,7 +107,7 @@ void AlignmentLayoutElement::alignmentSerialize(FormatContext& ctx, int position
 	{
 		auto& statChildren = statChild->GetChildren();
 
-		for (int i = 0; i < static_cast<int>(statChildren.size()); i++)
+		for (std::size_t i = 0; i < statChildren.size(); i++)
 		{
 			auto textChild = statChildren[i];
 			if (textChild->GetType() == FormatElementType::TextElement)
@@ -126,13 +126,14 @@ void AlignmentLayoutElement::alignmentSerialize(FormatContext& ctx, int position
 	return FormatElement::Serialize(ctx, position, parent);
 }
 
-void AlignmentLayoutElement::alignmentDiagnosis(DiagnosisContext& ctx, int position, FormatElement& parent, int eqPosition)
+void AlignmentLayoutElement::alignmentDiagnosis(DiagnosisContext& ctx, int position, FormatElement& parent,
+                                                int eqPosition)
 {
 	for (auto statChild : _children)
 	{
 		auto& statChildren = statChild->GetChildren();
 
-		for (int i = 0; i < static_cast<int>(statChildren.size()); i++)
+		for (std::size_t i = 0; i < statChildren.size(); i++)
 		{
 			auto textChild = statChildren[i];
 			if (textChild->GetType() == FormatElementType::TextElement)

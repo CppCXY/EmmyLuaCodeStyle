@@ -6,7 +6,6 @@
 #include <map>
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "LuaParser/LuaParser.h"
-#include "CodeService/LuaDiagnosisInfo.h"
 
 class FormatContext
 {
