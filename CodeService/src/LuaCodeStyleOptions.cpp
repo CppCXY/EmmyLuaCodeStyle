@@ -161,6 +161,11 @@ std::shared_ptr<LuaCodeStyleOptions> LuaCodeStyleOptions::ParseOptionsFromMap(st
 		options->max_line_length = std::stoi(optionMap["max_line_length"]);
 	}
 
+	if (optionMap.count("enable_check_codestyle"))
+	{
+		options->enable_check_codestyle = std::stoi(optionMap["enable_check_codestyle"]);
+	}
+
 	std::vector<std::pair<std::string, std::shared_ptr<FormatElement>&>> fieldList = {
 		{"keep_line_after_if_statement", options->keep_line_after_if_statement},
 		{"keep_line_after_do_statement", options->keep_line_after_do_statement},

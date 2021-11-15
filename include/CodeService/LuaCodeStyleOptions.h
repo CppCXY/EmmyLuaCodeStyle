@@ -80,4 +80,5 @@ public:
 	 */
 	int max_line_length = 120;
 
+	bool enable_check_codestyle = true;
 };

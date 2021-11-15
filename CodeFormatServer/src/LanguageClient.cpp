@@ -64,6 +64,12 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 		return;
 	}
 
+	auto options = GetOptions(uri);
+	if(!options->enable_check_codestyle)
+	{
+		return;
+	}
+
 	std::string text = it->second;
 
 	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(text));
@@ -73,7 +79,7 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 		return;
 	}
 
-	auto options = GetOptions(uri);
+
 
 	parser->BuildAstWithComment();
 
