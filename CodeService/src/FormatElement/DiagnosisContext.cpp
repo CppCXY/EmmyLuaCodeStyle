@@ -1,5 +1,6 @@
 #include "CodeService/FormatElement/DiagnosisContext.h"
 
+#include "CodeService/LanguageTranslator.h"
 #include "Util/format.h"
 
 DiagnosisContext::DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options)
@@ -111,7 +112,7 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 		{
 			LuaDiagnosisPosition start(line, _options.max_line_length);
 			LuaDiagnosisPosition end(line, character);
-			PushDiagnosis(format("The line width should not exceed {}", _options.max_line_length), start, end);
+			PushDiagnosis(format(T("The line width should not exceed {}"), _options.max_line_length), start, end);
 		}
 		_lineMaxLengthMap.clear();
 	}

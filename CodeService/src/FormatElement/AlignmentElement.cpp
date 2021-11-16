@@ -32,7 +32,7 @@ void AlignmentElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElem
 	auto character = ctx.GetColumn(nextOffset);
 	if (character != _alignmentPosition)
 	{
-		ctx.PushDiagnosis(format("'=' should align to character {}", _alignmentPosition),
+		ctx.PushDiagnosis(format(T("'=' should align to character {}"), _alignmentPosition),
 		                  TextRange(nextOffset, nextOffset + 1));
 	}
 }

@@ -1,5 +1,6 @@
 #include "CodeService/FormatElement/IndentElement.h"
 #include "Util/format.h"
+#include "CodeService/FormatElement/FormatElement.h"
 
 IndentElement::IndentElement(int specialIndent)
 	: FormatElement(TextRange(0, 0)),
@@ -36,7 +37,7 @@ void IndentElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement
 			if (character != static_cast<int>(ctx.GetCurrentIndent()))
 			{
 				auto line = ctx.GetLine(range.StartOffset);
-				ctx.PushDiagnosis(format("incorrect indentation {}, here need {} indent",
+				ctx.PushDiagnosis(format(T("incorrect indentation {}, here need {} indent"),
 				                         character, ctx.GetCurrentIndent()),
 				                  LuaDiagnosisPosition(line, 0),
 				                  LuaDiagnosisPosition(line, character)

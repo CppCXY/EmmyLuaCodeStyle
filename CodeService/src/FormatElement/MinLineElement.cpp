@@ -40,7 +40,7 @@ void MinLineElement::Serialize(FormatContext& ctx, int position, FormatElement& 
 
 void MinLineElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
 {
-	if(_line <= 0)
+	if (_line <= 0)
 	{
 		return;
 	}
@@ -57,6 +57,6 @@ void MinLineElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElemen
 
 	if (_line > (nextElementLine - lastElementLine - 1))
 	{
-		ctx.PushDiagnosis(format("here need at least {} line", _line), TextRange(lastOffset, nextOffset));
+		ctx.PushDiagnosis(format(T("here need at least {} line"), _line), TextRange(lastOffset, nextOffset));
 	}
 }

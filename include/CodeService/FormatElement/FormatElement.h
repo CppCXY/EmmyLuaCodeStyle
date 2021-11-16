@@ -4,6 +4,7 @@
 #include "FormatElementType.h"
 #include "FormatContext.h"
 #include "DiagnosisContext.h"
+#include "CodeService/LanguageTranslator.h"
 
 class FormatElement
 {

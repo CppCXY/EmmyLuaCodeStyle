@@ -53,12 +53,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/SubExpressionElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/DiagnosisContext.cpp	
 	${CodeService_SOURCE_DIR}/src/LuaCodeStyleOptions.cpp
-
-	${CodeService_SOURCE_DIR}/src/DiagnosisElement/DiagnosisElement.cpp
-	${CodeService_SOURCE_DIR}/src/DiagnosisElement/EqSymbolAlignDiagnosis.cpp
-	${CodeService_SOURCE_DIR}/src/DiagnosisElement/IndentDiagnosis.cpp
-	${CodeService_SOURCE_DIR}/src/DiagnosisElement/LineLayoutDiagnosis.cpp
-	${CodeService_SOURCE_DIR}/src/DiagnosisElement/MaxLineDiagnosis.cpp
+	${CodeService_SOURCE_DIR}/src/LanguageTranslator.cpp
 )
 
 target_link_libraries(CodeService LuaParser)
