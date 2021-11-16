@@ -52,7 +52,7 @@ void KeepLineElement::Diagnosis(DiagnosisContext& ctx, int position, FormatEleme
 
 		if (_line != (nextElementLine - lastElementLine - 1))
 		{
-			ctx.PushDiagnosis(format(T("here need keep {} line"), _line),
+			ctx.PushDiagnosis(format(LText("here need keep {} line"), _line),
 			                  TextRange(lastElementOffset, nextElementOffset));
 		}
 	}

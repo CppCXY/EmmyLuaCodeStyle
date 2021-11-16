@@ -57,6 +57,6 @@ void MinLineElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElemen
 
 	if (_line > (nextElementLine - lastElementLine - 1))
 	{
-		ctx.PushDiagnosis(format(T("here need at least {} line"), _line), TextRange(lastOffset, nextOffset));
+		ctx.PushDiagnosis(format(LText("here need at least {} line"), _line), TextRange(lastOffset, nextOffset));
 	}
 }

@@ -20,5 +20,5 @@ private:
 /*
  * 语言本地化翻译实例，保持一种惯用法
  */
-#define T(text) LanguageTranslator::GetInstance().Get(text)
+#define LText(text) LanguageTranslator::GetInstance().Get(text)
 
