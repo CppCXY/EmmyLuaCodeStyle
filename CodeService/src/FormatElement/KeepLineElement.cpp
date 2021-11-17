@@ -56,4 +56,6 @@ void KeepLineElement::Diagnosis(DiagnosisContext& ctx, int position, FormatEleme
 			                  TextRange(lastElementOffset, nextElementOffset));
 		}
 	}
+	ctx.SetCharacterCount(0);
+
 }

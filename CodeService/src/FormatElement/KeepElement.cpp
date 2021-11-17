@@ -39,6 +39,11 @@ void KeepElement::Serialize(FormatContext& ctx, int position, FormatElement& par
 
 void KeepElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
 {
+	if(position == 0)
+	{
+		return;
+	}
+
 	int lastOffset = getLastValidOffset(position, parent);
 	int nextOffset = getNextValidOffset(position, parent);
 
@@ -56,5 +61,9 @@ void KeepElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& 
 		{
 			ctx.PushDiagnosis(format(LText("here need keep {} space"), _keepBlank), TextRange(lastOffset, nextOffset));
 		}
+	}
+	else
+	{
+		ctx.SetCharacterCount(0);
 	}
 }

@@ -382,6 +382,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignment(std::shared_ptr<Lu
 					env->Add<KeepBlankElement>(1);
 					isLeftExprList = false;
 				}
+
 				break;
 			}
 		default:
@@ -434,6 +435,36 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
 std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_ptr<LuaAstNode> expressionList)
 {
 	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent);
+
+	for (auto node : expressionList->GetChildren())
+	{
+		switch (node->GetType())
+		{
+		case LuaAstNodeType::Expression:
+			{
+				auto subEnv = std::make_shared<SubExpressionElement>();
+				env->AddChild(FormatExpression(node, subEnv));
+				env->Add<KeepElement>(0);
+				break;
+			}
+		case LuaAstNodeType::GeneralOperator:
+			{
+				env->Add<TextElement>(node);
+				env->Add<KeepElement>(1);
+				break;
+			}
+		default:
+			DefaultHandle(node, env);
+			env->Add<KeepElement>(1);
+		}
+	}
+
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaFormatter::FormatAssignLeftExpressionList(std::shared_ptr<LuaAstNode> expressionList)
+{
+	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent, true);
 
 	for (auto node : expressionList->GetChildren())
 	{
@@ -910,6 +941,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 				}
 				else
 				{
+					auto& exprListChildren = exprListEnv->GetChildren();
+					auto keepElement = std::make_shared<KeepElement>(0);
+					exprListChildren.insert(exprListChildren.begin(), keepElement);
+
 					env->AddChild(exprListEnv);
 				}
 
@@ -1444,8 +1479,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(int& curren
 		{
 			env->Add<KeepBlankElement>(1);
 			env->Add<TextElement>(comment);
+			currentIndex++;
 		}
-		currentIndex++;
 	}
 
 	bool blockExist = false;

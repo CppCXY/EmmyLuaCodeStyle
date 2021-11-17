@@ -11,3 +11,9 @@ void StatementElement::Serialize(FormatContext& ctx, int position, FormatElement
 
 	ctx.PrintLine(1);
 }
+
+void StatementElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
+{
+	FormatElement::Diagnosis(ctx, position, parent);
+	ctx.SetCharacterCount(0);
+}

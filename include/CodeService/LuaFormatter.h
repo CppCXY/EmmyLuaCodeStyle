@@ -31,6 +31,8 @@ protected:
 
 	std::shared_ptr<FormatElement> FormatExpressionList(std::shared_ptr<LuaAstNode> expressionList);
 
+	std::shared_ptr<FormatElement> FormatAssignLeftExpressionList(std::shared_ptr<LuaAstNode> expressionList);
+
 	std::shared_ptr<FormatElement> FormatComment(std::shared_ptr<LuaAstNode> comment);
 
 	std::shared_ptr<FormatElement> FormatBreakStatement(std::shared_ptr<LuaAstNode> breakNode);
