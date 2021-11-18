@@ -3,6 +3,7 @@
 #include "LuaDefine.h"
 #include "LuaTokenTypeDetail.h"
 #include "Util/format.h"
+#include "utf8.h"
 
 std::map<std::string, LuaTokenType, std::less<>> LuaTokenParser::LuaReserved = {
 	{"and", TK_AND},
@@ -167,7 +168,10 @@ int LuaTokenParser::GetColumn(int offset)
 
 	int lineStartOffset = _lineOffsetVec[line];
 
-	return offset - lineStartOffset;
+	int bytesLength = offset - lineStartOffset;
+
+	int utf8Length = utf8nlen(_source.data() + lineStartOffset, bytesLength);
+	return utf8Length;
 }
 
 std::string& LuaTokenParser::GetSource()

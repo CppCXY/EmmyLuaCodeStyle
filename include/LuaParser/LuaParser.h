@@ -27,9 +27,9 @@ public:
 
 	std::vector<LuaToken>& GetAllComments() { return _tokenParser->GetComments(); }
 
-	int GetLine(int offset) const { return _tokenParser->GetLine(offset); }
+	int GetLine(int offset) const;
 
-	int GetColumn(int offset) const { return _tokenParser->GetColumn(offset); }
+	int GetColumn(int offset) const;
 
 private:
 	bool blockFollow(bool withUntil = false);

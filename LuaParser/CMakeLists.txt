@@ -6,6 +6,7 @@ add_library(LuaParser STATIC)
 
 target_include_directories(LuaParser PUBLIC
 	${LuaCodeStyle_SOURCE_DIR}/include
+	${LuaCodeStyle_SOURCE_DIR}/3rd/utf8/include
 	src
 )
 

@@ -62,6 +62,16 @@ bool LuaParser::HasError() const
 	return !_errors.empty();
 }
 
+int LuaParser::GetLine(int offset) const
+{
+	return _tokenParser->GetLine(offset);
+}
+
+int LuaParser::GetColumn(int offset) const
+{
+	return _tokenParser->GetColumn(offset);
+}
+
 void LuaParser::BuildAstWithComment()
 {
 	BuildAst();
