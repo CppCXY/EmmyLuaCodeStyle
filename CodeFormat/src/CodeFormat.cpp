@@ -42,6 +42,10 @@ int main(int argc, char** argv)
 	if (!cmd.Get<std::string>("file").empty())
 	{
 		parser = LuaParser::LoadFromFile(cmd.Get<std::string>("file"));
+		if (!parser)
+		{
+			std::cerr << format("can not find file: {}", cmd.Get<std::string>("file")) << std::endl;
+		}
 	}
 	else if (cmd.Get<int>("stdin") != 0)
 	{
@@ -56,10 +60,15 @@ int main(int argc, char** argv)
 		parser = LuaParser::LoadFromBuffer(std::move(buffer));
 	}
 
-	std::shared_ptr<LuaCodeStyleOptions> options;
+	std::shared_ptr<LuaCodeStyleOptions> options = nullptr;
+
 	if (!cmd.Get<std::string>("config").empty())
 	{
 		options = LuaCodeStyleOptions::ParseFromEditorConfig(cmd.Get<std::string>("config"));
+	}
+	else
+	{
+		options = std::make_shared<LuaCodeStyleOptions>();
 	}
 
 	parser->BuildAstWithComment();
