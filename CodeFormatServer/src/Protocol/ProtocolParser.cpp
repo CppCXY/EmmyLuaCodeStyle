@@ -6,7 +6,7 @@
 #include "CodeFormatServer/LanguageService.h"
 
 ProtocolParser::ProtocolParser()
-	: _id(-1)
+	: _id(nullptr)
 {
 }
 
@@ -17,6 +17,11 @@ void ProtocolParser::Parse(std::string_view msg)
 	{
 		_id = jsonMessage["id"].get<int>();
 	}
+	else if (jsonMessage["id"].is_string())
+	{
+		_id = jsonMessage["id"].get<std::string>();
+	}
+
 	if (jsonMessage["method"].is_string())
 	{
 		_method = jsonMessage["method"].get<std::string>();
@@ -40,11 +45,16 @@ std::string_view ProtocolParser::GetMethod()
 
 std::string ProtocolParser::SerializeProtocol(std::shared_ptr<vscode::Serializable> result)
 {
-
 	nlohmann::json json;
-	if (_id != -1) {
-		json["id"] = _id;
+	if (_id.index() == 0)
+	{
+		json["id"] = std::get<int>(_id);
 	}
+	else if (_id.index() == 1)
+	{
+		json["id"] = std::get<std::string>(_id);
+	}
+
 	json["result"] = result->Serialize();
 	json["jsonrpc"] = "2.0";
 	auto dumpResult = json.dump();

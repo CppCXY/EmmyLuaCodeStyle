@@ -52,6 +52,7 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 	{
 		LanguageClient::GetInstance().UpdateOptions(configFile.workspace, configFile.path);
 	}
+	result->capabilities.codeActionProvider = true;
 
 	return result;
 }

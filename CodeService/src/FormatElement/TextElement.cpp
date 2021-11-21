@@ -1,5 +1,6 @@
 #include "CodeService/FormatElement/TextElement.h"
 
+
 TextElement::TextElement(std::string_view text, TextRange range)
 	: _text(text),
 	  FormatElement(range)

@@ -12,7 +12,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_definitions(-DMSVC)
 endif ()
 
-
 add_subdirectory(LuaParser)
 add_subdirectory(CodeService)
 add_subdirectory(Util)

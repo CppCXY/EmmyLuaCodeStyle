@@ -35,7 +35,7 @@ std::shared_ptr<vscode::Serializable> vscode::MakeFromRequest(std::string_view m
 	{
 		return MakeRequestObject<DidCloseTextDocumentParams>(json);
 	}
-	else if (method  == "updateEditorConfig")
+	else if (method == "updateEditorConfig")
 	{
 		return MakeRequestObject<EditorConfigUpdateParams>(json);
 	}
@@ -150,7 +150,7 @@ nlohmann::json vscode::PublishDiagnosticsParams::Serialize()
 
 	auto array = nlohmann::json::array();
 
-	for(auto& diagnositc: diagnostics)
+	for (auto& diagnositc : diagnostics)
 	{
 		array.push_back(diagnositc.Serialize());
 	}
@@ -178,14 +178,10 @@ nlohmann::json vscode::TextDocumentSyncOptions::Serialize()
 
 	object["openClose"] = openClose;
 	object["change"] = change;
+	object["willSave"] = willSave;
+	object["willSaveWaitUntil"] = willSaveWaitUntil;
 
 	return object;
-}
-
-void vscode::TextDocumentSyncOptions::Deserialize(nlohmann::json json)
-{
-	openClose = json["openClose"];
-	change = static_cast<TextDocumentSyncKind>(json["change"].get<int>());
 }
 
 nlohmann::json vscode::ServerCapabilities::Serialize()
@@ -193,39 +189,47 @@ nlohmann::json vscode::ServerCapabilities::Serialize()
 	auto object = nlohmann::json::object();
 	object["textDocumentSync"] = textDocumentSync.Serialize();
 	object["documentFormattingProvider"] = documentFormattingProvider;
-
+	// object["codeActionProvider"] = codeActionProvider;
 	return object;
-}
-
-void vscode::ServerCapabilities::Deserialize(nlohmann::json json)
-{
-	documentFormattingProvider = json["documentFormattingProvider"];
-	textDocumentSync.Deserialize(json["textDocumentSync"]);
 }
 
 void vscode::InitializationOptions::Deserialize(nlohmann::json json)
 {
-	auto configFileArray = json["configFiles"];
-
-	for(auto& configSource: configFileArray)
+	if (json["configFiles"].is_array())
 	{
-		auto& source = configFiles.emplace_back();
-		source.Deserialize(configSource);
+		auto configFileArray = json["configFiles"];
+
+		for (auto& configSource : configFileArray)
+		{
+			auto& source = configFiles.emplace_back();
+			source.Deserialize(configSource);
+		}
 	}
-
-	auto workspaceFolderArray = json["workspaceFolders"];
-
-	for(auto& workspaceUri: workspaceFolderArray)
+	if (json["workspaceFolders"].is_array())
 	{
-		workspaceFolders.emplace_back(workspaceUri);
+		auto workspaceFolderArray = json["workspaceFolders"];
+
+		for (auto& workspaceUri : workspaceFolderArray)
+		{
+			workspaceFolders.emplace_back(workspaceUri);
+		}
 	}
 }
 
 void vscode::InitializeParams::Deserialize(nlohmann::json json)
 {
-	rootPath = json["rootPath"];
-	rootUri = json["rootUri"];
-	locale = json["locale"];
+	if (json["rootPath"].is_string())
+	{
+		rootPath = json["rootPath"];
+	}
+	if (json["rootUri"].is_string())
+	{
+		rootUri = json["rootUri"];
+	}
+	if (json["locale"].is_string())
+	{
+		locale = json["locale"];
+	}
 
 	initializationOptions.Deserialize(json["initializationOptions"]);
 }
@@ -290,14 +294,14 @@ void vscode::DocumentFormattingParams::Deserialize(nlohmann::json json)
 
 nlohmann::json vscode::DocumentFormattingResult::Serialize()
 {
-	if(hasError)
+	if (hasError)
 	{
 		return nullptr;
 	}
 	else
 	{
 		auto array = nlohmann::json::array();
-		for(auto& edit: edits)
+		for (auto& edit : edits)
 		{
 			array.push_back(edit.Serialize());
 		}

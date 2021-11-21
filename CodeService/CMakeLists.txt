@@ -4,10 +4,13 @@ project(CodeService)
 
 add_library(CodeService STATIC)
 
+#add_subdirectory(${LuaCodeStyle_SOURCE_DIR}/3rd/JamSpell-0.0.12 jamspell.out)
+
 add_dependencies(CodeService LuaParser)
 
 target_include_directories(CodeService PUBLIC
 	${LuaCodeStyle_SOURCE_DIR}/include
+	${LuaCodeStyle_SOURCE_DIR}/3rd/JamSpell-0.0.12/jamspell
 	src
 )
 

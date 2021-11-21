@@ -121,19 +121,20 @@ class TextDocumentSyncOptions : public Serializable
 public:
 	bool openClose = false;
 	TextDocumentSyncKind change = TextDocumentSyncKind::None;
+	bool willSave = false;
+	bool willSaveWaitUntil = false;
 
 	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
 };
 
 class ServerCapabilities : public Serializable
 {
 public:
 	TextDocumentSyncOptions textDocumentSync;
-	bool documentFormattingProvider;
+	bool documentFormattingProvider = false;
+	bool codeActionProvider = false;
 
 	nlohmann::json Serialize() override;
-	void Deserialize(nlohmann::json json) override;
 };
 
 class EditorConfigSource;
