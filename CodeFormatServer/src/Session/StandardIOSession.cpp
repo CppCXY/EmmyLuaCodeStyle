@@ -7,14 +7,14 @@
 
 void StandardIOSession::Run()
 {
-	ProtocolBuffer protocolBuffer(1024);
+
 	while (true)
 	{
 		std::size_t readSize = 0;
 		do
 		{
-			char* writableCursor = protocolBuffer.GetWritableCursor();
-			std::size_t capacity = protocolBuffer.GetRestCapacity();
+			char* writableCursor = _protocolBuffer.GetWritableCursor();
+			std::size_t capacity = _protocolBuffer.GetRestCapacity();
 
 			std::cin.peek();
 			readSize += std::cin.readsome(writableCursor, capacity);
@@ -23,9 +23,9 @@ void StandardIOSession::Run()
 				goto endLoop;
 			}
 
-			protocolBuffer.SetReadableSize(readSize);
+			_protocolBuffer.WriteBuff(readSize);
 
-			if (protocolBuffer.CanReadOneProtocol())
+			if (_protocolBuffer.CanReadOneProtocol())
 			{
 				break;
 			}
@@ -33,13 +33,13 @@ void StandardIOSession::Run()
 		} while (true);
 
 		do {
-			std::string result = Handle(protocolBuffer.ReadOneProtocol());
+			std::string result = Handle(_protocolBuffer.ReadOneProtocol());
 
-			protocolBuffer.Reset();
+			_protocolBuffer.Reset();
 			if (!result.empty()) {
 				Send(result);
 			}
-		} while (protocolBuffer.CanReadOneProtocol());
+		} while (_protocolBuffer.CanReadOneProtocol());
 	}
 endLoop:
 	return;

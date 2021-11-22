@@ -3,60 +3,44 @@
 
 ProtocolBuffer::ProtocolBuffer(std::size_t capacity)
 	: _writeIndex(0),
-	  _startIndex(0),
+	  _readBuffer(capacity, 0),
 	  _contentLength(0),
 	  _bodyStartIndex(0)
 {
-	_buffer.resize(capacity);
 }
 
 char* ProtocolBuffer::GetWritableCursor()
 {
-	return _buffer.data() + _writeIndex;
+	return _readBuffer.data();
 }
 
 
 std::size_t ProtocolBuffer::GetRestCapacity()
 {
-	return _buffer.size() - _writeIndex;
+	return _readBuffer.size();
 }
 
-void ProtocolBuffer::SetReadableSize(std::size_t readableSize)
+void ProtocolBuffer::WriteBuff(std::size_t size)
 {
-	_writeIndex = _startIndex + readableSize;
+	if (_textProtocol.size() < _writeIndex + size)
+	{
+		_textProtocol.resize(_writeIndex + size);
+	}
+
+	std::copy_n(_readBuffer.begin(), size, _textProtocol.begin() + _writeIndex);
+	_writeIndex += size;
 }
 
 bool ProtocolBuffer::CanReadOneProtocol()
 {
-	if (_startIndex == _writeIndex)
+	if (_writeIndex == 0)
 	{
 		return false;
 	}
 
-
 	bool success = TryParseHead();
-	bool completeOneProtocol = false;
 
-	if (success)
-	{
-		completeOneProtocol = _contentLength + _bodyStartIndex <= _writeIndex;
-	}
-
-	// 如果头解析不完整或者协议接收不完整
-	// 试图扩容
-	if ((!success || !completeOneProtocol) && (_buffer.size() - _writeIndex <= 1))
-	{
-		if (_contentLength != 0 && _bodyStartIndex != 0)
-		{
-			_buffer.resize(_bodyStartIndex + _contentLength);
-		}
-		else
-		{
-			_buffer.resize(_buffer.size() * 2);
-		}
-	}
-
-	return completeOneProtocol;
+	return success && (_contentLength + _bodyStartIndex <= _writeIndex);
 }
 
 std::string_view ProtocolBuffer::ReadOneProtocol()
@@ -65,7 +49,7 @@ std::string_view ProtocolBuffer::ReadOneProtocol()
 	{
 		if (_writeIndex >= _contentLength + _bodyStartIndex)
 		{
-			return std::string_view(_buffer.data() + _bodyStartIndex, _contentLength);
+			return std::string_view(_textProtocol.data() + _bodyStartIndex, _contentLength);
 		}
 	}
 	return "";
@@ -73,18 +57,21 @@ std::string_view ProtocolBuffer::ReadOneProtocol()
 
 void ProtocolBuffer::Reset()
 {
-	if(_writeIndex > _contentLength + _bodyStartIndex)
+	if (_writeIndex > _contentLength + _bodyStartIndex)
 	{
 		std::size_t doneIndex = _contentLength + _bodyStartIndex;
-		std::memmove(_buffer.data(), _buffer.data() + doneIndex, _writeIndex - doneIndex);
+		std::copy_n(_textProtocol.data() + doneIndex, _writeIndex - doneIndex, _textProtocol.data());
 
-		_startIndex = 0;
-		_writeIndex -= _contentLength + _bodyStartIndex;
+		_writeIndex -= doneIndex;
+		_textProtocol.resize(std::max(_writeIndex, _readBuffer.size()));
+		_textProtocol.shrink_to_fit();
 	}
 	else
 	{
-		_startIndex = 0;
 		_writeIndex = 0;
+		_textProtocol.clear();
+		_textProtocol.resize(_readBuffer.size());
+		_textProtocol.shrink_to_fit();
 	}
 
 	_contentLength = 0;
@@ -100,7 +87,7 @@ bool ProtocolBuffer::TryParseHead()
 		CRLF_CRLF
 	} state = ParseState::HeadStart;
 
-	std::string_view text(_buffer.data() + _startIndex, _writeIndex - _startIndex);
+	std::string_view text(_textProtocol.data(), _writeIndex);
 	for (std::size_t index = 0; index < text.size();)
 	{
 		switch (state)
@@ -153,5 +140,5 @@ bool ProtocolBuffer::TryParseHead()
 		}
 	}
 
-	return true;
+	return false;
 }

@@ -1,7 +1,5 @@
 #include "CodeFormatServer/Session/SocketIOSession.h"
-
 #include <iostream>
-
 #include "CodeFormatServer/Protocol/ProtocolParser.h"
 #include "CodeFormatServer/Protocol/ProtocolBuffer.h"
 using namespace asio::ip;
@@ -13,27 +11,24 @@ SocketIOSession::SocketIOSession(asio::ip::tcp::socket&& socket)
 
 void SocketIOSession::Run()
 {
-	ProtocolBuffer protocolBuffer(1024);
 	while (true)
 	{
-		asio::error_code code;
-		std::size_t readSize = 0;
-
-
 		do
 		{
-			char* writableCursor = protocolBuffer.GetWritableCursor();
-			std::size_t capacity = protocolBuffer.GetRestCapacity();
+			asio::error_code code;
 
-			readSize += _socket.read_some(asio::buffer(writableCursor, capacity), code);
+			char* writableCursor = _protocolBuffer.GetWritableCursor();
+			std::size_t capacity = _protocolBuffer.GetRestCapacity();
+
+			std::size_t readSize = _socket.read_some(asio::buffer(writableCursor, capacity), code);
 			if (code == asio::error::eof || code)
 			{
 				goto endLoop;
 			}
 
-			protocolBuffer.SetReadableSize(readSize);
+			_protocolBuffer.WriteBuff(readSize);
 
-			if (protocolBuffer.CanReadOneProtocol())
+			if (_protocolBuffer.CanReadOneProtocol())
 			{
 				break;
 			}
@@ -41,15 +36,15 @@ void SocketIOSession::Run()
 		while (true);
 
 		do {
-			auto content = protocolBuffer.ReadOneProtocol();
+			auto content = _protocolBuffer.ReadOneProtocol();
 			// std::cout << content << std::endl;
 			std::string result = Handle(content);
 
-			protocolBuffer.Reset();
+			_protocolBuffer.Reset();
 			if (!result.empty()) {
 				Send(result);
 			}
-		} while (protocolBuffer.CanReadOneProtocol());
+		} while (_protocolBuffer.CanReadOneProtocol());
 	}
 endLoop:
 	return;

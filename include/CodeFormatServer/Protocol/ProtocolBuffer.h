@@ -11,7 +11,7 @@ public:
 
 	std::size_t GetRestCapacity();
 
-	void SetReadableSize(std::size_t readableSize);
+	void WriteBuff(std::size_t size);
 
 	bool CanReadOneProtocol();
 
@@ -22,12 +22,13 @@ private:
 	bool TryParseHead();
 	// 代表从这个位置开始可写
 	std::size_t _writeIndex;
-	// 代表从这个位置开始可读
-	// 同时如果writeIndex 和 startIndex 相同则认为可读长度为0
-	std::size_t _startIndex;
-	std::string _buffer;
+	std::string _textProtocol;
+
+	std::string _readBuffer;
 
 	std::size_t _contentLength;
 	std::size_t _bodyStartIndex;
+
+
 };
 

@@ -82,8 +82,6 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 		return;
 	}
 
-
-
 	parser->BuildAstWithComment();
 
 	LuaFormatter formatter(parser, *options);
