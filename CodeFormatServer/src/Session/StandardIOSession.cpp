@@ -10,14 +10,13 @@ void StandardIOSession::Run()
 
 	while (true)
 	{
-		std::size_t readSize = 0;
 		do
 		{
 			char* writableCursor = _protocolBuffer.GetWritableCursor();
 			std::size_t capacity = _protocolBuffer.GetRestCapacity();
 
 			std::cin.peek();
-			readSize += std::cin.readsome(writableCursor, capacity);
+			std::size_t readSize = std::cin.readsome(writableCursor, capacity);
 			if (!std::cin)
 			{
 				goto endLoop;

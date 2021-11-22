@@ -33,7 +33,6 @@ int main(int argc, char** argv)
     }
     else
     {
-        // std::this_thread::sleep_for(std::chrono::seconds(10));
         SET_BINARY_MODE();
         LanguageClient::GetInstance().SetSession(std::make_shared<StandardIOSession>());
         LanguageClient::GetInstance().Run();
