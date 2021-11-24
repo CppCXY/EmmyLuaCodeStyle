@@ -8,6 +8,7 @@
 
 namespace vscode
 {
+
 class Serializable
 {
 public:
@@ -127,12 +128,22 @@ public:
 	nlohmann::json Serialize() override;
 };
 
+class DocumentOnTypeFormattingOptions : public Serializable
+{
+public:
+	std::string firstTriggerCharacter;
+	std::vector<std::string> moreTriggerCharacter;
+
+	nlohmann::json Serialize() override;
+};
+
 class ServerCapabilities : public Serializable
 {
 public:
 	TextDocumentSyncOptions textDocumentSync;
 	bool documentFormattingProvider = false;
 	bool documentRangeFormattingProvider = false;
+	DocumentOnTypeFormattingOptions documentOnTypeFormattingProvider;
 
 	nlohmann::json Serialize() override;
 };
@@ -264,6 +275,15 @@ class DocumentRangeFormattingParams: public Serializable
 public:
 	TextDocument textDocument;
 	Range range;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+class TextDocumentPositionParams: public Serializable
+{
+public:
+	TextDocument textDocument;
+	Position position;
 
 	void Deserialize(nlohmann::json json) override;
 };

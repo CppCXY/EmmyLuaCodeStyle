@@ -34,6 +34,8 @@ private:
 
 	std::shared_ptr<vscode::Serializable> OnRangeFormatting(std::shared_ptr<vscode::DocumentRangeFormattingParams> param);
 
+	std::shared_ptr<vscode::Serializable> OnTypeFormatting(std::shared_ptr<vscode::TextDocumentPositionParams> param);
+
 	std::map<std::string, MessageHandle, std::less<>> _handles;
 };
 

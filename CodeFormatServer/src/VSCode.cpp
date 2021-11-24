@@ -43,6 +43,10 @@ std::shared_ptr<vscode::Serializable> vscode::MakeFromRequest(std::string_view m
 	{
 		return MakeRequestObject<DocumentRangeFormattingParams>(json);
 	}
+	else if (method == "textDocument/onTypeFormatting")
+	{
+		return MakeRequestObject<TextDocumentPositionParams>(json);
+	}
 
 	return nullptr;
 }
@@ -194,6 +198,8 @@ nlohmann::json vscode::ServerCapabilities::Serialize()
 	object["textDocumentSync"] = textDocumentSync.Serialize();
 	object["documentFormattingProvider"] = documentFormattingProvider;
 	object["documentRangeFormattingProvider"] = documentRangeFormattingProvider;
+	object["documentOnTypeFormattingProvider"] = documentOnTypeFormattingProvider.Serialize();
+
 	return object;
 }
 
@@ -336,4 +342,26 @@ void vscode::DocumentRangeFormattingParams::Deserialize(nlohmann::json json)
 {
 	textDocument.Deserialize(json["textDocument"]);
 	range.Deserialize(json["range"]);
+}
+
+nlohmann::json vscode::DocumentOnTypeFormattingOptions::Serialize()
+{
+	auto object = nlohmann::json::object();
+
+	object["firstTriggerCharacter"] = firstTriggerCharacter;
+	auto array = nlohmann::json::array();
+
+	for (auto& c : moreTriggerCharacter)
+	{
+		array.push_back(c);
+	}
+
+	object["moreTriggerCharacter"] = array;
+	return object;
+}
+
+void vscode::TextDocumentPositionParams::Deserialize(nlohmann::json json)
+{
+	textDocument.Deserialize(json["textDocument"]);
+	position.Deserialize(json["position"]);
 }
