@@ -14,7 +14,11 @@ FormatElementType KeepBlankElement::GetType()
 
 void KeepBlankElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
-	ctx.PrintBlank(_blank);
+	int nextOffset = getNextValidOffset(position, parent);
+	if (nextOffset != -1)
+	{
+		ctx.PrintBlank(_blank);
+	}
 }
 
 void KeepBlankElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)

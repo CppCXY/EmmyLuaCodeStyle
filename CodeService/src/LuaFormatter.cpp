@@ -310,15 +310,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::FunctionStatement:
 			{
 				indentEnv->AddChild(FormatNode(statement));
-
-				// if (nextMatch(index, LuaAstNodeType::FunctionStatement, statements))
-				// {
-				// 	indentEnv->Add<KeepLineElement>(1);
-				// }
-				// else
-				// {
-				// 	indentEnv->Add<MinLineElement>(1);
-				// }
 				indentEnv->AddChild(_options.keep_line_after_function_define_statement);
 				break;
 			}
@@ -345,14 +336,20 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalStatement(std::shared_pt
 		case LuaAstNodeType::KeyWord:
 		case LuaAstNodeType::GeneralOperator:
 			{
+				// 基于这样的考虑 可能local 语句没有等号所以nameDefList的空格移上来
+				if (node->GetText() == "=")
+				{
+					env->Add<KeepBlankElement>(1);
+				}
+
 				env->Add<TextElement>(node);
 				env->Add<KeepBlankElement>(1);
 				break;
 			}
 		case LuaAstNodeType::NameDefList:
 			{
+				
 				env->AddChild(FormatNode(node));
-				env->Add<KeepBlankElement>(1);
 				break;
 			}
 		case LuaAstNodeType::ExpressionList:
@@ -883,12 +880,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 				env->Add<KeepBlankElement>(1);
 				break;
 			}
-		// case LuaAstNodeType::Block:
-		// 	{
-		// 		env->AddChild(FormatNode(child));
-		// 		env->Add<KeepLineElement>();
-		// 		break;
-		// 	}
+			// case LuaAstNodeType::Block:
+			// 	{
+			// 		env->AddChild(FormatNode(child));
+			// 		env->Add<KeepLineElement>();
+			// 		break;
+			// 	}
 		default:
 			{
 				DefaultHandle(child, env);
@@ -908,13 +905,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 	{
 		switch (child->GetType())
 		{
-		// 目前表达式语句上只有调用表达式
+			// 目前表达式语句上只有调用表达式
 		case LuaAstNodeType::CallExpression:
 			{
 				env->AddChild(FormatNode(child));
 				break;
 			}
-		// default 一般只有一个分号
+			// default 一般只有一个分号
 		default:
 			{
 				DefaultHandle(child, env);
