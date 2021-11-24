@@ -7,6 +7,8 @@
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "LuaParser/LuaParser.h"
 
+class TextElement;
+
 class FormatContext
 {
 public:
@@ -17,14 +19,13 @@ public:
 	};
 
 	FormatContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options);
+	virtual ~FormatContext();
 
-	void Print(std::string_view text);
+	virtual void Print(TextElement& textElement);
 
-	void PrintLine(int line);
+	virtual void PrintLine(int line);
 
-	void PrintBlank(int blank);
-
-	void PrintIndent(int indent, const std::string& indentString);
+	virtual void PrintBlank(int blank);
 
 	void AddIndent(int specialIndent = -1);
 
@@ -42,7 +43,9 @@ public:
 
 	std::shared_ptr<LuaParser> GetParser();
 
-private:
+protected:
+	void PrintIndent(int indent, const std::string& indentString);
+
 	std::stack<IndentState, std::vector<IndentState>> _indentStack;
 	std::map<int, std::string> _indentMap;
 	std::stringstream _os;

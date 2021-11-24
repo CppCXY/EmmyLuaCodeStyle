@@ -1,4 +1,5 @@
 #include "CodeService/FormatElement/FormatContext.h"
+#include "CodeService/FormatElement/TextElement.h"
 
 FormatContext::FormatContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options)
 	: _options(options),
@@ -8,15 +9,19 @@ FormatContext::FormatContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOpti
 {
 }
 
-void FormatContext::Print(std::string_view text)
+FormatContext::~FormatContext()
+{
+}
+
+void FormatContext::Print(TextElement& textElement)
 {
 	auto& indentState = _indentStack.top();
 	if (static_cast<int>(_characterCount) < indentState.Indent)
 	{
 		PrintIndent(indentState.Indent - static_cast<int>(_characterCount), indentState.IndentString);
 	}
-	_os << text;
-	_characterCount += text.size();
+	_os << textElement.GetText();
+	_characterCount += textElement.GetText().size();
 }
 
 void FormatContext::PrintLine(int line)

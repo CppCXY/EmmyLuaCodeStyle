@@ -5,6 +5,7 @@
 #include "FormatContext.h"
 #include "DiagnosisContext.h"
 #include "CodeService/LanguageTranslator.h"
+#include "CodeService/LuaFormatRange.h"
 
 class FormatElement
 {

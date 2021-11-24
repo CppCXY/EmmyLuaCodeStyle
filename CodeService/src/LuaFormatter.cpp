@@ -12,6 +12,7 @@
 #include "CodeService/FormatElement/AlignToFirstElement.h"
 #include "CodeService/FormatElement/KeepElement.h"
 #include "CodeService/FormatElement/LongExpressionLayoutElement.h"
+#include "CodeService/FormatElement/RangeFormatContext.h"
 #include "CodeService/FormatElement/SubExpressionElement.h"
 
 bool nextMatch(int currentIndex, LuaAstNodeType type, const std::vector<std::shared_ptr<LuaAstNode>>& vec)
@@ -52,6 +53,14 @@ std::string LuaFormatter::GetFormattedText()
 {
 	FormatContext ctx(_parser, _options);
 
+	_env->Format(ctx);
+
+	return ctx.GetText();
+}
+
+std::string LuaFormatter::GetRangeFormattedText(LuaFormatRange validRange)
+{
+	RangeFormatContext ctx(_parser, _options, validRange);
 	_env->Format(ctx);
 
 	return ctx.GetText();

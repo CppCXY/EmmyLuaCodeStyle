@@ -19,7 +19,7 @@ FormatElementType TextElement::GetType()
 
 void TextElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
 {
-	ctx.Print(_text);
+	ctx.Print(*this);
 }
 
 void TextElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)

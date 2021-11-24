@@ -132,7 +132,7 @@ class ServerCapabilities : public Serializable
 public:
 	TextDocumentSyncOptions textDocumentSync;
 	bool documentFormattingProvider = false;
-	bool codeActionProvider = false;
+	bool documentRangeFormattingProvider = false;
 
 	nlohmann::json Serialize() override;
 };
@@ -258,4 +258,14 @@ public:
 
 	void Deserialize(nlohmann::json json) override;
 };
+
+class DocumentRangeFormattingParams: public Serializable
+{
+public:
+	TextDocument textDocument;
+	Range range;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
 }

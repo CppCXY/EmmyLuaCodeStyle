@@ -39,6 +39,10 @@ std::shared_ptr<vscode::Serializable> vscode::MakeFromRequest(std::string_view m
 	{
 		return MakeRequestObject<EditorConfigUpdateParams>(json);
 	}
+	else if (method == "textDocument/rangeFormatting")
+	{
+		return MakeRequestObject<DocumentRangeFormattingParams>(json);
+	}
 
 	return nullptr;
 }
@@ -189,7 +193,7 @@ nlohmann::json vscode::ServerCapabilities::Serialize()
 	auto object = nlohmann::json::object();
 	object["textDocumentSync"] = textDocumentSync.Serialize();
 	object["documentFormattingProvider"] = documentFormattingProvider;
-	// object["codeActionProvider"] = codeActionProvider;
+	object["documentRangeFormattingProvider"] = documentRangeFormattingProvider;
 	return object;
 }
 
@@ -326,4 +330,10 @@ void vscode::EditorConfigUpdateParams::Deserialize(nlohmann::json json)
 {
 	type = json["type"];
 	source.Deserialize(json["source"]);
+}
+
+void vscode::DocumentRangeFormattingParams::Deserialize(nlohmann::json json)
+{
+	textDocument.Deserialize(json["textDocument"]);
+	range.Deserialize(json["range"]);
 }

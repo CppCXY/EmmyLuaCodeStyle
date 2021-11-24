@@ -5,6 +5,7 @@
 #include "LuaCodeStyleOptions.h"
 #include "FormatElement/FormatElement.h"
 #include "LuaDiagnosisInfo.h"
+#include "LuaFormatRange.h"
 
 class LuaFormatter
 {
@@ -15,6 +16,8 @@ public:
 	void BuildFormattedElement();
 
 	std::string GetFormattedText();
+
+	std::string GetRangeFormattedText(LuaFormatRange validRange);
 
 	std::vector<LuaDiagnosisInfo> GetDiagnosisInfos();
 
