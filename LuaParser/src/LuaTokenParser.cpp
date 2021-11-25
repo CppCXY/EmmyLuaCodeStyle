@@ -580,11 +580,25 @@ LuaTokenType LuaTokenParser::readNumeral()
 
 	if (lislalpha(getCurrentChar())) /* is numeral touching a letter? */
 	{
-		saveAndNext();
+		// luajit
+		if(checkNext1('U'))
+		{
+			if(checkNext1('U') && checkNext1('L'))
+			{
+				return TK_INT;
+			}
+			else
+			{
+				luaError("unknown integer type", TextRange(_currentParseIndex, _currentParseIndex));
+			}
+		}
+		else {
+			saveAndNext();
+		}
 	}
 
 	// todo error format check
-
+	// 实际上应该是TK_NUMBER
 	return TK_INT;
 }
 
