@@ -6,22 +6,25 @@ RangeFormatContext::RangeFormatContext(std::shared_ptr<LuaParser> parser, LuaCod
                                        LuaFormatRange validRange)
 	: FormatContext(parser, options),
 	  _validRange(validRange),
-	  _formattedLine(-1)
+	  _formattedRange(validRange),
+	  _inValidRange(false)
 
 {
 }
 
 void RangeFormatContext::Print(TextElement& textElement)
 {
-	int offset = textElement.GetTextRange().StartOffset;
-	int offsetLine = _parser->GetLine(offset);
-	if (offsetLine < _validRange.StartLine || offsetLine > _validRange.EndLine)
+	int startOffset = textElement.GetTextRange().StartOffset;
+	int startLine = _parser->GetLine(startOffset);
+	int endLine = _parser->GetLine(textElement.GetTextRange().EndOffset);
+	if (startLine > _validRange.EndLine || endLine < _validRange.StartLine)
 	{
+		_inValidRange = false;
 		_characterCount += textElement.GetText().size();
-		_formattedLine = -1;
 		return;
 	}
 
+	_inValidRange = true;
 	auto& indentState = _indentStack.top();
 	if (static_cast<int>(_characterCount) < indentState.Indent)
 	{
@@ -30,7 +33,16 @@ void RangeFormatContext::Print(TextElement& textElement)
 	_os << textElement.GetText();
 	_characterCount += textElement.GetText().size();
 
-	_formattedLine = _parser->GetLine(textElement.GetTextRange().EndOffset);
+	if(startLine < _formattedRange.StartLine)
+	{
+		_formattedRange.StartLine = startLine;
+		_formattedRange.StartCharacter = _parser->GetColumn(startOffset);
+	}
+
+	if(endLine > _formattedRange.EndLine)
+	{
+		_formattedRange.EndLine = endLine;
+	}
 }
 
 void RangeFormatContext::PrintBlank(int blank)
@@ -39,7 +51,7 @@ void RangeFormatContext::PrintBlank(int blank)
 	{
 		_characterCount++;
 	}
-	if (_formattedLine >= 0)
+	if (_inValidRange)
 	{
 		for (int i = 0; i < blank; i++)
 		{
@@ -51,7 +63,7 @@ void RangeFormatContext::PrintBlank(int blank)
 void RangeFormatContext::PrintLine(int line)
 {
 	_characterCount = 0;
-	if (_formattedLine >= 0 && _formattedLine <= _validRange.EndLine)
+	if (_inValidRange)
 	{
 		for (int i = 0; i < line; i++)
 		{
@@ -80,5 +92,5 @@ std::string RangeFormatContext::GetText()
 
 LuaFormatRange RangeFormatContext::GetFormattedRange()
 {
-	return _validRange;
+	return _formattedRange;
 }

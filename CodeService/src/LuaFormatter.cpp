@@ -58,10 +58,12 @@ std::string LuaFormatter::GetFormattedText()
 	return ctx.GetText();
 }
 
-std::string LuaFormatter::GetRangeFormattedText(LuaFormatRange validRange)
+std::string LuaFormatter::GetRangeFormattedText(LuaFormatRange& validRange)
 {
 	RangeFormatContext ctx(_parser, _options, validRange);
 	_env->Format(ctx);
+
+	validRange = ctx.GetFormattedRange();
 
 	return ctx.GetText();
 }

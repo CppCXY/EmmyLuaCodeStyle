@@ -181,8 +181,8 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnRangeFormatting(
 
 	edit.newText = formatter.GetRangeFormattedText(formattedRange);
 	edit.range = vscode::Range(
-		vscode::Position(formattedRange.StartLine, 0),
-		vscode::Position(formattedRange.EndLine + 1, 0)
+		vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
+		vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
 	);
 	return result;
 }
@@ -216,8 +216,8 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 
 	edit.newText = formatter.GetRangeFormattedText(formattedRange);
 	edit.range = vscode::Range(
-		vscode::Position(formattedRange.StartLine, 0),
-		vscode::Position(formattedRange.EndLine + 1, 0)
+		vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
+		vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
 	);
 	return result;
 }

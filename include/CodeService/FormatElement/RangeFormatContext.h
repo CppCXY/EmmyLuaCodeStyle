@@ -15,5 +15,6 @@ public:
 	LuaFormatRange GetFormattedRange();
 private:
 	LuaFormatRange _validRange;
-	int _formattedLine;
+	LuaFormatRange _formattedRange;
+	bool _inValidRange;
 };

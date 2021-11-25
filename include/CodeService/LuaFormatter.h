@@ -17,7 +17,7 @@ public:
 
 	std::string GetFormattedText();
 
-	std::string GetRangeFormattedText(LuaFormatRange validRange);
+	std::string GetRangeFormattedText(LuaFormatRange& validRange);
 
 	std::vector<LuaDiagnosisInfo> GetDiagnosisInfos();
 

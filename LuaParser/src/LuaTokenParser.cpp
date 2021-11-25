@@ -198,7 +198,7 @@ bool LuaTokenParser::IsEmptyLine(int line)
 	for (int offset = lineStartOffset; offset < nextLineStartOffset; offset++)
 	{
 		char ch = _source[offset];
-		if(ch != '\n' && ch != '\r' && ch != '\t' && ch != ' ')
+		if (ch != '\n' && ch != '\r' && ch != '\t' && ch != ' ')
 		{
 			return false;
 		}
@@ -679,11 +679,29 @@ void LuaTokenParser::readString(int del)
 				case EOZ:
 					luaError("unfinished string", TextRange(_currentParseIndex, _currentParseIndex));
 					return;
+				case 'z':
+					{
+						saveAndNext();
+						while (lisspace(getCurrentChar()))
+						{
+							if (currentIsNewLine())
+							{
+								incLinenumber();
+							}
+							else
+							{
+								saveAndNext();
+							}
+						}
+						goto no_save;
+					}
 				}
 				break;
 			}
 		}
 		saveAndNext();
+		// 空语句
+	no_save:;
 	}
 	saveAndNext();
 }
