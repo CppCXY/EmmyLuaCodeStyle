@@ -56,7 +56,6 @@ LuaTokenParser::LuaTokenParser(std::string&& source)
 
 bool LuaTokenParser::Parse()
 {
-
 	while (true)
 	{
 		auto type = llex();
@@ -130,7 +129,7 @@ int LuaTokenParser::GetLine(int offset)
 
 	int maxLine = static_cast<int>(_lineOffsetVec.size()) - 1;
 	int targetLine = maxLine;
-	int upperLine = maxLine; 
+	int upperLine = maxLine;
 	int lowestLine = 0;
 
 	while (true)
@@ -172,6 +171,40 @@ int LuaTokenParser::GetColumn(int offset)
 
 	int utf8Length = utf8nlen(_source.data() + lineStartOffset, bytesLength);
 	return utf8Length;
+}
+
+int LuaTokenParser::GetTotalLine()
+{
+	return _linenumber;
+}
+
+bool LuaTokenParser::IsEmptyLine(int line)
+{
+	if (line < 0 || line >= _lineOffsetVec.size())
+	{
+		return true;
+	}
+	int lineStartOffset = _lineOffsetVec[line];
+	int nextLineStartOffset = 0;
+	if (line == _linenumber)
+	{
+		nextLineStartOffset = _source.size();
+	}
+	else
+	{
+		nextLineStartOffset = _lineOffsetVec[line + 1];
+	}
+
+	for (int offset = lineStartOffset; offset < nextLineStartOffset; offset++)
+	{
+		char ch = _source[offset];
+		if(ch != '\n' && ch != '\r' && ch != '\t' && ch != ' ')
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 std::string& LuaTokenParser::GetSource()

@@ -31,6 +31,10 @@ public:
 	
 	int GetColumn(int offset);
 
+	int GetTotalLine();
+
+	bool IsEmptyLine(int line);
+
 	std::string& GetSource();
 
 	std::vector<LuaToken>& GetComments();

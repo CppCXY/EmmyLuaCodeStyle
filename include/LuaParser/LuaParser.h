@@ -31,6 +31,10 @@ public:
 
 	int GetColumn(int offset) const;
 
+	int GetTotalLine();
+
+	bool IsEmptyLine(int line);
+
 private:
 	bool blockFollow(bool withUntil = false);
 

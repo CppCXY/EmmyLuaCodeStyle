@@ -51,9 +51,7 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 
 	vscode::DocumentOnTypeFormattingOptions typeOptions;
 
-	typeOptions.firstTriggerCharacter = ";";
-
-	typeOptions.moreTriggerCharacter = {"\"", "\'", ",", ":", "."};
+	typeOptions.firstTriggerCharacter = "\n";
 
 	result->capabilities.documentOnTypeFormattingProvider = typeOptions;
 
@@ -75,7 +73,10 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 {
 	for (auto& content : param->contentChanges)
 	{
-		LanguageClient::GetInstance().CacheFile(param->textDocument.uri, content.text);
+		auto parser = LuaParser::LoadFromBuffer(std::move(content.text));
+		parser->BuildAstWithComment();
+
+		LanguageClient::GetInstance().CacheFile(param->textDocument.uri, parser);
 
 		LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
 	}
@@ -85,7 +86,9 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidOpen(
 	std::shared_ptr<vscode::DidOpenTextDocumentParams> param)
 {
-	LanguageClient::GetInstance().CacheFile(param->textDocument.uri, param->textDocument.text);
+	auto parser = LuaParser::LoadFromBuffer(std::move(param->textDocument.text));
+	parser->BuildAstWithComment();
+	LanguageClient::GetInstance().CacheFile(param->textDocument.uri, parser);
 	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
 
 	return nullptr;
@@ -94,22 +97,19 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidOpen(
 std::shared_ptr<vscode::Serializable> LanguageService::OnFormatting(
 	std::shared_ptr<vscode::DocumentFormattingParams> param)
 {
-	auto text = LanguageClient::GetInstance().GetFile(param->textDocument.uri);
+	auto parser = LanguageClient::GetInstance().GetFileParser(param->textDocument.uri);
 
-	auto lastOffset = text.size();
+	auto totalLine = parser->GetTotalLine();
 
 	auto result = std::make_shared<vscode::DocumentFormattingResult>();
 
-	if (text.empty())
+	if (totalLine == 0)
 	{
 		result->hasError = true;
 		return result;
 	}
 
 	auto options = LanguageClient::GetInstance().GetOptions(param->textDocument.uri);
-
-	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(text));
-	parser->BuildAstWithComment();
 
 	if (parser->HasError())
 	{
@@ -124,7 +124,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnFormatting(
 	edit.newText = formatter.GetFormattedText();
 	edit.range = vscode::Range(
 		vscode::Position(0, 0),
-		vscode::Position(parser->GetLine(lastOffset), parser->GetColumn(lastOffset))
+		vscode::Position(totalLine + 1, 0)
 	);
 	return result;
 }
@@ -161,20 +161,11 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnEditorConfigUpdate(
 std::shared_ptr<vscode::Serializable> LanguageService::OnRangeFormatting(
 	std::shared_ptr<vscode::DocumentRangeFormattingParams> param)
 {
-	auto text = LanguageClient::GetInstance().GetFile(param->textDocument.uri);
+	auto parser = LanguageClient::GetInstance().GetFileParser(param->textDocument.uri);
 
 	auto result = std::make_shared<vscode::DocumentFormattingResult>();
 
-	if (text.empty())
-	{
-		result->hasError = true;
-		return result;
-	}
-
 	auto options = LanguageClient::GetInstance().GetOptions(param->textDocument.uri);
-
-	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(text));
-	parser->BuildAstWithComment();
 
 	if (parser->HasError())
 	{
@@ -199,11 +190,11 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnRangeFormatting(
 std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 	std::shared_ptr<vscode::TextDocumentPositionParams> param)
 {
-	auto text = LanguageClient::GetInstance().GetFile(param->textDocument.uri);
+	auto parser = LanguageClient::GetInstance().GetFileParser(param->textDocument.uri);
+	auto position = param->position;
 
 	auto result = std::make_shared<vscode::DocumentFormattingResult>();
-
-	if (text.empty())
+	if(parser->IsEmptyLine(position.line - 1))
 	{
 		result->hasError = true;
 		return result;
@@ -211,21 +202,17 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 
 	auto options = LanguageClient::GetInstance().GetOptions(param->textDocument.uri);
 
-	std::shared_ptr<LuaParser> parser = LuaParser::LoadFromBuffer(std::move(text));
-	parser->BuildAstWithComment();
-
-	// ºöÂÔ¼üÈë´íÎó
-	// if (parser->HasError())
-	// {
-	// 	result->hasError = true;
-	// 	return result;
-	// }
+	if (parser->HasError())
+	{
+		result->hasError = true;
+		return result;
+	}
 
 	LuaFormatter formatter(parser, *options);
 	formatter.BuildFormattedElement();
 
 	auto& edit = result->edits.emplace_back();
-	LuaFormatRange formattedRange(param->position.line, param->position.line);
+	LuaFormatRange formattedRange(position.line - 1, position.line - 1);
 
 	edit.newText = formatter.GetRangeFormattedText(formattedRange);
 	edit.range = vscode::Range(

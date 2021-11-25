@@ -39,7 +39,7 @@ public:
 
 	std::size_t GetCurrentIndent() const;
 
-	std::string GetText();
+	virtual std::string GetText();
 
 	std::shared_ptr<LuaParser> GetParser();
 

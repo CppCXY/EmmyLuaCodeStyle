@@ -10,9 +10,10 @@ public:
 	void Print(TextElement& textElement) override;
 	void PrintBlank(int blank) override;
 	void PrintLine(int line) override;
+	std::string GetText() override;
 
 	LuaFormatRange GetFormattedRange();
 private:
 	LuaFormatRange _validRange;
-	bool _inFormattedRange;
+	int _formattedLine;
 };

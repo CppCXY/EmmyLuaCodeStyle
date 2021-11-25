@@ -72,6 +72,16 @@ int LuaParser::GetColumn(int offset) const
 	return _tokenParser->GetColumn(offset);
 }
 
+int LuaParser::GetTotalLine()
+{
+	return _tokenParser->GetTotalLine();
+}
+
+bool LuaParser::IsEmptyLine(int line)
+{
+	return _tokenParser->IsEmptyLine(line);
+}
+
 void LuaParser::BuildAstWithComment()
 {
 	BuildAst();
