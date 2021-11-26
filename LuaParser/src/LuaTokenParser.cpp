@@ -583,7 +583,7 @@ LuaTokenType LuaTokenParser::readNumeral()
 		// luajit
 		if(checkNext1('U'))
 		{
-			if(checkNext1('U') && checkNext1('L'))
+			if(checkNext1('L') && checkNext1('L'))
 			{
 				return TK_INT;
 			}
