@@ -350,7 +350,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalStatement(std::shared_pt
 			}
 		case LuaAstNodeType::NameDefList:
 			{
-				
 				env->AddChild(FormatNode(node));
 				break;
 			}
@@ -1569,14 +1568,16 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(int& currentI
 		}
 	}
 
-	if (block)
+	if (block && !comments.empty())
 	{
+		std::shared_ptr<LuaAstNode> copyBlock = block->Copy();
+
 		for (auto comment : comments)
 		{
-			block->AddLeafChild(comment);
+			copyBlock->AddLeafChild(comment);
 		}
 
-		return FormatBlock(block);
+		return FormatBlock(copyBlock);
 	}
 	else
 	{

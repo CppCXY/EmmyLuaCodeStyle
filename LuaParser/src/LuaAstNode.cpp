@@ -18,6 +18,17 @@ LuaAstNode::LuaAstNode(LuaAstNodeType type, LuaToken& token)
 	_text = token.Text;
 }
 
+std::shared_ptr<LuaAstNode> LuaAstNode::Copy()
+{
+	auto copyNode = std::make_shared<LuaAstNode>(GetType(), _source);
+	copyNode->_textRange = GetTextRange();
+	copyNode->_text = _text;
+	copyNode->_children = _children;
+	copyNode->_error = _error;
+
+	return copyNode;
+}
+
 TextRange LuaAstNode::GetTextRange() const
 {
 	return _textRange;

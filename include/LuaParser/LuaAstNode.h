@@ -14,6 +14,8 @@ public:
 
 	LuaAstNode(LuaAstNodeType type, LuaToken& token);
 
+	std::shared_ptr<LuaAstNode> Copy();
+
 	TextRange GetTextRange() const;
 
 	std::string_view GetText() const;
