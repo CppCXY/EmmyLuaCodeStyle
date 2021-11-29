@@ -1568,7 +1568,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(int& currentI
 		}
 	}
 
-	if (block && !comments.empty())
+	if (block)
 	{
 		std::shared_ptr<LuaAstNode> copyBlock = block->Copy();
 
