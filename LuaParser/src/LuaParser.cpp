@@ -101,7 +101,6 @@ void LuaParser::BuildAstWithComment()
 		for (auto& comment : comments)
 		{
 			std::shared_ptr<LuaAstNode> commentAst = createAstNode(LuaAstNodeType::Comment);
-
 			if (comment.TokenType == TK_SHORT_COMMENT)
 			{
 				commentAst->AddChild(createAstNodeFromToken(LuaAstNodeType::ShortComment, comment));

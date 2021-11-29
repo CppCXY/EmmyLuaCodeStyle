@@ -315,6 +315,24 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				indentEnv->AddChild(_options.keep_line_after_function_define_statement);
 				break;
 			}
+		case LuaAstNodeType::LabelStatement:
+			{
+				auto childEnv = FormatNode(statement);
+				if (_options.label_no_indent)
+				{
+					auto noIndent = std::make_shared<IndentElement>(0);
+					noIndent->AddChild(childEnv);
+					indentEnv->AddChild(noIndent);
+				}
+				else
+				{
+					indentEnv->AddChild(childEnv);
+				}
+
+				indentEnv->Add<KeepElement>(1);
+
+				break;
+			}
 		default:
 			{
 				auto childEnv = FormatNode(statement);
@@ -1528,7 +1546,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(int& curren
 	if (nextMatch(currentIndex, LuaAstNodeType::KeyWord, vec))
 	{
 		auto next = vec[currentIndex + 1];
-		if (next->GetText() == "end")
+		if (next->GetText() == "end" || next->GetText() == "else" || next->GetText() == "elseif")
 		{
 			env->Add<TextElement>(next);
 			currentIndex++;

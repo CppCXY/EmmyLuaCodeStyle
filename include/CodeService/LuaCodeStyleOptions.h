@@ -54,6 +54,11 @@ public:
 	bool keep_one_space_between_table_and_bracket = true;
 
 	/*
+	 * 既然大佬们觉得不好那就不开放选项的设置
+	 */
+	bool label_no_indent = false;
+
+	/*
 	 * 表内每一个表项对齐到第一个表项
 	 */
 	bool align_table_field_to_first_field = true;

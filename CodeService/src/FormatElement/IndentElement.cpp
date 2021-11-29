@@ -30,7 +30,7 @@ void IndentElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement
 	{
 		auto child = _children[i];
 
-		if (child->HasValidTextRange() && !ctx.GetOptions().use_tab)
+		if (child->HasValidTextRange() && !ctx.GetOptions().use_tab && child->GetType() != FormatElementType::IndentElement)
 		{
 			auto range = child->GetTextRange();
 			auto character = ctx.GetColumn(range.StartOffset);
