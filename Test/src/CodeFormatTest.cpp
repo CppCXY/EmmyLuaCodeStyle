@@ -50,7 +50,7 @@ void Test(std::string input, const std::string& shouldBe, std::shared_ptr<LuaCod
 
 	if (TrimSpace(formattedText) != TrimSpace(shouldBe))
 	{
-		throw std::exception("error");
+		throw std::exception();
 	}
 }
 
