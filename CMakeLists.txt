@@ -27,3 +27,5 @@ endif()
 if(BuildCodeFormatServer)
 	add_subdirectory(CodeFormatServer)
 endif()
+
+add_subdirectory(Test)
