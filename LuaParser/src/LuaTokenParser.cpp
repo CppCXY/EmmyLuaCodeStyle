@@ -63,7 +63,7 @@ bool LuaTokenParser::Parse()
 
 		if (!text.empty())
 		{
-			if (type == TK_LONG_COMMENT || type == TK_SHEBANG || type == TK_SHORT_COMMENT || type == TK_REGION)
+			if (type == TK_LONG_COMMENT || type == TK_SHEBANG || type == TK_SHORT_COMMENT)
 			{
 				_commentTokens.emplace_back(type, text, TextRange(_buffStart, _buffIndex));
 			}
