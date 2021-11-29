@@ -30,7 +30,6 @@ public:
 
 	// child会被加入为最底层的叶子节点
 	void AddLeafChild(std::shared_ptr<LuaAstNode> child);
-
 private:
 	void addChildAfter(int index, std::shared_ptr<LuaAstNode> child);
 	void addChildBefore(int index, std::shared_ptr<LuaAstNode> child);

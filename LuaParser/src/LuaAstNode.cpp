@@ -98,6 +98,12 @@ void LuaAstNode::AddLeafChild(std::shared_ptr<LuaAstNode> child)
 {
 	auto childTextRange = child->GetTextRange();
 
+	// 防止无限递归
+	if(_textRange.StartOffset == childTextRange.StartOffset && _textRange.EndOffset == childTextRange.EndOffset)
+	{
+		return;
+	}
+
 	if (_children.empty())
 	{
 		return AddChild(child);
