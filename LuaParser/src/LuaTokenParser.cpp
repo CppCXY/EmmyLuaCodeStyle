@@ -581,9 +581,9 @@ LuaTokenType LuaTokenParser::readNumeral()
 	if (lislalpha(getCurrentChar())) /* is numeral touching a letter? */
 	{
 		// luajit
-		if(checkNext1('U'))
+		if (checkNext1('U'))
 		{
-			if(checkNext1('L') && checkNext1('L'))
+			if (checkNext1('L') && checkNext1('L'))
 			{
 				return TK_INT;
 			}
@@ -592,7 +592,8 @@ LuaTokenType LuaTokenParser::readNumeral()
 				luaError("unknown integer type", TextRange(_currentParseIndex, _currentParseIndex));
 			}
 		}
-		else {
+		else
+		{
 			saveAndNext();
 		}
 	}
@@ -706,6 +707,15 @@ void LuaTokenParser::readString(int del)
 							{
 								saveAndNext();
 							}
+						}
+						goto no_save;
+					}
+				case '\r':
+				case '\n':
+					{
+						if (currentIsNewLine())
+						{
+							incLinenumber();
 						}
 						goto no_save;
 					}
