@@ -59,7 +59,20 @@ bool TestGrammar(std::string input)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(input));
 	parser->BuildAstWithComment();
-	return parser->GetErrors().empty();
+	bool result = parser->GetErrors().empty();
+
+	if (!result)
+	{
+		for (auto& error : parser->GetErrors())
+			std::cout << format("error: {}, from [{},{}] to [{},{}]", error.ErrorMessage,
+			                    parser->GetLine(error.ErrorRange.StartOffset),
+			                    parser->GetColumn(error.ErrorRange.StartOffset),
+			                    parser->GetLine(error.ErrorRange.EndOffset),
+			                    parser->GetColumn(error.ErrorRange.EndOffset)
+			) << std::endl;
+	}
+
+	return result;
 }
 
 void CollectLuaFile(std::filesystem::path directoryPath, std::vector<std::string>& paths, std::filesystem::path& root)
@@ -138,10 +151,10 @@ int main(int argc, char* argv[])
 			bool passed = TestFormatted(waitFormattingText, formattedText, options);
 
 			success &= passed;
-			std::cout << format("test format {} ... {}", path, passed) << std::endl;
+			std::cout << format("test format {} ... {}", path, passed ? "true" : "false") << std::endl;
 		}
 	}
-	else if(target == "CheckGrammar")
+	else if (target == "CheckGrammar")
 	{
 		for (auto& path : luaFiles)
 		{
@@ -151,7 +164,7 @@ int main(int argc, char* argv[])
 			bool passed = TestGrammar(text);
 
 			success &= passed;
-			std::cout << format("test check grammar {} ... {}", path, passed) << std::endl;
+			std::cout << format("test check grammar {} ... {}", path, passed? "true" : "false") << std::endl;
 		}
 	}
 
