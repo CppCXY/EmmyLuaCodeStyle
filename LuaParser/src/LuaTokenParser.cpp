@@ -423,7 +423,7 @@ LuaTokenType LuaTokenParser::llex()
 			{
 				saveAndNext();
 				// 只认为第一行的才是shebang
-				if (_linenumber == 0 && getCurrentChar() == '!')
+				if (_linenumber == 0 && _tokens.empty())
 				{
 					// shebang
 					while (!currentIsNewLine() && getCurrentChar() != EOZ)

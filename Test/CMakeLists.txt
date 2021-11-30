@@ -18,4 +18,4 @@ target_sources(CodeFormatTest
 
 target_link_libraries(CodeFormatTest CodeService Util)
 
-add_test(NAME CodeFormatTest COMMAND CodeFormatTest)
+add_test(NAME CodeFormatTest COMMAND CodeFormatTest CheckGrammar -w ${CodeFormatTest_SOURCE_DIR}/test_script/grammar)

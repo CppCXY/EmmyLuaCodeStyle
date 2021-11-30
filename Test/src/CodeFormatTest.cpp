@@ -1,7 +1,11 @@
 #include <cassert>
 #include <iostream>
+#include <filesystem>
+#include <vector>
+#include <fstream>
 #include "CodeService/LuaFormatter.h"
-
+#include "Util/format.h"
+#include "Util/CommandLine.h"
 
 std::string_view TrimSpace(std::string_view source)
 {
@@ -37,7 +41,7 @@ std::string_view TrimSpace(std::string_view source)
 	return source.substr(start, end - start + 1);
 }
 
-void Test(std::string input, const std::string& shouldBe, std::shared_ptr<LuaCodeStyleOptions> options)
+bool TestFormatted(std::string input, const std::string& shouldBe, std::shared_ptr<LuaCodeStyleOptions> options)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(input));
 	parser->BuildAstWithComment();
@@ -48,74 +52,109 @@ void Test(std::string input, const std::string& shouldBe, std::shared_ptr<LuaCod
 
 	auto formattedText = formatter.GetFormattedText();
 
-	if (TrimSpace(formattedText) != TrimSpace(shouldBe))
+	return TrimSpace(formattedText) == TrimSpace(shouldBe);
+}
+
+bool TestGrammar(std::string input)
+{
+	auto parser = LuaParser::LoadFromBuffer(std::move(input));
+	parser->BuildAstWithComment();
+	return parser->GetErrors().empty();
+}
+
+void CollectLuaFile(std::filesystem::path directoryPath, std::vector<std::string>& paths, std::filesystem::path& root)
+{
+	if (!std::filesystem::exists(directoryPath))
 	{
-		throw std::exception();
+		return;
+	}
+
+	for (auto& it : std::filesystem::directory_iterator(directoryPath))
+	{
+		if (std::filesystem::is_directory(it.status()))
+		{
+			CollectLuaFile(it.path().string(), paths, root);
+		}
+		else if (it.path().extension() == ".lua")
+		{
+			paths.push_back(std::filesystem::relative(it.path(), root).string());
+		}
 	}
 }
 
-int main()
+std::string ReadFile(const std::string& path)
 {
-	auto options = std::make_shared<LuaCodeStyleOptions>();
-	options->line_separator = '\n';
-	try
+	std::fstream fin(path, std::ios::in | std::ios::binary);
+
+	if (fin.is_open())
 	{
-		Test(
-			"local t=123 --fff",
-			"local t = 123 --fff",
-			options
-		);
-
-		Test(
-			R"(
-local t  = 123
-local cc = 123
-)",
-			R"(
-local t  = 123
-local cc = 123
-)",
-			options
-		);
-
-		Test(
-			R"(
-function fff()
-local t =123
-end
-)",
-R"(
-function fff()
-    local t = 123
-end
-)",
-options
-);
-
-		Test(
-			R"(
-do return end
-)",
-R"(
-do return end
-)",
-options
-);
-
-		Test(
-			R"(
-local f = function (x,y) return x,y end
-)",
-R"(
-local f = function(x, y) return x, y end
-)",
-options
-);
+		std::stringstream s;
+		s << fin.rdbuf();
+		return s.str();
 	}
-	catch (std::exception& e)
+
+	return "";
+}
+
+// 第一个参数是待格式化文本目录，第二个参数是格式化预期结果
+int main(int argc, char* argv[])
+{
+	CommandLine commandLine;
+
+	commandLine.AddTarget("CheckGrammar");
+	commandLine.AddTarget("CheckFormatResult");
+
+	commandLine.Add<std::string>("work-directory", "w", "special base work directory");
+	commandLine.Add<std::string>("formatted-work-directory", "f", "special formatted work directory");
+
+	if (!commandLine.Parse(argc, argv))
 	{
+		commandLine.PrintUsage();
 		return -1;
 	}
 
-	return 0;
+
+	std::filesystem::path workRoot(commandLine.Get<std::string>("work-directory"));
+	std::vector<std::string> luaFiles;
+
+	CollectLuaFile(workRoot, luaFiles, workRoot);
+
+	auto target = commandLine.GetTarget();
+	bool success = true;
+
+	if (target == "CheckFormatResult")
+	{
+		auto options = std::make_shared<LuaCodeStyleOptions>();
+		std::filesystem::path formattedRoot(commandLine.Get<std::string>("formatted-work-directory"));
+		for (auto& path : luaFiles)
+		{
+			auto waitFormattingFilePath = workRoot / path;
+			auto waitFormattingText = ReadFile(waitFormattingFilePath.string());
+
+			auto formattedFilePath = formattedRoot / path;
+
+			auto formattedText = ReadFile(formattedFilePath.string());
+
+			bool passed = TestFormatted(waitFormattingText, formattedText, options);
+
+			success &= passed;
+			std::cout << format("test format {} ... {}", path, passed) << std::endl;
+		}
+	}
+	else if(target == "CheckGrammar")
+	{
+		for (auto& path : luaFiles)
+		{
+			auto filePath = workRoot / path;
+			auto text = ReadFile(filePath.string());
+
+			bool passed = TestGrammar(text);
+
+			success &= passed;
+			std::cout << format("test check grammar {} ... {}", path, passed) << std::endl;
+		}
+	}
+
+
+	return success ? 0 : -1;
 }

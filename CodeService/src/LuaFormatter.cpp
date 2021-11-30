@@ -879,7 +879,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 				if (child->GetText() == "then" || child->GetText() == "else")
 				{
 					env->AddChild(FormatNodeAndBlockOrEnd(i, children));
-					env->Add<KeepLineElement>();
+					env->Add<KeepElement>(1);
 				}
 				else if (child->GetText() == "if" || child->GetText() == "elseif")
 				{
@@ -899,12 +899,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 				env->Add<KeepBlankElement>(1);
 				break;
 			}
-			// case LuaAstNodeType::Block:
-			// 	{
-			// 		env->AddChild(FormatNode(child));
-			// 		env->Add<KeepLineElement>();
-			// 		break;
-			// 	}
 		default:
 			{
 				DefaultHandle(child, env);
@@ -1546,7 +1540,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(int& curren
 	if (nextMatch(currentIndex, LuaAstNodeType::KeyWord, vec))
 	{
 		auto next = vec[currentIndex + 1];
-		if (next->GetText() == "end" || next->GetText() == "else" || next->GetText() == "elseif")
+		if (next->GetText() == "end")
 		{
 			env->Add<TextElement>(next);
 			currentIndex++;
@@ -1554,6 +1548,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(int& curren
 		else if (!blockExist)
 		{
 			env->Add<LineElement>();
+		}
+		else
+		{
+			env->Add<KeepElement>(1);
 		}
 	}
 	else // 下一个不是关键词那能是什么那就换个行吧
