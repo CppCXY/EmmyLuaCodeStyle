@@ -42,6 +42,10 @@ std::string toFormatString(T t)
 	{
 		return t;
 	}
+	else if constexpr (std::is_same_v<T, const char *>)
+	{
+		return std::string(t);
+	}
 	else
 	{
 		return std::to_string(t);
@@ -63,6 +67,12 @@ inline std::string toFormatString(std::string t)
 
 template <>
 inline std::string toFormatString(std::string_view t)
+{
+	return std::string(t);
+}
+
+template <>
+inline std::string toFormatString(const char* t)
 {
 	return std::string(t);
 }
