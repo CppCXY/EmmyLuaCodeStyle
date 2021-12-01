@@ -652,7 +652,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatDoStatement(std::shared_ptr<L
 	auto env = std::make_shared<StatementElement>();
 	auto& children = doStatement->GetChildren();
 	int i = 0;
-	env->AddChild(FormatNodeAndBlockOrEnd(i, children));
+	bool singleLine = false;
+	env->AddChild(FormatNodeAndBlockOrEnd(i, singleLine, children));
 	return env;
 }
 
@@ -669,7 +670,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatWhileStatement(std::shared_pt
 			{
 				if (child->GetText() == "do")
 				{
-					env->AddChild(FormatNodeAndBlockOrEnd(i, children));
+					bool singleLine = false;
+					env->AddChild(FormatNodeAndBlockOrEnd(i, singleLine, children));
 					env->Add<KeepLineElement>();
 				}
 				else if (child->GetText() == "while")
@@ -792,7 +794,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatForBody(std::shared_ptr<LuaAs
 			{
 				if (child->GetText() == "do")
 				{
-					env->AddChild(FormatNodeAndBlockOrEnd(i, children));
+					bool singleLine = false;
+					env->AddChild(FormatNodeAndBlockOrEnd(i, singleLine, children));
 					env->Add<KeepLineElement>();
 				}
 				else
@@ -843,7 +846,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRepeatStatement(std::shared_p
 			{
 				if (child->GetText() == "repeat")
 				{
-					env->AddChild(FormatNodeAndBlockOrEnd(i, children));
+					bool singleLine = false;
+					env->AddChild(FormatNodeAndBlockOrEnd(i, singleLine, children));
 					env->Add<KeepLineElement>();
 				}
 				else
@@ -878,15 +882,16 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 			{
 				if (child->GetText() == "then" || child->GetText() == "else")
 				{
-					env->AddChild(FormatNodeAndBlockOrEnd(i, children));
-					env->Add<KeepElement>(1);
+					bool singleLine = false;
+					env->AddChild(FormatNodeAndBlockOrEnd(i, singleLine, children));
+					env->Add<KeepElement>(1, !singleLine);
 				}
 				else if (child->GetText() == "if" || child->GetText() == "elseif")
 				{
 					env->Add<TextElement>(child);
 					env->Add<KeepBlankElement>(1);
 				}
-				else // 然而end是在 formatkeyAndBlockAndEnd 中完成的
+				else // 然而end是在 FormatNodeAndBlockOrEnd 中完成的
 				{
 					env->Add<TextElement>(child);
 				}
@@ -1124,7 +1129,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 std::shared_ptr<FormatElement> LuaFormatter::FormatFunctionBody(std::shared_ptr<LuaAstNode> functionBody)
 {
 	int index = 0;
-	return FormatNodeAndBlockOrEnd(index, functionBody->GetChildren());
+	bool singleLine = false;
+	return FormatNodeAndBlockOrEnd(index, singleLine, functionBody->GetChildren());
 }
 
 
@@ -1480,6 +1486,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(int& currentI
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(int& currentIndex,
+                                                                     bool& singleLineBlock,
                                                                      const std::vector<std::shared_ptr<LuaAstNode>>&
                                                                      vec)
 {
@@ -1505,7 +1512,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(int& curren
 	bool blockExist = false;
 	auto block = FormatBlockFromParent(currentIndex, vec);
 
-
 	if (!block->GetChildren().empty())
 	{
 		blockExist = true;
@@ -1518,6 +1524,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(int& curren
 		}
 		else
 		{
+			singleLineBlock = true;
 			env->Add<KeepBlankElement>(1);
 
 			for (auto blockChild : block->GetChildren())
@@ -1548,10 +1555,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(int& curren
 		else if (!blockExist)
 		{
 			env->Add<LineElement>();
-		}
-		else
-		{
-			env->Add<KeepElement>(1);
 		}
 	}
 	else // 下一个不是关键词那能是什么那就换个行吧
