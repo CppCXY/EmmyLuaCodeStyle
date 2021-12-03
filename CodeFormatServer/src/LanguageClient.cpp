@@ -65,7 +65,7 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 	}
 
 	auto options = GetOptions(uri);
-	if(!options->enable_check_codestyle)
+	if (!options->enable_check_codestyle)
 	{
 		auto vscodeDiagnosis = std::make_shared<vscode::PublishDiagnosticsParams>();
 		vscodeDiagnosis->uri = uri;
@@ -148,12 +148,16 @@ void LanguageClient::UpdateOptions(std::string_view workspaceUri, std::string_vi
 	{
 		if (pair.first == workspaceUri)
 		{
-			pair.second = LuaCodeStyleOptions::ParseFromEditorConfig(configPath);
+			pair.second = LuaCodeStyleOptions::ParseFromEditorConfig(
+				LuaEditorConfig::LoadFromFile(std::string(configPath)));
 			return;
 		}
 	}
 
-	_optionsVector.push_back({std::string(workspaceUri), LuaCodeStyleOptions::ParseFromEditorConfig(configPath)});
+	_optionsVector.push_back({
+		std::string(workspaceUri),
+		LuaCodeStyleOptions::ParseFromEditorConfig(LuaEditorConfig::LoadFromFile(std::string(configPath)))
+	});
 }
 
 void LanguageClient::RemoveOptions(std::string_view workspaceUri)

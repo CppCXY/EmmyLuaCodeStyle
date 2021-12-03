@@ -1,7 +1,8 @@
 [*.lua]
-use_tab = false
-indent = 4
-continuation_indent = 4
+indent_style = space
+indent_size = 4
+tab_width = 8
+continuation_indent_size = 4
 align_call_args = false
 keep_one_space_between_call_args_and_bracket = false
 align_function_define_params = true
@@ -9,8 +10,8 @@ keep_one_space_between_table_and_bracket = true
 align_table_field_to_first_field = true
 continuous_assign_statement_align_to_equal_sign = true
 continuous_assign_table_field_align_to_equal_sign = true
-# 可选值 CRLF|LF
-line_separator = CRLF
+# 可选值 crlf/lf
+end_of_line = crlf
 
 # 以下配置均支持三种值
 # minLine:${数值}   

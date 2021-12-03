@@ -459,7 +459,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
  */
 std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_ptr<LuaAstNode> expressionList)
 {
-	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent);
+	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent_size);
 
 	for (auto node : expressionList->GetChildren())
 	{
@@ -489,7 +489,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_pt
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatAssignLeftExpressionList(std::shared_ptr<LuaAstNode> expressionList)
 {
-	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent, true);
+	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent_size, true);
 
 	for (auto node : expressionList->GetChildren())
 	{
@@ -959,7 +959,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 				auto exprListEnv = FormatNode(child);
 				if (_options.align_call_args)
 				{
-					auto alignToFirstEnv = std::make_shared<AlignToFirstElement>(_options.continuation_indent);
+					auto alignToFirstEnv = std::make_shared<AlignToFirstElement>(_options.continuation_indent_size);
 					alignToFirstEnv->AddChildren(exprListEnv->GetChildren());
 					env->AddChild(alignToFirstEnv);
 				}
@@ -1063,11 +1063,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 
 	if (_options.align_function_define_params)
 	{
-		paramListLayoutEnv = std::make_shared<AlignToFirstElement>(_options.continuation_indent);
+		paramListLayoutEnv = std::make_shared<AlignToFirstElement>(_options.continuation_indent_size);
 	}
 	else
 	{
-		paramListLayoutEnv = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent);
+		paramListLayoutEnv = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent_size);
 	}
 
 	auto& children = paramList->GetChildren();
@@ -1396,7 +1396,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(int& currentI
 	std::shared_ptr<FormatElement> env = nullptr;
 	if (_options.align_table_field_to_first_field)
 	{
-		env = std::make_shared<AlignToFirstElement>(_options.indent);
+		env = std::make_shared<AlignToFirstElement>(_options.indent_size);
 	}
 	else
 	{
@@ -1470,7 +1470,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(int& currentI
 	// 认为tableField 可以(但不是必须这样做)按照等号对齐
 	if (alignToEq && _options.continuous_assign_table_field_align_to_equal_sign)
 	{
-		auto newEnv = std::make_shared<AlignToFirstElement>(_options.indent);
+		auto newEnv = std::make_shared<AlignToFirstElement>(_options.indent_size);
 		auto alignmentLayoutElement = std::make_shared<AlignmentLayoutElement>();
 		for (auto child : env->GetChildren())
 		{
@@ -1661,7 +1661,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<Lu
 {
 	if (env == nullptr)
 	{
-		env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent);
+		env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent_size);
 	}
 
 	auto& children = expression->GetChildren();

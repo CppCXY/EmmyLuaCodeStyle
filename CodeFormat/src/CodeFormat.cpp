@@ -64,7 +64,8 @@ int main(int argc, char** argv)
 
 	if (!cmd.Get<std::string>("config").empty())
 	{
-		options = LuaCodeStyleOptions::ParseFromEditorConfig(cmd.Get<std::string>("config"));
+		auto editorConfig = LuaEditorConfig::LoadFromFile(cmd.Get<std::string>("config"));
+		options = LuaCodeStyleOptions::ParseFromEditorConfig(editorConfig);
 	}
 	else
 	{

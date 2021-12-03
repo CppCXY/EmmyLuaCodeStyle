@@ -13,8 +13,12 @@ target_include_directories(Util PUBLIC
 target_sources(Util
 	PUBLIC
 	${LuaCodeStyle_SOURCE_DIR}/include/Util/CommandLine.h
+	${LuaCodeStyle_SOURCE_DIR}/include/Util/LuaEditorConfig.h
+	${LuaCodeStyle_SOURCE_DIR}/include/Util/StringUtil.h
 
 	PRIVATE
 	${Util_SOURCE_DIR}/src/CommandLine.cpp
+	${Util_SOURCE_DIR}/src/LuaEditorConfig.cpp
+	${Util_SOURCE_DIR}/src/StringUtil.cpp
 )
 

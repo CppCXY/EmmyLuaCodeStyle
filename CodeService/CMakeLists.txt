@@ -4,7 +4,7 @@ project(CodeService)
 
 add_library(CodeService STATIC)
 
-add_dependencies(CodeService LuaParser)
+add_dependencies(CodeService LuaParser Util)
 
 target_include_directories(CodeService PUBLIC
 	${LuaCodeStyle_SOURCE_DIR}/include
@@ -61,4 +61,4 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	target_compile_options(CodeService PUBLIC /utf-8)
 endif ()
 
-target_link_libraries(CodeService LuaParser)
+target_link_libraries(CodeService LuaParser Util)

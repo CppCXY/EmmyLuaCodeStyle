@@ -6,40 +6,8 @@
 #include "CodeService/LuaFormatter.h"
 #include "Util/format.h"
 #include "Util/CommandLine.h"
+#include "Util/StringUtil.h"
 
-std::string_view TrimSpace(std::string_view source)
-{
-	if (source.empty())
-	{
-		return source;
-	}
-
-	std::size_t start = 0;
-	for (; start != source.size(); start++)
-	{
-		char ch = source[start];
-		if (ch != '\n' && ch != '\r' && ch != ' ')
-		{
-			break;
-		}
-	}
-
-	int end = source.size() - 1;
-	for (; end >= 0; end--)
-	{
-		char ch = source[end];
-		if (ch != '\n' && ch != '\r' && ch != ' ')
-		{
-			break;
-		}
-	}
-
-	if (end < static_cast<int>(start))
-	{
-		return "";
-	}
-	return source.substr(start, end - start + 1);
-}
 
 bool TestFormatted(std::string input, const std::string& shouldBe, std::shared_ptr<LuaCodeStyleOptions> options)
 {
@@ -52,7 +20,7 @@ bool TestFormatted(std::string input, const std::string& shouldBe, std::shared_p
 
 	auto formattedText = formatter.GetFormattedText();
 
-	return TrimSpace(formattedText) == TrimSpace(shouldBe);
+	return StringUtil::TrimSpace(formattedText) == StringUtil::TrimSpace(shouldBe);
 }
 
 bool TestGrammar(std::string input)

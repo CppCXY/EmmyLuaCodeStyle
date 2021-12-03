@@ -4,30 +4,40 @@
 #include <string_view>
 #include <memory>
 #include <map>
+#include "Util/LuaEditorConfig.h"
 
 class FormatElement;
+
+enum class IndentStyle
+{
+	Tab,
+	Space,
+};
 
 class LuaCodeStyleOptions
 {
 public:
-	static std::shared_ptr<LuaCodeStyleOptions> ParseFromEditorConfig(std::string_view filename);
-	static std::shared_ptr<LuaCodeStyleOptions> ParseOptionsFromMap(std::map<std::string, std::string>& optionMap);
+	static std::shared_ptr<LuaCodeStyleOptions> ParseFromEditorConfig(std::shared_ptr<LuaEditorConfig> editorConfig);
 	LuaCodeStyleOptions();
 	/*
-	 * 我反对这种风格
-	 * 但我依然实现他
+	 * 缩进风格
 	 */
-	bool use_tab = false;
+	 IndentStyle indent_style = IndentStyle::Space;
 
 	/*
 	 * 缩进的空白数
 	 */
-	int indent = 4;
+	int indent_size = 4;
+
+	/*
+	 * tab的width
+	 */
+	int tab_width = 8;
 
 	/*
 	 * 延续行缩进
 	 */
-	int continuation_indent = 4;
+	int continuation_indent_size = 4;
 
 	/*
 	 * 调用参数对齐到第一个参数，经过实际体验这种风格在vscode上会因为垂直对齐线的标注而显得极为难看
@@ -67,7 +77,7 @@ public:
 
 	bool continuous_assign_table_field_align_to_equal_sign = true;
 
-	std::string line_separator = "\r\n";
+	std::string end_of_line = "\r\n";
 
 	std::shared_ptr<FormatElement> keep_line_after_if_statement;
 	std::shared_ptr<FormatElement> keep_line_after_do_statement;

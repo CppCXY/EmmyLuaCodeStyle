@@ -10,7 +10,7 @@ DiagnosisContext::DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaCodeSty
 
 void DiagnosisContext::AddIndent(int specialIndent)
 {
-	if (!_options.use_tab)
+	if (_options.indent_style == IndentStyle::Space)
 	{
 		int newIndent = 0;
 		if (specialIndent == -1)
@@ -22,7 +22,7 @@ void DiagnosisContext::AddIndent(int specialIndent)
 			}
 
 			auto& topIndent = _indentStack.top();
-			newIndent = _options.indent + topIndent;
+			newIndent = _options.indent_size + topIndent;
 		}
 		else
 		{

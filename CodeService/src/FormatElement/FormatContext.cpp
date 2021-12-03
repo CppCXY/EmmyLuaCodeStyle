@@ -5,7 +5,6 @@ FormatContext::FormatContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOpti
 	: _options(options),
 	  _characterCount(0),
 	  _parser(parser)
-
 {
 }
 
@@ -28,7 +27,7 @@ void FormatContext::PrintLine(int line)
 {
 	for (int i = 0; i < line; i++)
 	{
-		_os << _options.line_separator;
+		_os << _options.end_of_line;
 		_characterCount = 0;
 	}
 }
@@ -54,7 +53,7 @@ void FormatContext::PrintIndent(int indent, const std::string& indentString)
 
 void FormatContext::AddIndent(int specialIndent)
 {
-	if (!_options.use_tab)
+	if (_options.indent_style == IndentStyle::Space)
 	{
 		int newIndent = 0;
 		if (specialIndent == -1)
@@ -66,7 +65,7 @@ void FormatContext::AddIndent(int specialIndent)
 			}
 
 			auto& topIndent = _indentStack.top();
-			newIndent = _options.indent + topIndent.Indent;
+			newIndent = _options.indent_size + topIndent.Indent;
 		}
 		else
 		{
@@ -93,7 +92,7 @@ void FormatContext::AddIndent(int specialIndent)
 		{
 			// 我会认为存在一个换算
 			// 当你制定了一个缩进，则我会认为保底有一个缩进
-			newIndent = std::max(1, specialIndent / 8);
+			newIndent = std::max(1, specialIndent / _options.tab_width);
 		}
 		std::string indentString = "\t";
 		_indentStack.push({newIndent, "\t"});
