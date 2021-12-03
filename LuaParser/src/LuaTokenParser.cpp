@@ -169,7 +169,8 @@ int LuaTokenParser::GetColumn(int offset)
 
 	int bytesLength = offset - lineStartOffset;
 
-	int utf8Length = ::utf8nlen(_source.data() + lineStartOffset, static_cast<std::size_t>(bytesLength));
+	int utf8Length = ::utf8nlen(const_cast<const char*>(_source.data() + lineStartOffset),
+	                            static_cast<std::size_t>(bytesLength));
 	return utf8Length;
 }
 
