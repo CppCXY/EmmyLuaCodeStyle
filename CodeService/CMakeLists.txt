@@ -60,4 +60,8 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/LanguageTranslator.cpp
 )
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	target_compile_options(CodeService PUBLIC /utf-8)
+endif ()
+
 target_link_libraries(CodeService LuaParser)

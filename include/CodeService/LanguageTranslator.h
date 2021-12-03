@@ -13,6 +13,7 @@ public:
 	std::string Get(const std::string& source);
 
 	void SetLanguageMap(std::map<std::string, std::string>&& languageDictionary);
+
 private:
 	std::map<std::string, std::string> _languageDictionary;
 };

@@ -155,7 +155,7 @@ class InitializationOptions : public Serializable
 public:
 	std::vector<std::string> workspaceFolders;
 	std::vector<EditorConfigSource> configFiles;
-
+	std::string localeRoot;
 	void Deserialize(nlohmann::json json) override;
 };
 

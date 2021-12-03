@@ -224,6 +224,10 @@ void vscode::InitializationOptions::Deserialize(nlohmann::json json)
 			workspaceFolders.emplace_back(workspaceUri);
 		}
 	}
+	if(json["localeRoot"].is_string())
+	{
+		localeRoot = json["localeRoot"];
+	}
 }
 
 void vscode::InitializeParams::Deserialize(nlohmann::json json)

@@ -1,4 +1,7 @@
 #include "CodeFormatServer/LanguageService.h"
+#include <fstream>
+#include <sstream>
+#include "nlohmann/json.hpp"
 #include "CodeFormatServer/VSCode.h"
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "CodeService/LuaFormatter.h"
@@ -62,6 +65,33 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 	for (auto& configFile : configFiles)
 	{
 		LanguageClient::GetInstance().UpdateOptions(configFile.workspace, configFile.path);
+	}
+
+	std::filesystem::path localePath = param->initializationOptions.localeRoot;
+	localePath /= param->locale + ".json";
+
+	if (std::filesystem::exists(localePath) && std::filesystem::is_regular_file(localePath))
+	{
+		std::fstream fin(localePath.string(), std::ios::in);
+
+		if (fin.is_open())
+		{
+			std::stringstream s;
+			s << fin.rdbuf();
+			std::string jsonText = s.str();
+			auto json = nlohmann::json::parse(jsonText);
+
+			if (json.is_object())
+			{
+				std::map<std::string, std::string> languageMap;
+				for (auto [key,value] : json.items())
+				{
+					languageMap.insert({key, value});
+				}
+
+				LanguageTranslator::GetInstance().SetLanguageMap(std::move(languageMap));
+			}
+		}
 	}
 
 
@@ -194,7 +224,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 	auto position = param->position;
 
 	auto result = std::make_shared<vscode::DocumentFormattingResult>();
-	if(parser->IsEmptyLine(position.line - 1))
+	if (parser->IsEmptyLine(position.line - 1))
 	{
 		result->hasError = true;
 		return result;
