@@ -171,7 +171,7 @@ int LuaTokenParser::GetColumn(int offset)
 
 #if __APPLE__
 	// git action 编译时在macos下编译会报错，我不觉得有什么问题
-	const char* macOsBug = const_cast<const char*>(_source.data() + lineStartOffset);
+	const char8_t* macOsBug = reinterpret_cast<const char8_t*>(_source.data() + lineStartOffset);
 	return ::utf8nlen(macOsBug, static_cast<std::size_t>(bytesLength));
 #else
 	return ::utf8nlen(_source.data() + lineStartOffset, static_cast<std::size_t>(bytesLength));
