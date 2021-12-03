@@ -169,9 +169,13 @@ int LuaTokenParser::GetColumn(int offset)
 
 	int bytesLength = offset - lineStartOffset;
 
-	int utf8Length = ::utf8nlen(const_cast<const char*>(_source.data() + lineStartOffset),
-	                            static_cast<std::size_t>(bytesLength));
-	return utf8Length;
+#if __APPLE__
+	// git action 编译时在macos下编译会报错，我不觉得有什么问题
+	const char* macOsBug = const_cast<const char*>(_source.data() + lineStartOffset);
+	return ::utf8nlen(macOsBug, static_cast<std::size_t>(bytesLength));
+#else
+	return ::utf8nlen(_source.data() + lineStartOffset, static_cast<std::size_t>(bytesLength));
+#endif
 }
 
 int LuaTokenParser::GetTotalLine()
