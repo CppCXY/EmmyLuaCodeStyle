@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <map>
 #include <string_view>
@@ -10,7 +10,7 @@
 #include "LuaTokenType.h"
 
 /*
- * token ½âÎöÀ´×ÔÓÚlua Ô´´úÂë,ÊµÏÖÉÏ·Ç³£½Ó½üµ«Ï¸½Ú´¦²¢²»ÏàÍ¬
+ * token è§£ææ¥è‡ªäºlua æºä»£ç ,å®ç°ä¸Šéå¸¸æ¥è¿‘ä½†ç»†èŠ‚å¤„å¹¶ä¸ç›¸åŒ
  */
 class LuaTokenParser
 {
@@ -91,7 +91,7 @@ private:
 	std::string _source;
 
 	std::vector<LuaToken> _tokens;
-	// ×¢ÊÍµ¥¶À´¦Àí
+	// æ³¨é‡Šå•ç‹¬å¤„ç†
 	std::vector<LuaToken> _commentTokens;
 
 	std::vector<LuaError> _errors;

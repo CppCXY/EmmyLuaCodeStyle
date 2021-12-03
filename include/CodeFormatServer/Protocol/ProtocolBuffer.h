@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <string>
 
@@ -20,7 +20,7 @@ public:
 	void Reset();
 private:
 	bool TryParseHead();
-	// ´ú±í´ÓÕâ¸öÎ»ÖÃ¿ªÊ¼¿ÉĞ´
+	// ä»£è¡¨ä»è¿™ä¸ªä½ç½®å¼€å§‹å¯å†™
 	std::size_t _writeIndex;
 	std::string _textProtocol;
 

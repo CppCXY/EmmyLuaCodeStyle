@@ -207,7 +207,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnRangeFormatting(
 	formatter.BuildFormattedElement();
 
 	auto& edit = result->edits.emplace_back();
-	LuaFormatRange formattedRange(param->range.start.line, param->range.end.line);
+	LuaFormatRange formattedRange(static_cast<int>(param->range.start.line), static_cast<int>(param->range.end.line));
 
 	edit.newText = formatter.GetRangeFormattedText(formattedRange);
 	edit.range = vscode::Range(
@@ -224,7 +224,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 	auto position = param->position;
 
 	auto result = std::make_shared<vscode::DocumentFormattingResult>();
-	if (parser->IsEmptyLine(position.line - 1))
+	if (parser->IsEmptyLine(static_cast<int>(position.line) - 1))
 	{
 		result->hasError = true;
 		return result;
@@ -242,7 +242,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 	formatter.BuildFormattedElement();
 
 	auto& edit = result->edits.emplace_back();
-	LuaFormatRange formattedRange(position.line - 1, position.line - 1);
+	LuaFormatRange formattedRange(static_cast<int>(position.line) - 1, static_cast<int>(position.line) - 1);
 
 	edit.newText = formatter.GetRangeFormattedText(formattedRange);
 	edit.range = vscode::Range(

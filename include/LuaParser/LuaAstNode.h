@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <string_view>
 #include <vector>
@@ -28,7 +28,7 @@ public:
 
 	void SetType(LuaAstNodeType type);
 
-	// child»á±»¼ÓÈëÎª×îµ×²ãµÄÒ¶×Ó½Úµã
+	// childä¼šè¢«åŠ å…¥ä¸ºæœ€åº•å±‚çš„å¶å­èŠ‚ç‚¹
 	void AddLeafChild(std::shared_ptr<LuaAstNode> child);
 private:
 	void addChildAfter(int index, std::shared_ptr<LuaAstNode> child);

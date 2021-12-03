@@ -1,4 +1,4 @@
-#include <cassert>
+ï»¿#include <cassert>
 #include <iostream>
 #include <filesystem>
 #include <vector>
@@ -109,7 +109,7 @@ std::string ReadFile(const std::string& path)
 	return "";
 }
 
-// µÚÒ»¸ö²ÎÊıÊÇ´ı¸ñÊ½»¯ÎÄ±¾Ä¿Â¼£¬µÚ¶ş¸ö²ÎÊıÊÇ¸ñÊ½»¯Ô¤ÆÚ½á¹û
+// ç¬¬ä¸€ä¸ªå‚æ•°æ˜¯å¾…æ ¼å¼åŒ–æ–‡æœ¬ç›®å½•ï¼Œç¬¬äºŒä¸ªå‚æ•°æ˜¯æ ¼å¼åŒ–é¢„æœŸç»“æœ
 int main(int argc, char* argv[])
 {
 	CommandLine commandLine;

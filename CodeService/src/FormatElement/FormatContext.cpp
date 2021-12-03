@@ -1,4 +1,4 @@
-#include "CodeService/FormatElement/FormatContext.h"
+ï»¿#include "CodeService/FormatElement/FormatContext.h"
 #include "CodeService/FormatElement/TextElement.h"
 
 FormatContext::FormatContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options)
@@ -44,7 +44,7 @@ void FormatContext::PrintBlank(int blank)
 
 void FormatContext::PrintIndent(int indent, const std::string& indentString)
 {
-	// ÎÒÊ¼ÖÕÈÏÎªÊ¹\tÀ´ÅÅ°æ¾ÍÊÇÀ¬»ø
+	// æˆ‘å§‹ç»ˆè®¤ä¸ºä½¿\tæ¥æ’ç‰ˆå°±æ˜¯åƒåœ¾
 	for (int i = 0; i < indent; i++)
 	{
 		_os << indentString;
@@ -74,7 +74,7 @@ void FormatContext::AddIndent(int specialIndent)
 		}
 		_indentStack.push({newIndent, " "});
 	}
-	else //Õâ¸öËã·¨¿ÉÄÜ»áÓĞÎÊÌâ
+	else //è¿™ä¸ªç®—æ³•å¯èƒ½ä¼šæœ‰é—®é¢˜
 	{
 		int newIndent = 0;
 		if (specialIndent == -1)
@@ -86,13 +86,13 @@ void FormatContext::AddIndent(int specialIndent)
 			}
 
 			auto& topIndent = _indentStack.top();
-			// Ò»´ÎÖ»ÔöÒ»¸ö\t
+			// ä¸€æ¬¡åªå¢ä¸€ä¸ª\t
 			newIndent = 1 + topIndent.Indent;
 		}
 		else
 		{
-			// ÎÒ»áÈÏÎª´æÔÚÒ»¸ö»»Ëã
-			// µ±ÄãÖÆ¶¨ÁËÒ»¸öËõ½ø£¬ÔòÎÒ»áÈÏÎª±£µ×ÓĞÒ»¸öËõ½ø
+			// æˆ‘ä¼šè®¤ä¸ºå­˜åœ¨ä¸€ä¸ªæ¢ç®—
+			// å½“ä½ åˆ¶å®šäº†ä¸€ä¸ªç¼©è¿›ï¼Œåˆ™æˆ‘ä¼šè®¤ä¸ºä¿åº•æœ‰ä¸€ä¸ªç¼©è¿›
 			newIndent = std::max(1, specialIndent / 8);
 		}
 		std::string indentString = "\t";

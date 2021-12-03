@@ -1,5 +1,4 @@
-#include "CodeService/FormatElement/DiagnosisContext.h"
-
+ï»¿#include "CodeService/FormatElement/DiagnosisContext.h"
 #include "CodeService/LanguageTranslator.h"
 #include "Util/format.h"
 
@@ -31,7 +30,7 @@ void DiagnosisContext::AddIndent(int specialIndent)
 		}
 		_indentStack.push(newIndent);
 	}
-	else //Õâ¸öËã·¨¿ÉÄÜ»áÓĞÎÊÌâ
+	else //è¿™ä¸ªç®—æ³•å¯èƒ½ä¼šæœ‰é—®é¢˜
 	{
 		int newIndent = 0;
 		if (specialIndent == -1)
@@ -43,13 +42,13 @@ void DiagnosisContext::AddIndent(int specialIndent)
 			}
 
 			auto& topIndent = _indentStack.top();
-			// Ò»´ÎÖ»ÔöÒ»¸ö\t
+			// ä¸€æ¬¡åªå¢ä¸€ä¸ª\t
 			newIndent = 1 + topIndent;
 		}
 		else
 		{
-			// ÎÒ»áÈÏÎª´æÔÚÒ»¸ö»»Ëã
-			// µ±ÄãÖÆ¶¨ÁËÒ»¸öËõ½ø£¬ÔòÎÒ»áÈÏÎª±£µ×ÓĞÒ»¸öËõ½ø
+			// æˆ‘ä¼šè®¤ä¸ºå­˜åœ¨ä¸€ä¸ªæ¢ç®—
+			// å½“ä½ åˆ¶å®šäº†ä¸€ä¸ªç¼©è¿›ï¼Œåˆ™æˆ‘ä¼šè®¤ä¸ºä¿åº•æœ‰ä¸€ä¸ªç¼©è¿›
 			newIndent = std::max(1, specialIndent / 8);
 		}
 		_indentStack.push(newIndent);

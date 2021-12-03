@@ -1,4 +1,4 @@
-#include "CodeService/FormatElement/FormatElement.h"
+ï»¿#include "CodeService/FormatElement/FormatElement.h"
 
 FormatElement::FormatElement(TextRange range)
 	: _textRange(range)
@@ -149,6 +149,6 @@ int FormatElement::getLastValidOffset(int position, FormatElement& parent)
 		}
 	}
 
-	// ÄÇÃ´Ò»¶¨ÊÇÍùÉÏÕÒ²»µ½ÓĞĞ§·¶Î§ÔªËØ
+	// é‚£ä¹ˆä¸€å®šæ˜¯å¾€ä¸Šæ‰¾ä¸åˆ°æœ‰æ•ˆèŒƒå›´å…ƒç´ 
 	return parent.GetTextRange().StartOffset;
 }

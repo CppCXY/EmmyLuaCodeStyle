@@ -169,7 +169,7 @@ int LuaTokenParser::GetColumn(int offset)
 
 	int bytesLength = offset - lineStartOffset;
 
-	int utf8Length = ::utf8nlen(_source.data() + lineStartOffset, bytesLength);
+	int utf8Length = ::utf8nlen(_source.data() + lineStartOffset, static_cast<std::size_t>(bytesLength));
 	return utf8Length;
 }
 
@@ -188,7 +188,7 @@ bool LuaTokenParser::IsEmptyLine(int line)
 	int nextLineStartOffset = 0;
 	if (line == _linenumber)
 	{
-		nextLineStartOffset = _source.size();
+		nextLineStartOffset = static_cast<int>(_source.size());
 	}
 	else
 	{

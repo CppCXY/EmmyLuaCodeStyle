@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <string>
 #include <map>
@@ -21,13 +21,13 @@ struct CommandLineOption
 };
 
 /**
- * @brief ÌØ¶¨Óï·¨½á¹¹µÄÃüÁîĞĞ½âÎö¹¤¾ß
+ * @brief ç‰¹å®šè¯­æ³•ç»“æ„çš„å‘½ä»¤è¡Œè§£æå·¥å…·
  */
 class CommandLine
 {
 public:
 	/**
-	 * @brief Ìí¼Ó½âÎöµÄ×Ö·û´®²ÎÊı
+	 * @brief æ·»åŠ è§£æçš„å­—ç¬¦ä¸²å‚æ•°
 	 */
 	template <typename T>
 	bool Add(const std::string_view name, std::string_view shortName,
@@ -86,14 +86,14 @@ public:
 	}
 
 	/**
-	 * @brief Ìí¼Ó½âÎöÄ¿±ê
+	 * @brief æ·»åŠ è§£æç›®æ ‡
 	 */
 	void AddTarget(const std::string& name);
 
 	std::string GetTarget() const noexcept;
 
 	/**
-	 * @brief °´Ë³Ğò»ñÈ¡²ÎÊı
+	 * @brief æŒ‰é¡ºåºè·å–å‚æ•°
 	 */
 	std::string GetArg(int index) const noexcept;
 

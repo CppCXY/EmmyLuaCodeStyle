@@ -1,4 +1,4 @@
-#include "CodeService/FormatElement/AlignmentLayoutElement.h"
+ï»¿#include "CodeService/FormatElement/AlignmentLayoutElement.h"
 #include "CodeService/FormatElement/StatementElement.h"
 #include "CodeService/FormatElement/TextElement.h"
 #include "CodeService/FormatElement/AlignmentElement.h"
@@ -53,9 +53,9 @@ int AlignmentLayoutElement::getAlignPosition(std::shared_ptr<LuaParser> luaParse
 {
 	int eqAlignedPosition = 0;
 	bool firstContainEq = true;
-	// ÏÈÑ°ÕÒµÈºÅ¶ÔÆëµÄÎ»ÖÃ£¬²¢ÇÒÅĞ¶ÏÁ¬ĞøµÄ´øµÈºÅµÄÓï¾äÊÇ·ñÓ¦¸Ã¶ÔÆëµ½µÈºÅ
-	// Á¬ĞøµÄ´øµÈºÅµÄÓï¾äÊÇ·ñÓ¦¸Ã¶ÔÆëµ½µÈºÅ£¬Õâ¸öĞĞÎªÓ¦¸ÃÓÉÁ¬ĞøÓï¾äµÄÊ×ĞĞ¾ö¶¨
-	// Èç¹û±»×Ó½ÚµãÄÚµÄÆäËûÓï¾ä¹²Í¬¾ö¶¨ÔòºÜÄÑ½«Á¬Ğø¶ÔÆë»¹Ô­ÎªÆÕÍ¨ÅÅ°æ
+	// å…ˆå¯»æ‰¾ç­‰å·å¯¹é½çš„ä½ç½®ï¼Œå¹¶ä¸”åˆ¤æ–­è¿ç»­çš„å¸¦ç­‰å·çš„è¯­å¥æ˜¯å¦åº”è¯¥å¯¹é½åˆ°ç­‰å·
+	// è¿ç»­çš„å¸¦ç­‰å·çš„è¯­å¥æ˜¯å¦åº”è¯¥å¯¹é½åˆ°ç­‰å·ï¼Œè¿™ä¸ªè¡Œä¸ºåº”è¯¥ç”±è¿ç»­è¯­å¥çš„é¦–è¡Œå†³å®š
+	// å¦‚æœè¢«å­èŠ‚ç‚¹å†…çš„å…¶ä»–è¯­å¥å…±åŒå†³å®šåˆ™å¾ˆéš¾å°†è¿ç»­å¯¹é½è¿˜åŸä¸ºæ™®é€šæ’ç‰ˆ
 	for (int statIndex = 0; statIndex != static_cast<int>(_children.size()); statIndex++)
 	{
 		auto statChild = _children[statIndex];
@@ -115,7 +115,7 @@ void AlignmentLayoutElement::alignmentSerialize(FormatContext& ctx, int position
 				auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
 				if (textElement->GetText() == "=" && i > 0)
 				{
-					// ½«¿ØÖÆÔªËØ±ä¸üÎª¶ÔÆëÔªËØ
+					// å°†æ§åˆ¶å…ƒç´ å˜æ›´ä¸ºå¯¹é½å…ƒç´ 
 					statChildren[i - 1] = std::make_shared<AlignmentElement>(eqPosition);
 					break;
 				}
@@ -141,7 +141,7 @@ void AlignmentLayoutElement::alignmentDiagnosis(DiagnosisContext& ctx, int posit
 				auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
 				if (textElement->GetText() == "=" && i > 0)
 				{
-					// ½«¿ØÖÆÔªËØ±ä¸üÎª¶ÔÆëÔªËØ
+					// å°†æ§åˆ¶å…ƒç´ å˜æ›´ä¸ºå¯¹é½å…ƒç´ 
 					statChildren[i - 1] = std::make_shared<AlignmentElement>(eqPosition);
 					break;
 				}

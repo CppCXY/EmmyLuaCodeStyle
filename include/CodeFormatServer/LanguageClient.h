@@ -1,9 +1,10 @@
-#pragma once
+ï»¿#pragma once
 
 #include <memory>
 #include "Session/IOSession.h"
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "LuaParser/LuaParser.h"
+
 class LanguageClient
 {
 public:
@@ -34,7 +35,7 @@ public:
 	void RemoveOptions(std::string_view workspaceUri);
 private:
 	std::shared_ptr<IOSession> _session;
-	// uri µ½file astµÄÓ³Éä
+	// uri åˆ°file astçš„æ˜ å°„
 	std::map<std::string, std::shared_ptr<LuaParser>, std::less<>> _fileMap;
 
 	std::vector<std::pair<std::string, std::shared_ptr<LuaCodeStyleOptions>>> _optionsVector;

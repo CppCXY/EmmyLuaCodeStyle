@@ -1,6 +1,6 @@
-#pragma once
+ï»¿#pragma once
 
-// È¡Ãû¶¼À´×Ôlua Ô´´úÂë
+// å–åéƒ½æ¥è‡ªlua æºä»£ç 
 enum class UnOpr
 {
 	OPR_MINUS,

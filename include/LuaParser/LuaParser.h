@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <memory>
 #include "LuaTokenParser.h"
@@ -109,7 +109,7 @@ private:
 
 	void functionCallArgs(std::shared_ptr<LuaAstNode>& expressionNode);
 
-	// ¸Ãº¯Êı»á¸Ä±äÈë²Î
+	// è¯¥å‡½æ•°ä¼šæ”¹å˜å…¥å‚
 	void fieldSel(std::shared_ptr<LuaAstNode>& expressionNode);
 
 	void yIndex(std::shared_ptr<LuaAstNode> expressionNode);
@@ -129,17 +129,17 @@ private:
 	BinOpr getBinaryOperator(LuaTokenType op);
 
 	/*
-	 * ËûÊÇ¼ì²éµ±Ç°tokenµÄtypeÊÇ·ñÓëcÏàÍ¬
-	 * Èç¹ûÊÇ¾ÍÌø¹ıµ±Ç°,
-	 * ·ñÔò»áÉú³É´íÎó
+	 * ä»–æ˜¯æ£€æŸ¥å½“å‰tokençš„typeæ˜¯å¦ä¸cç›¸åŒ
+	 * å¦‚æœæ˜¯å°±è·³è¿‡å½“å‰,
+	 * å¦åˆ™ä¼šç”Ÿæˆé”™è¯¯
 	 */
 	void checkAndNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent,
 	                  LuaAstNodeType addType = LuaAstNodeType::KeyWord);
 
 	/*
-	 * ËûÊÇ¼ì²éµ±Ç°tokenµÄtypeÊÇ·ñÓëcÏàÍ¬
-	 * Èç¹ûÊÇ¾ÍÌø¹ıµ±Ç°£¬²¢·µ»Øtrue
-	 * ·ñÔò·µ»Øfalse
+	 * ä»–æ˜¯æ£€æŸ¥å½“å‰tokençš„typeæ˜¯å¦ä¸cç›¸åŒ
+	 * å¦‚æœæ˜¯å°±è·³è¿‡å½“å‰ï¼Œå¹¶è¿”å›true
+	 * å¦åˆ™è¿”å›false
 	 */
 	bool testNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType = LuaAstNodeType::KeyWord);
 

@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 #include <cstdint>
 #include <string>
 #include <vector>
 
 #include <nlohmann/json.hpp>
-// ÃüÃû·ç¸ñºÍvscodeÒ»Ñù
+// å‘½åé£æ ¼å’Œvscodeä¸€æ ·
 
 namespace vscode
 {
@@ -167,7 +167,7 @@ public:
 	std::string locale;
 
 	InitializationOptions initializationOptions;
-	// ÆäËû²ÎÊıºöÂÔ
+	// å…¶ä»–å‚æ•°å¿½ç•¥
 	void Deserialize(nlohmann::json json) override;
 };
 
@@ -225,7 +225,7 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
-// ¸ÃÀà²¢·Çlanguage server protocol ½Ó¿Ú
+// è¯¥ç±»å¹¶élanguage server protocol æ¥å£
 class DocumentFormattingResult : public Serializable
 {
 public:

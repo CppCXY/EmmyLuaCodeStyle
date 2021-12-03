@@ -76,7 +76,7 @@ std::string RangeFormatContext::GetText()
 {
 	std::string formattedText = FormatContext::GetText();
 
-	for (int i = formattedText.size() - 1; i >= 0; i--)
+	for (int i = static_cast<int>(formattedText.size()) - 1; i >= 0; i--)
 	{
 		char ch = formattedText[i];
 

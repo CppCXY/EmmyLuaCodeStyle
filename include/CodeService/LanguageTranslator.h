@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <string>
 #include <map>
@@ -19,7 +19,7 @@ private:
 };
 
 /*
- * ÓïÑÔ±¾µØ»¯·­ÒëÊµÀı£¬±£³ÖÒ»ÖÖ¹ßÓÃ·¨
+ * è¯­è¨€æœ¬åœ°åŒ–ç¿»è¯‘å®ä¾‹ï¼Œä¿æŒä¸€ç§æƒ¯ç”¨æ³•
  */
 #define LText(text) LanguageTranslator::GetInstance().Get(text)
 

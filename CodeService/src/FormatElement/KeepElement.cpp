@@ -1,4 +1,4 @@
-#include "CodeService/FormatElement/KeepElement.h"
+ï»¿#include "CodeService/FormatElement/KeepElement.h"
 #include "Util/format.h"
 
 KeepElement::KeepElement(int keepBlank, bool hasLinebreak)
@@ -21,7 +21,7 @@ void KeepElement::Serialize(FormatContext& ctx, int position, FormatElement& par
 	{
 		return;
 	}
-	// Õâ¸öÌõ¼şµÄÒâË¼ÊÇÈç¹ûÉÏÒ»¸öÔªËØºÍÏÂÒ»¸öÔªËØÃ»ÓĞÊµÖÊµÄ»»ĞĞÔò±£³ÖÒ»¶¨µÄ¿Õ¸ñ
+	// è¿™ä¸ªæ¡ä»¶çš„æ„æ€æ˜¯å¦‚æœä¸Šä¸€ä¸ªå…ƒç´ å’Œä¸‹ä¸€ä¸ªå…ƒç´ æ²¡æœ‰å®è´¨çš„æ¢è¡Œåˆ™ä¿æŒä¸€å®šçš„ç©ºæ ¼
 	if (nextElementLine == lastElementLine && ctx.GetCharacterCount() != 0)
 	{
 		ctx.PrintBlank(_keepBlank);
