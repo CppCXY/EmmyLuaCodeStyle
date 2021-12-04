@@ -14,6 +14,14 @@ enum class IndentStyle
 	Space,
 };
 
+enum class NameStyle
+{
+	Off,
+	CamelCase,
+	PascalCase,
+	SnakeCase
+};
+
 class LuaCodeStyleOptions
 {
 public:
@@ -22,7 +30,7 @@ public:
 	/*
 	 * 缩进风格
 	 */
-	 IndentStyle indent_style = IndentStyle::Space;
+	IndentStyle indent_style = IndentStyle::Space;
 
 	/*
 	 * 缩进的空白数
@@ -79,6 +87,8 @@ public:
 
 	std::string end_of_line = "\r\n";
 
+	bool insert_final_newline = true;
+
 	std::shared_ptr<FormatElement> keep_line_after_if_statement;
 	std::shared_ptr<FormatElement> keep_line_after_do_statement;
 	std::shared_ptr<FormatElement> keep_line_after_while_statement;
@@ -89,11 +99,18 @@ public:
 
 
 	// 以下是代码诊断选项，诊断选项不一定会作为格式化内容
-
+	bool enable_check_codestyle = true;
 	/*
 	 * 最大行宽
 	 */
 	int max_line_length = 120;
 
-	bool enable_check_codestyle = true;
+	// 命名风格检查
+	bool enable_name_style_check = false;
+	NameStyle local_name_define_style = NameStyle::Off;
+	NameStyle function_name_define_style = NameStyle::Off;
+	NameStyle table_field_name_define_style = NameStyle::Off;
+	// global_variable_name_define_style = off
+	// local_require_module_name_define_style = off
+	// local_module_or_class_name_define = off
 };

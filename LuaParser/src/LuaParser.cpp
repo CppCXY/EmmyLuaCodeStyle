@@ -77,6 +77,11 @@ int LuaParser::GetTotalLine()
 	return _tokenParser->GetTotalLine();
 }
 
+std::string_view LuaParser::GetSource()
+{
+	return _tokenParser->GetSource();
+}
+
 bool LuaParser::IsEmptyLine(int line)
 {
 	return _tokenParser->IsEmptyLine(line);

@@ -33,6 +33,8 @@ public:
 
 	int GetTotalLine();
 
+	std::string_view GetSource();
+
 	bool IsEmptyLine(int line);
 
 private:

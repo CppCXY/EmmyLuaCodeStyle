@@ -21,7 +21,7 @@ void DiagnosisContext::AddIndent(int specialIndent)
 				return;
 			}
 
-			auto& topIndent = _indentStack.top();
+			auto topIndent = _indentStack.top();
 			newIndent = _options.indent_size + topIndent;
 		}
 		else
@@ -41,7 +41,7 @@ void DiagnosisContext::AddIndent(int specialIndent)
 				return;
 			}
 
-			auto& topIndent = _indentStack.top();
+			auto topIndent = _indentStack.top();
 			// 一次只增一个\t
 			newIndent = 1 + topIndent;
 		}
@@ -49,7 +49,7 @@ void DiagnosisContext::AddIndent(int specialIndent)
 		{
 			// 我会认为存在一个换算
 			// 当你制定了一个缩进，则我会认为保底有一个缩进
-			newIndent = std::max(1, specialIndent / 8);
+			newIndent = std::max(1, specialIndent / _options.tab_width);
 		}
 		_indentStack.push(newIndent);
 	}
@@ -114,6 +114,13 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 			PushDiagnosis(format(LText("The line width should not exceed {}"), _options.max_line_length), start, end);
 		}
 		_lineMaxLengthMap.clear();
+	}
+
+	if (_options.insert_final_newline && !_parser->IsEmptyLine(_parser->GetTotalLine()))
+	{
+		LuaDiagnosisPosition start(_parser->GetTotalLine(), _parser->GetColumn(_parser->GetSource().size()));
+		LuaDiagnosisPosition end(_parser->GetTotalLine() + 1, 0);
+		PushDiagnosis(LText("The code must end with a new line"), start, end);
 	}
 	return _diagnosisInfos;
 }

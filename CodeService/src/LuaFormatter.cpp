@@ -212,7 +212,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNode(std::shared_ptr<LuaAstNo
 	case LuaAstNodeType::LiteralExpression:
 	default:
 		{
-			return std::make_shared<TextElement>(node->GetText(), node->GetTextRange());
+			return std::make_shared<TextElement>(node->GetText(), TextDefineType::Normal, node->GetTextRange());
 		}
 	}
 }
@@ -401,11 +401,15 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignment(std::shared_ptr<Lu
 			}
 		case LuaAstNodeType::ExpressionList:
 			{
-				env->AddChild(FormatNode(node));
 				if (isLeftExprList)
 				{
+					env->AddChild(FormatAssignLeftExpressionList(node));
 					env->Add<KeepBlankElement>(1);
 					isLeftExprList = false;
+				}
+				else
+				{
+					env->AddChild(FormatNode(node));
 				}
 
 				break;
@@ -429,7 +433,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
 		{
 		case LuaAstNodeType::Identify:
 			{
-				env->Add<TextElement>(node);
+				env->Add<TextElement>(node, TextDefineType::LocalNameDefine);
 				break;
 			}
 		case LuaAstNodeType::GeneralOperator:
@@ -500,6 +504,35 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignLeftExpressionList(std:
 				auto subEnv = std::make_shared<SubExpressionElement>();
 				env->AddChild(FormatExpression(node, subEnv));
 				env->Add<KeepElement>(0);
+
+				if (_options.enable_name_style_check)
+				{
+					if (!node->GetChildren().empty())
+					{
+						auto type = node->GetChildren().back()->GetType();
+						if (type == LuaAstNodeType::IndexExpression)
+						{
+							auto textRange = node->GetTextRange();
+							std::shared_ptr<FormatElement> lastElement = env->LastValidElement();
+							while (lastElement != nullptr)
+							{
+								if (lastElement->GetType() == FormatElementType::TextElement && lastElement->
+									GetTextRange().EndOffset ==
+									textRange.EndOffset)
+								{
+									auto textElement = std::dynamic_pointer_cast<TextElement>(lastElement);
+									textElement->SetTextDefineType(TextDefineType::TableFieldNameDefine);
+									break;
+								}
+								lastElement = lastElement->LastValidElement();
+							}
+						}
+						else if (type == LuaAstNodeType::Identify)
+						{
+							//ignore
+						}
+					}
+				}
 				break;
 			}
 		case LuaAstNodeType::GeneralOperator:
@@ -1050,8 +1083,26 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameExpression(std::shared_pt
 
 	for (auto child : nameExpression->GetChildren())
 	{
-		DefaultHandle(child, env);
+		FormatSubExpressionNode(child, env);
 	}
+
+	if (_options.enable_name_style_check)
+	{
+		auto textRange = nameExpression->GetTextRange();
+		std::shared_ptr<FormatElement> lastElement = env->LastValidElement();
+		while (lastElement != nullptr)
+		{
+			if (lastElement->GetType() == FormatElementType::TextElement && lastElement->GetTextRange().EndOffset ==
+				textRange.EndOffset)
+			{
+				auto textElement = std::dynamic_pointer_cast<TextElement>(lastElement);
+				textElement->SetTextDefineType(TextDefineType::FunctionNameDefine);
+				break;
+			}
+			lastElement = lastElement->LastValidElement();
+		}
+	}
+
 	return env;
 }
 
@@ -1284,6 +1335,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 					env->Add<TextElement>(child);
 				}
 				break;
+			}
+		case LuaAstNodeType::Identify:
+			{
+				env->Add<TextElement>(child, TextDefineType::TableFieldNameDefine);
 			}
 		default:
 			{

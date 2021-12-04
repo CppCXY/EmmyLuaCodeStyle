@@ -31,7 +31,7 @@ target_sources(CodeService
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/AlignToFirstElement.h
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/KeepElement.h
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/SubExpressionElement.h
-	
+	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/TextDefineType.h
 	PRIVATE
 	${CodeService_SOURCE_DIR}/src/LuaFormatter.cpp	
 
