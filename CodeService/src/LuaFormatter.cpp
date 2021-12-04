@@ -1229,7 +1229,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalFunctionStatement(
 			}
 		case LuaAstNodeType::Identify:
 			{
-				env->AddChild(FormatNode(child));
+				env->Add<TextElement>(child, TextDefineType::FunctionNameDefine);
 				break;
 			}
 		case LuaAstNodeType::FunctionBody:
