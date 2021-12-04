@@ -152,7 +152,7 @@ bool TextElement::SnakeCase()
 			{
 				lowerCase = false;
 			}
-			else if(ch == '_' && _text.size() == 1)
+			else if (ch == '_' && _text.size() == 1)
 			{
 				return true;
 			}
@@ -163,7 +163,6 @@ bool TextElement::SnakeCase()
 		}
 		else if ((lowerCase && !::islower(ch)) || (!lowerCase && !::isupper(ch)))
 		{
-
 			if (ch == '_')
 			{
 				// 不允许双下划线
@@ -172,7 +171,7 @@ bool TextElement::SnakeCase()
 					return false;
 				}
 			}
-			else if(!::isdigit(ch))
+			else if (!::isdigit(ch))
 			{
 				return false;
 			}
@@ -203,7 +202,7 @@ bool TextElement::PascalCase()
 				}
 			}
 		}
-		// 我又没办法分词简单处理下
+			// 我又没办法分词简单处理下
 		else if (!::isalnum(ch))
 		{
 			return false;

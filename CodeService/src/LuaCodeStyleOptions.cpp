@@ -128,6 +128,47 @@ std::shared_ptr<LuaCodeStyleOptions> LuaCodeStyleOptions::ParseFromEditorConfig(
 			}
 		}
 	}
+
+	if (editorConfig->Exist("insert_final_newline"))
+	{
+		options->insert_final_newline = editorConfig->Get("insert_final_newline") == "true";
+	}
+
+	if (editorConfig->Exist("enable_name_style_check"))
+	{
+		options->enable_name_style_check = editorConfig->Get("enable_name_style_check") == "true";
+	}
+
+	std::vector<std::pair<std::string, NameStyle&>> styleList = {
+		{"local_name_define_style", options->local_name_define_style},
+		{"function_name_define_style", options->function_name_define_style},
+		{"table_field_name_define_style", options->table_field_name_define_style},
+	};
+
+	for (auto& styleOption : styleList)
+	{
+		if (editorConfig->Exist(styleOption.first))
+		{
+			std::string value = editorConfig->Get(styleOption.first);
+			if (value == "off")
+			{
+				styleOption.second = NameStyle::Off;
+			}
+			else if(value == "snake_case")
+			{
+				styleOption.second = NameStyle::SnakeCase;
+			}
+			else if(value == "camel_case")
+			{
+				styleOption.second = NameStyle::CamelCase;
+			}
+			else if(value == "pascal_case")
+			{
+				styleOption.second = NameStyle::PascalCase;
+			}
+		}
+	}
+
 	return options;
 }
 
