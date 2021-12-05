@@ -45,39 +45,39 @@ public:
 private:
 	static std::map<std::string, LuaTokenType, std::less<>> LuaReserved;
 
-	LuaTokenType llex();
+	LuaTokenType Lex();
 
-	int nextChar();
+	int NextChar();
 
-	void saveAndNext();
+	void SaveAndNext();
 
-	void save();
+	void Save();
 
-	int getCurrentChar();
+	int GetCurrentChar();
 
-	bool checkNext1(int ch);
+	bool CheckNext1(int ch);
 
-	bool checkNext2(std::string_view set);
+	bool CheckNext2(std::string_view set);
 
-	LuaTokenType readNumeral();
+	LuaTokenType ReadNumeral();
 
-	std::size_t skipSep();
+	std::size_t SkipSep();
 
-	void readLongString(std::size_t sep);
+	void ReadLongString(std::size_t sep);
 
-	void readString(int del);
+	void ReadString(int del);
 
-	void incLinenumber();
+	void IncLinenumber();
 
-	bool currentIsNewLine();
+	bool CurrentIsNewLine();
 
-	void resetBuffer();
+	void ResetBuffer();
 
-	std::string_view getSaveText() const;
+	std::string_view GetSaveText() const;
 
-	bool isReserved(std::string_view text);
+	bool IsReserved(std::string_view text);
 
-	void luaError(std::string_view message, TextRange range);
+	void PushLuaError(std::string_view message, TextRange range);
 
 	int _linenumber;
 
@@ -94,7 +94,7 @@ private:
 	// 注释单独处理
 	std::vector<LuaToken> _commentTokens;
 
-	std::vector<LuaError> _errors;
+	std::vector<::LuaError> _errors;
 
 	LuaToken _eosToken;
 

@@ -5,6 +5,7 @@
 #include "Util/format.h"
 #include "utf8.h"
 
+
 std::map<std::string, LuaTokenType, std::less<>> LuaTokenParser::LuaReserved = {
 	{"and", TK_AND},
 	{"break", TK_BREAK},
@@ -58,8 +59,8 @@ bool LuaTokenParser::Parse()
 {
 	while (true)
 	{
-		auto type = llex();
-		auto text = getSaveText();
+		auto type = Lex();
+		auto text = GetSaveText();
 
 		if (!text.empty())
 		{
@@ -76,7 +77,13 @@ bool LuaTokenParser::Parse()
 		{
 			break;
 		}
+
+		if(!_errors.empty())
+		{
+			return false;
+		}
 	}
+
 	return true;
 }
 
@@ -232,19 +239,19 @@ bool LuaTokenParser::HasError() const
 	return !_errors.empty();
 }
 
-LuaTokenType LuaTokenParser::llex()
+LuaTokenType LuaTokenParser::Lex()
 {
-	resetBuffer();
+	ResetBuffer();
 
 	for (;;)
 	{
-		int ch = getCurrentChar();
+		int ch = GetCurrentChar();
 		switch (ch)
 		{
 		case '\n':
 		case '\r':
 			{
-				incLinenumber();
+				IncLinenumber();
 				break;
 			}
 		case ' ':
@@ -252,56 +259,56 @@ LuaTokenType LuaTokenParser::llex()
 		case '\t':
 		case '\v':
 			{
-				nextChar();
+				NextChar();
 				break;
 			}
 		case '-':
 			{
-				saveAndNext();
-				if (getCurrentChar() != '-')
+				SaveAndNext();
+				if (GetCurrentChar() != '-')
 				{
 					return '-';
 				}
 				// is comment
-				saveAndNext();
+				SaveAndNext();
 
-				if (getCurrentChar() == '[')
+				if (GetCurrentChar() == '[')
 				{
-					std::size_t sep = skipSep();
+					std::size_t sep = SkipSep();
 					if (sep >= 2)
 					{
-						readLongString(sep);
+						ReadLongString(sep);
 						return TK_LONG_COMMENT;
 					}
 				}
 
 				// is short comment
-				while (!currentIsNewLine() && getCurrentChar() != EOZ)
+				while (!CurrentIsNewLine() && GetCurrentChar() != EOZ)
 				{
-					saveAndNext();
+					SaveAndNext();
 				}
 
 				return TK_SHORT_COMMENT;
 			}
 		case '[':
 			{
-				std::size_t sep = skipSep();
+				std::size_t sep = SkipSep();
 				if (sep >= 2)
 				{
-					readLongString(sep);
+					ReadLongString(sep);
 					return TK_STRING;
 				}
 				else if (sep == 0)
 				{
-					luaError("invalid long string delimiter", TextRange(_currentParseIndex, _currentParseIndex));
+					PushLuaError("invalid long string delimiter", TextRange(_currentParseIndex, _currentParseIndex));
 					return TK_STRING;
 				}
 				return '[';
 			}
 		case '=':
 			{
-				saveAndNext();
-				if (checkNext1('='))
+				SaveAndNext();
+				if (CheckNext1('='))
 				{
 					return TK_EQ;
 				}
@@ -312,12 +319,12 @@ LuaTokenType LuaTokenParser::llex()
 			}
 		case '<':
 			{
-				saveAndNext();
-				if (checkNext1('='))
+				SaveAndNext();
+				if (CheckNext1('='))
 				{
 					return TK_LE;
 				}
-				else if (checkNext1('<'))
+				else if (CheckNext1('<'))
 				{
 					return TK_SHL;
 				}
@@ -328,12 +335,12 @@ LuaTokenType LuaTokenParser::llex()
 			}
 		case '>':
 			{
-				saveAndNext();
-				if (checkNext1('='))
+				SaveAndNext();
+				if (CheckNext1('='))
 				{
 					return TK_GE;
 				}
-				else if (checkNext1('>'))
+				else if (CheckNext1('>'))
 				{
 					return TK_SHR;
 				}
@@ -344,8 +351,8 @@ LuaTokenType LuaTokenParser::llex()
 			}
 		case '/':
 			{
-				saveAndNext();
-				if (checkNext1('/'))
+				SaveAndNext();
+				if (CheckNext1('/'))
 				{
 					return TK_IDIV;
 				}
@@ -356,8 +363,8 @@ LuaTokenType LuaTokenParser::llex()
 			}
 		case '~':
 			{
-				saveAndNext();
-				if (checkNext1('='))
+				SaveAndNext();
+				if (CheckNext1('='))
 				{
 					return TK_NE;
 				}
@@ -368,8 +375,8 @@ LuaTokenType LuaTokenParser::llex()
 			}
 		case ':':
 			{
-				saveAndNext();
-				if (checkNext1(':'))
+				SaveAndNext();
+				if (CheckNext1(':'))
 				{
 					return TK_DBCOLON;
 				}
@@ -381,15 +388,15 @@ LuaTokenType LuaTokenParser::llex()
 		case '"':
 		case '\'':
 			{
-				readString(ch);
+				ReadString(ch);
 				return TK_STRING;
 			}
 		case '.':
 			{
-				saveAndNext();
-				if (checkNext1('.'))
+				SaveAndNext();
+				if (CheckNext1('.'))
 				{
-					if (checkNext1('.'))
+					if (CheckNext1('.'))
 					{
 						return TK_DOTS; /* '...' */
 					}
@@ -398,13 +405,13 @@ LuaTokenType LuaTokenParser::llex()
 						return TK_CONCAT;
 					}
 				}
-				else if (!lisdigit(getCurrentChar()))
+				else if (!lisdigit(GetCurrentChar()))
 				{
 					return '.';
 				}
 				else
 				{
-					return readNumeral();
+					return ReadNumeral();
 				}
 			}
 		case '0':
@@ -418,7 +425,7 @@ LuaTokenType LuaTokenParser::llex()
 		case '8':
 		case '9':
 			{
-				return readNumeral();
+				return ReadNumeral();
 			}
 		case EOZ:
 			{
@@ -426,14 +433,14 @@ LuaTokenType LuaTokenParser::llex()
 			}
 		case '#':
 			{
-				saveAndNext();
+				SaveAndNext();
 				// 只认为第一行的才是shebang
 				if (_linenumber == 0 && _tokens.empty())
 				{
 					// shebang
-					while (!currentIsNewLine() && getCurrentChar() != EOZ)
+					while (!CurrentIsNewLine() && GetCurrentChar() != EOZ)
 					{
-						saveAndNext();
+						SaveAndNext();
 					}
 
 					return TK_SHEBANG;
@@ -442,17 +449,17 @@ LuaTokenType LuaTokenParser::llex()
 			}
 		default:
 			{
-				if (lislalpha(getCurrentChar())) /* identifier or reserved word? */
+				if (lislalpha(GetCurrentChar())) /* identifier or reserved word? */
 				{
 					do
 					{
-						saveAndNext();
+						SaveAndNext();
 					}
-					while (lislalnum(getCurrentChar()));
+					while (lislalnum(GetCurrentChar()));
 
-					auto text = getSaveText();
+					auto text = GetSaveText();
 
-					if (isReserved(text))
+					if (IsReserved(text))
 					{
 						return LuaReserved.find(text)->second;
 					}
@@ -463,8 +470,8 @@ LuaTokenType LuaTokenParser::llex()
 				}
 				else /* single-char tokens ('+', '*', '%', '{', '}', ...) */
 				{
-					int c = getCurrentChar();
-					saveAndNext();
+					int c = GetCurrentChar();
+					SaveAndNext();
 					return c;
 				}
 			}
@@ -472,7 +479,7 @@ LuaTokenType LuaTokenParser::llex()
 	}
 }
 
-int LuaTokenParser::nextChar()
+int LuaTokenParser::NextChar()
 {
 	if (_currentParseIndex < _source.size())
 	{
@@ -484,17 +491,17 @@ int LuaTokenParser::nextChar()
 	}
 }
 
-void LuaTokenParser::saveAndNext()
+void LuaTokenParser::SaveAndNext()
 {
-	save();
-	int ch = nextChar();
+	Save();
+	int ch = NextChar();
 	if (ch == EOZ)
 	{
 		_hasEoz = true;
 	}
 }
 
-void LuaTokenParser::save()
+void LuaTokenParser::Save()
 {
 	if (!_hasSaveText)
 	{
@@ -504,7 +511,7 @@ void LuaTokenParser::save()
 	_buffIndex = _currentParseIndex;
 }
 
-int LuaTokenParser::getCurrentChar()
+int LuaTokenParser::GetCurrentChar()
 {
 	if (!_hasEoz && _currentParseIndex < _source.size())
 	{
@@ -514,11 +521,11 @@ int LuaTokenParser::getCurrentChar()
 	return EOZ;
 }
 
-bool LuaTokenParser::checkNext1(int ch)
+bool LuaTokenParser::CheckNext1(int ch)
 {
 	if (_source[_currentParseIndex] == ch)
 	{
-		saveAndNext();
+		SaveAndNext();
 		return true;
 	}
 	return false;
@@ -528,16 +535,16 @@ bool LuaTokenParser::checkNext1(int ch)
 ** Check whether current char is in set 'set' (with two chars) and
 ** saves it
 */
-bool LuaTokenParser::checkNext2(std::string_view set)
+bool LuaTokenParser::CheckNext2(std::string_view set)
 {
 	if (set.size() > 2)
 	{
 		return false;
 	}
-	int ch = getCurrentChar();
+	int ch = GetCurrentChar();
 	if (ch == set[0] || ch == set[1])
 	{
-		saveAndNext();
+		SaveAndNext();
 		return true;
 	}
 	return false;
@@ -556,26 +563,26 @@ bool LuaTokenParser::checkNext2(std::string_view set)
 **
 ** The caller might have already read an initial dot.
 */
-LuaTokenType LuaTokenParser::readNumeral()
+LuaTokenType LuaTokenParser::ReadNumeral()
 {
-	int first = getCurrentChar();
+	int first = GetCurrentChar();
 	const char* expo = "Ee";
-	saveAndNext();
+	SaveAndNext();
 
-	if (first == '0' && checkNext2("xX")) /* hexadecimal? */
+	if (first == '0' && CheckNext2("xX")) /* hexadecimal? */
 	{
 		expo = "Pp";
 	}
 
 	for (;;)
 	{
-		if (checkNext2(expo)) /* exponent mark? */
+		if (CheckNext2(expo)) /* exponent mark? */
 		{
-			checkNext2("-+"); /* optional exponent sign */
+			CheckNext2("-+"); /* optional exponent sign */
 		}
-		else if (lisxdigit(getCurrentChar()) || getCurrentChar() == '.') /* '%x|%.' */
+		else if (lisxdigit(GetCurrentChar()) || GetCurrentChar() == '.') /* '%x|%.' */
 		{
-			saveAndNext();
+			SaveAndNext();
 		}
 		else
 		{
@@ -583,23 +590,23 @@ LuaTokenType LuaTokenParser::readNumeral()
 		}
 	}
 
-	if (lislalpha(getCurrentChar())) /* is numeral touching a letter? */
+	if (lislalpha(GetCurrentChar())) /* is numeral touching a letter? */
 	{
 		// luajit
-		if (checkNext1('U'))
+		if (CheckNext1('U'))
 		{
-			if (checkNext1('L') && checkNext1('L'))
+			if (CheckNext1('L') && CheckNext1('L'))
 			{
 				return TK_INT;
 			}
 			else
 			{
-				luaError("unknown integer type", TextRange(_currentParseIndex, _currentParseIndex));
+				PushLuaError("unknown integer type", TextRange(_currentParseIndex, _currentParseIndex));
 			}
 		}
 		else
 		{
-			saveAndNext();
+			SaveAndNext();
 		}
 	}
 
@@ -614,49 +621,49 @@ LuaTokenType LuaTokenParser::readNumeral()
 ** return 1 if it is a single bracket (no '='s and no 2nd bracket);
 ** otherwise (an unfinished '[==...') return 0.
 */
-std::size_t LuaTokenParser::skipSep()
+std::size_t LuaTokenParser::SkipSep()
 {
 	std::size_t count = 0;
-	int ch = getCurrentChar();
+	int ch = GetCurrentChar();
 
-	saveAndNext();
+	SaveAndNext();
 
-	while (getCurrentChar() == '=')
+	while (GetCurrentChar() == '=')
 	{
-		saveAndNext();
+		SaveAndNext();
 		count++;
 	}
 
-	return getCurrentChar() == ch
+	return GetCurrentChar() == ch
 		       ? count + 2
 		       : (count == 0)
 		       ? 1
 		       : 0;
 }
 
-void LuaTokenParser::readLongString(std::size_t sep)
+void LuaTokenParser::ReadLongString(std::size_t sep)
 {
-	saveAndNext();
+	SaveAndNext();
 
-	if (currentIsNewLine())
+	if (CurrentIsNewLine())
 	{
-		incLinenumber();
+		IncLinenumber();
 	}
 
 	for (;;)
 	{
-		switch (getCurrentChar())
+		switch (GetCurrentChar())
 		{
 		case EOZ:
 			{
-				luaError("unfinished long string starting", TextRange(_currentParseIndex, _currentParseIndex));
+				PushLuaError("unfinished long string starting", TextRange(_currentParseIndex, _currentParseIndex));
 				return;
 			}
 		case ']':
 			{
-				if (skipSep() == sep)
+				if (SkipSep() == sep)
 				{
-					saveAndNext();
+					SaveAndNext();
 					return;
 				}
 				break;
@@ -664,53 +671,53 @@ void LuaTokenParser::readLongString(std::size_t sep)
 		case '\n':
 		case '\r':
 			{
-				save();
-				incLinenumber();
+				Save();
+				IncLinenumber();
 				break;
 			}
 		default:
 			{
-				saveAndNext();
+				SaveAndNext();
 			}
 		}
 	}
 }
 
-void LuaTokenParser::readString(int del)
+void LuaTokenParser::ReadString(int del)
 {
-	saveAndNext();
-	while (getCurrentChar() != del)
+	SaveAndNext();
+	while (GetCurrentChar() != del)
 	{
-		switch (getCurrentChar())
+		switch (GetCurrentChar())
 		{
 		case EOZ:
 		case '\n':
 		case '\r':
 			{
-				luaError("unfinished string", TextRange(_currentParseIndex, _currentParseIndex));
+				PushLuaError("unfinished string", TextRange(_currentParseIndex, _currentParseIndex));
 				return;
 			}
 		case '\\':
 			{
-				saveAndNext();
+				SaveAndNext();
 
-				switch (getCurrentChar())
+				switch (GetCurrentChar())
 				{
 				case EOZ:
-					luaError("unfinished string", TextRange(_currentParseIndex, _currentParseIndex));
+					PushLuaError("unfinished string", TextRange(_currentParseIndex, _currentParseIndex));
 					return;
 				case 'z':
 					{
-						saveAndNext();
-						while (lisspace(getCurrentChar()))
+						SaveAndNext();
+						while (lisspace(GetCurrentChar()))
 						{
-							if (currentIsNewLine())
+							if (CurrentIsNewLine())
 							{
-								incLinenumber();
+								IncLinenumber();
 							}
 							else
 							{
-								saveAndNext();
+								SaveAndNext();
 							}
 						}
 						goto no_save;
@@ -718,9 +725,9 @@ void LuaTokenParser::readString(int del)
 				case '\r':
 				case '\n':
 					{
-						if (currentIsNewLine())
+						if (CurrentIsNewLine())
 						{
-							incLinenumber();
+							IncLinenumber();
 						}
 						goto no_save;
 					}
@@ -728,23 +735,23 @@ void LuaTokenParser::readString(int del)
 				break;
 			}
 		}
-		saveAndNext();
+		SaveAndNext();
 		// 空语句
 	no_save:;
 	}
-	saveAndNext();
+	SaveAndNext();
 }
 
 
-void LuaTokenParser::incLinenumber()
+void LuaTokenParser::IncLinenumber()
 {
-	int old = getCurrentChar();
+	int old = GetCurrentChar();
 
-	nextChar();
+	NextChar();
 
-	if (currentIsNewLine() && getCurrentChar() != old)
+	if (CurrentIsNewLine() && GetCurrentChar() != old)
 	{
-		nextChar(); /* skip '\n\r' or '\r\n' */
+		NextChar(); /* skip '\n\r' or '\r\n' */
 	}
 
 	if (++_linenumber >= std::numeric_limits<int>::max())
@@ -757,20 +764,20 @@ void LuaTokenParser::incLinenumber()
 	_lineOffsetVec.push_back(static_cast<int>(_currentParseIndex));
 }
 
-bool LuaTokenParser::currentIsNewLine()
+bool LuaTokenParser::CurrentIsNewLine()
 {
-	int ch = getCurrentChar();
+	int ch = GetCurrentChar();
 	return ch == '\n' || ch == '\r';
 }
 
-void LuaTokenParser::resetBuffer()
+void LuaTokenParser::ResetBuffer()
 {
 	_hasSaveText = false;
 	_buffStart = 0;
 	_buffIndex = 0;
 }
 
-std::string_view LuaTokenParser::getSaveText() const
+std::string_view LuaTokenParser::GetSaveText() const
 {
 	if (_hasSaveText)
 	{
@@ -782,12 +789,12 @@ std::string_view LuaTokenParser::getSaveText() const
 	}
 }
 
-bool LuaTokenParser::isReserved(std::string_view text)
+bool LuaTokenParser::IsReserved(std::string_view text)
 {
 	return LuaReserved.find(text) != LuaReserved.end();
 }
 
-void LuaTokenParser::luaError(std::string_view message, TextRange range)
+void LuaTokenParser::PushLuaError(std::string_view message, TextRange range)
 {
 	_errors.emplace_back(message, range);
 }
