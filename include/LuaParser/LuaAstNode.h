@@ -7,14 +7,24 @@
 #include "TextRange.h"
 #include "LuaToken.h"
 
-class LuaAstNode
+class LuaAstVisitor;
+
+class LuaAstNode: public std::enable_shared_from_this<LuaAstNode>
 {
 public:
 	LuaAstNode(LuaAstNodeType type, const char* source);
 
 	LuaAstNode(LuaAstNodeType type, LuaToken& token);
 
+	~LuaAstNode();
+
 	std::shared_ptr<LuaAstNode> Copy();
+
+	std::shared_ptr<LuaAstNode> FindFirstOf(LuaAstNodeType type);
+
+	void AcceptChildren(LuaAstVisitor& visitor);
+
+	void Accept(LuaAstVisitor& visitor);
 
 	TextRange GetTextRange() const;
 
@@ -30,10 +40,13 @@ public:
 
 	// child会被加入为最底层的叶子节点
 	void AddLeafChild(std::shared_ptr<LuaAstNode> child);
+
+	std::shared_ptr<LuaAstNode> GetParent();
 private:
 	void addChildAfter(int index, std::shared_ptr<LuaAstNode> child);
 	void addChildBefore(int index, std::shared_ptr<LuaAstNode> child);
 
+	std::weak_ptr<LuaAstNode> _parent;
 	LuaAstNodeType _type;
 	std::string_view _text;
 

@@ -21,10 +21,7 @@ public:
 	
 private:
 	std::string TranslateNameStyle(NameStyle style);
-	bool NameStyleCheck(NameStyle style);
-	bool SnakeCase();
-	bool PascalCase();
-	bool CamelCase();
+
 	std::string_view _text;
 	TextDefineType _textDefineType;
 };

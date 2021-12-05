@@ -14,6 +14,7 @@
 #include "CodeService/FormatElement/LongExpressionLayoutElement.h"
 #include "CodeService/FormatElement/RangeFormatContext.h"
 #include "CodeService/FormatElement/SubExpressionElement.h"
+#include "CodeService/NameStyle/NameStyleChecker.h"
 
 bool nextMatch(int currentIndex, LuaAstNodeType type, const std::vector<std::shared_ptr<LuaAstNode>>& vec)
 {
@@ -74,6 +75,13 @@ std::vector<LuaDiagnosisInfo> LuaFormatter::GetDiagnosisInfos()
 
 	_env->DiagnosisCodeStyle(ctx);
 
+	if (_options.enable_name_style_check) {
+		NameStyleChecker checker(ctx);
+		auto chunkAst = _parser->GetAst();
+		chunkAst->AcceptChildren(checker);
+		auto result = checker.Analysis();
+	}
+	 
 	return ctx.GetDiagnosisInfos();
 }
 
@@ -504,35 +512,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignLeftExpressionList(std:
 				auto subEnv = std::make_shared<SubExpressionElement>();
 				env->AddChild(FormatExpression(node, subEnv));
 				env->Add<KeepElement>(0);
-
-				if (_options.enable_name_style_check)
-				{
-					if (!node->GetChildren().empty())
-					{
-						auto type = node->GetChildren().back()->GetType();
-						if (type == LuaAstNodeType::IndexExpression)
-						{
-							auto textRange = node->GetTextRange();
-							std::shared_ptr<FormatElement> lastElement = env->LastValidElement();
-							while (lastElement != nullptr)
-							{
-								if (lastElement->GetType() == FormatElementType::TextElement && lastElement->
-									GetTextRange().EndOffset ==
-									textRange.EndOffset)
-								{
-									auto textElement = std::dynamic_pointer_cast<TextElement>(lastElement);
-									textElement->SetTextDefineType(TextDefineType::TableFieldNameDefine);
-									break;
-								}
-								lastElement = lastElement->LastValidElement();
-							}
-						}
-						else if (type == LuaAstNodeType::Identify)
-						{
-							//ignore
-						}
-					}
-				}
 				break;
 			}
 		case LuaAstNodeType::GeneralOperator:
@@ -1084,23 +1063,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameExpression(std::shared_pt
 	for (auto child : nameExpression->GetChildren())
 	{
 		FormatSubExpressionNode(child, env);
-	}
-
-	if (_options.enable_name_style_check)
-	{
-		auto textRange = nameExpression->GetTextRange();
-		std::shared_ptr<FormatElement> lastElement = env->LastValidElement();
-		while (lastElement != nullptr)
-		{
-			if (lastElement->GetType() == FormatElementType::TextElement && lastElement->GetTextRange().EndOffset ==
-				textRange.EndOffset)
-			{
-				auto textElement = std::dynamic_pointer_cast<TextElement>(lastElement);
-				textElement->SetTextDefineType(TextDefineType::FunctionNameDefine);
-				break;
-			}
-			lastElement = lastElement->LastValidElement();
-		}
 	}
 
 	return env;

@@ -27,6 +27,7 @@ target_sources(LuaParser PUBLIC
 	${LuaParser_SOURCE_DIR}/src/LuaParseException.cpp
 	${LuaParser_SOURCE_DIR}/src/LuaAstNode.cpp
 	${LuaParser_SOURCE_DIR}/src/TextRange.cpp
+	${LuaParser_SOURCE_DIR}/src/LuaAstVisitor.cpp
 	
 	${LuaParser_SOURCE_DIR}/src/LuaDefine.h
 	${LuaParser_SOURCE_DIR}/src/LuaTokenTypeDetail.h

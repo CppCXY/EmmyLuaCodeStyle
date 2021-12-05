@@ -1,7 +1,12 @@
 ﻿#include "LuaParser/LuaAstNode.h"
 
+#include <iostream>
+
+#include "LuaParser/LuaAstVisitor.h"
+
 LuaAstNode::LuaAstNode(LuaAstNodeType type, const char* source)
-	: _type(type),
+	: _parent(),
+	  _type(type),
 	  _text(source, 0),
 	  _source(source),
 	  _textRange(0, 0)
@@ -18,6 +23,10 @@ LuaAstNode::LuaAstNode(LuaAstNodeType type, LuaToken& token)
 	_text = token.Text;
 }
 
+LuaAstNode::~LuaAstNode()
+{
+}
+
 std::shared_ptr<LuaAstNode> LuaAstNode::Copy()
 {
 	auto copyNode = std::make_shared<LuaAstNode>(GetType(), _source);
@@ -27,6 +36,32 @@ std::shared_ptr<LuaAstNode> LuaAstNode::Copy()
 	copyNode->_error = _error;
 
 	return copyNode;
+}
+
+std::shared_ptr<LuaAstNode> LuaAstNode::FindFirstOf(LuaAstNodeType type)
+{
+	for (auto& child : _children)
+	{
+		if (child->GetType() == type)
+		{
+			return child;
+		}
+	}
+
+	return nullptr;
+}
+
+void LuaAstNode::AcceptChildren(LuaAstVisitor& visitor)
+{
+	for (auto& child : _children)
+	{
+		visitor.Visit(child);
+	}
+}
+
+void LuaAstNode::Accept(LuaAstVisitor& visitor)
+{
+	visitor.Visit(shared_from_this());
 }
 
 TextRange LuaAstNode::GetTextRange() const
@@ -81,6 +116,7 @@ void LuaAstNode::AddChild(std::shared_ptr<LuaAstNode> child)
 	}
 
 	_children.push_back(child);
+	child->_parent = weak_from_this();
 	_text = std::string_view(_source + _textRange.StartOffset, _textRange.EndOffset - _textRange.StartOffset + 1);
 }
 
@@ -99,7 +135,7 @@ void LuaAstNode::AddLeafChild(std::shared_ptr<LuaAstNode> child)
 	auto childTextRange = child->GetTextRange();
 
 	// 防止无限递归
-	if(_textRange.StartOffset == childTextRange.StartOffset && _textRange.EndOffset == childTextRange.EndOffset)
+	if (_textRange.StartOffset == childTextRange.StartOffset && _textRange.EndOffset == childTextRange.EndOffset)
 	{
 		return;
 	}
@@ -130,6 +166,15 @@ void LuaAstNode::AddLeafChild(std::shared_ptr<LuaAstNode> child)
 			return addChildBefore(index, child);
 		}
 	}
+}
+
+std::shared_ptr<LuaAstNode> LuaAstNode::GetParent()
+{
+	if(!_parent.expired())
+	{
+		return _parent.lock();
+	}
+	return nullptr;
 }
 
 void LuaAstNode::addChildAfter(int index, std::shared_ptr<LuaAstNode> child)

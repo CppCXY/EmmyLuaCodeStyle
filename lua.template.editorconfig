@@ -42,6 +42,6 @@ insert_final_newline = true
 # the following is name style check rule 
 # optional off/camel_case/snake_case/pascal_case
 enable_name_style_check = false
-local_name_define_style = off
+local_name_define_style = snake_case
 function_name_define_style = off
 table_field_name_define_style = off
