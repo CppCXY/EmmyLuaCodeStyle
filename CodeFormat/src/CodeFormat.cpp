@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <fstream>
+#include "CodeService/LuaEditorConfig.h"
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"
 #include "CodeService/LuaFormatter.h"
@@ -26,11 +27,12 @@ int main(int argc, char** argv)
 
 	cmd.Add<std::string>("file", "f", "Specify the input file");
 	cmd.Add<int>("stdin", "i", "Read from stdin and specify read size");
+	cmd.Add<std::string>("workspace", "w", "Specify a directory for diagnosis(not for format)");
 	cmd.Add<std::string>("config", "c",
 	                     "Specify editorconfig file, it decides on the effect of formatting or diagnosis");
 	cmd.Add<std::string>("outfile", "o",
 	                     "Specify output file");
-
+	cmd.Add<bool>("diagnosis-as-error", "diagnosis-as-error", "if exist error or diagnosis info , return -1");
 	if (!cmd.Parse(argc, argv))
 	{
 		cmd.PrintUsage();
@@ -65,7 +67,14 @@ int main(int argc, char** argv)
 	if (!cmd.Get<std::string>("config").empty())
 	{
 		auto editorConfig = LuaEditorConfig::LoadFromFile(cmd.Get<std::string>("config"));
-		options = LuaCodeStyleOptions::ParseFromEditorConfig(editorConfig);
+		if (!cmd.Get<std::string>("file").empty())
+		{
+			options = editorConfig->Generate(cmd.Get<std::string>("file"));
+		}
+		else
+		{
+			options = editorConfig->Generate(cmd.Get<std::string>(""));
+		}
 	}
 	else
 	{
@@ -98,6 +107,10 @@ int main(int argc, char** argv)
 		{
 			std::cout << format("{} from {}:{} to {}:{}", d.Message, d.Range.Start.Line, d.Range.Start.Character,
 			                    d.Range.End.Line, d.Range.End.Character) << std::endl;
+		}
+		if (cmd.Get<bool>("diagnosis-as-error"))
+		{
+			return diagnosis.empty() ? 0 : -1;
 		}
 	}
 	return 0;

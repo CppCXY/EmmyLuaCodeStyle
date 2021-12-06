@@ -3,8 +3,6 @@
 #include <string>
 #include <string_view>
 #include <memory>
-#include <map>
-#include "Util/LuaEditorConfig.h"
 
 class FormatElement;
 
@@ -25,7 +23,6 @@ enum class NameStyle
 class LuaCodeStyleOptions
 {
 public:
-	static std::shared_ptr<LuaCodeStyleOptions> ParseFromEditorConfig(std::shared_ptr<LuaEditorConfig> editorConfig);
 	LuaCodeStyleOptions();
 	/*
 	 * 缩进风格

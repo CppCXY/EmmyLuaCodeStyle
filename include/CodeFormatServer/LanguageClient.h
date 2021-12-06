@@ -3,6 +3,7 @@
 #include <memory>
 #include "Session/IOSession.h"
 #include "CodeService/LuaCodeStyleOptions.h"
+#include "CodeService/LuaEditorConfig.h"
 #include "LuaParser/LuaParser.h"
 
 class LanguageClient
@@ -22,9 +23,9 @@ public:
 
 	void ReleaseFile(std::string_view uri);
 
-	void DiagnosticFile(const std::string_view uri);
+	void DiagnosticFile(std::string_view uri);
 
-	std::shared_ptr<LuaParser> GetFileParser(const std::string_view uri);
+	std::shared_ptr<LuaParser> GetFileParser(std::string_view uri);
 
 	void Run();
 
@@ -38,7 +39,7 @@ private:
 	// uri 到file ast的映射
 	std::map<std::string, std::shared_ptr<LuaParser>, std::less<>> _fileMap;
 
-	std::vector<std::pair<std::string, std::shared_ptr<LuaCodeStyleOptions>>> _optionsVector;
+	std::vector<std::pair<std::string, std::shared_ptr<LuaEditorConfig>>> _editorConfigVector;
 
 	std::shared_ptr<LuaCodeStyleOptions> _defaultOptions;
 };

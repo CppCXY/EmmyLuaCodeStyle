@@ -1,5 +1,6 @@
 #include "CodeFormatServer/LanguageClient.h"
 
+#include "CodeService/LuaEditorConfig.h"
 #include "CodeService/LuaFormatter.h"
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"
@@ -130,12 +131,12 @@ std::shared_ptr<LuaCodeStyleOptions> LanguageClient::GetOptions(std::string_view
 {
 	std::size_t matchLength = 0;
 	std::shared_ptr<LuaCodeStyleOptions> options = _defaultOptions;
-	for (auto it = _optionsVector.begin(); it != _optionsVector.end(); it++)
+	for (auto it = _editorConfigVector.begin(); it != _editorConfigVector.end(); it++)
 	{
 		if (uri.starts_with(it->first) && it->first.size() > matchLength)
 		{
 			matchLength = it->first.size();
-			options = it->second;
+			options = it->second->Generate(uri);
 		}
 	}
 
@@ -144,35 +145,31 @@ std::shared_ptr<LuaCodeStyleOptions> LanguageClient::GetOptions(std::string_view
 
 void LanguageClient::UpdateOptions(std::string_view workspaceUri, std::string_view configPath)
 {
-	for (auto& pair : _optionsVector)
+	for (auto& pair : _editorConfigVector)
 	{
 		if (pair.first == workspaceUri)
 		{
-			pair.second = LuaCodeStyleOptions::ParseFromEditorConfig(
-				LuaEditorConfig::LoadFromFile(std::string(configPath)));
+			pair.second = LuaEditorConfig::LoadFromFile(std::string(configPath));
+			pair.second->SetWorkspace(workspaceUri);
 			return;
 		}
 	}
 
-	_optionsVector.push_back({
+	_editorConfigVector.push_back({
 		std::string(workspaceUri),
-		LuaCodeStyleOptions::ParseFromEditorConfig(LuaEditorConfig::LoadFromFile(std::string(configPath)))
+		LuaEditorConfig::LoadFromFile(std::string(configPath))
 	});
+	_editorConfigVector.back().second->SetWorkspace(workspaceUri);
 }
 
 void LanguageClient::RemoveOptions(std::string_view workspaceUri)
 {
-	for (auto it = _optionsVector.begin(); it != _optionsVector.end(); it++)
+	for (auto it = _editorConfigVector.begin(); it != _editorConfigVector.end(); it++)
 	{
 		if (it->first == workspaceUri)
 		{
-			_optionsVector.erase(it);
+			_editorConfigVector.erase(it);
 			break;
 		}
 	}
 }
-
-// LuaCodeStyleOptions& LanguageClient::GetOptions()
-// {
-// 	return _optionsVector;
-// }

@@ -2,12 +2,6 @@
 #include <iostream>
 #include "Util/format.h"
 
-// bool checkNext(std::string_view source, std::string_view checkString, std::size_t start)
-// {
-//
-// }
-
-
 void CommandLine::AddTarget(const std::string& name)
 {
 	_targets.insert(name);

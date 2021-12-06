@@ -54,6 +54,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/DiagnosisContext.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/RangeFormatContext.cpp	
 	${CodeService_SOURCE_DIR}/src/LuaCodeStyleOptions.cpp
+	${CodeService_SOURCE_DIR}/src/LuaEditorConfig.cpp
 	${CodeService_SOURCE_DIR}/src/LanguageTranslator.cpp
 	${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleChecker.cpp
 )
