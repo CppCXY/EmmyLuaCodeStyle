@@ -37,6 +37,9 @@ public:
 
 	bool IsEmptyLine(int line);
 
+	void SetFilename(std::string_view filename);
+
+	std::string_view GetFilename();
 private:
 	bool BlockFollow(bool withUntil = false);
 
@@ -162,4 +165,6 @@ private:
 	std::shared_ptr<LuaAstNode> _chunkAstNode;
 
 	std::vector<LuaError> _errors;
+
+	std::string _filename;
 };

@@ -19,7 +19,7 @@ public:
 	class Scope
 	{
 	public:
-
+		std::map<std::string, std::shared_ptr<CheckElement>, std::less<>> LocalVariableMap;
 	};
 
 	NameStyleChecker(DiagnosisContext& ctx);
@@ -36,7 +36,7 @@ protected:
 	void VisitReturnStatement(const std::shared_ptr<LuaAstNode>& node) override;
 	void VisitBlock(const std::shared_ptr<LuaAstNode>& node) override;
 private:
-	void RecordLocalVariable(std::shared_ptr<LuaAstNode> identify);
+	void RecordLocalVariable(std::shared_ptr<CheckElement> checkElement);
 	bool InTopBlock(std::shared_ptr<LuaAstNode> chunkBlockStatement);
 	bool IsGlobal(std::shared_ptr<LuaAstNode> node);
 	bool SnakeCase(std::string_view source);
@@ -47,7 +47,7 @@ private:
 
 	// block到作用域的映射
 	std::map<std::shared_ptr<LuaAstNode>, Scope> _scopeMap;
-	std::vector<CheckElement> _nameStyleCheckVector;
+	std::vector<std::shared_ptr<CheckElement>> _nameStyleCheckVector;
 	std::string_view _moduleName;
 
 };

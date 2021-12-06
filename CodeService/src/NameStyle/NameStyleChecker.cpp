@@ -1,5 +1,7 @@
 ﻿#include "CodeService/NameStyle/NameStyleChecker.h"
 #include <algorithm>
+#include "Util/format.h"
+#include "CodeService/LanguageTranslator.h"
 
 NameStyleChecker::NameStyleChecker(DiagnosisContext& ctx)
 	: _ctx(ctx)
@@ -8,6 +10,21 @@ NameStyleChecker::NameStyleChecker(DiagnosisContext& ctx)
 
 std::vector<LuaDiagnosisInfo> NameStyleChecker::Analysis()
 {
+	for (auto checkElement : _nameStyleCheckVector)
+	{
+		if (checkElement->Type == NameDefineType::ModuleDefineName)
+		{
+			auto parser = _ctx.GetParser();
+
+			auto filename = parser->GetFilename();
+
+			if (checkElement->Node->GetText() != filename)
+			{
+				_ctx.PushDiagnosis(format(LText("module name must be {}"), filename),
+				                   checkElement->Node->GetTextRange());
+			}
+		}
+	}
 	// if (ctx.GetOptions().enable_name_style_check)
 	// {
 	// 	switch (_textDefineType)
@@ -95,7 +112,9 @@ void NameStyleChecker::VisitLocalStatement(const std::shared_ptr<LuaAstNode>& lo
 			auto nameIdentify = nameVector[index];
 			if (index >= expressionVector.size())
 			{
-				_nameStyleCheckVector.push_back({NameDefineType::LocalVariableName, nameIdentify});
+				auto checkElement = std::make_shared<CheckElement>(NameDefineType::LocalVariableName, nameIdentify);
+				_nameStyleCheckVector.push_back(checkElement);
+				RecordLocalVariable(checkElement);
 				continue;
 			}
 			auto expression = expressionVector[index];
@@ -110,20 +129,27 @@ void NameStyleChecker::VisitLocalStatement(const std::shared_ptr<LuaAstNode>& lo
 					if (methodNameNode->GetText() == "require" || methodNameNode->GetText() == "import")
 					{
 						auto callArgsList = callExpression->FindFirstOf(LuaAstNodeType::CallArgList);
-						_nameStyleCheckVector.push_back({NameDefineType::ImportModuleName, nameIdentify, callArgsList});
+
+						auto checkElement = std::make_shared<CheckElement>(
+							NameDefineType::ImportModuleName, nameIdentify, callArgsList);
+						_nameStyleCheckVector.push_back(checkElement);
+						RecordLocalVariable(checkElement);
 						continue;
 					}
 					else if (methodNameNode->GetText() == "Class" || methodNameNode->GetText() == "class")
 					{
 						auto callArgsList = callExpression->FindFirstOf(LuaAstNodeType::CallArgList);
-						_nameStyleCheckVector.push_back({
-							NameDefineType::ClassVariableName, nameIdentify, callArgsList
-						});
+						auto checkElement = std::make_shared<CheckElement>(
+							NameDefineType::ClassVariableName, nameIdentify, callArgsList);
+						_nameStyleCheckVector.push_back(checkElement);
+						RecordLocalVariable(checkElement);
 						continue;
 					}
 				}
 			}
-			_nameStyleCheckVector.push_back({NameDefineType::LocalVariableName, nameIdentify});
+			auto checkElement = std::make_shared<CheckElement>(NameDefineType::LocalVariableName, nameIdentify);
+			_nameStyleCheckVector.push_back(checkElement);
+			RecordLocalVariable(checkElement);
 		}
 	}
 	else if (nameDefineList)
@@ -132,7 +158,9 @@ void NameStyleChecker::VisitLocalStatement(const std::shared_ptr<LuaAstNode>& lo
 		{
 			if (nameIdentify->GetType() == LuaAstNodeType::Identify)
 			{
-				_nameStyleCheckVector.push_back({NameDefineType::LocalVariableName, nameIdentify});
+				auto checkElement = std::make_shared<CheckElement>(NameDefineType::LocalVariableName, nameIdentify);
+				_nameStyleCheckVector.push_back(checkElement);
+				RecordLocalVariable(checkElement);
 			}
 		}
 	}
@@ -144,7 +172,7 @@ void NameStyleChecker::VisitParamList(const std::shared_ptr<LuaAstNode>& paramLi
 	{
 		if (param->GetType() == LuaAstNodeType::Identify)
 		{
-			_nameStyleCheckVector.push_back({NameDefineType::ParamName, param});
+			_nameStyleCheckVector.push_back(std::make_shared<CheckElement>(NameDefineType::ParamName, param));
 		}
 	}
 }
@@ -155,7 +183,7 @@ void NameStyleChecker::VisitLocalFunctionStatement(const std::shared_ptr<LuaAstN
 	{
 		if (child->GetType() == LuaAstNodeType::Identify)
 		{
-			_nameStyleCheckVector.push_back({NameDefineType::LocalFunctionName, child});
+			_nameStyleCheckVector.push_back(std::make_shared<CheckElement>(NameDefineType::LocalFunctionName, child));
 			break;
 		}
 	}
@@ -184,7 +212,8 @@ void NameStyleChecker::VisitFunctionStatement(const std::shared_ptr<LuaAstNode>&
 			if (lastElement && lastElement->GetType() == LuaAstNodeType::Identify
 				|| lastElement->GetType() == LuaAstNodeType::PrimaryExpression)
 			{
-				_nameStyleCheckVector.push_back({NameDefineType::FunctionDefineName, lastElement});
+				_nameStyleCheckVector.push_back(
+					std::make_shared<CheckElement>(NameDefineType::FunctionDefineName, lastElement));
 			}
 		}
 	}
@@ -203,7 +232,8 @@ void NameStyleChecker::VisitAssignment(const std::shared_ptr<LuaAstNode>& assign
 			{
 				if (IsGlobal(expressionFirstChild))
 				{
-					_nameStyleCheckVector.push_back({NameDefineType::GlobalVariableDefineName, expressionFirstChild});
+					_nameStyleCheckVector.push_back(
+						std::make_shared<CheckElement>(NameDefineType::GlobalVariableDefineName, expressionFirstChild));
 				}
 			}
 			else if (expressionFirstChild->GetType() == LuaAstNodeType::IndexExpression)
@@ -224,7 +254,8 @@ void NameStyleChecker::VisitAssignment(const std::shared_ptr<LuaAstNode>& assign
 
 				if (lastElement && lastElement->GetType() == LuaAstNodeType::Identify)
 				{
-					_nameStyleCheckVector.push_back({NameDefineType::FunctionDefineName, lastElement});
+					_nameStyleCheckVector.push_back(
+						std::make_shared<CheckElement>(NameDefineType::FunctionDefineName, lastElement));
 				}
 			}
 		}
@@ -237,7 +268,7 @@ void NameStyleChecker::VisitTableField(const std::shared_ptr<LuaAstNode>& tableF
 
 	if (identify)
 	{
-		_nameStyleCheckVector.push_back({NameDefineType::TableFieldDefineName, identify});
+		_nameStyleCheckVector.push_back(std::make_shared<CheckElement>(NameDefineType::TableFieldDefineName, identify));
 	}
 }
 
@@ -249,9 +280,23 @@ void NameStyleChecker::VisitReturnStatement(const std::shared_ptr<LuaAstNode>& r
 		if (expressionList && !expressionList->GetChildren().empty())
 		{
 			auto firstReturnExpression = expressionList->GetChildren().front();
-			if (firstReturnExpression->GetType() == LuaAstNodeType::PrimaryExpression)
+			if (firstReturnExpression->GetType() == LuaAstNodeType::Expression)
 			{
-				auto block = returnStatement->GetParent();
+				auto primaryReturnIdentify = firstReturnExpression->FindFirstOf(LuaAstNodeType::PrimaryExpression);
+				if (primaryReturnIdentify)
+				{
+					auto block = returnStatement->GetParent();
+
+					if (_scopeMap.count(block))
+					{
+						auto& scope = _scopeMap[block];
+						auto it = scope.LocalVariableMap.find(primaryReturnIdentify->GetText());
+						if (it != scope.LocalVariableMap.end())
+						{
+							it->second->Type = NameDefineType::ModuleDefineName;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -262,8 +307,23 @@ void NameStyleChecker::VisitBlock(const std::shared_ptr<LuaAstNode>& block)
 	_scopeMap.insert({block, Scope()});
 }
 
-void NameStyleChecker::RecordLocalVariable(std::shared_ptr<LuaAstNode> identify)
+void NameStyleChecker::RecordLocalVariable(std::shared_ptr<CheckElement> checkElement)
 {
+	auto node = checkElement->Node;
+	auto parent = node->GetParent();
+	while (parent)
+	{
+		if (parent->GetType() == LuaAstNodeType::Block)
+		{
+			if (_scopeMap.count(parent))
+			{
+				auto& scope = _scopeMap[parent];
+				scope.LocalVariableMap.insert({std::string(node->GetText()), checkElement});
+			}
+			break;
+		}
+		parent = parent->GetParent();
+	}
 }
 
 bool NameStyleChecker::InTopBlock(std::shared_ptr<LuaAstNode> chunkBlockStatement)
@@ -279,6 +339,26 @@ bool NameStyleChecker::InTopBlock(std::shared_ptr<LuaAstNode> chunkBlockStatemen
 
 bool NameStyleChecker::IsGlobal(std::shared_ptr<LuaAstNode> node)
 {
+	auto identifyText = node->GetText();
+
+	auto parent = node->GetParent();
+	while (parent)
+	{
+		if (parent->GetType() == LuaAstNodeType::Block)
+		{
+			if (_scopeMap.count(parent))
+			{
+				auto& scope = _scopeMap[parent];
+				auto it = scope.LocalVariableMap.find(identifyText);
+				if (it != scope.LocalVariableMap.end())
+				{
+					return false;
+				}
+			}
+		}
+		parent = parent->GetParent();
+	}
+
 	return true;
 }
 

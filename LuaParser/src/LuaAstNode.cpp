@@ -5,8 +5,7 @@
 #include "LuaParser/LuaAstVisitor.h"
 
 LuaAstNode::LuaAstNode(LuaAstNodeType type, const char* source)
-	: _parent(),
-	  _type(type),
+	: _type(type),
 	  _text(source, 0),
 	  _source(source),
 	  _textRange(0, 0)
@@ -170,7 +169,7 @@ void LuaAstNode::AddLeafChild(std::shared_ptr<LuaAstNode> child)
 
 std::shared_ptr<LuaAstNode> LuaAstNode::GetParent()
 {
-	if(!_parent.expired())
+	if (!_parent.expired())
 	{
 		return _parent.lock();
 	}

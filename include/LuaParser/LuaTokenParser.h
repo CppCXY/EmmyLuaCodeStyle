@@ -42,6 +42,7 @@ public:
 	std::vector<LuaError>& GetErrors();
 
 	bool HasError() const;
+
 private:
 	static std::map<std::string, LuaTokenType, std::less<>> LuaReserved;
 

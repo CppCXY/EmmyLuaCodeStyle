@@ -46,7 +46,6 @@ private:
 	void addChildAfter(int index, std::shared_ptr<LuaAstNode> child);
 	void addChildBefore(int index, std::shared_ptr<LuaAstNode> child);
 
-	std::weak_ptr<LuaAstNode> _parent;
 	LuaAstNodeType _type;
 	std::string_view _text;
 
@@ -54,4 +53,5 @@ private:
 	TextRange _textRange;
 	std::vector<std::shared_ptr<LuaAstNode>> _children;
 	std::string _error;
+	std::weak_ptr<LuaAstNode> _parent;
 };

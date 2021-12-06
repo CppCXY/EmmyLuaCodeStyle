@@ -20,7 +20,9 @@ std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 	{
 		std::stringstream s;
 		s << fin.rdbuf();
-		return LoadFromBuffer(s.str());
+		auto parser = LoadFromBuffer(s.str());
+		parser->SetFilename(filePath.filename().string());
+		return parser;
 	}
 
 	return nullptr;
@@ -92,6 +94,18 @@ std::string_view LuaParser::GetSource()
 bool LuaParser::IsEmptyLine(int line)
 {
 	return _tokenParser->IsEmptyLine(line);
+}
+
+void LuaParser::SetFilename(std::string_view filename)
+{
+	std::filesystem::path path(filename);
+	
+	_filename = path.replace_extension().string();
+}
+
+std::string_view LuaParser::GetFilename()
+{
+	return _filename;
 }
 
 void LuaParser::BuildAstWithComment()

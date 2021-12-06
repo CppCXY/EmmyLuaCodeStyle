@@ -45,6 +45,8 @@ void LanguageClient::SendNotification(std::string_view method, std::shared_ptr<v
 
 void LanguageClient::CacheFile(std::string_view uri, std::shared_ptr<LuaParser> parser)
 {
+	std::filesystem::path path(uri);
+	parser->SetFilename(path.filename().string());
 	_fileMap[std::string(uri)] = parser;
 }
 
