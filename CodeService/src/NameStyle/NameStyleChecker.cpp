@@ -3,6 +3,15 @@
 #include "Util/format.h"
 #include "CodeService/LanguageTranslator.h"
 
+NameStyleChecker::CheckElement::CheckElement(NameDefineType type, std::shared_ptr<LuaAstNode> node,
+                                             std::shared_ptr<LuaAstNode> extraInfoNode)
+	: Type(type),
+	  Node(node),
+	  ExtraInfoNode(extraInfoNode)
+
+{
+}
+
 NameStyleChecker::NameStyleChecker(DiagnosisContext& ctx)
 	: _ctx(ctx)
 {

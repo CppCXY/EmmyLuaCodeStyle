@@ -11,6 +11,8 @@ public:
 	class CheckElement
 	{
 	public:
+		CheckElement(NameDefineType type, std::shared_ptr<LuaAstNode> node,
+		             std::shared_ptr<LuaAstNode> extraInfoNode = nullptr);
 		NameDefineType Type;
 		std::shared_ptr<LuaAstNode> Node;
 		std::shared_ptr<LuaAstNode> ExtraInfoNode = nullptr;
@@ -49,5 +51,4 @@ private:
 	std::map<std::shared_ptr<LuaAstNode>, Scope> _scopeMap;
 	std::vector<std::shared_ptr<CheckElement>> _nameStyleCheckVector;
 	std::string_view _moduleName;
-
 };
