@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <climits>
+
 const int FIRST_RESERVED = UCHAR_MAX + 1;
 
 enum LuaTokenTypeDetail : int

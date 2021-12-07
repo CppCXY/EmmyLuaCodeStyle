@@ -1,7 +1,7 @@
 ﻿#include "LuaParser/LuaTokenParser.h"
 #include <limits>
 #include "LuaDefine.h"
-#include "LuaTokenTypeDetail.h"
+#include "LuaParser/LuaTokenTypeDetail.h"
 #include "Util/format.h"
 #include "utf8.h"
 

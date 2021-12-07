@@ -3,7 +3,7 @@
 #include <sstream>
 #include <filesystem>
 #include "LuaDefine.h"
-#include "LuaTokenTypeDetail.h"
+#include "LuaParser/LuaTokenTypeDetail.h"
 #include "LuaParser/LuaOperatorType.h"
 #include "Util/format.h"
 #include "LuaParser/LuaParseException.h"

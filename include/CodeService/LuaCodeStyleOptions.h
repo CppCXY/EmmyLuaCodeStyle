@@ -5,6 +5,7 @@
 #include <memory>
 
 class FormatElement;
+class NameStyleRuleMatcher;
 
 enum class IndentStyle
 {
@@ -24,6 +25,7 @@ class LuaCodeStyleOptions
 {
 public:
 	LuaCodeStyleOptions();
+
 	/*
 	 * 缩进风格
 	 */
@@ -104,10 +106,15 @@ public:
 
 	// 命名风格检查
 	bool enable_name_style_check = false;
-	NameStyle local_name_define_style = NameStyle::Off;
-	NameStyle function_name_define_style = NameStyle::Off;
-	NameStyle table_field_name_define_style = NameStyle::Off;
-	// global_variable_name_define_style = off
-	// local_require_module_name_define_style = off
-	// local_module_or_class_name_define = off
+	std::shared_ptr<NameStyleRuleMatcher> local_name_define_style;
+	std::shared_ptr<NameStyleRuleMatcher> function_name_define_style;
+	std::shared_ptr<NameStyleRuleMatcher> table_field_name_define_style;
+	std::shared_ptr<NameStyleRuleMatcher> global_variable_name_define_style;
+	std::shared_ptr<NameStyleRuleMatcher> module_name_define_style;
+	std::shared_ptr<NameStyleRuleMatcher> require_module_name_style;
+	std::shared_ptr<NameStyleRuleMatcher> class_name_define_style;
+
+private:
+
+	void SetDefault();
 };

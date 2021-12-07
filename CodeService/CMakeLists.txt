@@ -57,6 +57,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/LuaEditorConfig.cpp
 	${CodeService_SOURCE_DIR}/src/LanguageTranslator.cpp
 	${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleChecker.cpp
+	${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleRuleMatcher.cpp
 )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
