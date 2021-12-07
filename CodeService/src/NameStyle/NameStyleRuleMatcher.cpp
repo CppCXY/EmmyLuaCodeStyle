@@ -6,56 +6,84 @@
 std::shared_ptr<NameStyleRuleMatcher> NameStyleRuleMatcher::ParseFrom(std::string_view rule)
 {
 	auto matcher = std::make_shared<NameStyleRuleMatcher>();
-	matcher->SetRule(rule);
-	matcher->ParseRule();
+	matcher->ParseRule(rule);
 	return matcher;
 }
 
 NameStyleRuleMatcher::NameStyleRuleMatcher()
-	: _tokenParser(nullptr)
 {
 }
 
-void NameStyleRuleMatcher::SetRule(std::string_view rule)
+void NameStyleRuleMatcher::Diagnosis(DiagnosisContext& ctx, std::shared_ptr<CheckElement> checkElement)
 {
-	_tokenParser = std::make_shared<LuaTokenParser>(std::string(rule));
+
 }
 
-void NameStyleRuleMatcher::ParseRule()
+void NameStyleRuleMatcher::ParseRule(std::string_view rule)
 {
-	enum class ParseState
-	{
-		NamedRule,
-		FunctionRule
-	} state = ParseState::NamedRule;
+	auto tokenParser = std::make_shared<LuaTokenParser>(std::string(rule));
 
-	while (_tokenParser->Current().TokenType != TK_EOS)
+	while(tokenParser->Current().TokenType != TK_EOS)
 	{
-		auto type = _tokenParser->Current().TokenType;
-		switch (state)
+		if(tokenParser->Current().TokenType == TK_NAME)
 		{
-		case ParseState::NamedRule:
+			auto& lookAhead = tokenParser->LookAhead();
+			if(lookAhead.TokenType == '(')
 			{
-				if(type == TK_NAME)
-				{
-					
-				}
-				else if(type == '|')
-				{
-					break;
-				}
-				else if(type == '(')
-				{
-					state = ParseState::FunctionRule;
 
-				}
-				break;
+
+
+
+
+
+
+
 			}
-		case ParseState::FunctionRule:
+			else if(lookAhead.TokenType == TK_EOS || lookAhead.TokenType == '|')
 			{
-				break;
+				auto currentText = tokenParser->Current().Text;
+				if(currentText == "snake_case")
+				{
+					_rulers.push_back(SnakeCase);
+				}
+				else if(currentText == "camel_case")
+				{
+					_rulers.push_back(CamelCase);
+				}
+				else if(currentText == "pascal_case")
+				{
+					_rulers.push_back(PascalCase);
+				}
 			}
+
+			if(lookAhead.TokenType == '|')
+			{
+				tokenParser->Next();
+			}
+
 		}
-		_tokenParser->Next();
+		else // Óï·¨´íÎó
+		{
+			break;
+		}
+
+		next:
+		tokenParser->Next();
 	}
+}
+
+bool NameStyleRuleMatcher::SnakeCase(std::shared_ptr<CheckElement> checkElement)
+{
+}
+
+bool NameStyleRuleMatcher::CamelCase(std::shared_ptr<CheckElement> checkElement)
+{
+}
+
+bool NameStyleRuleMatcher::PascalCase(std::shared_ptr<CheckElement> checkElement)
+{
+}
+
+bool NameStyleRuleMatcher::Same(std::shared_ptr<CheckElement> checkElement, std::vector<std::string>& param)
+{
 }

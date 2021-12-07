@@ -2,79 +2,66 @@
 #include <algorithm>
 #include "Util/format.h"
 #include "CodeService/LanguageTranslator.h"
-
-NameStyleChecker::CheckElement::CheckElement(NameDefineType type, std::shared_ptr<LuaAstNode> node,
-                                             std::shared_ptr<LuaAstNode> extraInfoNode)
-	: Type(type),
-	  Node(node),
-	  ExtraInfoNode(extraInfoNode)
-
-{
-}
+#include "CodeService/NameStyle/NameStyleRuleMatcher.h"
 
 NameStyleChecker::NameStyleChecker(DiagnosisContext& ctx)
 	: _ctx(ctx)
 {
 }
 
-std::vector<LuaDiagnosisInfo> NameStyleChecker::Analysis()
+void NameStyleChecker::Analysis()
 {
 	for (auto checkElement : _nameStyleCheckVector)
 	{
-		if (checkElement->Type == NameDefineType::ModuleDefineName)
+		switch (checkElement->Type)
 		{
-			auto parser = _ctx.GetParser();
-
-			auto filename = parser->GetFilename();
-
-			if (checkElement->Node->GetText() != filename)
+		case NameDefineType::LocalVariableName:
 			{
-				_ctx.PushDiagnosis(format(LText("module name must be {}"), filename),
-				                   checkElement->Node->GetTextRange());
+				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				break;
+			}
+		case NameDefineType::ModuleDefineName:
+			{
+				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				break;
+			}
+		case NameDefineType::LocalFunctionName:
+			{
+				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				break;
+			}
+		case NameDefineType::GlobalVariableDefineName:
+			{
+				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				break;
+			}
+		case NameDefineType::ParamName:
+			{
+				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				break;
+			}
+		case NameDefineType::ImportModuleName:
+			{
+				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				break;
+			}
+		case NameDefineType::ClassVariableName:
+			{
+				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				break;
+			}
+		case NameDefineType::FunctionDefineName:
+			{
+				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				break;
+			}
+		case NameDefineType::TableFieldDefineName:
+			{
+				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				break;
 			}
 		}
 	}
-	// if (ctx.GetOptions().enable_name_style_check)
-	// {
-	// 	switch (_textDefineType)
-	// 	{
-	// 	case TextDefineType::LocalNameDefine:
-	// 	{
-	// 		if (!NameStyleCheck(ctx.GetOptions().local_name_define_style))
-	// 		{
-	// 			ctx.PushDiagnosis(format(
-	// 				LText("local name define does not match {} name style"),
-	// 				TranslateNameStyle(ctx.GetOptions().local_name_define_style)), _textRange);
-	// 		}
-	// 		break;
-	// 	}
-	// 	case TextDefineType::FunctionNameDefine:
-	// 	{
-	// 		if (!NameStyleCheck(ctx.GetOptions().function_name_define_style))
-	// 		{
-	// 			ctx.PushDiagnosis(format(
-	// 				LText("function name define does not match {} name style"),
-	// 				TranslateNameStyle(ctx.GetOptions().function_name_define_style)), _textRange);
-	// 		}
-	// 		break;
-	// 	}
-	// 	case TextDefineType::TableFieldNameDefine:
-	// 	{
-	// 		if (!NameStyleCheck(ctx.GetOptions().table_field_name_define_style))
-	// 		{
-	// 			ctx.PushDiagnosis(format(
-	// 				LText("table field name define does not match {} name style"),
-	// 				TranslateNameStyle(ctx.GetOptions().table_field_name_define_style)),
-	// 				_textRange);
-	// 		}
-	// 		break;
-	// 	}
-	// 	default:
-	// 	{
-	// 		break;
-	// 	}
-	// 	}
-	return {};
 }
 
 void NameStyleChecker::VisitLocalStatement(const std::shared_ptr<LuaAstNode>& localStatement)

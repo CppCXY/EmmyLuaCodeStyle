@@ -45,11 +45,11 @@ enable_name_style_check = false
 local_name_define_style = snake_case
 function_name_define_style = snake_case
 table_field_name_define_style = snake_case
-global_variable_name_define_style = snake_case|pascal_case
+global_variable_name_define_style = snake_case + pascal_case
 # the following has extra option: same(filename/first_param/'<const string>', snake_case/pascal_case/camel_case)
 # for example:
 # same(first_param, snake_case)
 # same('m')
-module_name_define_style = same(filename, snake_case)|same('m')
+module_name_define_style = same(filename, snake_case) + same('m')
 require_module_name_sytle = same(first_param, snake_case)
 class_name_define_style = same(first_param)

@@ -79,7 +79,7 @@ std::vector<LuaDiagnosisInfo> LuaFormatter::GetDiagnosisInfos()
 		NameStyleChecker checker(ctx);
 		auto chunkAst = _parser->GetAst();
 		chunkAst->AcceptChildren(checker);
-		auto result = checker.Analysis();
+		checker.Analysis();
 	}
 	 
 	return ctx.GetDiagnosisInfos();

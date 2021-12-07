@@ -7,6 +7,7 @@
 #include "Util/StringUtil.h"
 #include "CodeService/FormatElement/KeepElement.h"
 #include "CodeService/FormatElement/MinLineElement.h"
+#include "CodeService/NameStyle/NameStyleRuleMatcher.h"
 
 std::string dirPath(std::string& filePath)
 {
@@ -295,34 +296,19 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		options->enable_name_style_check = configMap.at("enable_name_style_check") == "true";
 	}
 	//
-	// std::vector<std::pair<std::string, NameStyle&>> styleList = {
-	// 	{"local_name_define_style", options->local_name_define_style},
-	// 	{"function_name_define_style", options->function_name_define_style},
-	// 	{"table_field_name_define_style", options->table_field_name_define_style},
-	// 	{"global_variable_name_define_style", options->table_field_name_define_style}
-	// };
-	//
-	// for (auto& styleOption : styleList)
-	// {
-	// 	if (configMap.count(styleOption.first))
-	// 	{
-	// 		std::string value = configMap.at(styleOption.first);
-	// 		if (value == "off")
-	// 		{
-	// 			styleOption.second = NameStyle::Off;
-	// 		}
-	// 		else if (value == "snake_case")
-	// 		{
-	// 			styleOption.second = NameStyle::SnakeCase;
-	// 		}
-	// 		else if (value == "camel_case")
-	// 		{
-	// 			styleOption.second = NameStyle::CamelCase;
-	// 		}
-	// 		else if (value == "pascal_case")
-	// 		{
-	// 			styleOption.second = NameStyle::PascalCase;
-	// 		}
-	// 	}
-	// }
+	std::vector<std::pair<std::string, std::shared_ptr<NameStyleRuleMatcher>&>> styleList = {
+		{"local_name_define_style", options->local_name_define_style},
+		{"function_name_define_style", options->function_name_define_style},
+		{"table_field_name_define_style", options->table_field_name_define_style},
+		{"global_variable_name_define_style", options->table_field_name_define_style}
+	};
+	
+	for (auto& styleOption : styleList)
+	{
+		if (configMap.count(styleOption.first))
+		{
+			std::string value = configMap.at(styleOption.first);
+			styleOption.second = NameStyleRuleMatcher::ParseFrom(value);
+		}
+	}
 }

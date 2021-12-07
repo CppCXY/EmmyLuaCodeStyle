@@ -4,20 +4,11 @@
 #include "LuaParser/LuaAstVisitor.h"
 #include "CodeService/FormatElement/DiagnosisContext.h"
 #include "NameDefineType.h"
+#include "CheckElement.h"
 
 class NameStyleChecker : public LuaAstVisitor
 {
 public:
-	class CheckElement
-	{
-	public:
-		CheckElement(NameDefineType type, std::shared_ptr<LuaAstNode> node,
-		             std::shared_ptr<LuaAstNode> extraInfoNode = nullptr);
-		NameDefineType Type;
-		std::shared_ptr<LuaAstNode> Node;
-		std::shared_ptr<LuaAstNode> ExtraInfoNode = nullptr;
-	};
-
 	class Scope
 	{
 	public:
@@ -26,7 +17,7 @@ public:
 
 	NameStyleChecker(DiagnosisContext& ctx);
 
-	std::vector<LuaDiagnosisInfo> Analysis();
+	void Analysis();
 
 protected:
 	void VisitLocalStatement(const std::shared_ptr<LuaAstNode>& node) override;
