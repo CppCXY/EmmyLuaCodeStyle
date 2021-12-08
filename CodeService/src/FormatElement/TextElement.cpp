@@ -44,26 +44,3 @@ void TextElement::SetTextDefineType(TextDefineType textDefineType)
 {
 	_textDefineType = textDefineType;
 }
-
-std::string TextElement::TranslateNameStyle(NameStyle style)
-{
-	switch (style)
-	{
-	case NameStyle::CamelCase:
-		{
-			return "camel-case";
-		}
-	case NameStyle::PascalCase:
-		{
-			return "pascal-case";
-		}
-	case NameStyle::SnakeCase:
-		{
-			return "snake-case";
-		}
-	default:
-		{
-			return "unknwon";
-		}
-	}
-}

@@ -22,42 +22,42 @@ void NameStyleChecker::Analysis()
 			}
 		case NameDefineType::ModuleDefineName:
 			{
-				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				_ctx.GetOptions().module_name_define_style->Diagnosis(_ctx, checkElement);
 				break;
 			}
 		case NameDefineType::LocalFunctionName:
 			{
-				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				_ctx.GetOptions().local_function_name_define_style->Diagnosis(_ctx, checkElement);
 				break;
 			}
 		case NameDefineType::GlobalVariableDefineName:
 			{
-				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				_ctx.GetOptions().global_variable_name_define_style->Diagnosis(_ctx, checkElement);
 				break;
 			}
 		case NameDefineType::ParamName:
 			{
-				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				_ctx.GetOptions().function_param_name_style->Diagnosis(_ctx, checkElement);
 				break;
 			}
 		case NameDefineType::ImportModuleName:
 			{
-				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				_ctx.GetOptions().require_module_name_style->Diagnosis(_ctx, checkElement);
 				break;
 			}
 		case NameDefineType::ClassVariableName:
 			{
-				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				_ctx.GetOptions().class_name_define_style->Diagnosis(_ctx, checkElement);
 				break;
 			}
 		case NameDefineType::FunctionDefineName:
 			{
-				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				_ctx.GetOptions().function_name_define_style->Diagnosis(_ctx, checkElement);
 				break;
 			}
 		case NameDefineType::TableFieldDefineName:
 			{
-				_ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
+				_ctx.GetOptions().table_field_name_define_style->Diagnosis(_ctx, checkElement);
 				break;
 			}
 		}
@@ -355,113 +355,5 @@ bool NameStyleChecker::IsGlobal(std::shared_ptr<LuaAstNode> node)
 		parent = parent->GetParent();
 	}
 
-	return true;
-}
-
-bool NameStyleChecker::SnakeCase(std::string_view source)
-{
-	bool lowerCase = false;
-	for (std::size_t index = 0; index != source.size(); index++)
-	{
-		char ch = source[index];
-
-		if (index == 0)
-		{
-			if (::islower(ch))
-			{
-				lowerCase = true;
-			}
-			else if (::isupper(ch))
-			{
-				lowerCase = false;
-			}
-			else if (ch == '_' && source.size() == 1)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else if ((lowerCase && !::islower(ch)) || (!lowerCase && !::isupper(ch)))
-		{
-			if (ch == '_')
-			{
-				// 不允许双下划线
-				if ((index < source.size() - 1) && source[index + 1] == '_')
-				{
-					return false;
-				}
-			}
-			else if (!::isdigit(ch))
-			{
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-bool NameStyleChecker::PascalCase(std::string_view source)
-{
-	for (std::size_t index = 0; index != source.size(); index++)
-	{
-		char ch = source[index];
-
-		if (index == 0)
-		{
-			// 首字母必须大写
-			if (!::isupper(ch))
-			{
-				// _ 亚元不受命名限制
-				if (source.size() == 1 && ch == '_')
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-		}
-			// 我又没办法分词简单处理下
-		else if (!::isalnum(ch))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-bool NameStyleChecker::CamelCase(std::string_view source)
-{
-	for (std::size_t index = 0; index != source.size(); index++)
-	{
-		char ch = source[index];
-
-		if (index == 0)
-		{
-			// 首字母可以小写，也可以单下划线开头
-			if (!::islower(ch))
-			{
-				if (ch == '_')
-				{
-					if (source.size() > 1 && !::islower(ch))
-					{
-						return false;
-					}
-				}
-				else
-				{
-					return false;
-				}
-			}
-		}
-		else if (!::isalnum(ch))
-		{
-			return false;
-		}
-	}
 	return true;
 }

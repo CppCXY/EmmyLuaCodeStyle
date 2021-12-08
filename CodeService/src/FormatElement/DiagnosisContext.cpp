@@ -64,7 +64,7 @@ void DiagnosisContext::RecoverIndent()
 void DiagnosisContext::PushDiagnosis(std::string_view message, TextRange range)
 {
 	LuaDiagnosisPosition start(GetLine(range.StartOffset), GetColumn(range.StartOffset));
-	LuaDiagnosisPosition end(GetLine(range.EndOffset), GetColumn(range.EndOffset));
+	LuaDiagnosisPosition end(GetLine(range.EndOffset), GetColumn(range.EndOffset) + 1);
 	PushDiagnosis(message, start, end);
 }
 

@@ -20,7 +20,6 @@ public:
 	void SetTextDefineType(TextDefineType textDefineType);
 	
 private:
-	std::string TranslateNameStyle(NameStyle style);
 
 	std::string_view _text;
 	TextDefineType _textDefineType;

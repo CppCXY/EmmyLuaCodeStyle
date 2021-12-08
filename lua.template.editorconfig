@@ -39,17 +39,20 @@ max_line_length = 120
 insert_final_newline = true
 
 
+enable_name_style_check = true
 # the following is name style check rule 
-# base option off/camel_case/snake_case/pascal_case
-enable_name_style_check = false
-local_name_define_style = snake_case
-function_name_define_style = snake_case
-table_field_name_define_style = snake_case
-global_variable_name_define_style = snake_case + pascal_case
-# the following has extra option: same(filename/first_param/'<const string>', snake_case/pascal_case/camel_case)
+# base option off/camel_case/snake_case/upper_snake_case/pascal_case/same(filename/first_param/'<const string>', snake_case/pascal_case/camel_case)
+# all option can use '|' represent or 
 # for example:
+# snake_case | upper_snake_case
 # same(first_param, snake_case)
 # same('m')
-module_name_define_style = same(filename, snake_case) + same('m')
-require_module_name_sytle = same(first_param, snake_case)
-class_name_define_style = same(first_param)
+local_name_define_style = snake_case
+function_param_name_style = snake_case
+function_name_define_style = snake_case
+local_function_name_define_style = snake_case
+table_field_name_define_style = snake_case
+global_variable_name_define_style = snake_case|upper_snake_case
+module_name_define_style = same('m')|same(filename, snake_case)
+require_module_name_style = same(first_param, snake_case)
+class_name_define_style = same(filename, snake_case)

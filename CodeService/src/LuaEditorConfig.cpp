@@ -298,9 +298,14 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 	//
 	std::vector<std::pair<std::string, std::shared_ptr<NameStyleRuleMatcher>&>> styleList = {
 		{"local_name_define_style", options->local_name_define_style},
+		{"function_param_name_style", options->function_param_name_style},
 		{"function_name_define_style", options->function_name_define_style},
+		{"local_function_name_define_style", options->local_function_name_define_style},
 		{"table_field_name_define_style", options->table_field_name_define_style},
-		{"global_variable_name_define_style", options->table_field_name_define_style}
+		{"global_variable_name_define_style", options->global_variable_name_define_style},
+		{"module_name_define_style", options->module_name_define_style},
+		{"require_module_name_style", options->require_module_name_style},
+		{"class_name_define_style", options->class_name_define_style},
 	};
 	
 	for (auto& styleOption : styleList)

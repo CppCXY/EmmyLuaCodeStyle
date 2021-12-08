@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CodeService/NameStyle/NameDefineType.h"
 #include "LuaParser/LuaAstNode.h"

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <functional>
 #include <string_view>
@@ -11,7 +11,23 @@
 class NameStyleRuleMatcher
 {
 public:
-	using MatchRuler = std::function<bool(std::shared_ptr<CheckElement>)>;
+	enum class NameStyleType
+	{
+		Off,
+		CamelCase,
+		PascalCase,
+		SnakeCase,
+		Same,
+		Custom
+	};
+
+	struct NameStyleRule
+	{
+		explicit NameStyleRule(NameStyleType type);
+		NameStyleRule(NameStyleType type, std::vector<std::string> param);
+		NameStyleType Type;
+		std::vector<std::string> Param;
+	};
 
 	static std::shared_ptr<NameStyleRuleMatcher> ParseFrom(std::string_view rule);
 
@@ -22,10 +38,11 @@ public:
 	void ParseRule(std::string_view rule);
 private:
 	static bool SnakeCase(std::shared_ptr<CheckElement> checkElement);
+	static bool UpperSnakeCase(std::shared_ptr<CheckElement> checkElement);
 	static bool CamelCase(std::shared_ptr<CheckElement> checkElement);
 	static bool PascalCase(std::shared_ptr<CheckElement> checkElement);
 
 	static bool Same(std::shared_ptr<CheckElement> checkElement, std::vector<std::string>& param);
 
-	std::vector<MatchRuler> _rulers;
+	std::vector<NameStyleRule> _rulers;
 };

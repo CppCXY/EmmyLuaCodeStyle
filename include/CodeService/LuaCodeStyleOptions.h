@@ -13,14 +13,6 @@ enum class IndentStyle
 	Space,
 };
 
-enum class NameStyle
-{
-	Off,
-	CamelCase,
-	PascalCase,
-	SnakeCase
-};
-
 class LuaCodeStyleOptions
 {
 public:
@@ -107,14 +99,12 @@ public:
 	// 命名风格检查
 	bool enable_name_style_check = false;
 	std::shared_ptr<NameStyleRuleMatcher> local_name_define_style;
+	std::shared_ptr<NameStyleRuleMatcher> function_param_name_style;
 	std::shared_ptr<NameStyleRuleMatcher> function_name_define_style;
+	std::shared_ptr<NameStyleRuleMatcher> local_function_name_define_style;
 	std::shared_ptr<NameStyleRuleMatcher> table_field_name_define_style;
 	std::shared_ptr<NameStyleRuleMatcher> global_variable_name_define_style;
 	std::shared_ptr<NameStyleRuleMatcher> module_name_define_style;
 	std::shared_ptr<NameStyleRuleMatcher> require_module_name_style;
 	std::shared_ptr<NameStyleRuleMatcher> class_name_define_style;
-
-private:
-
-	void SetDefault();
 };

@@ -32,9 +32,6 @@ private:
 	void RecordLocalVariable(std::shared_ptr<CheckElement> checkElement);
 	bool InTopBlock(std::shared_ptr<LuaAstNode> chunkBlockStatement);
 	bool IsGlobal(std::shared_ptr<LuaAstNode> node);
-	bool SnakeCase(std::string_view source);
-	bool PascalCase(std::string_view source);
-	bool CamelCase(std::string_view source);
 
 	DiagnosisContext& _ctx;
 
