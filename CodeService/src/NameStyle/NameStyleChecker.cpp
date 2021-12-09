@@ -4,6 +4,17 @@
 #include "CodeService/LanguageTranslator.h"
 #include "CodeService/NameStyle/NameStyleRuleMatcher.h"
 
+std::set<std::string, std::less<>> NameStyleChecker::TableFieldSpecialName = {
+	"__add", "__sub", "__mul", "__div", "__mod", "__pow",
+	"__unm", "__idiv", "__band", "__bor", "__bxor", "__bnot", "__shl",
+	"__shr", "__concat", "__len", "__eq", "__lt", "__index", "__newindex",
+	"__call", "__gc", "__close", "__mode", "__name"
+};
+
+std::set<std::string, std::less<>> NameStyleChecker::GlobalSpecialName = {
+	"_G", "_ENV"
+};
+
 NameStyleChecker::NameStyleChecker(DiagnosisContext& ctx)
 	: _ctx(ctx)
 {
@@ -27,11 +38,19 @@ void NameStyleChecker::Analysis()
 			}
 		case NameDefineType::LocalFunctionName:
 			{
+				if (TableFieldSpecialName.count(checkElement->Node->GetText()))
+				{
+					return;
+				}
 				_ctx.GetOptions().local_function_name_define_style->Diagnosis(_ctx, checkElement);
 				break;
 			}
 		case NameDefineType::GlobalVariableDefineName:
 			{
+				if (GlobalSpecialName.count(checkElement->Node->GetText()))
+				{
+					return;
+				}
 				_ctx.GetOptions().global_variable_name_define_style->Diagnosis(_ctx, checkElement);
 				break;
 			}
@@ -52,11 +71,21 @@ void NameStyleChecker::Analysis()
 			}
 		case NameDefineType::FunctionDefineName:
 			{
+				if (TableFieldSpecialName.count(checkElement->Node->GetText()))
+				{
+					return;
+				}
+
 				_ctx.GetOptions().function_name_define_style->Diagnosis(_ctx, checkElement);
 				break;
 			}
 		case NameDefineType::TableFieldDefineName:
 			{
+				// 忽略元方法
+				if (TableFieldSpecialName.count(checkElement->Node->GetText()))
+				{
+					return;
+				}
 				_ctx.GetOptions().table_field_name_define_style->Diagnosis(_ctx, checkElement);
 				break;
 			}

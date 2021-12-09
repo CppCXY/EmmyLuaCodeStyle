@@ -46,6 +46,14 @@ void NameStyleRuleMatcher::Diagnosis(DiagnosisContext& ctx, std::shared_ptr<Chec
 				}
 				break;
 			}
+		case NameStyleType::UpperSnakeCase:
+			{
+				if(UpperSnakeCase(checkElement))
+				{
+					return;
+				}
+				break;
+			}
 		case NameStyleType::CamelCase:
 			{
 				if (CamelCase(checkElement))
@@ -64,7 +72,7 @@ void NameStyleRuleMatcher::Diagnosis(DiagnosisContext& ctx, std::shared_ptr<Chec
 			}
 		case NameStyleType::Same:
 			{
-				if (Same(checkElement, rule.Param))
+				if (Same(ctx, checkElement, rule.Param))
 				{
 					return;
 				}
@@ -100,10 +108,14 @@ void NameStyleRuleMatcher::Diagnosis(DiagnosisContext& ctx, std::shared_ptr<Chec
 			}
 		case NameStyleType::Same:
 			{
-				// if (Same(checkElement, rule.Param))
-				// {
-				// 	return;
-				// }
+				if (rule.Param.size() == 1)
+				{
+					ruleMessage.append(format("same({})", rule.Param[0]));
+				}
+				else if (rule.Param.size() == 2)
+				{
+					ruleMessage.append(format("same({},{})", rule.Param[0], rule.Param[1]));
+				}
 				break;
 			}
 		default:
@@ -151,6 +163,7 @@ void NameStyleRuleMatcher::ParseRule(std::string_view rule)
 				}
 
 				_rulers.emplace_back(type, param);
+				tokenParser->Next();
 			}
 			else if (lookAhead.TokenType == TK_EOS || lookAhead.TokenType == '|')
 			{
@@ -166,6 +179,10 @@ void NameStyleRuleMatcher::ParseRule(std::string_view rule)
 				else if (currentText == "pascal_case")
 				{
 					_rulers.emplace_back(NameStyleType::PascalCase);
+				}
+				else if (currentText == "upper_snake_case")
+				{
+					_rulers.emplace_back(NameStyleType::UpperSnakeCase);
 				}
 			}
 
@@ -224,7 +241,7 @@ bool NameStyleRuleMatcher::UpperSnakeCase(std::shared_ptr<CheckElement> checkEle
 		{
 			return false;
 		}
-		
+
 		else if (!::isupper(ch))
 		{
 			if (ch == '_')
@@ -307,7 +324,7 @@ bool NameStyleRuleMatcher::PascalCase(std::shared_ptr<CheckElement> checkElement
 				}
 			}
 		}
-		// 我又没办法分词简单处理下
+			// 我又没办法分词简单处理下
 		else if (!::isalnum(ch))
 		{
 			return false;
@@ -316,7 +333,226 @@ bool NameStyleRuleMatcher::PascalCase(std::shared_ptr<CheckElement> checkElement
 	return true;
 }
 
-bool NameStyleRuleMatcher::Same(std::shared_ptr<CheckElement> checkElement, std::vector<std::string>& param)
+bool NameStyleRuleMatcher::Same(DiagnosisContext& ctx, std::shared_ptr<CheckElement> checkElement,
+                                std::vector<std::string>& param)
 {
+	if (param.empty())
+	{
+		return true;
+	}
+
+	auto& firstParam = param.front();
+
+	if (firstParam == "first_param")
+	{
+		// 可空判断太长了
+		if (!checkElement->ExtraInfoNode)
+		{
+			return true;
+		}
+		if (checkElement->ExtraInfoNode->GetType() != LuaAstNodeType::CallArgList)
+		{
+			return true;
+		}
+
+		auto firstParamNode = checkElement->ExtraInfoNode->FindFirstOf(LuaAstNodeType::LiteralExpression);
+
+		if (!firstParamNode)
+		{
+			auto expressionList = checkElement->ExtraInfoNode->FindFirstOf(LuaAstNodeType::ExpressionList);
+			if (!expressionList)
+			{
+				return true;
+			}
+			auto expressionNode = expressionList->FindFirstOf(LuaAstNodeType::Expression);
+			if (!expressionNode)
+			{
+				return true;
+			}
+			firstParamNode = expressionNode->FindFirstOf(LuaAstNodeType::LiteralExpression);
+			if (!firstParamNode)
+			{
+				return true;
+			}
+		}
+
+		std::string_view firstText = firstParamNode->GetText();
+
+		if (firstText.size() <= 2)
+		{
+			return true;
+		}
+
+		firstText = firstText.substr(1, firstText.size() - 2);
+		if (param.size() == 2)
+		{
+			auto& secondParam = param[1];
+
+			if (secondParam == "snake_case")
+			{
+				return SameSnake(firstText, checkElement);
+			}
+			else if (secondParam == "camel_case")
+			{
+				return SameCamel(firstText, checkElement);
+			}
+			else if (secondParam == "pascal_case")
+			{
+				return SamePascal(firstText, checkElement);
+			}
+		}
+		else
+		{
+			return SameSimple(firstText, checkElement);
+		}
+	}
+	else if (firstParam == "filename")
+	{
+		auto filename = ctx.GetParser()->GetFilename();
+
+		if (param.size() == 2)
+		{
+			auto& secondParam = param[1];
+
+			if (secondParam == "snake_case")
+			{
+				return SameSnake(filename, checkElement);
+			}
+			else if (secondParam == "camel_case")
+			{
+				return SameCamel(filename, checkElement);
+			}
+			else if (secondParam == "pascal_case")
+			{
+				return SamePascal(filename, checkElement);
+			}
+		}
+		else
+		{
+			return SameSimple(filename, checkElement);
+		}
+	}
+	else if (firstParam.size() > 2 && (firstParam.starts_with("\'") || firstParam.starts_with("\"")))
+	{
+		auto name = firstParam.substr(1, firstParam.size() - 2);
+		return checkElement->Node->GetText() == name;
+	}
+
 	return true;
+}
+
+bool NameStyleRuleMatcher::SameSimple(std::string_view text, std::shared_ptr<CheckElement> checkElement)
+{
+	auto checkText = checkElement->Node->GetText();
+	return checkText == text;
+}
+
+bool NameStyleRuleMatcher::SameSnake(std::string_view text, std::shared_ptr<CheckElement> checkElement)
+{
+	if (!SnakeCase(checkElement))
+	{
+		return false;
+	}
+
+	auto checkText = checkElement->Node->GetText();
+	auto textParts = SplitPart(text);
+	auto checkParts = SplitPart(checkText);
+
+	if (checkParts.size() > textParts.size())
+	{
+		return false;
+	}
+
+	for (std::size_t i = 1; i <= checkParts.size(); i++)
+	{
+		if (checkParts[checkParts.size() - i] != textParts[textParts.size() - i])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool NameStyleRuleMatcher::SameCamel(std::string_view text, std::shared_ptr<CheckElement> checkElement)
+{
+	if (!CamelCase(checkElement))
+	{
+		return false;
+	}
+
+	auto checkText = checkElement->Node->GetText();
+	auto textParts = SplitPart(text);
+
+
+	for (int i = textParts.size() - 1; i >= 0; i--)
+	{
+		if (checkText.ends_with(textParts[i]))
+		{
+			if (checkText.size() == textParts[i].size())
+			{
+				return true;
+			}
+			checkText = checkText.substr(0, checkText.size() - textParts[i].size());
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool NameStyleRuleMatcher::SamePascal(std::string_view text, std::shared_ptr<CheckElement> checkElement)
+{
+	if (!PascalCase(checkElement))
+	{
+		return false;
+	}
+
+	auto checkText = checkElement->Node->GetText();
+	auto textParts = SplitPart(text);
+
+
+	for (int i = textParts.size() - 1; i >= 0; i--)
+	{
+		if (checkText.ends_with(textParts[i]))
+		{
+			if (checkText.size() == textParts[i].size())
+			{
+				return true;
+			}
+			checkText = checkText.substr(0, checkText.size() - textParts[i].size());
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+std::vector<std::string_view> NameStyleRuleMatcher::SplitPart(std::string_view source)
+{
+	std::vector<std::string_view> result;
+	std::size_t lastIndex = 0;
+	for (std::size_t index = 0; index < source.size(); index++)
+	{
+		char ch = source[index];
+
+		if ((ch == '.' || ch == '_' || ch == '-' || ch == '/' || ch == '\\') && index != 0)
+		{
+			result.push_back(source.substr(lastIndex, index - lastIndex));
+			lastIndex = index + 1;
+		}
+	}
+
+	if (lastIndex < source.size())
+	{
+		result.push_back(source.substr(lastIndex, source.size() - lastIndex));
+	}
+
+	return result;
 }

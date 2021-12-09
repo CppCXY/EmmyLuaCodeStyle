@@ -17,6 +17,7 @@ public:
 		CamelCase,
 		PascalCase,
 		SnakeCase,
+		UpperSnakeCase,
 		Same,
 		Custom
 	};
@@ -42,7 +43,15 @@ private:
 	static bool CamelCase(std::shared_ptr<CheckElement> checkElement);
 	static bool PascalCase(std::shared_ptr<CheckElement> checkElement);
 
-	static bool Same(std::shared_ptr<CheckElement> checkElement, std::vector<std::string>& param);
+	static bool Same(DiagnosisContext& ctx, std::shared_ptr<CheckElement> checkElement,
+	                 std::vector<std::string>& param);
+
+	static bool SameSimple(std::string_view text, std::shared_ptr<CheckElement> checkElement);
+	static bool SameSnake(std::string_view text, std::shared_ptr<CheckElement> checkElement);
+	static bool SameCamel(std::string_view text, std::shared_ptr<CheckElement> checkElement);
+	static bool SamePascal(std::string_view text, std::shared_ptr<CheckElement> checkElement);
+
+	static std::vector<std::string_view> SplitPart(std::string_view source);
 
 	std::vector<NameStyleRule> _rulers;
 };

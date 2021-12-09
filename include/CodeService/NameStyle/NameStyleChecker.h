@@ -33,6 +33,9 @@ private:
 	bool InTopBlock(std::shared_ptr<LuaAstNode> chunkBlockStatement);
 	bool IsGlobal(std::shared_ptr<LuaAstNode> node);
 
+	static std::set<std::string, std::less<>> TableFieldSpecialName;
+	static std::set<std::string, std::less<>> GlobalSpecialName;
+
 	DiagnosisContext& _ctx;
 
 	// block到作用域的映射
