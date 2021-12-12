@@ -5,6 +5,7 @@
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "CodeService/LuaEditorConfig.h"
 #include "LuaParser/LuaParser.h"
+#include "FileManager.h"
 
 class LanguageClient
 {
@@ -34,10 +35,11 @@ public:
 	void UpdateOptions(std::string_view workspaceUri, std::string_view configPath);
 
 	void RemoveOptions(std::string_view workspaceUri);
+
 private:
 	std::shared_ptr<IOSession> _session;
 	// uri 到file ast的映射
-	std::map<std::string, std::shared_ptr<LuaParser>, std::less<>> _fileMap;
+	std::map<std::string, std::shared_ptr<LuaParser>, std::less<>> _parserMap;
 
 	std::vector<std::pair<std::string, std::shared_ptr<LuaEditorConfig>>> _editorConfigVector;
 

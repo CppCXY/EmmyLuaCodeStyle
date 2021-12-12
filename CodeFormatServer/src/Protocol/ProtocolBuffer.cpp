@@ -24,7 +24,14 @@ void ProtocolBuffer::WriteBuff(std::size_t size)
 {
 	if (_textProtocol.size() < _writeIndex + size)
 	{
-		_textProtocol.resize(_writeIndex + size);
+		if (_bodyStartIndex != 0 && _contentLength != 0 && _writeIndex < (_bodyStartIndex + _contentLength))
+		{
+			_textProtocol.resize(std::max(_writeIndex + size, _bodyStartIndex + _contentLength));
+		}
+		else
+		{
+			_textProtocol.resize(_writeIndex + size);
+		}
 	}
 
 	std::copy_n(_readBuffer.begin(), size, _textProtocol.begin() + _writeIndex);

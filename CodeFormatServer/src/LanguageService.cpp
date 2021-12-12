@@ -1,5 +1,6 @@
 #include "CodeFormatServer/LanguageService.h"
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include "nlohmann/json.hpp"
 #include "CodeFormatServer/VSCode.h"
@@ -59,7 +60,7 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 	result->capabilities.documentOnTypeFormattingProvider = typeOptions;
 
 	result->capabilities.textDocumentSync.change = vscode::TextDocumentSyncKind::Full;
-	result->capabilities.textDocumentSync.openClose = true;
+	result->capabilities.textDocumentSync.openClose = true;  
 
 	auto& configFiles = param->initializationOptions.configFiles;
 	for (auto& configFile : configFiles)
@@ -101,6 +102,7 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 	std::shared_ptr<vscode::DidChangeTextDocumentParams> param)
 {
+	std::string_view fileText;
 	for (auto& content : param->contentChanges)
 	{
 		auto parser = LuaParser::LoadFromBuffer(std::move(content.text));
@@ -110,6 +112,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 
 		LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
 	}
+
 	return nullptr;
 }
 

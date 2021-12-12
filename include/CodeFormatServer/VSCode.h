@@ -183,9 +183,9 @@ public:
 class TextDocumentContentChangeEvent : public Serializable
 {
 public:
+	std::optional<Range> range;
 	std::string text;
 
-	nlohmann::json Serialize() override;
 	void Deserialize(nlohmann::json json) override;
 };
 

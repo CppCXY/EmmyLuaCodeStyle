@@ -47,22 +47,23 @@ void LanguageClient::CacheFile(std::string_view uri, std::shared_ptr<LuaParser> 
 {
 	std::filesystem::path path(uri);
 	parser->SetFilename(path.filename().string());
-	_fileMap[std::string(uri)] = parser;
+	_parserMap[std::string(uri)] = parser;
 }
 
 void LanguageClient::ReleaseFile(std::string_view uri)
 {
-	auto it = _fileMap.find(uri);
-	if (it != _fileMap.end())
+	auto it = _parserMap.find(uri);
+	if (it != _parserMap.end())
 	{
-		_fileMap.erase(it);
+		_parserMap.erase(it);
 	}
+
 }
 
 void LanguageClient::DiagnosticFile(std::string_view uri)
 {
-	auto it = _fileMap.find(uri);
-	if (it == _fileMap.end())
+	auto it = _parserMap.find(uri);
+	if (it == _parserMap.end())
 	{
 		return;
 	}
@@ -112,8 +113,8 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 
 std::shared_ptr<LuaParser> LanguageClient::GetFileParser(std::string_view uri)
 {
-	auto it = _fileMap.find(uri);
-	if (it != _fileMap.end())
+	auto it = _parserMap.find(uri);
+	if (it != _parserMap.end())
 	{
 		return it->second;
 	}

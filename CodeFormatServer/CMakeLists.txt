@@ -30,6 +30,7 @@ target_sources(CodeFormatServer
 	${CodeFormatServer_SOURCE_DIR}/src/CodeFormatServer.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/LanguageClient.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/LanguageService.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/FileManager.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Session/IOSession.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Session/SocketIOSession.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Session/StandardIOSession.cpp

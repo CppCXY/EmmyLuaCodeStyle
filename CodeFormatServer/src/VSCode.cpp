@@ -261,17 +261,15 @@ void vscode::InitializeResult::Deserialize(nlohmann::json json)
 	capabilities.Deserialize(json["capabilities"]);
 }
 
-nlohmann::json vscode::TextDocumentContentChangeEvent::Serialize()
-{
-	auto object = nlohmann::json::object();
-
-	object["text"] = text;
-	return object;
-}
-
 void vscode::TextDocumentContentChangeEvent::Deserialize(nlohmann::json json)
 {
 	text = json["text"];
+	if(!json["range"].is_null())
+	{
+		auto textRange = Range();
+		textRange.Deserialize(json["range"]);
+		range = textRange;
+	}
 }
 
 void vscode::DidChangeTextDocumentParams::Deserialize(nlohmann::json json)

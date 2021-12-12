@@ -3,7 +3,7 @@
 #include "LuaDefine.h"
 #include "LuaParser/LuaTokenTypeDetail.h"
 #include "Util/format.h"
-#include "utf8.h"
+#include "Util/Utf8.h"
 
 
 std::map<std::string, LuaTokenType, std::less<>> LuaTokenParser::LuaReserved = {
@@ -78,7 +78,7 @@ bool LuaTokenParser::Parse()
 			break;
 		}
 
-		if(!_errors.empty())
+		if (!_errors.empty())
 		{
 			return false;
 		}
@@ -176,13 +176,7 @@ int LuaTokenParser::GetColumn(int offset)
 
 	int bytesLength = offset - lineStartOffset;
 
-#if __APPLE__
-	// git action 编译时在macos下编译会报错，我不觉得有什么问题
-	const char8_t* macOsBug = reinterpret_cast<const char8_t*>(_source.data() + lineStartOffset);
-	return ::utf8nlen(macOsBug, static_cast<std::size_t>(bytesLength));
-#else
-	return ::utf8nlen(_source.data() + lineStartOffset, static_cast<std::size_t>(bytesLength));
-#endif
+	return static_cast<int>(utf8::Utf8nLen(_source.data() + lineStartOffset, static_cast<std::size_t>(bytesLength)));
 }
 
 int LuaTokenParser::GetTotalLine()
