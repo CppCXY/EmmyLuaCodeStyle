@@ -32,3 +32,5 @@ target_sources(LuaParser PUBLIC
 	
 	${LuaParser_SOURCE_DIR}/src/LuaDefine.h
 )
+
+target_link_libraries(LuaParser Util)
