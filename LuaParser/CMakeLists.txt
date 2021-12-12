@@ -4,6 +4,8 @@ project(LuaParser)
 
 add_library(LuaParser STATIC)
 
+add_dependencies(LuaParser Util)
+
 target_include_directories(LuaParser PUBLIC
 	${LuaCodeStyle_SOURCE_DIR}/include
 	src
