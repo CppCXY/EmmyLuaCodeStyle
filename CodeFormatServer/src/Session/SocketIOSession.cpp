@@ -26,12 +26,15 @@ void SocketIOSession::Run()
 				goto endLoop;
 			}
 
-			_protocolBuffer.WriteBuff(readSize);
+			_protocolBuffer.SetWriteSize(readSize);
 
 			if (_protocolBuffer.CanReadOneProtocol())
 			{
 				break;
 			}
+
+			_protocolBuffer.FitCapacity();
+			// if(_protocolBuffer.)
 		}
 		while (true);
 

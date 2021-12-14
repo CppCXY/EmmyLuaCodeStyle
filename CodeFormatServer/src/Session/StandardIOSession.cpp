@@ -22,12 +22,14 @@ void StandardIOSession::Run()
 				goto endLoop;
 			}
 
-			_protocolBuffer.WriteBuff(readSize);
+			_protocolBuffer.SetWriteSize(readSize);
 
 			if (_protocolBuffer.CanReadOneProtocol())
 			{
 				break;
 			}
+
+			_protocolBuffer.FitCapacity();
 
 		} while (true);
 

@@ -3,38 +3,27 @@
 
 ProtocolBuffer::ProtocolBuffer(std::size_t capacity)
 	: _writeIndex(0),
-	  _readBuffer(capacity, 0),
+	  // _readBuffer(capacity, 0),
+	  _textProtocol(capacity, 0),
 	  _contentLength(0),
-	  _bodyStartIndex(0)
+	  _bodyStartIndex(0),
+	  _normalCapacity(capacity)
 {
 }
 
 char* ProtocolBuffer::GetWritableCursor()
 {
-	return _readBuffer.data();
+	return _textProtocol.data() + _writeIndex;
 }
 
 
 std::size_t ProtocolBuffer::GetRestCapacity()
 {
-	return _readBuffer.size();
+	return _textProtocol.size() - _writeIndex;
 }
 
-void ProtocolBuffer::WriteBuff(std::size_t size)
+void ProtocolBuffer::SetWriteSize(std::size_t size)
 {
-	if (_textProtocol.size() < _writeIndex + size)
-	{
-		if (_bodyStartIndex != 0 && _contentLength != 0 && _writeIndex < (_bodyStartIndex + _contentLength))
-		{
-			_textProtocol.resize(std::max(_writeIndex + size, _bodyStartIndex + _contentLength));
-		}
-		else
-		{
-			_textProtocol.resize(_writeIndex + size);
-		}
-	}
-
-	std::copy_n(_readBuffer.begin(), size, _textProtocol.begin() + _writeIndex);
 	_writeIndex += size;
 }
 
@@ -62,6 +51,15 @@ std::string_view ProtocolBuffer::ReadOneProtocol()
 	return "";
 }
 
+void ProtocolBuffer::FitCapacity()
+{
+	auto oneProtocolCapacity = _contentLength + _bodyStartIndex;
+	if (oneProtocolCapacity > _normalCapacity && oneProtocolCapacity > _textProtocol.size()) 
+	{
+		_textProtocol.resize(oneProtocolCapacity);
+	}
+}
+
 void ProtocolBuffer::Reset()
 {
 	if (_writeIndex > _contentLength + _bodyStartIndex)
@@ -70,15 +68,25 @@ void ProtocolBuffer::Reset()
 		std::copy_n(_textProtocol.data() + doneIndex, _writeIndex - doneIndex, _textProtocol.data());
 
 		_writeIndex -= doneIndex;
-		_textProtocol.resize(std::max(_writeIndex, _readBuffer.size()));
-		_textProtocol.shrink_to_fit();
+		if (_writeIndex > _normalCapacity)
+		{
+			_textProtocol.resize(_writeIndex);
+			_textProtocol.shrink_to_fit();
+		}
+		else
+		{
+			_textProtocol.resize(_normalCapacity);
+			_textProtocol.shrink_to_fit();
+		}
 	}
 	else
 	{
 		_writeIndex = 0;
-		_textProtocol.clear();
-		_textProtocol.resize(_readBuffer.size());
-		_textProtocol.shrink_to_fit();
+		if (_textProtocol.size() > _normalCapacity)
+		{
+			_textProtocol.resize(_normalCapacity);
+			_textProtocol.shrink_to_fit();
+		}
 	}
 
 	_contentLength = 0;
@@ -121,8 +129,10 @@ bool ProtocolBuffer::TryParseHead()
 					}
 					auto lengthStr = text.substr(colonPosition + 1, lineEndPosition - colonPosition - 1);
 					_contentLength = std::stoi(std::string(lengthStr));
+					
 				}
 				index = lineEndPosition + 2;
+				_bodyStartIndex = index + 2;
 				state = ParseState::CRLF;
 				break;
 			}

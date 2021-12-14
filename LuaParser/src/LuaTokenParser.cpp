@@ -233,6 +233,15 @@ bool LuaTokenParser::HasError() const
 	return !_errors.empty();
 }
 
+void LuaTokenParser::ReleaseTokens()
+{
+	_tokens.clear();
+	_tokens.shrink_to_fit();
+
+	_commentTokens.clear();
+	_commentTokens.shrink_to_fit();
+}
+
 LuaTokenType LuaTokenParser::Lex()
 {
 	ResetBuffer();

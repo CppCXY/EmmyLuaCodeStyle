@@ -43,6 +43,7 @@ public:
 
 	bool HasError() const;
 
+	void ReleaseTokens();
 private:
 	static std::map<std::string, LuaTokenType, std::less<>> LuaReserved;
 

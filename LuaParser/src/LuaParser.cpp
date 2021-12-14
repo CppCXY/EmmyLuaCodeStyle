@@ -54,6 +54,7 @@ void LuaParser::BuildAst()
 	{
 		_errors.push_back(tokeError);
 	}
+	_tokenParser->ReleaseTokens();
 }
 
 std::shared_ptr<LuaAstNode> LuaParser::GetAst()
