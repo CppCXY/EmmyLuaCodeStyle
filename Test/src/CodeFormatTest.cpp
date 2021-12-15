@@ -19,9 +19,12 @@ bool TestFormatted(std::string input, const std::string& shouldBe, std::shared_p
 	formatter.BuildFormattedElement();
 
 	auto formattedText = formatter.GetFormattedText();
-	std::cout << StringUtil::TrimSpace(formattedText) << std::endl;
-	std::cout << "=============" << std::endl;
-	std::cout << StringUtil::TrimSpace(shouldBe) << std::endl;
+	auto f1 = StringUtil::TrimSpace(formattedText);
+	auto f2 = StringUtil::TrimSpace(shouldBe);
+
+	std::cout << format("size {} {}", f1.size(), f2.size()) << std::endl;
+	std::cout << format("size {} {}", f1.size(), f2.size()) << std::endl;
+
 	return StringUtil::TrimSpace(formattedText) == StringUtil::TrimSpace(shouldBe);
 }
 
@@ -67,7 +70,7 @@ void CollectLuaFile(std::filesystem::path directoryPath, std::vector<std::string
 
 std::string ReadFile(const std::string& path)
 {
-	std::fstream fin(path, std::ios::in | std::ios::binary);
+	std::fstream fin(path, std::ios::in);
 
 	if (fin.is_open())
 	{
