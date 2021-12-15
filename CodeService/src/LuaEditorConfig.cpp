@@ -83,7 +83,7 @@ void LuaEditorConfig::Parse()
 
 std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view fileUri)
 {
-	auto options = std::make_shared<LuaCodeStyleOptions>();
+	std::shared_ptr<LuaCodeStyleOptions> options = nullptr;
 
 	std::string patternKey;
 	std::vector<std::shared_ptr<Section>> luaSections;
@@ -148,6 +148,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 	}
 	else
 	{
+		options = std::make_shared<LuaCodeStyleOptions>();
 		for (auto luaSection : luaSections)
 		{
 			ParseFromSection(options, luaSection->ConfigMap);
