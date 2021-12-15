@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
 			bool passed = TestFormatted(waitFormattingText, formattedText, options);
 
 			success &= passed;
-			std::cout << format("test format {} ... {}", path, passed ? "true" : "false") << std::endl;
+			std::cout << format("test format {} ... {}", path, passed ? "passed" : "false") << std::endl;
 		}
 	}
 	else if (target == "CheckGrammar")
@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
 			bool passed = TestGrammar(text);
 
 			success &= passed;
-			std::cout << format("test check grammar {} ... {}", path, passed? "true" : "false") << std::endl;
+			std::cout << format("test check grammar {} ... {}", path, passed? "passed" : "false") << std::endl;
 		}
 	}
 
