@@ -19,10 +19,6 @@ bool TestFormatted(std::string input, const std::string& shouldBe, std::shared_p
 	formatter.BuildFormattedElement();
 
 	auto formattedText = formatter.GetFormattedText();
-	auto f1 = StringUtil::TrimSpace(formattedText);
-	auto f2 = StringUtil::TrimSpace(shouldBe);
-
-	std::cout << format("size {} {}", f1.size(), f2.size()) << std::endl;
 
 	return StringUtil::TrimSpace(formattedText) == StringUtil::TrimSpace(shouldBe);
 }
@@ -69,7 +65,8 @@ void CollectLuaFile(std::filesystem::path directoryPath, std::vector<std::string
 
 std::string ReadFile(const std::string& path)
 {
-	std::fstream fin(path, std::ios::in | std::ios::binary);
+	// std::ios::binary 取消读取
+	std::fstream fin(path, std::ios::in);
 
 	if (fin.is_open())
 	{
@@ -110,6 +107,9 @@ int main(int argc, char* argv[])
 	if (target == "CheckFormatResult")
 	{
 		auto options = std::make_shared<LuaCodeStyleOptions>();
+#ifndef _WIN32
+		options->end_of_line = "\n";
+#endif
 		std::filesystem::path formattedRoot(commandLine.Get<std::string>("formatted-work-directory"));
 		for (auto& path : luaFiles)
 		{
