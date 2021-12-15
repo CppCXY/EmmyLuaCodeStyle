@@ -19,7 +19,9 @@ bool TestFormatted(std::string input, const std::string& shouldBe, std::shared_p
 	formatter.BuildFormattedElement();
 
 	auto formattedText = formatter.GetFormattedText();
-
+	std::cout << StringUtil::TrimSpace(formattedText) << std::endl;
+	std::cout << "=============" << std::endl;
+	std::cout << StringUtil::TrimSpace(shouldBe) << std::endl;
 	return StringUtil::TrimSpace(formattedText) == StringUtil::TrimSpace(shouldBe);
 }
 
