@@ -19,7 +19,7 @@ jobs:
             cd build
             cmake ..
             cmake --build . --config Release
-            ctest -V -C Release
+            ctest -V -C --output-on-failure Release
             cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/${{ runner.os }}/
           
     - name: Upload
