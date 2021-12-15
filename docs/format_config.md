@@ -220,9 +220,12 @@ local cc = {
 
 ## align_table_field_to_first_field
 
-该选项表示表的表项是否对齐到首个表项，选项默认值为true，格式化效果如下：
+该选项表示表的表项是否对齐到首个表项，选项默认值为true。
+
+格式化前：
+
 ```lua
--- 格式化前
+
 local t = {
     aaa,bbbb,ccc,
     ddd,eee,fff
@@ -231,9 +234,13 @@ local t = {
 local t2 = {aaa,bbbb,
 ccc,eee
 }
+```
 
+格式化后:
 
--- 该选项为true
+```lua
+
+-- = true
 local t = {
     aaa, bbbb, ccc,
     ddd, eee, fff
@@ -242,7 +249,7 @@ local t2 = { aaa, bbbb,
              ccc, eee
 }
 
--- 该选项为false
+-- false
 local t = {
     aaa, bbbb, ccc,
     ddd, eee, fff
@@ -254,60 +261,73 @@ local t2 = { aaa, bbbb,
 
 ## continuous_assign_statement_align_to_equal_sign
 
-该选项表示连续赋值语句的首行语句如果等号与左边符号相距大于一个空格，则对齐到连续赋值语句的等号最大的位置，该选项默认值为true，效果如下：
+该选项表示连续赋值语句的首行语句如果等号与左边符号相距大于一个空格，则对齐到连续赋值语句的等号最大的位置，该选项默认值为true.
+
+格式化前:
+
 ```lua
--- 格式化前
+
 local t  = 123
 local cccc = 456
 cccc = 321
--- 这是个注释
-eeeeeeeee = 654 -- 这也是个注释
+-- this is a comment
+eeeeeeeee = 654 -- this is a comment2
 
 
---不连续了
+-- no continuous
 local c =132
+```
 
--- 选项为true时
+格式化后：
+
+```lua
+-- true
 local t    = 123
 local cccc = 456
 cccc       = 321
--- 这是个注释
-eeeeeeeee  = 654 -- 这也是个注释
+-- this is a comment
+eeeeeeeee  = 654 -- this is a comment2
 
 
---不连续了
+-- no continuous
 local c = 132
 
--- 选项为false时
+-- false
 local t = 123
 local cccc = 456
 cccc = 321
--- 这是个注释
-eeeeeeeee = 654 -- 这也是个注释
+-- this is a comment
+eeeeeeeee = 654 -- this is a comment2
 
 
---不连续了
+-- no continuous
 local c = 132
 ```
 
 ## continuous_assign_table_field_align_to_equal_sign
 
-该选项表示表中各项是否允许对齐到等号，对齐的规则和上面的选项近似，选项默认值为true，格式化效果如下：
+该选项表示表中各项是否允许对齐到等号，对齐的规则和上面的选项近似，选项默认值为true
+
+格式化前:
+
 ```lua
--- 格式化前
 local t = {
     aadddd  = 123,
     bbb =456,
     ddd =789
 }
+```
 
--- 选项为true时
+格式化：
+
+```lua
+-- true
 local t = {
     aadddd  = 123,
     bbb     = 456,
     ddd     = 789
 }
--- 选项为false时
+-- false
 local t = {
     aadddd = 123,
     bbb = 456,

@@ -19,4 +19,4 @@ target_sources(CodeFormatTest
 target_link_libraries(CodeFormatTest CodeService Util)
 
 add_test(NAME GrammarTest COMMAND CodeFormatTest CheckGrammar -w ${CodeFormatTest_SOURCE_DIR}/test_script/grammar)
-add_test(NAME FormatTest COMMAND CodeFormatTest CheckFormat -w ${CodeFormatTest_SOURCE_DIR}/test_script/format_text -f ${CodeFormatTest_SOURCE_DIR}/test_script/format_text_shouldbe) 
+add_test(NAME FormatTest COMMAND CodeFormatTest CheckFormatResult -w ${CodeFormatTest_SOURCE_DIR}/test_script/format_text -f ${CodeFormatTest_SOURCE_DIR}/test_script/format_text_shouldbe) 

@@ -8,17 +8,6 @@ local ddd = aaa + eee
 local f = function() end
 local cc2 = function()
 end
---do
---local
-local requireA = require "aaa.bbb.ccc"
-
-local ccc = aaa + bbbb
-local ddd = aaa + eee
-    + eeee
-
-local f = function() end
-local cc2 = function()
-end
 
 
 --cotinuous
