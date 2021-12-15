@@ -23,7 +23,6 @@ bool TestFormatted(std::string input, const std::string& shouldBe, std::shared_p
 	auto f2 = StringUtil::TrimSpace(shouldBe);
 
 	std::cout << format("size {} {}", f1.size(), f2.size()) << std::endl;
-	std::cout << format("size {} {}", f1.size(), f2.size()) << std::endl;
 
 	return StringUtil::TrimSpace(formattedText) == StringUtil::TrimSpace(shouldBe);
 }
@@ -70,7 +69,7 @@ void CollectLuaFile(std::filesystem::path directoryPath, std::vector<std::string
 
 std::string ReadFile(const std::string& path)
 {
-	std::fstream fin(path, std::ios::in);
+	std::fstream fin(path, std::ios::in | std::ios::binary);
 
 	if (fin.is_open())
 	{
@@ -137,7 +136,7 @@ int main(int argc, char* argv[])
 			bool passed = TestGrammar(text);
 
 			success &= passed;
-			std::cout << format("test check grammar {} ... {}", path, passed? "passed" : "false") << std::endl;
+			std::cout << format("test check grammar {} ... {}", path, passed ? "passed" : "false") << std::endl;
 		}
 	}
 
