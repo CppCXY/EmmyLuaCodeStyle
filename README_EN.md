@@ -10,7 +10,7 @@ The main pursuit of this project is reasonable formatting and diagnosis of vario
 
 In addition to providing language service examples, the project also provides an independent command line tool CodeFormat, which can be used for batch code formatting and code style checking (there are still many problems, you can modify it yourself). 
 
-## 文档
+## Document
 
 * [Introduction to formatting behavior](docs/format_action_EN.md)
 * [How to configure formatting](docs/format_config_EN.md)
@@ -23,9 +23,9 @@ Any pr or issue are welcome
 ## Build
 
 If you want to compile the project yourself, make sure that your compiler can basically support C++20: 
-* VS2019 16.10以上
-* gcc 10以上
-* clang 10以上
+* VS2019 16.10 and above
+* gcc 10 and above
+* clang 10 and above
 
 ```
 mkdir build && cd build
