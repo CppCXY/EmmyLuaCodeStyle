@@ -87,7 +87,7 @@ local d = {
 }
 ```
 
-格式化后：
+after formatting：
 
 ```lua
 local t = { 1, 2, 3 }
@@ -219,7 +219,7 @@ local c = {
 }
 ```
 
-格式化后：
+after formatting：
 
 ```lua
 --[[
