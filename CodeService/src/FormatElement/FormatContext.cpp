@@ -94,7 +94,6 @@ void FormatContext::AddIndent(int specialIndent)
 			// 当你制定了一个缩进，则我会认为保底有一个缩进
 			newIndent = std::max(1, specialIndent / _options.tab_width);
 		}
-		std::string indentString = "\t";
 		_indentStack.push({newIndent, "\t"});
 	}
 }

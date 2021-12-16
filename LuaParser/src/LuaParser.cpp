@@ -99,7 +99,7 @@ bool LuaParser::IsEmptyLine(int line)
 void LuaParser::SetFilename(std::string_view filename)
 {
 	std::filesystem::path path(filename);
-	
+
 	_filename = path.replace_extension().string();
 }
 
@@ -140,7 +140,7 @@ void LuaParser::BuildAstWithComment()
 				commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::ShebangComment, comment));
 			}
 
-			blockNode->AddLeafChild(commentAst);
+			blockNode->AddComment(commentAst);
 		}
 	}
 
@@ -182,7 +182,7 @@ void LuaParser::Statement(std::shared_ptr<LuaAstNode> blockNode)
 	{
 	case ';':
 		{
-			auto emptyStatement = CreateAstNodeFromToken(LuaAstNodeType::EmptyStatement, _tokenParser->Current());
+			auto emptyStatement = CreateAstNodeFromCurrentToken(LuaAstNodeType::EmptyStatement);
 			blockNode->AddChild(emptyStatement);
 			_tokenParser->Next();
 			break;
@@ -562,7 +562,7 @@ void LuaParser::CheckMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<
 	{
 		auto range = parent->GetTextRange();
 		ThrowMatchError(format("token {} expected ,(to close {} at", what, who),
-		              TextRange(range.EndOffset, range.EndOffset));
+		                TextRange(range.EndOffset, range.EndOffset));
 	}
 }
 
@@ -1148,7 +1148,7 @@ void LuaParser::CodeName(std::shared_ptr<LuaAstNode> parent)
 
 std::shared_ptr<LuaAstNode> LuaParser::CreateAstNode(LuaAstNodeType type)
 {
-	return std::make_shared<LuaAstNode>(type, _tokenParser->GetSource().c_str());
+	return std::make_shared<LuaAstNode>(type, std::string_view(GetSource().data(), 0), TextRange(0, 0));
 }
 
 std::shared_ptr<LuaAstNode> LuaParser::CreateAstNodeFromToken(LuaAstNodeType type, LuaToken& token)

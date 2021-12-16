@@ -105,6 +105,8 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 	std::string_view fileText;
 	for (auto& content : param->contentChanges)
 	{
+		LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
+
 		auto parser = LuaParser::LoadFromBuffer(std::move(content.text));
 		parser->BuildAstWithComment();
 
@@ -119,6 +121,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidOpen(
 	std::shared_ptr<vscode::DidOpenTextDocumentParams> param)
 {
+	LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
 	auto parser = LuaParser::LoadFromBuffer(std::move(param->textDocument.text));
 	parser->BuildAstWithComment();
 	LanguageClient::GetInstance().CacheFile(param->textDocument.uri, parser);

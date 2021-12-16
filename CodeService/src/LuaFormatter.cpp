@@ -1611,7 +1611,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(int& currentI
 
 		for (auto comment : comments)
 		{
-			copyBlock->AddLeafChild(comment);
+			copyBlock->AddComment(comment);
 		}
 
 		return FormatBlock(copyBlock);

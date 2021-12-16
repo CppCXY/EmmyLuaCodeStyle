@@ -12,7 +12,7 @@ class LuaAstVisitor;
 class LuaAstNode: public std::enable_shared_from_this<LuaAstNode>
 {
 public:
-	LuaAstNode(LuaAstNodeType type, const char* source);
+	LuaAstNode(LuaAstNodeType type, std::string_view text, TextRange range);
 
 	LuaAstNode(LuaAstNodeType type, LuaToken& token);
 
@@ -38,20 +38,20 @@ public:
 
 	void SetType(LuaAstNodeType type);
 
-	// child会被加入为最底层的叶子节点
-	void AddLeafChild(std::shared_ptr<LuaAstNode> child);
+	void AddComment(std::shared_ptr<LuaAstNode> comment);
 
 	std::shared_ptr<LuaAstNode> GetParent();
+
+	const char* GetSource();
 private:
-	void addChildAfter(int index, std::shared_ptr<LuaAstNode> child);
-	void addChildBefore(int index, std::shared_ptr<LuaAstNode> child);
+	void AddChildAfter(int index, std::shared_ptr<LuaAstNode> child);
+	void AddChildBefore(int index, std::shared_ptr<LuaAstNode> child);
 
 	LuaAstNodeType _type;
 	std::string_view _text;
-
-	const char* _source;
 	TextRange _textRange;
+
 	std::vector<std::shared_ptr<LuaAstNode>> _children;
-	std::string _error;
 	std::weak_ptr<LuaAstNode> _parent;
 };
+
