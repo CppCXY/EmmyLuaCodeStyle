@@ -342,7 +342,7 @@ local t = {
 
 This option represents the symbol at the end of the line, the default is crlf, and it can also be lf 
 
-# 语句的行布局
+# Statement line layout 
 
 The algorithm also supports setting the line spacing between different sentences. The sentences that can be set include if, while, repeat, for, do, and local/assign sentences.
 
