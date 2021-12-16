@@ -39,7 +39,7 @@ max_line_length = 120
 insert_final_newline = true
 
 
-enable_name_style_check = true
+enable_name_style_check = false
 # the following is name style check rule 
 # base option off/camel_case/snake_case/upper_snake_case/pascal_case/same(filename/first_param/'<const string>', snake_case/pascal_case/camel_case)
 # all option can use '|' represent or 
