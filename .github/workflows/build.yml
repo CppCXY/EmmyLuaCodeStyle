@@ -23,7 +23,7 @@ jobs:
             cd build
             cmake ..
             cmake --build . --config Release
-            ctest -V -C --output-on-failure Release
+            ctest -V -C Release
             cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/${{ matrix.platform }}/
           
     - name: Upload
@@ -42,6 +42,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          generate_release_notes: true
           files: CodeFormat.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
