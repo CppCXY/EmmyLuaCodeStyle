@@ -72,6 +72,7 @@ jobs:
         with:
           name: CodeFormat
           draft: false
+        
           generate_release_notes: true
           files: |
             linux-x64.zip
