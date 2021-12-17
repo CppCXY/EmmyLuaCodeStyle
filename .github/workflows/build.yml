@@ -1,6 +1,11 @@
 name: Build
 
-on: push
+on: 
+  push:
+    branches:
+      - master
+    tags:
+      - "v*.*.*"
 
 jobs:
   build:
@@ -38,11 +43,17 @@ jobs:
     steps:
       - name: Download
         uses: actions/download-artifact@v2
+      - name: Display structure of downloaded files
+        run: ls -R
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           generate_release_notes: true
-          files: CodeFormat.zip
+          files: |
+            linux-x64.zip
+            darwin-x64.zip
+            darwin-arm64.zip
+            win32-x64.zip
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
+          GITHUB_TOKEN: ${{ secrets.RELEASE }}        
