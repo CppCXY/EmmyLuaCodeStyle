@@ -75,13 +75,14 @@ std::vector<LuaDiagnosisInfo> LuaFormatter::GetDiagnosisInfos()
 
 	_env->DiagnosisCodeStyle(ctx);
 
-	if (_options.enable_name_style_check) {
+	if (_options.enable_name_style_check)
+	{
 		NameStyleChecker checker(ctx);
 		auto chunkAst = _parser->GetAst();
 		chunkAst->AcceptChildren(checker);
 		checker.Analysis();
 	}
-	 
+
 	return ctx.GetDiagnosisInfos();
 }
 
@@ -1823,6 +1824,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 					env->Add<KeepElement>(1);
 				}
 
+				break;
+			}
+		case LuaAstNodeType::CallExpression:
+			{
+				env->AddChild(FormatNode(child));
+				env->Add<KeepElement>(0);
 				break;
 			}
 		case LuaAstNodeType::CallArgList:
