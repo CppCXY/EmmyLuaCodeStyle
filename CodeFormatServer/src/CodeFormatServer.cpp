@@ -11,8 +11,6 @@
 # define SET_BINARY_MODE() _setmode(_fileno(stdin), _O_BINARY);\
 	_setmode(_fileno(stdout), _O_BINARY)
 #else
-# include <sys/io.h>
-# include <fcntl.h>
 # define SET_BINARY_MODE() (void)0
 #endif
 
