@@ -1,9 +1,89 @@
 #include "CodeFormatServer/Session/StandardIOSession.h"
 
 #include <iostream>
-#include <thread>
+
+#ifndef _WIN32
+#include <asio.hpp>
+#include <unistd.h>
+#endif
 #include "CodeFormatServer/Protocol/ProtocolParser.h"
 #include "CodeFormatServer/Protocol/ProtocolBuffer.h"
+
+
+class StandardIO
+{
+public:
+	static StandardIO& GetInstance();
+
+	StandardIO();
+
+	std::size_t ReadSome(char* buffer, std::size_t maxSize);
+
+	bool HasError();
+
+	void Write(std::string_view content);
+private:
+#ifndef _WIN32
+	asio::io_context _ioc;
+	asio::error_code _code;
+	std::shared_ptr<asio::posix::stream_descriptor> _in;
+	std::shared_ptr<asio::posix::stream_descriptor> _out;
+#endif
+};
+
+StandardIO& StandardIO::GetInstance()
+{
+	static StandardIO instance;
+	return instance;
+}
+
+#ifndef _WIN32
+StandardIO::StandardIO()
+	:_ioc(1)
+{
+	_in = std::make_shared<asio::posix::stream_descriptor>(_ioc, STDIN_FILENO);
+	_out = std::make_shared<asio::posix::stream_descriptor>(_ioc, STDOUT_FILENO);
+}
+
+std::size_t StandardIO::ReadSome(char* buffer, std::size_t maxSize)
+{
+	return _in->read_some(asio::buffer(buffer, maxSize), _code);
+}
+
+bool StandardIO::HasError()
+{
+	return _code == asio::error::eof || _code;
+}
+
+void StandardIO::Write(std::string_view content)
+{
+	_out->write_some(asio::buffer(content.data(),content.size()));
+}
+
+#else
+StandardIO::StandardIO()
+{
+}
+
+std::size_t StandardIO::ReadSome(char* buffer, std::size_t maxSize)
+{
+	std::cin.peek();
+	return std::cin.readsome(buffer, maxSize);
+}
+
+bool StandardIO::HasError()
+{
+	return !std::cin;
+}
+
+void StandardIO::Write(std::string_view content)
+{
+	std::cout.write(content.data(), content.size());
+}
+
+
+#endif
+
 
 void StandardIOSession::Run()
 {
@@ -15,9 +95,9 @@ void StandardIOSession::Run()
 			char* writableCursor = _protocolBuffer.GetWritableCursor();
 			std::size_t capacity = _protocolBuffer.GetRestCapacity();
 
-			std::cin.peek();
-			std::size_t readSize = std::cin.readsome(writableCursor, capacity);
-			if (!std::cin)
+			std::size_t readSize = StandardIO::GetInstance().ReadSome(writableCursor, capacity);
+
+			if(StandardIO::GetInstance().HasError())
 			{
 				goto endLoop;
 			}
@@ -30,17 +110,20 @@ void StandardIOSession::Run()
 			}
 
 			_protocolBuffer.FitCapacity();
+		}
+		while (true);
 
-		} while (true);
-
-		do {
+		do
+		{
 			std::string result = Handle(_protocolBuffer.ReadOneProtocol());
 
 			_protocolBuffer.Reset();
-			if (!result.empty()) {
+			if (!result.empty())
+			{
 				Send(result);
 			}
-		} while (_protocolBuffer.CanReadOneProtocol());
+		}
+		while (_protocolBuffer.CanReadOneProtocol());
 	}
 endLoop:
 	return;
@@ -48,5 +131,5 @@ endLoop:
 
 void StandardIOSession::Send(std::string_view content)
 {
-	std::cout.write(content.data(), content.size());
+	StandardIO::GetInstance().Write(content);
 }
