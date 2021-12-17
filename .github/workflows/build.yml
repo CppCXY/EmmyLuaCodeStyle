@@ -8,7 +8,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        include:
+          - { os: ubuntu-latest, target: linux, platform: linux-x64}
+          - { os: macos-latest, target: darwin, platform: darwin-x64}
+          - { os: macos-latest, target: darwin, platform: darwin-arm64}
+          - { os: windows-latest, target: windows, platform: win32-x64}
     steps:
     - uses: actions/checkout@v2
       with:
@@ -20,7 +24,7 @@ jobs:
             cmake ..
             cmake --build . --config Release
             ctest -V -C --output-on-failure Release
-            cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/${{ runner.os }}/
+            cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/${{ matrix.platform }}/
           
     - name: Upload
       uses: actions/upload-artifact@v2

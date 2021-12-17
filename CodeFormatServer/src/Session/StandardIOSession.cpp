@@ -57,7 +57,6 @@ bool StandardIO::HasError()
 
 void StandardIO::Write(std::string_view content)
 {
-	// _out->write_some();
 	asio::write(*_out, asio::buffer(content.data(), content.size()));
 }
 
