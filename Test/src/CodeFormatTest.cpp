@@ -65,8 +65,11 @@ void CollectLuaFile(std::filesystem::path directoryPath, std::vector<std::string
 
 std::string ReadFile(const std::string& path)
 {
-	// std::ios::binary 取消读取
+#ifdef _WIN32
+	std::fstream fin(path, std::ios::in | std::ios::binary);
+#else
 	std::fstream fin(path, std::ios::in);
+#endif
 
 	if (fin.is_open())
 	{

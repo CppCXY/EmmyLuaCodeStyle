@@ -18,14 +18,14 @@ FormatElementType TextElement::GetType()
 	return FormatElementType::TextElement;
 }
 
-void TextElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
+void TextElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
 	ctx.Print(*this);
 }
 
-void TextElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
+void TextElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
-	int character = ctx.GetColumn(_textRange.EndOffset);
+	const int character = ctx.GetColumn(_textRange.EndOffset);
 	ctx.SetCharacterCount(character);
 
 	if (character > ctx.GetOptions().max_line_length)

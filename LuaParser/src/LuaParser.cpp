@@ -112,13 +112,13 @@ void LuaParser::BuildAstWithComment()
 {
 	BuildAst();
 
-	auto& chunkChildren = _chunkAstNode->GetChildren();
+	auto chunkChildren = _chunkAstNode->GetChildren();
 	if (chunkChildren.empty())
 	{
 		return;
 	}
 
-	auto blockNode = chunkChildren[0];
+	auto blockNode = chunkChildren.front();
 
 	auto& comments = _tokenParser->GetComments();
 	// 将注释注入AST中
@@ -651,7 +651,7 @@ void LuaParser::Subexpression(std::shared_ptr<LuaAstNode> expressionNode, int li
 	}
 	else
 	{
-		auto& children = binaryExpression->GetChildren();
+		auto children = binaryExpression->GetChildren();
 		for (auto child : children)
 		{
 			expressionNode->AddChild(child);

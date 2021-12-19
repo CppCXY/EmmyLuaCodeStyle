@@ -9,6 +9,6 @@ public:
 
 	FormatElementType GetType() override;
 
-	void Serialize(FormatContext& ctx, int position, FormatElement& parent) override;
-	void Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent) override;
+	void Serialize(FormatContext& ctx, std::optional<ChildIterator> selfIt, FormatElement& parent) override;
+	void Diagnosis(DiagnosisContext& ctx, std::optional<ChildIterator> selfIt, FormatElement& parent) override;
 };

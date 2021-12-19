@@ -12,27 +12,35 @@ FormatElementType KeepBlankElement::GetType()
 	return FormatElementType::KeepBlankElement;
 }
 
-void KeepBlankElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
+void KeepBlankElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
-	int nextOffset = getNextValidOffset(position, parent);
-	if (nextOffset != -1)
+	if(selfIt.has_value())
 	{
-		ctx.PrintBlank(_blank);
+		int nextOffset = GetNextValidOffset(selfIt.value(), parent);
+		if (nextOffset != -1)
+		{
+			ctx.PrintBlank(_blank);
+		}
 	}
 }
 
-void KeepBlankElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
+void KeepBlankElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
-	int lastOffset = getLastValidOffset(position, parent);
-	int nextOffset = getNextValidOffset(position, parent);
-
-	if (nextOffset == -1)
+	if(!selfIt.has_value())
 	{
 		return;
 	}
 
-	int lastElementLine = ctx.GetLine(lastOffset);
-	int nextElementLine = ctx.GetLine(nextOffset);
+	const int lastOffset = GetLastValidOffset(selfIt.value(), parent);
+	const int nextOffset = GetNextValidOffset(selfIt.value(), parent);
+
+ 	if (nextOffset == -1)
+	{
+		return;
+	}
+
+	const int lastElementLine = ctx.GetLine(lastOffset);
+	const int nextElementLine = ctx.GetLine(nextOffset);
 
 	if (nextElementLine == lastElementLine)
 	{

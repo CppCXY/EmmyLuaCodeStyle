@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <optional>
 #include "LuaParser/LuaAstNode.h"
 #include "FormatElementType.h"
 #include "FormatContext.h"
@@ -7,22 +8,21 @@
 #include "CodeService/LanguageTranslator.h"
 #include "CodeService/LuaFormatRange.h"
 
-class FormatElement
+// 智能指针对多态支持可能有问题
+class FormatElement //: std::enable_shared_from_this<FormatElement>
 {
 public:
+	using ChildContainer = std::vector<std::shared_ptr<FormatElement>>;
+	using ChildIterator = ChildContainer::iterator;
+
 	explicit FormatElement(TextRange range = TextRange());
 	virtual ~FormatElement();
 
 	virtual FormatElementType GetType();
-	/*
-	 * 智能指针在多态方面支持不够方便
-	 */
-	virtual void Serialize(FormatContext& ctx, int position, FormatElement& parent);
 
-	/*
-	 * 智能指针在多态方面支持不够方便
-	 */
-	virtual void Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent);
+	virtual void Serialize(FormatContext& ctx, std::optional<ChildIterator> selfIt, FormatElement& parent);
+
+	virtual void Diagnosis(DiagnosisContext& ctx, std::optional<ChildIterator> selfIt, FormatElement& parent);
 
 	void Format(FormatContext& ctx);
 
@@ -32,9 +32,9 @@ public:
 
 	void AddChild(std::shared_ptr<FormatElement> child);
 
-	void AddChildren(std::vector<std::shared_ptr<FormatElement>>& children);
+	void AddChildren(ChildContainer& children);
 
-	std::vector<std::shared_ptr<FormatElement>>& GetChildren();
+	ChildContainer& GetChildren();
 
 	bool HasValidTextRange() const;
 
@@ -46,17 +46,16 @@ public:
 		AddChild(std::make_shared<T>(std::forward<ARGS>(args)...));
 	}
 
-
 protected:
-	void addTextRange(TextRange range);
+	static int GetLastValidOffset(ChildIterator it, FormatElement& parent);
+	static int GetNextValidOffset(ChildIterator it, FormatElement& parent);
 
-	int getLastValidLine(FormatContext& ctx, int position, FormatElement& parent);
-	int getNextValidLine(FormatContext& ctx, int position, FormatElement& parent);
+	static int GetLastValidLine(FormatContext& ctx, ChildIterator it, FormatElement& parent);
+	static int GetNextValidLine(FormatContext& ctx, ChildIterator it, FormatElement& parent);
 
-	int getLastValidOffset(int position, FormatElement& parent);
-	int getNextValidOffset(int position, FormatElement& parent);
+	void AddTextRange(TextRange range);
 
 	TextRange _textRange;
 
-	std::vector<std::shared_ptr<FormatElement>> _children;
+	ChildContainer _children;
 };

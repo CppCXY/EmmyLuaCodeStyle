@@ -12,7 +12,7 @@ FormatElementType LongExpressionLayoutElement::GetType()
 	return FormatElementType::LongExpressionLayoutElement;
 }
 
-void LongExpressionLayoutElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
+void LongExpressionLayoutElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
 	SerializeSubExpression(ctx, *this);
 	if (_hasContinuation)
@@ -21,7 +21,7 @@ void LongExpressionLayoutElement::Serialize(FormatContext& ctx, int position, Fo
 	}
 }
 
-void LongExpressionLayoutElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
+void LongExpressionLayoutElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
 	DiagnosisSubExpression(ctx, *this);
 	if (_hasContinuation)
@@ -33,9 +33,9 @@ void LongExpressionLayoutElement::Diagnosis(DiagnosisContext& ctx, int position,
 void LongExpressionLayoutElement::SerializeSubExpression(FormatContext& ctx, FormatElement& parent)
 {
 	auto& children = parent.GetChildren();
-	for (int i = 0; i < static_cast<int>(children.size()); i++)
+	for (auto it = children.begin(); it != children.end(); ++it)
 	{
-		auto child = children[i];
+		auto child = *it;
 
 		if (child->GetType() == FormatElementType::SubExpressionElement)
 		{
@@ -43,7 +43,7 @@ void LongExpressionLayoutElement::SerializeSubExpression(FormatContext& ctx, For
 		}
 		else
 		{
-			child->Serialize(ctx, i, parent);
+			child->Serialize(ctx, it, parent);
 		}
 		if (child->GetType() == FormatElementType::KeepElement)
 		{
@@ -59,9 +59,9 @@ void LongExpressionLayoutElement::SerializeSubExpression(FormatContext& ctx, For
 void LongExpressionLayoutElement::DiagnosisSubExpression(DiagnosisContext& ctx, FormatElement& parent)
 {
 	auto& children = parent.GetChildren();
-	for (int i = 0; i < static_cast<int>(children.size()); i++)
+	for (auto it = children.begin();it != children.end(); ++it)
 	{
-		auto child = children[i];
+		auto child = *it;
 
 		if (child->GetType() == FormatElementType::SubExpressionElement)
 		{
@@ -69,7 +69,7 @@ void LongExpressionLayoutElement::DiagnosisSubExpression(DiagnosisContext& ctx, 
 		}
 		else
 		{
-			child->Diagnosis(ctx, i, parent);
+			child->Diagnosis(ctx, it, parent);
 		}
 		if (child->GetType() == FormatElementType::KeepElement)
 		{

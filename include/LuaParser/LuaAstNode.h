@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <vector>
+#include <list>
 #include <memory>
 #include "LuaAstNodeType.h"
 #include "TextRange.h"
@@ -12,6 +13,9 @@ class LuaAstVisitor;
 class LuaAstNode: public std::enable_shared_from_this<LuaAstNode>
 {
 public:
+	using ChildrenContainer = std::list<std::shared_ptr<LuaAstNode>>;
+	using ChildIterator = ChildrenContainer::iterator;
+
 	LuaAstNode(LuaAstNodeType type, std::string_view text, TextRange range);
 
 	LuaAstNode(LuaAstNodeType type, LuaToken& token);
@@ -30,7 +34,7 @@ public:
 
 	std::string_view GetText() const;
 
-	const std::vector<std::shared_ptr<LuaAstNode>>& GetChildren();
+	ChildrenContainer& GetChildren();
 
 	void AddChild(std::shared_ptr<LuaAstNode> child);
 
@@ -44,14 +48,13 @@ public:
 
 	const char* GetSource();
 private:
-	void AddChildAfter(int index, std::shared_ptr<LuaAstNode> child);
-	void AddChildBefore(int index, std::shared_ptr<LuaAstNode> child);
+	void AddChildBefore(ChildIterator it, std::shared_ptr<LuaAstNode> child);
 
 	LuaAstNodeType _type;
 	std::string_view _text;
 	TextRange _textRange;
 
-	std::vector<std::shared_ptr<LuaAstNode>> _children;
+	ChildrenContainer _children;
 	std::weak_ptr<LuaAstNode> _parent;
 };
 

@@ -99,9 +99,11 @@ LuaToken& LuaTokenParser::Next()
 
 LuaToken& LuaTokenParser::LookAhead()
 {
-	if (_currentIndex + 1 < _tokens.size())
+	std::size_t nextIndex = _currentIndex + 1;
+
+	if (nextIndex < _tokens.size())
 	{
-		return _tokens[_currentIndex + 1];
+		return _tokens[nextIndex];
 	}
 
 	return _eosToken;

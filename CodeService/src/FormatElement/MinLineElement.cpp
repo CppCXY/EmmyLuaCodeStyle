@@ -12,16 +12,21 @@ FormatElementType MinLineElement::GetType()
 	return FormatElementType::MinLineElement;
 }
 
-void MinLineElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
+void MinLineElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
+	if(!selfIt.has_value())
+	{
+		return;
+	}
+
 	auto minLine = 0;
 	if (_line > 0)
 	{
 		minLine = _line;
 	}
 
-	int lastElementLine = getLastValidLine(ctx, position, parent);
-	int nextElementLine = getNextValidLine(ctx, position, parent);
+	const int lastElementLine = GetLastValidLine(ctx, selfIt.value(), parent);
+	const int nextElementLine = GetNextValidLine(ctx, selfIt.value(), parent);
 
 	if (nextElementLine == -1)
 	{
@@ -38,22 +43,28 @@ void MinLineElement::Serialize(FormatContext& ctx, int position, FormatElement& 
 	ctx.PrintLine(line);
 }
 
-void MinLineElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
+void MinLineElement::Diagnosis(DiagnosisContext& ctx, std::optional<ChildIterator> selfIt, FormatElement& parent)
 {
+	if (!selfIt.has_value())
+	{
+		return;
+	}
+
 	if (_line <= 0)
 	{
 		return;
 	}
-	int lastOffset = getLastValidOffset(position, parent);
-	int nextOffset = getNextValidOffset(position, parent);
+
+	const int lastOffset = GetLastValidOffset(selfIt.value(), parent);
+	const int nextOffset = GetNextValidOffset(selfIt.value(), parent);
 
 	if (nextOffset == -1)
 	{
 		return;
 	}
 
-	int lastElementLine = ctx.GetLine(lastOffset);
-	int nextElementLine = nextOffset == -1 ? -1 : ctx.GetLine(nextOffset);
+	const int lastElementLine = ctx.GetLine(lastOffset);
+	const int nextElementLine = nextOffset == -1 ? -1 : ctx.GetLine(nextOffset);
 
 	if (_line > (nextElementLine - lastElementLine - 1))
 	{
