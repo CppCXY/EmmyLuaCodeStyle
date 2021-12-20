@@ -1306,6 +1306,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 				env->Add<TextElement>(child, TextDefineType::TableFieldNameDefine);
 				break;
 			}
+		case LuaAstNodeType::Comment:
+			{
+				env->Add<TextElement>(child);
+				env->Add<KeepElement>(1);
+				break;
+			}
 		default:
 			{
 				DefaultHandle(child, env);
