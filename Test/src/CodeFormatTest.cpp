@@ -38,6 +38,30 @@ bool TestGrammar(std::string input)
 			                    parser->GetLine(error.ErrorRange.EndOffset),
 			                    parser->GetColumn(error.ErrorRange.EndOffset)
 			) << std::endl;
+		return result;
+	}
+
+	auto options = std::make_shared<LuaCodeStyleOptions>();
+
+	LuaFormatter formatter(parser, *options);
+
+	formatter.BuildFormattedElement();
+
+	auto formattedText = formatter.GetFormattedText();
+	auto formattedParser = LuaParser::LoadFromBuffer(std::move(formattedText));
+
+	formattedParser->BuildAstWithComment();
+	result = formattedParser->GetErrors().empty();
+
+	if (!result)
+	{
+		for (auto& error : formattedParser->GetErrors())
+			std::cout << format("error after formatted: {}, from [{},{}] to [{},{}]", error.ErrorMessage,
+				formattedParser->GetLine(error.ErrorRange.StartOffset),
+				formattedParser->GetColumn(error.ErrorRange.StartOffset),
+				formattedParser->GetLine(error.ErrorRange.EndOffset),
+				formattedParser->GetColumn(error.ErrorRange.EndOffset)
+			) << std::endl;
 	}
 
 	return result;

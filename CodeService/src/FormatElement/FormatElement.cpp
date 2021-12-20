@@ -22,7 +22,7 @@ TextRange FormatElement::GetTextRange()
 
 void FormatElement::AddChild(std::shared_ptr<FormatElement> child)
 {
-	if (static_cast<int>(child->GetType()) < static_cast<int>(FormatElementType::ControlStart))
+	if (!child->GetTextRange().IsEmpty())
 	{
 		const auto range = child->GetTextRange();
 		AddTextRange(range);

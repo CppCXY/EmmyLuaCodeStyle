@@ -262,7 +262,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 			}
 		case LuaAstNodeType::RepeatStatement:
 			{
-				indentEnv->AddChild(FormatNode(statement));
+				auto child = FormatNode(statement);
+				indentEnv->AddChild(child);
 				indentEnv->AddChild(_options.keep_line_after_repeat_statement);
 				break;
 			}
@@ -868,7 +869,14 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRepeatStatement(std::shared_p
 				{
 					bool singleLine = false;
 					env->AddChild(FormatNodeAndBlockOrEnd(it, singleLine, children));
-					env->Add<KeepLineElement>();
+					if (singleLine)
+					{
+						env->Add<KeepElement>(1);
+					}
+					else
+					{
+						env->Add<KeepLineElement>();
+					}
 				}
 				else
 				{
@@ -1723,9 +1731,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBinaryExpression(std::shared_
 std::shared_ptr<FormatElement> LuaFormatter::FormatUnaryExpression(std::shared_ptr<LuaAstNode> unaryExpression)
 {
 	auto env = std::make_shared<SubExpressionElement>();
-
-	for (const auto& child : unaryExpression->GetChildren())
+	auto& children = unaryExpression->GetChildren();
+	for (auto it = children.begin(); it != children.end(); ++it)
 	{
+		auto child = *it;
 		switch (child->GetType())
 		{
 		case LuaAstNodeType::UnaryOperator:
@@ -1737,6 +1746,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatUnaryExpression(std::shared_p
 				}
 				else
 				{
+					auto next = nextNode(it, children);
+					if (next && (next->GetType() == LuaAstNodeType::UnaryExpression || next->GetType() ==
+						LuaAstNodeType::Comment))
+					{
+						env->Add<KeepElement>(1);
+						break;
+					}
 					env->Add<KeepElement>(0);
 				}
 				break;
