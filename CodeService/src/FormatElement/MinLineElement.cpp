@@ -2,7 +2,7 @@
 #include "Util/format.h"
 
 MinLineElement::MinLineElement(int line)
-	: FormatElement(TextRange()),
+	: FormatElement(),
 	  _line(line)
 {
 }

@@ -5,11 +5,13 @@
 class TextRange
 {
 public:
-	explicit TextRange(std::size_t startOffset = 0, std::size_t endOffset = 0);
+	explicit TextRange(int startOffset = 0, int endOffset = -1);
 
-	bool Contain(TextRange& range);
+	bool IsEmpty() const;
 
-	bool Between(TextRange& leftRange, TextRange& rightRange);
+	bool Contain(TextRange& range) const;
+
+	bool Between(TextRange& leftRange, TextRange& rightRange) const;
 
 	int StartOffset;
 	int EndOffset;

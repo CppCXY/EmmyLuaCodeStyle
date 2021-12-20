@@ -1,7 +1,7 @@
 #include "CodeService/FormatElement/LineElement.h"
 
 LineElement::LineElement()
-	: FormatElement(TextRange())
+	: FormatElement()
 {
 }
 

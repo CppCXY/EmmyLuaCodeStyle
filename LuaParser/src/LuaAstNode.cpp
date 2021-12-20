@@ -72,24 +72,24 @@ void LuaAstNode::AddChild(std::shared_ptr<LuaAstNode> child)
 	{
 		return;
 	}
-	auto source = GetSource();
+
+	if (child->_textRange.IsEmpty())
+	{
+		return;
+	}
+
+	const auto source = GetSource();
 	if (child->GetSource() != source)
 	{
 		return;
 	}
 
-	if (_textRange.StartOffset == 0 && _textRange.EndOffset == 0)
+	if (_textRange.IsEmpty())
 	{
 		_textRange = child->_textRange;
 	}
-
 	else
 	{
-		if (child->_textRange.StartOffset == 0 && child->_textRange.EndOffset == 0)
-		{
-			return;
-		}
-
 		if (_textRange.StartOffset > child->_textRange.StartOffset)
 		{
 			_textRange.StartOffset = child->_textRange.StartOffset;
@@ -173,23 +173,23 @@ void LuaAstNode::AddChildBefore(ChildIterator it, std::shared_ptr<LuaAstNode> ch
 {
 	if (it == _children.begin())
 	{
-		auto source = GetSource();
+		if (child->_textRange.IsEmpty())
+		{
+			return;
+		}
+
+		const auto source = GetSource();
 		if (child->GetSource() != source)
 		{
 			return;
 		}
 
-		if (_textRange.StartOffset == 0 && _textRange.EndOffset == 0)
+		if (_textRange.IsEmpty())
 		{
 			_textRange = child->_textRange;
 		}
 		else
 		{
-			if (child->_textRange.StartOffset == 0 && child->_textRange.EndOffset == 0)
-			{
-				return;
-			}
-
 			if (_textRange.StartOffset > child->_textRange.StartOffset)
 			{
 				_textRange.StartOffset = child->_textRange.StartOffset;
@@ -203,7 +203,7 @@ void LuaAstNode::AddChildBefore(ChildIterator it, std::shared_ptr<LuaAstNode> ch
 		_text = std::string_view(source + _textRange.StartOffset,
 		                         _textRange.EndOffset - _textRange.StartOffset + 1);
 	}
-	else if(it == _children.end())
+	else if (it == _children.end())
 	{
 		return AddChild(child);
 	}

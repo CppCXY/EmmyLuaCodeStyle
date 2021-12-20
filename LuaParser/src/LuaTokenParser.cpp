@@ -66,11 +66,13 @@ bool LuaTokenParser::Parse()
 		{
 			if (type == TK_LONG_COMMENT || type == TK_SHEBANG || type == TK_SHORT_COMMENT)
 			{
-				_commentTokens.emplace_back(type, text, TextRange(_buffStart, _buffIndex));
+				_commentTokens.emplace_back(type, text, TextRange(
+					                            static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
 			}
 			else
 			{
-				_tokens.emplace_back(type, text, TextRange(_buffStart, _buffIndex));
+				_tokens.emplace_back(type, text, TextRange(
+					                     static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
 			}
 		}
 		else

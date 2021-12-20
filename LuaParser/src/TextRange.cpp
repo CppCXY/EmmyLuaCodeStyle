@@ -1,17 +1,22 @@
 ﻿#include "LuaParser/TextRange.h"
 
-TextRange::TextRange(std::size_t startOffset, std::size_t endOffset)
-	: StartOffset(static_cast<int>(startOffset)),
-	EndOffset(static_cast<int>(endOffset))
+TextRange::TextRange(int startOffset, int endOffset)
+	: StartOffset(startOffset),
+	  EndOffset(endOffset)
 {
 }
 
-bool TextRange::Contain(TextRange& range)
+bool TextRange::IsEmpty() const
+{
+	return StartOffset == 0 && EndOffset == -1;
+}
+
+bool TextRange::Contain(TextRange& range) const
 {
 	return this->StartOffset <= range.StartOffset && this->EndOffset >= range.EndOffset;
 }
 
-bool TextRange::Between(TextRange& leftRange, TextRange& rightRange)
+bool TextRange::Between(TextRange& leftRange, TextRange& rightRange) const
 {
 	return this->StartOffset > leftRange.EndOffset && this->EndOffset < rightRange.StartOffset;
 }

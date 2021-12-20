@@ -45,7 +45,7 @@ FormatElement::ChildContainer& FormatElement::GetChildren()
 
 bool FormatElement::HasValidTextRange() const
 {
-	return !(_textRange.StartOffset == 0 && _textRange.EndOffset == 0);
+	return !_textRange.IsEmpty();
 }
 
 std::shared_ptr<FormatElement> FormatElement::LastValidElement() const
@@ -91,7 +91,7 @@ void FormatElement::DiagnosisCodeStyle(DiagnosisContext& ctx)
 
 void FormatElement::AddTextRange(TextRange range)
 {
-	if (_textRange.StartOffset == 0 && _textRange.EndOffset == 0)
+	if (_textRange.IsEmpty())
 	{
 		_textRange = range;
 	}

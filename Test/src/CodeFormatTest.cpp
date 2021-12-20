@@ -81,7 +81,7 @@ std::string ReadFile(const std::string& path)
 	return "";
 }
 
-// 第一个参数是待格式化文本目录，第二个参数是格式化预期结果
+
 int main(int argc, char* argv[])
 {
 	CommandLine commandLine;

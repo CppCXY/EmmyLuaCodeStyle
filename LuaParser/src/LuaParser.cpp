@@ -1148,7 +1148,7 @@ void LuaParser::CodeName(std::shared_ptr<LuaAstNode> parent)
 
 std::shared_ptr<LuaAstNode> LuaParser::CreateAstNode(LuaAstNodeType type)
 {
-	return std::make_shared<LuaAstNode>(type, std::string_view(GetSource().data(), 0), TextRange(0, 0));
+	return std::make_shared<LuaAstNode>(type, std::string_view(GetSource().data(), 0), TextRange());
 }
 
 std::shared_ptr<LuaAstNode> LuaParser::CreateAstNodeFromToken(LuaAstNodeType type, LuaToken& token)

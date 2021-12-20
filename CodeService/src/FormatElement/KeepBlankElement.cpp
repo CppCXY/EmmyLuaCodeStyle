@@ -2,7 +2,7 @@
 #include "Util/format.h"
 
 KeepBlankElement::KeepBlankElement(int blank)
-	: FormatElement(TextRange(0, 0)),
+	: FormatElement(),
 	  _blank(blank)
 {
 }

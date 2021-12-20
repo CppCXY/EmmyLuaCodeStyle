@@ -3,7 +3,7 @@
 #include "CodeService/FormatElement/FormatElement.h"
 
 IndentElement::IndentElement(int specialIndent)
-	: FormatElement(TextRange(0, 0)),
+	: FormatElement(),
 	  _specialIndent(specialIndent)
 {
 }
