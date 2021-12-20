@@ -304,4 +304,10 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			styleOption.second = NameStyleRuleMatcher::ParseFrom(value);
 		}
 	}
+
+	if (options->indent_style == IndentStyle::Tab)
+	{
+		options->continuous_assign_table_field_align_to_equal_sign = false;
+		options->align_table_field_to_first_field = false;
+	}
 }
