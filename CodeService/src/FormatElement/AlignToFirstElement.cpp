@@ -10,11 +10,12 @@ FormatElementType AlignToFirstElement::GetType()
 	return FormatElementType::AlignToFirstElement;
 }
 
-void AlignToFirstElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
+void AlignToFirstElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
-	for (int i = 0; i != static_cast<int>(_children.size()); i++)
+	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
-		if (i == 0)
+		auto child = *it;
+		if (it == _children.begin())
 		{
 			auto writeCount = ctx.GetCharacterCount();
 			auto indentCount = ctx.GetCurrentIndent();
@@ -25,8 +26,8 @@ void AlignToFirstElement::Serialize(FormatContext& ctx, int position, FormatElem
 			else
 			{
 				indentCount += _lowestIndent;
-				auto column = ctx.GetColumn(_children[i]->GetTextRange().StartOffset);
-				if (column > indentCount)
+				const auto column = ctx.GetColumn(child->GetTextRange().StartOffset);
+				if (column > static_cast<int>(indentCount))
 				{
 					ctx.AddIndent(column);
 				}
@@ -37,20 +38,20 @@ void AlignToFirstElement::Serialize(FormatContext& ctx, int position, FormatElem
 			}
 		}
 
-		_children[i]->Serialize(ctx, i, *this);
+		child->Serialize(ctx, it, *this);
+	}
 
-		if(i == _children.size() - 1)
-		{
-			ctx.RecoverIndent();
-		}
+	if (!_children.empty()) {
+		ctx.RecoverIndent();
 	}
 }
 
-void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
+void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
-	for (int i = 0; i != static_cast<int>(_children.size()); i++)
+	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
-		if (i == 0)
+		auto child = *it;
+		if (it == _children.begin())
 		{
 			auto writeCount = ctx.GetCharacterCount();
 			auto indentCount = ctx.GetCurrentIndent();
@@ -61,8 +62,8 @@ void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, int position, FormatE
 			else
 			{
 				indentCount += _lowestIndent;
-				auto column = ctx.GetColumn(_children[i]->GetTextRange().StartOffset);
-				if (column > indentCount)
+				const auto column = ctx.GetColumn(child->GetTextRange().StartOffset);
+				if (column > static_cast<int>(indentCount))
 				{
 					ctx.AddIndent(column);
 				}
@@ -73,11 +74,10 @@ void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, int position, FormatE
 			}
 		}
 
-		_children[i]->Diagnosis(ctx, i, *this);
+		child->Diagnosis(ctx, it, *this);
+	}
 
-		if (i == _children.size() - 1)
-		{
-			ctx.RecoverIndent();
-		}
+	if (!_children.empty()) {
+		ctx.RecoverIndent();
 	}
 }

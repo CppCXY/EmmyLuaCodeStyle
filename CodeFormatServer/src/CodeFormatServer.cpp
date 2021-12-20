@@ -1,9 +1,7 @@
-#include <iostream>
 #include <asio.hpp>
 #include "CodeFormatServer/LanguageClient.h"
 #include "CodeFormatServer/Session/SocketIOSession.h"
 #include "CodeFormatServer/Session/StandardIOSession.h"
-#include <thread>
 // https://stackoverflow.com/questions/1598985/c-read-binary-stdin
 #ifdef _WIN32
 # include <io.h>

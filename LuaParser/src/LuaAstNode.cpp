@@ -61,7 +61,7 @@ std::string_view LuaAstNode::GetText() const
 	return _text;
 }
 
-const std::vector<std::shared_ptr<LuaAstNode>>& LuaAstNode::GetChildren()
+std::list<std::shared_ptr<LuaAstNode>>& LuaAstNode::GetChildren()
 {
 	return _children;
 }
@@ -103,7 +103,7 @@ void LuaAstNode::AddChild(std::shared_ptr<LuaAstNode> child)
 
 	_children.push_back(child);
 	child->_parent = weak_from_this();
-	_text = std::string_view( source + _textRange.StartOffset, _textRange.EndOffset - _textRange.StartOffset + 1);
+	_text = std::string_view(source + _textRange.StartOffset, _textRange.EndOffset - _textRange.StartOffset + 1);
 }
 
 LuaAstNodeType LuaAstNode::GetType() const
@@ -131,10 +131,9 @@ void LuaAstNode::AddComment(std::shared_ptr<LuaAstNode> comment)
 		return AddChild(comment);
 	}
 
-	// 因为std::size_t 没法低于0
-	for (int index = static_cast<int>(_children.size()) - 1; index >= 0; index--)
+	for (auto it = _children.rbegin(); it != _children.rend(); ++it)
 	{
-		auto& currentChild = _children[index];
+		auto currentChild = *it;
 		auto currentChildTextRange = currentChild->GetTextRange();
 
 		if (currentChildTextRange.Contain(childTextRange))
@@ -143,13 +142,11 @@ void LuaAstNode::AddComment(std::shared_ptr<LuaAstNode> comment)
 		}
 		else if (childTextRange.StartOffset > currentChildTextRange.EndOffset)
 		{
-			//此时一定在子节点空隙
-			return AddChildAfter(index, comment);
+			return AddChildBefore(it.base(), comment);
 		}
-		else if (index == 0)
+		else if (currentChild == *_children.begin())
 		{
-			//此时在所有子节点之前
-			return AddChildBefore(index, comment);
+			return AddChildBefore(_children.begin(), comment);
 		}
 	}
 }
@@ -172,22 +169,9 @@ const char* LuaAstNode::GetSource()
 	return nullptr;
 }
 
-void LuaAstNode::AddChildAfter(int index, std::shared_ptr<LuaAstNode> child)
+void LuaAstNode::AddChildBefore(ChildIterator it, std::shared_ptr<LuaAstNode> child)
 {
-	if (index == static_cast<int>(_children.size() - 1))
-	{
-		AddChild(child);
-	}
-	else
-	{
-		auto it = _children.begin() + index + 1;
-		_children.insert(it, child);
-	}
-}
-
-void LuaAstNode::AddChildBefore(int index, std::shared_ptr<LuaAstNode> child)
-{
-	if (index == 0)
+	if (it == _children.begin())
 	{
 		auto source = GetSource();
 		if (child->GetSource() != source)
@@ -219,7 +203,10 @@ void LuaAstNode::AddChildBefore(int index, std::shared_ptr<LuaAstNode> child)
 		_text = std::string_view(source + _textRange.StartOffset,
 		                         _textRange.EndOffset - _textRange.StartOffset + 1);
 	}
+	else if(it == _children.end())
+	{
+		return AddChild(child);
+	}
 
-	auto it = _children.begin() + index;
 	_children.insert(it, child);
 }

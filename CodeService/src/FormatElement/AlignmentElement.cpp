@@ -12,24 +12,29 @@ FormatElementType AlignmentElement::GetType()
 	return FormatElementType::AlignmentElement;
 }
 
-void AlignmentElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
+void AlignmentElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
-	int blank = _alignmentPosition - static_cast<int>(ctx.GetCharacterCount());
+	const int blank = _alignmentPosition - static_cast<int>(ctx.GetCharacterCount());
 	if (blank > 0)
 	{
 		ctx.PrintBlank(blank);
 	}
 }
 
-void AlignmentElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
+void AlignmentElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
-	int nextOffset = getNextValidOffset(position, parent);
+	if(!selfIt.has_value())
+	{
+		return;
+	}
+
+	const int nextOffset = GetNextValidOffset(selfIt.value(), parent);
 	if (nextOffset == -1)
 	{
 		return;
 	}
 
-	auto character = ctx.GetColumn(nextOffset);
+	const auto character = ctx.GetColumn(nextOffset);
 	if (character != _alignmentPosition)
 	{
 		ctx.PushDiagnosis(format(LText("'=' should align to character {}"), _alignmentPosition),

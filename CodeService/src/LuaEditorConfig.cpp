@@ -7,20 +7,7 @@
 #include "Util/StringUtil.h"
 #include "CodeService/FormatElement/KeepElement.h"
 #include "CodeService/FormatElement/MinLineElement.h"
-#include "CodeService/NameStyle/NameStyleRuleMatcher.h"
-
-std::string dirPath(std::string& filePath)
-{
-	for (int i = filePath.size() - 1; i >= 0; i--)
-	{
-		char ch = filePath[i];
-		if(ch == '/' || ch == '\\')
-		{
-			return filePath.substr(0, i + 1);
-		}
-	}
-	return "";
-}
+#include "CodeService/NameStyle/NameStyleRuleMatcher.h" 
 
 std::shared_ptr<LuaEditorConfig> LuaEditorConfig::LoadFromFile(const std::string& path)
 {

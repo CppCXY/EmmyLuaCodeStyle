@@ -3,16 +3,17 @@
 #include "CodeService/FormatElement/TextElement.h"
 #include "CodeService/FormatElement/AlignmentElement.h"
 
-int FindLastValidChildIndex(int position, std::vector<std::shared_ptr<FormatElement>>& vec)
+std::shared_ptr<FormatElement> FindLastValidChild(FormatElement::ChildIterator it,
+                                                  FormatElement::ChildContainer& children)
 {
-	for (int index = position - 1; position >= 0; index--)
+	for (auto rIt = std::reverse_iterator<decltype(it)>(it); rIt != children.rend(); ++rIt)
 	{
-		if (vec[index]->HasValidTextRange())
+		if ((*rIt)->HasValidTextRange())
 		{
-			return index;
+			return *rIt;
 		}
 	}
-	return -1;
+	return nullptr;
 }
 
 
@@ -21,67 +22,68 @@ FormatElementType AlignmentLayoutElement::GetType()
 	return FormatElementType::AlignmentLayoutElement;
 }
 
-void AlignmentLayoutElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
+void AlignmentLayoutElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt,
+                                       FormatElement& parent)
 {
-	auto eqPosition = getAlignPosition(ctx.GetParser());
+	const auto eqPosition = GetAlignPosition(ctx.GetParser());
 
 	if (eqPosition != -1)
 	{
-		return alignmentSerialize(ctx, position, parent, eqPosition);
+		return AlignmentSerialize(ctx, selfIt, eqPosition, parent);
 	}
 	else
 	{
-		FormatElement::Serialize(ctx, position, parent);
+		FormatElement::Serialize(ctx, selfIt, parent);
 	}
 }
 
-void AlignmentLayoutElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
+void AlignmentLayoutElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt,
+                                       FormatElement& parent)
 {
-	auto eqPosition = getAlignPosition(ctx.GetParser());
+	const auto eqPosition = GetAlignPosition(ctx.GetParser());
 
 	if (eqPosition != -1)
 	{
-		return alignmentDiagnosis(ctx, position, parent, eqPosition);
+		return AlignmentDiagnosis(ctx, selfIt, eqPosition, parent);
 	}
 	else
 	{
-		FormatElement::Diagnosis(ctx, position, parent);
+		FormatElement::Diagnosis(ctx, selfIt, parent);
 	}
 }
 
-int AlignmentLayoutElement::getAlignPosition(std::shared_ptr<LuaParser> luaParser)
+int AlignmentLayoutElement::GetAlignPosition(std::shared_ptr<LuaParser> luaParser)
 {
 	int eqAlignedPosition = 0;
 	bool firstContainEq = true;
 	// 先寻找等号对齐的位置，并且判断连续的带等号的语句是否应该对齐到等号
 	// 连续的带等号的语句是否应该对齐到等号，这个行为应该由连续语句的首行决定
 	// 如果被子节点内的其他语句共同决定则很难将连续对齐还原为普通排版
-	for (int statIndex = 0; statIndex != static_cast<int>(_children.size()); statIndex++)
+	for (auto statIt = _children.begin(); statIt != _children.end(); ++statIt)
 	{
-		auto statChild = _children[statIndex];
+		const auto statement = *statIt;
 
-		auto& statChildren = statChild->GetChildren();
+		auto& statementChildren = statement->GetChildren();
 
-		for (int index = 0; index != static_cast<int>(statChildren.size()); index++)
+		for (auto it = statementChildren.begin(); it != statementChildren.end(); ++it)
 		{
-			auto textChild = statChildren[index];
+			auto textChild = *it;
 			if (textChild->GetType() == FormatElementType::TextElement)
 			{
-				auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
+				const auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
 				if (textElement->GetText() == "=")
 				{
-					int eqPosition = luaParser->GetColumn(textElement->GetTextRange().StartOffset);
-					if (firstContainEq && index > 0)
+					const auto eqPosition = luaParser->GetColumn(textElement->GetTextRange().StartOffset);
+					if (firstContainEq && it != statementChildren.begin())
 					{
 						firstContainEq = false;
-						auto lastValidIndex = FindLastValidChildIndex(index, statChildren);
-						if (lastValidIndex == -1)
+						auto lastStatChild = FindLastValidChild(it, statementChildren);
+						if (lastStatChild == nullptr)
 						{
 							return -1;
 						}
-						auto lastStatChild = statChildren[lastValidIndex];
-						auto lastPosition = luaParser->GetColumn(lastStatChild->GetTextRange().EndOffset);
 
+						const auto lastPosition = luaParser->GetColumn(lastStatChild->GetTextRange().EndOffset);
 
 						if (eqPosition - lastPosition <= 2)
 						{
@@ -101,53 +103,59 @@ int AlignmentLayoutElement::getAlignPosition(std::shared_ptr<LuaParser> luaParse
 	return eqAlignedPosition;
 }
 
-void AlignmentLayoutElement::alignmentSerialize(FormatContext& ctx, int position, FormatElement& parent, int eqPosition)
+void AlignmentLayoutElement::AlignmentSerialize(FormatContext& ctx, std::optional<ChildIterator> selfIt, int eqPosition,
+                                                FormatElement& parent)
 {
-	for (auto statChild : _children)
+	for (const auto& statChild : _children)
 	{
 		auto& statChildren = statChild->GetChildren();
 
-		for (std::size_t i = 0; i < statChildren.size(); i++)
+		for (auto it = statChildren.begin(); it != statChildren.end(); ++it)
 		{
-			auto textChild = statChildren[i];
+			auto textChild = *it;
 			if (textChild->GetType() == FormatElementType::TextElement)
 			{
-				auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
-				if (textElement->GetText() == "=" && i > 0)
+				const auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
+				if (textElement->GetText() == "=" && it != statChildren.begin())
 				{
+					auto lastIt = it;
+					--lastIt;
 					// 将控制元素变更为对齐元素
-					statChildren[i - 1] = std::make_shared<AlignmentElement>(eqPosition);
+					*lastIt = std::make_shared<AlignmentElement>(eqPosition);
 					break;
 				}
 			}
 		}
 	}
 
-	return FormatElement::Serialize(ctx, position, parent);
+	return FormatElement::Serialize(ctx, selfIt, parent);
 }
 
-void AlignmentLayoutElement::alignmentDiagnosis(DiagnosisContext& ctx, int position, FormatElement& parent,
-                                                int eqPosition)
+void AlignmentLayoutElement::AlignmentDiagnosis(DiagnosisContext& ctx,
+                                                std::optional<FormatElement::ChildIterator> selfIt,
+                                                int eqPosition, FormatElement& parent)
 {
-	for (auto statChild : _children)
+	for (const auto& statChild : _children)
 	{
 		auto& statChildren = statChild->GetChildren();
 
-		for (std::size_t i = 0; i < statChildren.size(); i++)
+		for (auto it = statChildren.begin(); it != statChildren.end(); ++it)
 		{
-			auto textChild = statChildren[i];
+			auto textChild = *it;
 			if (textChild->GetType() == FormatElementType::TextElement)
 			{
-				auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
-				if (textElement->GetText() == "=" && i > 0)
+				const auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
+				if (textElement->GetText() == "=" && it != statChildren.begin())
 				{
+					auto lastIt = it;
+					--lastIt;
 					// 将控制元素变更为对齐元素
-					statChildren[i - 1] = std::make_shared<AlignmentElement>(eqPosition);
+					*lastIt = std::make_shared<AlignmentElement>(eqPosition);
 					break;
 				}
 			}
 		}
 	}
 
-	return FormatElement::Diagnosis(ctx, position, parent);
+	return FormatElement::Diagnosis(ctx, selfIt, parent);
 }

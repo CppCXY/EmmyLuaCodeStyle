@@ -118,7 +118,8 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 
 	if (_options.insert_final_newline && !_parser->IsEmptyLine(_parser->GetTotalLine()))
 	{
-		LuaDiagnosisPosition start(_parser->GetTotalLine(), _parser->GetColumn(_parser->GetSource().size()));
+		LuaDiagnosisPosition start(_parser->GetTotalLine(), _parser->GetColumn(
+			static_cast<int>(_parser->GetSource().size())));
 		LuaDiagnosisPosition end(_parser->GetTotalLine() + 1, 0);
 		PushDiagnosis(LText("The code must end with a new line"), start, end);
 	}

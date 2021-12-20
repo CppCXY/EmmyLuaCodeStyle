@@ -13,24 +13,25 @@ FormatElementType IndentElement::GetType()
 	return FormatElementType::IndentElement;
 }
 
-void IndentElement::Serialize(FormatContext& ctx, int position, FormatElement& parent)
+void IndentElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
 	ctx.AddIndent(_specialIndent);
 
-	FormatElement::Serialize(ctx, position, parent);
+	FormatElement::Serialize(ctx, selfIt, parent);
 
 	ctx.RecoverIndent();
 }
 
-void IndentElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement& parent)
+void IndentElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
 	ctx.AddIndent(_specialIndent);
 
-	for (int i = 0; i < static_cast<int>(_children.size()); i++)
+	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
-		auto child = _children[i];
+		const auto child = *it;
 
-		if (child->HasValidTextRange() && ctx.GetOptions().indent_style == IndentStyle::Space && child->GetType() != FormatElementType::IndentElement)
+		if (child->HasValidTextRange() && ctx.GetOptions().indent_style == IndentStyle::Space && child->GetType() !=
+			FormatElementType::IndentElement)
 		{
 			auto range = child->GetTextRange();
 			auto character = ctx.GetColumn(range.StartOffset);
@@ -45,7 +46,7 @@ void IndentElement::Diagnosis(DiagnosisContext& ctx, int position, FormatElement
 			}
 		}
 
-		_children[i]->Diagnosis(ctx, i, *this);
+		child->Diagnosis(ctx, it, *this);
 	}
 
 	ctx.RecoverIndent();

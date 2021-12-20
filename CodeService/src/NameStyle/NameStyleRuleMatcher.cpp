@@ -48,7 +48,7 @@ void NameStyleRuleMatcher::Diagnosis(DiagnosisContext& ctx, std::shared_ptr<Chec
 			}
 		case NameStyleType::UpperSnakeCase:
 			{
-				if(UpperSnakeCase(checkElement))
+				if (UpperSnakeCase(checkElement))
 				{
 					return;
 				}
@@ -485,15 +485,15 @@ bool NameStyleRuleMatcher::SameCamel(std::string_view text, std::shared_ptr<Chec
 	auto textParts = SplitPart(text);
 
 
-	for (int i = textParts.size() - 1; i >= 0; i--)
+	for (auto it = textParts.rbegin(); it != textParts.rend(); ++it)
 	{
-		if (checkText.ends_with(textParts[i]))
+		if (checkText.ends_with(*it))
 		{
-			if (checkText.size() == textParts[i].size())
+			if (checkText.size() == it->size())
 			{
 				return true;
 			}
-			checkText = checkText.substr(0, checkText.size() - textParts[i].size());
+			checkText = checkText.substr(0, checkText.size() - it->size());
 		}
 		else
 		{
@@ -515,15 +515,15 @@ bool NameStyleRuleMatcher::SamePascal(std::string_view text, std::shared_ptr<Che
 	auto textParts = SplitPart(text);
 
 
-	for (int i = textParts.size() - 1; i >= 0; i--)
+	for (auto it = textParts.rbegin(); it != textParts.rend(); --it)
 	{
-		if (checkText.ends_with(textParts[i]))
+		if (checkText.ends_with(*it))
 		{
-			if (checkText.size() == textParts[i].size())
+			if (checkText.size() == it->size())
 			{
 				return true;
 			}
-			checkText = checkText.substr(0, checkText.size() - textParts[i].size());
+			checkText = checkText.substr(0, checkText.size() - it->size());
 		}
 		else
 		{
