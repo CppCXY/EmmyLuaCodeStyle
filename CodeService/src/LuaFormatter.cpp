@@ -46,8 +46,14 @@ LuaFormatter::LuaFormatter(std::shared_ptr<LuaParser> luaParser, LuaCodeStyleOpt
 void LuaFormatter::BuildFormattedElement()
 {
 	auto chunkNode = _parser->GetAst();
-
-	_env = FormatBlock(chunkNode->GetChildren().front());
+	if (!chunkNode->GetChildren().empty())
+	{
+		_env = FormatBlock(chunkNode->GetChildren().front());
+	}
+	else
+	{
+		_env = std::make_shared<IndentElement>();
+	}
 }
 
 std::string LuaFormatter::GetFormattedText()

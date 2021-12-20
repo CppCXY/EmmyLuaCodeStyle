@@ -43,7 +43,6 @@ void FormatContext::PrintBlank(int blank)
 
 void FormatContext::PrintIndent(int indent, const std::string& indentString)
 {
-	// 我始终认为使\t来排版就是垃圾
 	for (int i = 0; i < indent; i++)
 	{
 		_os << indentString;
