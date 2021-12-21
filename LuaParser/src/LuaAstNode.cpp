@@ -61,7 +61,7 @@ std::string_view LuaAstNode::GetText() const
 	return _text;
 }
 
-std::list<std::shared_ptr<LuaAstNode>>& LuaAstNode::GetChildren()
+LuaAstNode::ChildrenContainer& LuaAstNode::GetChildren()
 {
 	return _children;
 }

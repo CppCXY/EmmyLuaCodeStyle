@@ -191,6 +191,8 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnEditorConfigUpdate(
 		}
 	}
 
+	LanguageClient::GetInstance().UpdateAllDiagnosis();
+
 	return nullptr;
 }
 

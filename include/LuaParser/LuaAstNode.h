@@ -13,7 +13,7 @@ class LuaAstVisitor;
 class LuaAstNode: public std::enable_shared_from_this<LuaAstNode>
 {
 public:
-	using ChildrenContainer = std::list<std::shared_ptr<LuaAstNode>>;
+	using ChildrenContainer = std::vector<std::shared_ptr<LuaAstNode>>;
 	using ChildIterator = ChildrenContainer::iterator;
 
 	LuaAstNode(LuaAstNodeType type, std::string_view text, TextRange range);

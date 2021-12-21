@@ -176,3 +176,11 @@ void LanguageClient::RemoveOptions(std::string_view workspaceUri)
 		}
 	}
 }
+
+void LanguageClient::UpdateAllDiagnosis()
+{
+	for(auto it: _parserMap)
+	{
+		DiagnosticFile(it.first);
+	}
+}

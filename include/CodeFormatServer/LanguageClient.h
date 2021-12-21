@@ -36,7 +36,10 @@ public:
 
 	void RemoveOptions(std::string_view workspaceUri);
 
+	void UpdateAllDiagnosis();
 private:
+
+
 	std::shared_ptr<IOSession> _session;
 	// uri 到file ast的映射
 	std::map<std::string, std::shared_ptr<LuaParser>, std::less<>> _parserMap;
