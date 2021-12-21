@@ -392,6 +392,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalStatement(std::shared_pt
 				env->AddChild(FormatNode(node));
 				break;
 			}
+		case LuaAstNodeType::Comment:
+			{
+				env->AddChild(FormatNode(node));
+				env->Add<KeepElement>(1);
+				break;
+			}
 		default:
 			DefaultHandle(node, env);
 			break;
@@ -430,6 +436,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignment(std::shared_ptr<Lu
 
 				break;
 			}
+		case LuaAstNodeType::Comment:
+			{
+				env->AddChild(FormatNode(node));
+				env->Add<KeepElement>(1);
+				break;
+			}
 		default:
 			DefaultHandle(node, env);
 			break;
@@ -456,6 +468,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
 			{
 				env->Add<TextElement>(node);
 				env->Add<KeepBlankElement>(1);
+				break;
+			}
+		case LuaAstNodeType::Comment:
+			{
+				env->AddChild(FormatNode(node));
+				env->Add<KeepElement>(1);
 				break;
 			}
 		default:
@@ -587,7 +605,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatReturnStatement(std::shared_p
 				env->AddChild(FormatNode(child));
 				break;
 			}
-
+		case LuaAstNodeType::Comment:
+			{
+				env->AddChild(FormatNode(child));
+				env->Add<KeepElement>(1);
+				break;
+			}
 		default:
 			DefaultHandle(child, env);
 			break;
@@ -1320,6 +1343,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 				env->Add<TextElement>(child, TextDefineType::TableFieldNameDefine);
 				break;
 			}
+		case LuaAstNodeType::Comment:
+			{
+				env->AddChild(FormatNode(child));
+				env->Add<KeepElement>(1);
+				break;
+			}
 		default:
 			{
 				DefaultHandle(child, env);
@@ -1333,10 +1362,6 @@ void LuaFormatter::DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_p
 {
 	auto childEnv = FormatNode(node);
 	envElement->AddChild(childEnv);
-	if (node->GetType() == LuaAstNodeType::Comment)
-	{
-		envElement->Add<KeepElement>(1);
-	}
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::ChildIterator& it,

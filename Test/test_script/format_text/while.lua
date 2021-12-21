@@ -2,9 +2,9 @@ while true do while false do end end
 
 while false do
     print("if \z
-    OK
-    ok
-    
+    OK\z
+    ok\z
+    \z
     ")
 
 end
