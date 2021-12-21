@@ -345,8 +345,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 					indentEnv->AddChild(childEnv);
 				}
 
-				indentEnv->Add<KeepElement>(1);
-
 				break;
 			}
 		default:

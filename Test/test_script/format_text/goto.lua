@@ -19,5 +19,6 @@ while true do
 end
 end
 ::endloop::
+fwfwfw = 123
 end
 

@@ -20,4 +20,5 @@ function f2()
     end
 
     ::endloop::
+    fwfwfw = 123
 end
