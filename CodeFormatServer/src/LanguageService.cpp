@@ -7,6 +7,7 @@
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "CodeService/LuaFormatter.h"
 #include "CodeFormatServer/LanguageClient.h"
+#include "Util/Url.h"
 
 using namespace std::placeholders;
 
@@ -99,7 +100,7 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 	std::shared_ptr<vscode::DidChangeTextDocumentParams> param)
 {
-	std::string_view fileText;
+	// std::string_view fileText;
 	for (auto& content : param->contentChanges)
 	{
 		LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
@@ -123,7 +124,6 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidOpen(
 	parser->BuildAstWithComment();
 	LanguageClient::GetInstance().CacheFile(param->textDocument.uri, parser);
 	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
-
 	return nullptr;
 }
 
