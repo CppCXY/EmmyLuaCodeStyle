@@ -25,11 +25,11 @@ std::string IOSession::Handle(std::string_view msg)
 
 		parser.Parse(msg);
 
-		auto param = parser.GetParam();
+		auto params = parser.GetParams();
 
-		if (param)
+		if (!params.is_null())
 		{
-			auto result = _service.Dispatch(parser.GetMethod(), param);
+			auto result = _service.Dispatch(parser.GetMethod(), params);
 			if (result)
 			{
 				return parser.SerializeProtocol(result);

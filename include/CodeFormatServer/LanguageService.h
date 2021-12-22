@@ -5,10 +5,19 @@
 #include <map>
 #include "CodeFormatServer/VSCode.h"
 
+template <class T>
+std::shared_ptr<T> MakeRequestObject(nlohmann::json json)
+{
+	auto object = std::make_shared<T>();
+	object->Deserialize(json);
+
+	return object;
+}
+
 class LanguageService
 {
 public:
-	using MessageHandle = std::function<std::shared_ptr<vscode::Serializable>(std::shared_ptr<vscode::Serializable>)>;
+	using MessageHandle = std::function<std::shared_ptr<vscode::Serializable>(nlohmann::json)>;
 
 	LanguageService();
 
@@ -17,9 +26,17 @@ public:
 	bool Initialize();
 
 	std::shared_ptr<vscode::Serializable> Dispatch(std::string_view method,
-	                                               std::shared_ptr<vscode::Serializable> param);
+	                                               nlohmann::json params);
 
 private:
+	template <class ParamType,class ReturnType>
+	void JsonProtocol(std::string_view method, std::shared_ptr<ReturnType>(LanguageService::* handle)(std::shared_ptr<ParamType>))
+	{
+		_handles[std::string(method)] = [this, handle](auto jsonParams) {
+			return (this->*handle)(MakeRequestObject<ParamType>(jsonParams));
+		};
+	}
+
 	std::shared_ptr<vscode::InitializeResult> OnInitialize(std::shared_ptr<vscode::InitializeParams> param);
 
 	std::shared_ptr<vscode::Serializable> OnDidChange(std::shared_ptr<vscode::DidChangeTextDocumentParams> param);

@@ -25,8 +25,6 @@ public:
 	};
 };
 
-std::shared_ptr<Serializable> MakeFromRequest(std::string_view method, nlohmann::json json);
-
 class Position : public Serializable
 {
 public:

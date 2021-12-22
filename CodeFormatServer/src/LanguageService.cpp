@@ -20,28 +20,25 @@ LanguageService::~LanguageService()
 
 bool LanguageService::Initialize()
 {
-#define DynamicBind(Method, ParamClass)\
-	[this](auto param) { auto inputParam = std::dynamic_pointer_cast<ParamClass>(param); return Method(inputParam);}
-
-	_handles["initialize"] = DynamicBind(OnInitialize, vscode::InitializeParams);
-	_handles["textDocument/didChange"] = DynamicBind(OnDidChange, vscode::DidChangeTextDocumentParams);
-	_handles["textDocument/didOpen"] = DynamicBind(OnDidOpen, vscode::DidOpenTextDocumentParams);
-	_handles["textDocument/formatting"] = DynamicBind(OnFormatting, vscode::DocumentFormattingParams);
-	_handles["textDocument/didClose"] = DynamicBind(OnClose, vscode::DidCloseTextDocumentParams);
-	_handles["updateEditorConfig"] = DynamicBind(OnEditorConfigUpdate, vscode::EditorConfigUpdateParams);
-	_handles["textDocument/rangeFormatting"] = DynamicBind(OnRangeFormatting, vscode::DocumentRangeFormattingParams);
-	_handles["textDocument/onTypeFormatting"] = DynamicBind(OnTypeFormatting, vscode::TextDocumentPositionParams);
+	JsonProtocol("initialize", &LanguageService::OnInitialize);
+	JsonProtocol("textDocument/didChange", &LanguageService::OnDidChange);
+	JsonProtocol("textDocument/didOpen", &LanguageService::OnDidOpen);
+	JsonProtocol("textDocument/didClose", &LanguageService::OnClose);
+	JsonProtocol("updateEditorConfig", &LanguageService::OnEditorConfigUpdate);
+	JsonProtocol("textDocument/formatting", &LanguageService::OnFormatting);
+	JsonProtocol("textDocument/rangeFormatting", &LanguageService::OnRangeFormatting);
+	JsonProtocol("textDocument/onTypeFormatting", &LanguageService::OnTypeFormatting);
 
 	return true;
 }
 
 std::shared_ptr<vscode::Serializable> LanguageService::Dispatch(std::string_view method,
-                                                                std::shared_ptr<vscode::Serializable> param)
+                                                                nlohmann::json params)
 {
 	auto it = _handles.find(method);
 	if (it != _handles.end())
 	{
-		return it->second(param);
+		return it->second(params);
 	}
 	return nullptr;
 }
@@ -60,7 +57,7 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 	result->capabilities.documentOnTypeFormattingProvider = typeOptions;
 
 	result->capabilities.textDocumentSync.change = vscode::TextDocumentSyncKind::Full;
-	result->capabilities.textDocumentSync.openClose = true;  
+	result->capabilities.textDocumentSync.openClose = true;
 
 	auto& configFiles = param->initializationOptions.configFiles;
 	for (auto& configFile : configFiles)

@@ -13,7 +13,7 @@ public:
 
 	void Parse(std::string_view msg);
 
-	std::shared_ptr<vscode::Serializable> GetParam();
+	nlohmann::json GetParams();
 
 	std::string_view GetMethod();
 
@@ -21,5 +21,5 @@ public:
 private:
 	std::variant<int, std::string, void*> _id;
 	std::string _method;
-	std::shared_ptr<vscode::Serializable> _param;
+	nlohmann::json _params;
 };

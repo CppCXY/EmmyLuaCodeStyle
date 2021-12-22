@@ -34,7 +34,6 @@ void SocketIOSession::Run()
 			}
 
 			_protocolBuffer.FitCapacity();
-			// if(_protocolBuffer.)
 		}
 		while (true);
 

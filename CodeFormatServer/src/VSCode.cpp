@@ -1,54 +1,7 @@
 #include "CodeFormatServer/VSCode.h"
 
-template <class T>
-std::shared_ptr<vscode::Serializable> MakeRequestObject(nlohmann::json json)
-{
-	auto object = std::make_shared<T>();
-	object->Deserialize(json);
-
-	return object;
-}
-
 vscode::Serializable::~Serializable()
 {
-}
-
-std::shared_ptr<vscode::Serializable> vscode::MakeFromRequest(std::string_view method, nlohmann::json json)
-{
-	if (method == "initialize")
-	{
-		return MakeRequestObject<InitializeParams>(json);
-	}
-	else if (method == "textDocument/didChange")
-	{
-		return MakeRequestObject<DidChangeTextDocumentParams>(json);
-	}
-	else if (method == "textDocument/didOpen")
-	{
-		return MakeRequestObject<DidOpenTextDocumentParams>(json);
-	}
-	else if (method == "textDocument/formatting")
-	{
-		return MakeRequestObject<DocumentFormattingParams>(json);
-	}
-	else if (method == "textDocument/didClose")
-	{
-		return MakeRequestObject<DidCloseTextDocumentParams>(json);
-	}
-	else if (method == "updateEditorConfig")
-	{
-		return MakeRequestObject<EditorConfigUpdateParams>(json);
-	}
-	else if (method == "textDocument/rangeFormatting")
-	{
-		return MakeRequestObject<DocumentRangeFormattingParams>(json);
-	}
-	else if (method == "textDocument/onTypeFormatting")
-	{
-		return MakeRequestObject<TextDocumentPositionParams>(json);
-	}
-
-	return nullptr;
 }
 
 vscode::Position::Position(uint64_t _line, uint64_t _character)

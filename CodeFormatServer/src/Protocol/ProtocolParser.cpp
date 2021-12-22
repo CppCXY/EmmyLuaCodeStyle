@@ -1,6 +1,4 @@
 #include "CodeFormatServer/Protocol/ProtocolParser.h"
-
-#include <iostream>
 #include <nlohmann/json.hpp>
 #include "Util/format.h"
 #include "CodeFormatServer/LanguageService.h"
@@ -28,14 +26,13 @@ void ProtocolParser::Parse(std::string_view msg)
 	}
 	if (jsonMessage["params"].is_object())
 	{
-		auto params = jsonMessage["params"];
-		_param = vscode::MakeFromRequest(_method, params);
+		_params = jsonMessage["params"];
 	}
 }
 
-std::shared_ptr<vscode::Serializable> ProtocolParser::GetParam()
+nlohmann::json ProtocolParser::GetParams()
 {
-	return _param;
+	return _params;
 }
 
 std::string_view ProtocolParser::GetMethod()
