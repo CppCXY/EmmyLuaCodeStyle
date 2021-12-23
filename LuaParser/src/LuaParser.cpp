@@ -7,6 +7,7 @@
 #include "LuaParser/LuaOperatorType.h"
 #include "Util/format.h"
 #include "LuaParser/LuaParseException.h"
+#include "LuaParser/LuaFile.h"
 
 using namespace std::filesystem;
 
@@ -30,7 +31,9 @@ std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 
 std::shared_ptr<LuaParser> LuaParser::LoadFromBuffer(std::string&& buffer)
 {
-	auto tokenParser = std::make_shared<LuaTokenParser>(std::move(buffer));
+	auto file = std::make_shared<LuaFile>("chunk", std::move(buffer));
+
+	auto tokenParser = std::make_shared<LuaTokenParser>(file);
 	tokenParser->Parse();
 
 	return std::make_shared<LuaParser>(tokenParser);
@@ -71,19 +74,24 @@ bool LuaParser::HasError() const
 	return !_errors.empty();
 }
 
+std::vector<LuaToken>& LuaParser::GetAllComments()
+{
+	return _tokenParser->GetComments();
+}
+
 int LuaParser::GetLine(int offset) const
 {
-	return _tokenParser->GetLine(offset);
+	return _file->GetLine(offset);
 }
 
 int LuaParser::GetColumn(int offset) const
 {
-	return _tokenParser->GetColumn(offset);
+	return _file->GetColumn(offset);
 }
 
 int LuaParser::GetTotalLine()
 {
-	return _tokenParser->GetTotalLine();
+	return _file->GetTotalLine();
 }
 
 std::string_view LuaParser::GetSource()
@@ -93,19 +101,19 @@ std::string_view LuaParser::GetSource()
 
 bool LuaParser::IsEmptyLine(int line)
 {
-	return _tokenParser->IsEmptyLine(line);
+	return _file->IsEmptyLine(line);
 }
 
 void LuaParser::SetFilename(std::string_view filename)
 {
 	std::filesystem::path path(filename);
 
-	_filename = path.replace_extension().string();
+	_file->SetFilename(path.replace_extension().string());
 }
 
 std::string_view LuaParser::GetFilename()
 {
-	return _filename;
+	return _file->GetFilename();
 }
 
 void LuaParser::BuildAstWithComment()
@@ -149,7 +157,8 @@ void LuaParser::BuildAstWithComment()
 
 LuaParser::LuaParser(std::shared_ptr<LuaTokenParser> tokenParser)
 	: _tokenParser(tokenParser),
-	  _chunkAstNode(nullptr)
+	  _chunkAstNode(nullptr),
+	  _file(tokenParser->GetFile())
 {
 }
 

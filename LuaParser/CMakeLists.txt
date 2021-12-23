@@ -17,7 +17,7 @@ target_sources(LuaParser PUBLIC
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenType.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenParser.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaParser.h
-
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaFile.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaAstNode.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaAstNodeType.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/TextRange.h
@@ -29,7 +29,7 @@ target_sources(LuaParser PUBLIC
 	${LuaParser_SOURCE_DIR}/src/LuaAstNode.cpp
 	${LuaParser_SOURCE_DIR}/src/TextRange.cpp
 	${LuaParser_SOURCE_DIR}/src/LuaAstVisitor.cpp
-	
+	${LuaParser_SOURCE_DIR}/src/LuaFile.cpp
 	${LuaParser_SOURCE_DIR}/src/LuaDefine.h
 )
 

@@ -2,12 +2,14 @@
 
 #include <map>
 #include <string_view>
+#include <memory>
 #include <string>
 #include <vector>
 #include <set>
 
 #include "LuaToken.h"
 #include "LuaTokenType.h"
+#include "LuaFile.h"
 
 /*
  * token 解析来自于lua 源代码,实现上非常接近但细节处并不相同
@@ -15,7 +17,7 @@
 class LuaTokenParser
 {
 public:
-	LuaTokenParser(std::string&& source);
+	LuaTokenParser(std::shared_ptr<LuaFile> file);
 
 	bool Parse();
 
@@ -27,15 +29,7 @@ public:
 
 	int LastValidOffset();
 
-	int GetLine(int offset);
-	
-	int GetColumn(int offset);
-
-	int GetTotalLine();
-
-	bool IsEmptyLine(int line);
-
-	std::string& GetSource();
+	std::string_view GetSource();
 
 	std::vector<LuaToken>& GetComments();
 
@@ -44,6 +38,8 @@ public:
 	bool HasError() const;
 
 	void ReleaseTokens();
+
+	std::shared_ptr<LuaFile> GetFile();
 private:
 	static std::map<std::string, LuaTokenType, std::less<>> LuaReserved;
 
@@ -90,15 +86,15 @@ private:
 	bool _hasEoz;
 	std::size_t _currentParseIndex;
 	std::size_t _currentIndex;
-	std::string _source;
+	std::string_view _source;
 
 	std::vector<LuaToken> _tokens;
 	// 注释单独处理
 	std::vector<LuaToken> _commentTokens;
 
-	std::vector<::LuaError> _errors;
+	std::vector<LuaError> _errors;
 
 	LuaToken _eosToken;
 
-	std::vector<int> _lineOffsetVec;
+	std::shared_ptr<LuaFile> _file;
 };

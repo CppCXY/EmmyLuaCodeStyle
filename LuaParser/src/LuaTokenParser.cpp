@@ -41,18 +41,20 @@ std::map<std::string, LuaTokenType, std::less<>> LuaTokenParser::LuaReserved = {
 	{"::", TK_DBCOLON}
 };
 
-LuaTokenParser::LuaTokenParser(std::string&& source)
-	: _currentParseIndex(0),
-	  _currentIndex(0),
-	  _source(source),
-	  _hasSaveText(false),
-	  _buffStart(0),
-	  _buffIndex(0),
-	  _linenumber(0),
-	  _hasEoz(false),
-	  _eosToken(LuaToken{TK_EOS, "", TextRange(0, 0)})
+LuaTokenParser::LuaTokenParser(std::shared_ptr<LuaFile> file)
+	:
+	_linenumber(0),
+	_hasSaveText(false),
+	_buffStart(0),
+	_buffIndex(0),
+	_hasEoz(false),
+	_currentParseIndex(0),
+	_currentIndex(0),
+	_source(file->GetSource()),
+	_eosToken(LuaToken{ TK_EOS, "", TextRange(0, 0) }),
+	_file(file)
 {
-	_lineOffsetVec.push_back(0);
+	
 }
 
 bool LuaTokenParser::Parse()
@@ -82,10 +84,12 @@ bool LuaTokenParser::Parse()
 
 		if (!_errors.empty())
 		{
+			_file->SetTotalLine(_linenumber);
 			return false;
 		}
 	}
 
+	_file->SetTotalLine(_linenumber);
 	return true;
 }
 
@@ -130,94 +134,7 @@ int LuaTokenParser::LastValidOffset()
 	return 0;
 }
 
-
-int LuaTokenParser::GetLine(int offset)
-{
-	if (_lineOffsetVec.empty())
-	{
-		return 0;
-	}
-
-	int maxLine = static_cast<int>(_lineOffsetVec.size()) - 1;
-	int targetLine = maxLine;
-	int upperLine = maxLine;
-	int lowestLine = 0;
-
-	while (true)
-	{
-		if (_lineOffsetVec[targetLine] > offset)
-		{
-			upperLine = targetLine;
-
-			targetLine = (upperLine + lowestLine) / 2;
-
-			if (targetLine == 0)
-			{
-				return targetLine;
-			}
-		}
-		else
-		{
-			if (upperLine - targetLine <= 1)
-			{
-				return targetLine;
-			}
-
-			lowestLine = targetLine;
-
-			targetLine = (upperLine + lowestLine) / 2;
-		}
-	}
-
-	return 0;
-}
-
-int LuaTokenParser::GetColumn(int offset)
-{
-	int line = GetLine(offset);
-
-	int lineStartOffset = _lineOffsetVec[line];
-
-	int bytesLength = offset - lineStartOffset;
-
-	return static_cast<int>(utf8::Utf8nLen(_source.data() + lineStartOffset, static_cast<std::size_t>(bytesLength)));
-}
-
-int LuaTokenParser::GetTotalLine()
-{
-	return _linenumber;
-}
-
-bool LuaTokenParser::IsEmptyLine(int line)
-{
-	if (line < 0 || line >= _lineOffsetVec.size())
-	{
-		return true;
-	}
-	int lineStartOffset = _lineOffsetVec[line];
-	int nextLineStartOffset = 0;
-	if (line == _linenumber)
-	{
-		nextLineStartOffset = static_cast<int>(_source.size());
-	}
-	else
-	{
-		nextLineStartOffset = _lineOffsetVec[line + 1];
-	}
-
-	for (int offset = lineStartOffset; offset < nextLineStartOffset; offset++)
-	{
-		char ch = _source[offset];
-		if (ch != '\n' && ch != '\r' && ch != '\t' && ch != ' ')
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-std::string& LuaTokenParser::GetSource()
+std::string_view LuaTokenParser::GetSource()
 {
 	return _source;
 }
@@ -244,6 +161,11 @@ void LuaTokenParser::ReleaseTokens()
 
 	_commentTokens.clear();
 	_commentTokens.shrink_to_fit();
+}
+
+std::shared_ptr<LuaFile> LuaTokenParser::GetFile()
+{
+	return _file;
 }
 
 LuaTokenType LuaTokenParser::Lex()
@@ -488,12 +410,13 @@ LuaTokenType LuaTokenParser::Lex()
 
 int LuaTokenParser::NextChar()
 {
-	if (_currentParseIndex < _source.size())
+	if (_currentParseIndex < (_source.size() - 1))
 	{
 		return _source[++_currentParseIndex];
 	}
 	else
 	{
+		++_currentParseIndex;
 		return EOZ;
 	}
 }
@@ -764,11 +687,9 @@ void LuaTokenParser::IncLinenumber()
 	if (++_linenumber >= std::numeric_limits<int>::max())
 	{
 		return;
-		// luaError("")
-		// throw LuaParserException("chunk has too many lines");
 	}
 
-	_lineOffsetVec.push_back(static_cast<int>(_currentParseIndex));
+	_file->PushLine(static_cast<int>(_currentParseIndex));
 }
 
 bool LuaTokenParser::CurrentIsNewLine()

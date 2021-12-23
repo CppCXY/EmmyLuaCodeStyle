@@ -25,7 +25,7 @@ public:
 
 	bool HasError() const;
 
-	std::vector<LuaToken>& GetAllComments() { return _tokenParser->GetComments(); }
+	std::vector<LuaToken>& GetAllComments();
 
 	int GetLine(int offset) const;
 
@@ -166,5 +166,5 @@ private:
 
 	std::vector<LuaError> _errors;
 
-	std::string _filename;
+	std::shared_ptr<LuaFile> _file;
 };

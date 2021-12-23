@@ -135,7 +135,8 @@ void NameStyleRuleMatcher::Diagnosis(DiagnosisContext& ctx, std::shared_ptr<Chec
 
 void NameStyleRuleMatcher::ParseRule(std::string_view rule)
 {
-	auto tokenParser = std::make_shared<LuaTokenParser>(std::string(rule));
+	auto file = std::make_shared<LuaFile>("", std::string(rule));
+	auto tokenParser = std::make_shared<LuaTokenParser>(file);
 	tokenParser->Parse();
 
 	while (tokenParser->Current().TokenType != TK_EOS)
