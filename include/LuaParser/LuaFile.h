@@ -26,7 +26,7 @@ public:
 	void SetFilename(std::string_view filename);
 
 	std::string_view GetFilename() const;
-private:
+protected:
 	std::string _source;
 	std::string _filename;
 

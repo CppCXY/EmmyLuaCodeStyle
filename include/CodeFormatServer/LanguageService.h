@@ -53,6 +53,10 @@ private:
 
 	std::shared_ptr<vscode::Serializable> OnTypeFormatting(std::shared_ptr<vscode::TextDocumentPositionParams> param);
 
+	std::shared_ptr<vscode::CodeActionResult> OnCodeAction(std::shared_ptr<vscode::CodeActionParams> param);
+
+	std::shared_ptr<vscode::Serializable> OnExecuteCommand(std::shared_ptr<vscode::ExecuteCommandParams> param);
+
 	std::map<std::string, MessageHandle, std::less<>> _handles;
 };
 

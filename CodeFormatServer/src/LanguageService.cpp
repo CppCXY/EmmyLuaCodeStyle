@@ -29,7 +29,8 @@ bool LanguageService::Initialize()
 	JsonProtocol("textDocument/formatting", &LanguageService::OnFormatting);
 	JsonProtocol("textDocument/rangeFormatting", &LanguageService::OnRangeFormatting);
 	JsonProtocol("textDocument/onTypeFormatting", &LanguageService::OnTypeFormatting);
-
+	JsonProtocol("textDocument/codeAction", &LanguageService::OnCodeAction);
+	JsonProtocol("workspace/executeCommand", &LanguageService::OnExecuteCommand);
 	return true;
 }
 
@@ -59,6 +60,12 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 
 	result->capabilities.textDocumentSync.change = vscode::TextDocumentSyncKind::Full;
 	result->capabilities.textDocumentSync.openClose = true;
+
+	result->capabilities.codeActionProvider = true;
+	result->capabilities.executeCommandProvider.commands = {
+		"emmylua.reformat.me",
+		"emmylua.import.me"
+	};
 
 	auto& configFiles = param->initializationOptions.configFiles;
 	for (auto& configFile : configFiles)
@@ -105,10 +112,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 	{
 		LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
 
-		auto parser = LuaParser::LoadFromBuffer(std::move(content.text));
-		parser->BuildAstWithComment();
-
-		LanguageClient::GetInstance().CacheFile(param->textDocument.uri, parser);
+		LanguageClient::GetInstance().CacheFile(param->textDocument.uri, std::move(content.text));
 
 		LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
 	}
@@ -120,9 +124,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidOpen(
 	std::shared_ptr<vscode::DidOpenTextDocumentParams> param)
 {
 	LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
-	auto parser = LuaParser::LoadFromBuffer(std::move(param->textDocument.text));
-	parser->BuildAstWithComment();
-	LanguageClient::GetInstance().CacheFile(param->textDocument.uri, parser);
+	LanguageClient::GetInstance().CacheFile(param->textDocument.uri, std::move(param->textDocument.text));
 	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
 	return nullptr;
 }
@@ -255,4 +257,64 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 		vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
 	);
 	return result;
+}
+
+std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::shared_ptr<vscode::CodeActionParams> param)
+{
+	auto codeActionResult = std::make_shared<vscode::CodeActionResult>();
+
+	auto& action = codeActionResult->actions.emplace_back();
+	std::string title = "reformat me";
+	action.title = title;
+	action.command.title = title;
+	action.command.command = "emmylua.reformat.me";
+	action.command.arguments.push_back(param->textDocument.uri);
+	action.command.arguments.push_back(param->range.Serialize());
+
+	action.kind = vscode::CodeActionKind::QuickFix;
+	return codeActionResult;
+}
+
+std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
+	std::shared_ptr<vscode::ExecuteCommandParams> param)
+{
+	if(param->command == "emmylua.reformat.me")
+	{
+		if(param->arguments.size() < 2)
+		{
+			return nullptr;
+		}
+
+		std::string uri = param->arguments[0];
+		vscode::Range range;
+
+		range.Deserialize(param->arguments[1]);
+
+		auto parser = LanguageClient::GetInstance().GetFileParser(uri);
+
+		auto result = std::make_shared<vscode::DocumentFormattingResult>();
+
+		auto options = LanguageClient::GetInstance().GetOptions(uri);
+
+		if (parser->HasError())
+		{
+			result->hasError = true;
+			return result;
+		}
+
+		LuaFormatter formatter(parser, *options);
+		formatter.BuildFormattedElement();
+
+		auto& edit = result->edits.emplace_back();
+		LuaFormatRange formattedRange(static_cast<int>(range.start.line), static_cast<int>(range.end.line));
+
+		edit.newText = formatter.GetRangeFormattedText(formattedRange);
+		edit.range = vscode::Range(
+			vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
+			vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
+		);
+		return result;
+	}
+
+	return nullptr;
 }

@@ -5,7 +5,7 @@
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "CodeService/LuaEditorConfig.h"
 #include "LuaParser/LuaParser.h"
-#include "FileManager.h"
+#include "VirtualFile/VirtualFile.h"
 
 class LanguageClient
 {
@@ -20,7 +20,7 @@ public:
 
 	void SendNotification(std::string_view method, std::shared_ptr<vscode::Serializable> param);
 
-	void CacheFile(std::string_view uri, std::shared_ptr<LuaParser> parser);
+	void CacheFile(std::string_view uri, std::string&& text);
 
 	void ReleaseFile(std::string_view uri);
 
@@ -38,11 +38,9 @@ public:
 
 	void UpdateAllDiagnosis();
 private:
-
-
 	std::shared_ptr<IOSession> _session;
-	// uri 到file ast的映射
-	std::map<std::string, std::shared_ptr<LuaParser>, std::less<>> _parserMap;
+	// filePath 到 file的映射
+	std::map<std::string, std::shared_ptr<VirtualFile>, std::less<>> _fileMap;
 
 	std::vector<std::pair<std::string, std::shared_ptr<LuaEditorConfig>>> _editorConfigVector;
 

@@ -6,8 +6,7 @@
 #include <nlohmann/json.hpp>
 // 命名风格和vscode一样
 
-namespace vscode
-{
+namespace vscode {
 
 class Serializable
 {
@@ -135,6 +134,14 @@ public:
 	nlohmann::json Serialize() override;
 };
 
+class ExecuteCommandOptions : public Serializable
+{
+public:
+	std::vector<std::string> commands;
+
+	nlohmann::json Serialize() override;
+};
+
 class ServerCapabilities : public Serializable
 {
 public:
@@ -142,6 +149,8 @@ public:
 	bool documentFormattingProvider = false;
 	bool documentRangeFormattingProvider = false;
 	DocumentOnTypeFormattingOptions documentOnTypeFormattingProvider;
+	bool codeActionProvider = false;
+	ExecuteCommandOptions executeCommandProvider;
 
 	nlohmann::json Serialize() override;
 };
@@ -268,7 +277,7 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
-class DocumentRangeFormattingParams: public Serializable
+class DocumentRangeFormattingParams : public Serializable
 {
 public:
 	TextDocument textDocument;
@@ -277,11 +286,83 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
-class TextDocumentPositionParams: public Serializable
+class TextDocumentPositionParams : public Serializable
 {
 public:
 	TextDocument textDocument;
 	Position position;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+class CodeActionContext: public Serializable
+{
+public:
+	std::vector<Diagnostic> diagnostics;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+class CodeActionParams: public Serializable
+{
+public:
+	TextDocument textDocument;
+
+	Range range;
+
+	CodeActionContext context;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+class Command: public Serializable
+{
+public:
+	std::string title;
+
+	std::string command;
+
+	std::vector<nlohmann::json> arguments;
+
+	nlohmann::json Serialize() override;
+};
+
+class CodeActionKind
+{
+public:
+	inline static std::string Empty = "";
+
+	inline static std::string QuickFix = "quickfix";
+
+	inline static std::string Refactor = "refactor";
+};
+
+class CodeAction: public Serializable
+{
+public:
+	std::string title;
+
+	Command command;
+
+	std::string kind;
+
+	nlohmann::json Serialize() override;
+};
+
+class CodeActionResult : public Serializable
+{
+public:
+	std::vector<CodeAction> actions;
+
+	nlohmann::json Serialize() override;
+};
+
+class ExecuteCommandParams: public Serializable
+{
+public:
+	std::string command;
+
+	std::vector<nlohmann::json> arguments;
 
 	void Deserialize(nlohmann::json json) override;
 };

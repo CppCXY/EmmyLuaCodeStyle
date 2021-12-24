@@ -152,6 +152,8 @@ nlohmann::json vscode::ServerCapabilities::Serialize()
 	object["documentFormattingProvider"] = documentFormattingProvider;
 	object["documentRangeFormattingProvider"] = documentRangeFormattingProvider;
 	object["documentOnTypeFormattingProvider"] = documentOnTypeFormattingProvider.Serialize();
+	object["codeActionProvider"] = codeActionProvider;
+	object["executeCommandProvider"] = executeCommandProvider.Serialize();
 
 	return object;
 }
@@ -177,7 +179,7 @@ void vscode::InitializationOptions::Deserialize(nlohmann::json json)
 			workspaceFolders.emplace_back(workspaceUri);
 		}
 	}
-	if(json["localeRoot"].is_string())
+	if (json["localeRoot"].is_string())
 	{
 		localeRoot = json["localeRoot"];
 	}
@@ -217,7 +219,7 @@ void vscode::InitializeResult::Deserialize(nlohmann::json json)
 void vscode::TextDocumentContentChangeEvent::Deserialize(nlohmann::json json)
 {
 	text = json["text"];
-	if(!json["range"].is_null())
+	if (!json["range"].is_null())
 	{
 		auto textRange = Range();
 		textRange.Deserialize(json["range"]);
@@ -315,8 +317,95 @@ nlohmann::json vscode::DocumentOnTypeFormattingOptions::Serialize()
 	return object;
 }
 
+nlohmann::json vscode::ExecuteCommandOptions::Serialize()
+{
+	auto object = nlohmann::json::object();
+	auto array = nlohmann::json::array();
+	for (auto& command : commands)
+	{
+		array.push_back(command);
+	}
+	object["commands"] = array;
+
+	return object;
+}
+
 void vscode::TextDocumentPositionParams::Deserialize(nlohmann::json json)
 {
 	textDocument.Deserialize(json["textDocument"]);
 	position.Deserialize(json["position"]);
+}
+
+void vscode::CodeActionContext::Deserialize(nlohmann::json json)
+{
+	auto jsonDiagnostics = json["diagnostics"];
+	if (jsonDiagnostics.is_array())
+	{
+		for (auto& diagnostic : jsonDiagnostics)
+		{
+			diagnostics.emplace_back().Deserialize(diagnostic);
+		}
+	}
+}
+
+void vscode::CodeActionParams::Deserialize(nlohmann::json json)
+{
+	textDocument.Deserialize(json["textDocument"]);
+	range.Deserialize(json["range"]);
+	context.Deserialize(json["context"]);
+}
+
+nlohmann::json vscode::Command::Serialize()
+{
+	auto object = nlohmann::json::object();
+
+	object["title"] = title;
+	object["command"] = command;
+
+	auto array = nlohmann::json::array();
+
+	for(auto& arg: arguments)
+	{
+		array.push_back(arg);
+	}
+
+	object["arguments"] = array;
+
+	return object;
+}
+
+nlohmann::json vscode::CodeAction::Serialize()
+{
+	auto object = nlohmann::json::object();
+
+	object["title"] = title;
+	object["command"] = command.Serialize();
+	object["kind"] = kind;
+	return object;
+}
+
+nlohmann::json vscode::CodeActionResult::Serialize()
+{
+	auto array = nlohmann::json::array();
+
+	for (auto& action : actions)
+	{
+		array.push_back(action.Serialize());
+	}
+
+	return array;
+}
+
+void vscode::ExecuteCommandParams::Deserialize(nlohmann::json json)
+{
+	command = json["command"];
+	auto args = json["arguments"];
+	if(args.is_array())
+	{
+		for (auto arg : args) {
+			if (!arg.is_null()) {
+				arguments.push_back(arg);
+			}
+		}
+	}
 }

@@ -4,6 +4,7 @@
 #include "CodeService/LuaFormatter.h"
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"
+#include "Util/Url.h"
 
 LanguageClient& LanguageClient::GetInstance()
 {
@@ -43,27 +44,28 @@ void LanguageClient::SendNotification(std::string_view method, std::shared_ptr<v
 	}
 }
 
-void LanguageClient::CacheFile(std::string_view uri, std::shared_ptr<LuaParser> parser)
+void LanguageClient::CacheFile(std::string_view uri, std::string&& text)
 {
-	std::filesystem::path path(uri);
-	parser->SetFilename(path.filename().string());
-	_parserMap[std::string(uri)] = parser;
+	auto filename = url::UrlToFilePath(uri);
+	auto virtualFile = std::make_shared<VirtualFile>(filename, std::move(text));
+	_fileMap[filename] = virtualFile;
 }
 
 void LanguageClient::ReleaseFile(std::string_view uri)
 {
-	auto it = _parserMap.find(uri);
-	if (it != _parserMap.end())
+	auto filename = url::UrlToFilePath(uri);
+	auto it = _fileMap.find(filename);
+	if (it != _fileMap.end())
 	{
-		_parserMap.erase(it);
+		_fileMap.erase(it);
 	}
-
 }
 
 void LanguageClient::DiagnosticFile(std::string_view uri)
 {
-	auto it = _parserMap.find(uri);
-	if (it == _parserMap.end())
+	auto filename = url::UrlToFilePath(uri);
+	auto it = _fileMap.find(filename);
+	if (it == _fileMap.end())
 	{
 		return;
 	}
@@ -77,7 +79,7 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 		return;
 	}
 
-	std::shared_ptr<LuaParser> parser = it->second;
+	std::shared_ptr<LuaParser> parser = it->second->GetLuaParser();
 
 	if (parser->HasError())
 	{
@@ -113,10 +115,11 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 
 std::shared_ptr<LuaParser> LanguageClient::GetFileParser(std::string_view uri)
 {
-	auto it = _parserMap.find(uri);
-	if (it != _parserMap.end())
+	auto filename = url::UrlToFilePath(uri);
+	auto it = _fileMap.find(filename);
+	if (it != _fileMap.end())
 	{
-		return it->second;
+		return it->second->GetLuaParser();
 	}
 
 	return nullptr;
@@ -132,14 +135,15 @@ void LanguageClient::Run()
 
 std::shared_ptr<LuaCodeStyleOptions> LanguageClient::GetOptions(std::string_view uri)
 {
+	auto filename = url::UrlToFilePath(uri);
 	std::size_t matchLength = 0;
 	std::shared_ptr<LuaCodeStyleOptions> options = _defaultOptions;
 	for (auto it = _editorConfigVector.begin(); it != _editorConfigVector.end(); it++)
 	{
-		if (uri.starts_with(it->first) && it->first.size() > matchLength)
+		if (filename.starts_with(it->first) && it->first.size() > matchLength)
 		{
 			matchLength = it->first.size();
-			options = it->second->Generate(uri);
+			options = it->second->Generate(filename);
 		}
 	}
 
@@ -148,28 +152,30 @@ std::shared_ptr<LuaCodeStyleOptions> LanguageClient::GetOptions(std::string_view
 
 void LanguageClient::UpdateOptions(std::string_view workspaceUri, std::string_view configPath)
 {
+	auto workspace = url::UrlToFilePath(workspaceUri);
 	for (auto& pair : _editorConfigVector)
 	{
-		if (pair.first == workspaceUri)
+		if (pair.first == workspace)
 		{
 			pair.second = LuaEditorConfig::LoadFromFile(std::string(configPath));
-			pair.second->SetWorkspace(workspaceUri);
+			pair.second->SetWorkspace(workspace);
 			return;
 		}
 	}
 
 	_editorConfigVector.push_back({
-		std::string(workspaceUri),
+		workspace,
 		LuaEditorConfig::LoadFromFile(std::string(configPath))
 	});
-	_editorConfigVector.back().second->SetWorkspace(workspaceUri);
+	_editorConfigVector.back().second->SetWorkspace(workspace);
 }
 
 void LanguageClient::RemoveOptions(std::string_view workspaceUri)
 {
+	auto workspace = url::UrlToFilePath(workspaceUri);
 	for (auto it = _editorConfigVector.begin(); it != _editorConfigVector.end(); it++)
 	{
-		if (it->first == workspaceUri)
+		if (it->first == workspace)
 		{
 			_editorConfigVector.erase(it);
 			break;
@@ -179,8 +185,9 @@ void LanguageClient::RemoveOptions(std::string_view workspaceUri)
 
 void LanguageClient::UpdateAllDiagnosis()
 {
-	for(auto it: _parserMap)
+	for (auto it : _fileMap)
 	{
-		DiagnosticFile(it.first);
+		auto uri = url::FilePathToUrl(it.first);
+		DiagnosticFile(uri);
 	}
 }
