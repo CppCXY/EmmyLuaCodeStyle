@@ -7,7 +7,7 @@
 #include "Util/StringUtil.h"
 #include "CodeService/FormatElement/KeepElement.h"
 #include "CodeService/FormatElement/MinLineElement.h"
-#include "CodeService/NameStyle/NameStyleRuleMatcher.h" 
+#include "CodeService/NameStyle/NameStyleRuleMatcher.h"
 
 std::shared_ptr<LuaEditorConfig> LuaEditorConfig::LoadFromFile(const std::string& path)
 {
@@ -25,7 +25,7 @@ std::shared_ptr<LuaEditorConfig> LuaEditorConfig::LoadFromFile(const std::string
 }
 
 LuaEditorConfig::LuaEditorConfig(std::string&& source)
-	:  _source(source)
+	: _source(source)
 {
 }
 
@@ -105,7 +105,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 		{
 			std::string prefix = sectionPattern.substr(0, sectionPattern.size() - 6);
 			std::filesystem::path workspace(_workspace);
-			
+
 			auto dirname = workspace / prefix;
 			std::filesystem::path file(fileUri);
 			auto dirNormal = dirname.lexically_normal();
@@ -149,6 +149,11 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 void LuaEditorConfig::SetWorkspace(std::string_view workspace)
 {
 	_workspace = std::string(workspace);
+}
+
+void LuaEditorConfig::SetRootWorkspace(std::string_view rootWorkspace)
+{
+	_rootWorkspace = rootWorkspace;
 }
 
 void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> options,
@@ -295,7 +300,7 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		{"require_module_name_style", options->require_module_name_style},
 		{"class_name_define_style", options->class_name_define_style},
 	};
-	
+
 	for (auto& styleOption : styleList)
 	{
 		if (configMap.count(styleOption.first))
@@ -303,6 +308,33 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			std::string value = configMap.at(styleOption.first);
 			styleOption.second = NameStyleRuleMatcher::ParseFrom(value);
 		}
+	}
+
+	// if (configMap.count("root"))
+	// {
+	// 	options->root = configMap.at("root") == "true";
+	// }
+
+	if (configMap.count("auto_import"))
+	{
+		options->auto_import = configMap.at("auto_import") == "true";
+	}
+
+	if (configMap.count("export_root"))
+	{
+		options->export_root = StringUtil::Replace(configMap.at("export_root"), "${workspace}", _rootWorkspace);
+	}
+
+	if (configMap.count("import_from"))
+	{
+		auto splitVec = StringUtil::Split(configMap.at("import_from"), ",");
+		std::vector<std::string> from;
+		for (auto view : splitVec)
+		{
+			from.emplace_back(StringUtil::Replace(StringUtil::TrimSpace(view), "${workspace}", _rootWorkspace));
+		}
+
+		options->import_from = from;
 	}
 
 	if (options->indent_style == IndentStyle::Tab)

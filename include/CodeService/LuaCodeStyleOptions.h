@@ -3,6 +3,7 @@
 #include <string>
 #include <string_view>
 #include <memory>
+#include <vector>
 
 class FormatElement;
 class NameStyleRuleMatcher;
@@ -107,4 +108,12 @@ public:
 	std::shared_ptr<NameStyleRuleMatcher> module_name_define_style;
 	std::shared_ptr<NameStyleRuleMatcher> require_module_name_style;
 	std::shared_ptr<NameStyleRuleMatcher> class_name_define_style;
+
+
+	// auto import
+	bool auto_import = true;
+
+	// bool root = true;
+	std::string export_root;
+	std::vector<std::string> import_from;
 };

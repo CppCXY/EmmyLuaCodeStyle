@@ -39,6 +39,8 @@ private:
 
 	std::shared_ptr<vscode::InitializeResult> OnInitialize(std::shared_ptr<vscode::InitializeParams> param);
 
+	std::shared_ptr<vscode::Serializable> OnInitialized(std::shared_ptr<vscode::Serializable> param);
+
 	std::shared_ptr<vscode::Serializable> OnDidChange(std::shared_ptr<vscode::DidChangeTextDocumentParams> param);
 
 	std::shared_ptr<vscode::Serializable> OnDidOpen(std::shared_ptr<vscode::DidOpenTextDocumentParams> param);
@@ -59,4 +61,6 @@ private:
 
 	std::map<std::string, MessageHandle, std::less<>> _handles;
 };
+
+
 

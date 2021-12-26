@@ -25,6 +25,7 @@ target_sources(Util
 	${Util_SOURCE_DIR}/src/StringUtil.cpp
 	${Util_SOURCE_DIR}/src/Utf8.cpp
 	${Util_SOURCE_DIR}/src/Url.cpp
+	${Util_SOURCE_DIR}/src/FileFinder.cpp
 )
 
 

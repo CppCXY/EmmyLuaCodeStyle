@@ -60,3 +60,29 @@ std::string_view StringUtil::TrimSpace(std::string_view source)
 	}
 	return source.substr(start, end - start + 1);
 }
+
+std::string StringUtil::Replace(std::string_view source, std::string_view oldString, std::string_view newString)
+{
+	if(oldString.empty())
+	{
+		return std::string(source);
+	}
+
+	std::string result;
+	// 假设只有一次替换
+	result.reserve(source.size() - oldString.size() + newString.size());
+
+	while(true)
+	{
+		auto findPosition = source.find_first_of(oldString);
+		result.append(source.substr(0, findPosition));
+		if(findPosition == std::string_view::npos)
+		{
+			break;
+		}
+		result.append(newString);
+		source = source.substr(findPosition + oldString.size());
+	}
+
+	return result;
+}

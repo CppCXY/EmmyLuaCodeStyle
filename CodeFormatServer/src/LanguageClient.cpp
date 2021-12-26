@@ -5,6 +5,7 @@
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"
 #include "Util/Url.h"
+#include "Util/FileFinder.h"
 
 LanguageClient& LanguageClient::GetInstance()
 {
@@ -13,7 +14,9 @@ LanguageClient& LanguageClient::GetInstance()
 }
 
 LanguageClient::LanguageClient()
-	: _defaultOptions(std::make_shared<LuaCodeStyleOptions>())
+	: _defaultOptions(std::make_shared<LuaCodeStyleOptions>()),
+	  _idCounter(0),
+	  _moduleIndex(std::make_shared<ModuleIndex>())
 {
 }
 
@@ -32,6 +35,24 @@ void LanguageClient::SendNotification(std::string_view method, std::shared_ptr<v
 	auto json = nlohmann::json::object();
 	json["jsonrpc"] = "2.0";
 	json["method"] = method;
+	json["params"] = param->Serialize();
+
+	if (_session)
+	{
+		auto dumpResult = json.dump();
+		std::string message = format("Content-Length:{}\r\n\r\n", dumpResult.size());
+
+		message.append(dumpResult);
+		_session->Send(std::move(message));
+	}
+}
+
+void LanguageClient::SendRequest(std::string_view method, std::shared_ptr<vscode::Serializable> param)
+{
+	auto json = nlohmann::json::object();
+	json["jsonrpc"] = "2.0";
+	json["method"] = method;
+	json["id"] = GetRequestId();
 	json["params"] = param->Serialize();
 
 	if (_session)
@@ -110,6 +131,9 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 		diagnosis.severity = vscode::DiagnosticSeverity::Warning;
 	}
 
+
+
+
 	SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
 }
 
@@ -133,9 +157,18 @@ void LanguageClient::Run()
 	}
 }
 
-std::shared_ptr<LuaCodeStyleOptions> LanguageClient::GetOptions(std::string_view uri)
+std::shared_ptr<LuaCodeStyleOptions> LanguageClient::GetOptions(std::string_view uriOrFilename)
 {
-	auto filename = url::UrlToFilePath(uri);
+	std::string filename;
+	if (uriOrFilename.starts_with("file"))
+	{
+		filename = url::UrlToFilePath(uriOrFilename);
+	}
+	else
+	{
+		filename = std::string(uriOrFilename);
+	}
+
 	std::size_t matchLength = 0;
 	std::shared_ptr<LuaCodeStyleOptions> options = _defaultOptions;
 	for (auto it = _editorConfigVector.begin(); it != _editorConfigVector.end(); it++)
@@ -159,6 +192,7 @@ void LanguageClient::UpdateOptions(std::string_view workspaceUri, std::string_vi
 		{
 			pair.second = LuaEditorConfig::LoadFromFile(std::string(configPath));
 			pair.second->SetWorkspace(workspace);
+			pair.second->SetRootWorkspace(_root);
 			return;
 		}
 	}
@@ -168,6 +202,7 @@ void LanguageClient::UpdateOptions(std::string_view workspaceUri, std::string_vi
 		LuaEditorConfig::LoadFromFile(std::string(configPath))
 	});
 	_editorConfigVector.back().second->SetWorkspace(workspace);
+	_editorConfigVector.back().second->SetRootWorkspace(_root);
 }
 
 void LanguageClient::RemoveOptions(std::string_view workspaceUri)
@@ -185,9 +220,32 @@ void LanguageClient::RemoveOptions(std::string_view workspaceUri)
 
 void LanguageClient::UpdateAllDiagnosis()
 {
+	FileFinder finder(_root);
+
+	finder.AddIgnoreDirectory(".git");
+	finder.AddIgnoreDirectory(".github");
+	finder.AddIgnoreDirectory(".svn");
+	finder.AddIgnoreDirectory(".idea");
+	finder.AddIgnoreDirectory(".vs");
+	finder.AddIgnoreDirectory(".vscode");
+
+	finder.AddFindExtension(".lua");
+
+	_moduleIndex->ReBuildIndex(finder.FindFiles());
+
 	for (auto it : _fileMap)
 	{
 		auto uri = url::FilePathToUrl(it.first);
 		DiagnosticFile(uri);
 	}
+}
+
+void LanguageClient::SetRoot(std::string_view root)
+{
+	_root = root;
+}
+
+uint64_t LanguageClient::GetRequestId()
+{
+	return ++_idCounter;
 }

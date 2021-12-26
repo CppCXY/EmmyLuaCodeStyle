@@ -23,4 +23,6 @@ private:
 	std::string _filename;
 	std::shared_ptr<LuaFile> _luaFile;
 	std::shared_ptr<LuaParser> _luaParser;
+
+	bool _isOpen;
 };

@@ -1,5 +1,6 @@
 #include "CodeFormatServer/VSCode.h"
 
+
 vscode::Serializable::~Serializable()
 {
 }
@@ -408,4 +409,62 @@ void vscode::ExecuteCommandParams::Deserialize(nlohmann::json json)
 			}
 		}
 	}
+}
+
+nlohmann::json vscode::OptionalVersionedTextDocumentIdentifier::Serialize()
+{
+	auto object = TextDocument::Serialize();
+	if(version.has_value())
+	{
+		object["version"] = version.value();
+	}
+	else
+	{
+		object["version"] = nullptr;
+	}
+
+	return object;
+}
+
+nlohmann::json vscode::TextDocumentEdit::Serialize()
+{
+	auto object = nlohmann::json::object();
+
+	object["textDocument"] = textDocument.Serialize();
+
+	object["edits"] = SerializeArray(edits);
+
+	return object;
+}
+
+nlohmann::json vscode::WorkspaceEdit::Serialize()
+{
+	auto object = nlohmann::json::object();
+
+	auto changesObject = nlohmann::json::object();
+
+	for (auto it : changes) {
+		changesObject[it.first] = SerializeArray(it.second);
+	}
+	object["changes"] = changesObject;
+
+	return object;
+}
+
+nlohmann::json vscode::ApplyWorkspaceEditParams::Serialize()
+{
+	auto object = nlohmann::json::object();
+
+	if(label.has_value())
+	{
+		object["label"] = label.value();
+	}
+	else
+	{
+		object["label"] = nullptr;
+	}
+
+	object["edit"] = edit.Serialize();
+
+	return object;
 }

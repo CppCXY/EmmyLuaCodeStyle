@@ -2,12 +2,12 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-
+#include <type_traits>
 #include <nlohmann/json.hpp>
 // 命名风格和vscode一样
 
-namespace vscode {
-
+namespace vscode
+{
 class Serializable
 {
 public:
@@ -15,13 +15,33 @@ public:
 
 	virtual nlohmann::json Serialize()
 	{
-		auto object = nlohmann::json::object();
-		return object;
+		return nlohmann::json::object();
 	}
 
 	virtual void Deserialize(nlohmann::json json)
 	{
 	};
+
+	template<class T>
+	nlohmann::json SerializeArray(std::vector<T>& vec)
+	{
+		nlohmann::json array = nlohmann::json::array();
+
+		for(auto& v: vec)
+		{
+			if constexpr (std::is_base_of_v<Serializable, T>)
+			{
+				array.push_back(v.Serialize());
+			}
+			else
+			{
+				array.push_back(v);
+			}
+			
+		}
+		return array;
+	}
+
 };
 
 class Position : public Serializable
@@ -295,7 +315,7 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
-class CodeActionContext: public Serializable
+class CodeActionContext : public Serializable
 {
 public:
 	std::vector<Diagnostic> diagnostics;
@@ -303,7 +323,7 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
-class CodeActionParams: public Serializable
+class CodeActionParams : public Serializable
 {
 public:
 	TextDocument textDocument;
@@ -315,7 +335,7 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
-class Command: public Serializable
+class Command : public Serializable
 {
 public:
 	std::string title;
@@ -337,7 +357,7 @@ public:
 	inline static std::string Refactor = "refactor";
 };
 
-class CodeAction: public Serializable
+class CodeAction : public Serializable
 {
 public:
 	std::string title;
@@ -357,7 +377,7 @@ public:
 	nlohmann::json Serialize() override;
 };
 
-class ExecuteCommandParams: public Serializable
+class ExecuteCommandParams : public Serializable
 {
 public:
 	std::string command;
@@ -367,4 +387,39 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
+class OptionalVersionedTextDocumentIdentifier: public TextDocument
+{
+public:
+	std::optional<int> version;
+
+	nlohmann::json Serialize() override;
+};
+
+class TextDocumentEdit: public Serializable
+{
+public:
+	OptionalVersionedTextDocumentIdentifier textDocument;
+
+	std::vector<TextEdit> edits;
+
+	nlohmann::json Serialize() override;
+};
+
+class WorkspaceEdit: public Serializable
+{
+public:
+    // std::vector<TextDocumentEdit> documentChanges;
+	std::map<std::string, std::vector<TextEdit>> changes;
+	nlohmann::json Serialize() override;
+};
+
+
+class ApplyWorkspaceEditParams : public Serializable
+{
+public:
+	std::optional<std::string> label;
+	WorkspaceEdit edit;
+
+	nlohmann::json Serialize() override;
+};
 }

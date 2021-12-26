@@ -22,6 +22,7 @@ LanguageService::~LanguageService()
 bool LanguageService::Initialize()
 {
 	JsonProtocol("initialize", &LanguageService::OnInitialize);
+	JsonProtocol("Initialized", &LanguageService::OnInitialized);
 	JsonProtocol("textDocument/didChange", &LanguageService::OnDidChange);
 	JsonProtocol("textDocument/didOpen", &LanguageService::OnDidOpen);
 	JsonProtocol("textDocument/didClose", &LanguageService::OnClose);
@@ -100,8 +101,15 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 		}
 	}
 
+	LanguageClient::GetInstance().SetRoot(param->rootPath);
 
 	return result;
+}
+
+std::shared_ptr<vscode::Serializable> LanguageService::OnInitialized(std::shared_ptr<vscode::Serializable> param)
+{
+	LanguageClient::GetInstance().UpdateAllDiagnosis();
+	return nullptr;
 }
 
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
@@ -278,11 +286,12 @@ std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::sha
 std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 	std::shared_ptr<vscode::ExecuteCommandParams> param)
 {
-	if(param->command == "emmylua.reformat.me")
+	auto result = std::make_shared<vscode::Serializable>();
+	if (param->command == "emmylua.reformat.me")
 	{
-		if(param->arguments.size() < 2)
+		if (param->arguments.size() < 2)
 		{
-			return nullptr;
+			return result;
 		}
 
 		std::string uri = param->arguments[0];
@@ -292,20 +301,21 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 
 		auto parser = LanguageClient::GetInstance().GetFileParser(uri);
 
-		auto result = std::make_shared<vscode::DocumentFormattingResult>();
+		auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();
 
 		auto options = LanguageClient::GetInstance().GetOptions(uri);
 
 		if (parser->HasError())
 		{
-			result->hasError = true;
 			return result;
 		}
 
 		LuaFormatter formatter(parser, *options);
 		formatter.BuildFormattedElement();
+		auto it = applyParams->edit.changes.emplace(uri, std::vector<vscode::TextEdit>());
+		auto& change = it.first->second;
 
-		auto& edit = result->edits.emplace_back();
+		auto& edit = change.emplace_back();
 		LuaFormatRange formattedRange(static_cast<int>(range.start.line), static_cast<int>(range.end.line));
 
 		edit.newText = formatter.GetRangeFormattedText(formattedRange);
@@ -313,8 +323,10 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 			vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
 			vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
 		);
-		return result;
+
+
+		LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
 	}
 
-	return nullptr;
+	return result;
 }
