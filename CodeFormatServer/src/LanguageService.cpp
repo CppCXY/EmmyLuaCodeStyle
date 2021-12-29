@@ -218,11 +218,11 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnRangeFormatting(
 		return result;
 	}
 
-	LuaFormatter formatter(parser, *options);
-	formatter.BuildFormattedElement();
-
 	auto& edit = result->edits.emplace_back();
 	LuaFormatRange formattedRange(static_cast<int>(param->range.start.line), static_cast<int>(param->range.end.line));
+
+	LuaFormatter formatter(parser, *options);
+	formatter.BuildRangeFormattedElement(formattedRange);
 
 	edit.newText = formatter.GetRangeFormattedText(formattedRange);
 	edit.range = vscode::Range(
@@ -253,11 +253,11 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 		return result;
 	}
 
-	LuaFormatter formatter(parser, *options);
-	formatter.BuildFormattedElement();
-
 	auto& edit = result->edits.emplace_back();
 	LuaFormatRange formattedRange(static_cast<int>(position.line) - 1, static_cast<int>(position.line) - 1);
+
+	LuaFormatter formatter(parser, *options);
+	formatter.BuildRangeFormattedElement(formattedRange);
 
 	edit.newText = formatter.GetRangeFormattedText(formattedRange);
 	edit.range = vscode::Range(
@@ -310,20 +310,20 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 			return result;
 		}
 
-		LuaFormatter formatter(parser, *options);
-		formatter.BuildFormattedElement();
 		auto it = applyParams->edit.changes.emplace(uri, std::vector<vscode::TextEdit>());
 		auto& change = it.first->second;
 
 		auto& edit = change.emplace_back();
 		LuaFormatRange formattedRange(static_cast<int>(range.start.line), static_cast<int>(range.end.line));
 
+		LuaFormatter formatter(parser, *options);
+		formatter.BuildRangeFormattedElement(formattedRange);
+
 		edit.newText = formatter.GetRangeFormattedText(formattedRange);
 		edit.range = vscode::Range(
 			vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
 			vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
 		);
-
 
 		LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
 	}

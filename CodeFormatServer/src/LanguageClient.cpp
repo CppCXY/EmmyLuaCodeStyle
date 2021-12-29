@@ -131,9 +131,6 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 		diagnosis.severity = vscode::DiagnosticSeverity::Warning;
 	}
 
-
-
-
 	SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
 }
 
@@ -243,6 +240,8 @@ void LanguageClient::UpdateAllDiagnosis()
 void LanguageClient::SetRoot(std::string_view root)
 {
 	_root = root;
+	_defaultOptions->export_root = root;
+	_defaultOptions->import_from.emplace_back(root);
 }
 
 uint64_t LanguageClient::GetRequestId()

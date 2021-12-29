@@ -65,6 +65,20 @@ std::string LuaFormatter::GetFormattedText()
 	return ctx.GetText();
 }
 
+void LuaFormatter::BuildRangeFormattedElement(LuaFormatRange& validRange)
+{
+	auto chunkNode = _parser->GetAst();
+	if (!chunkNode->GetChildren().empty())
+	{
+		auto fileBlock = chunkNode->GetChildren().front();
+		_env = FormatRangeBlock(fileBlock, validRange);
+	}
+	else
+	{
+		_env = std::make_shared<IndentElement>();
+	}
+}
+
 std::string LuaFormatter::GetRangeFormattedText(LuaFormatRange& validRange)
 {
 	RangeFormatContext ctx(_parser, _options, validRange);
@@ -1894,4 +1908,207 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 		}
 	}
 	return env;
+}
+
+std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode,
+                                                              LuaFormatRange& validRange)
+{
+	enum class State
+	{
+		UnReach,
+		Contain,
+	} state = State::UnReach;
+
+	auto indentEnv = std::make_shared<IndentElement>();
+
+	auto& statements = blockNode->GetChildren();
+
+	for (auto it = statements.begin(); it != statements.end(); ++it)
+	{
+		const auto statement = *it;
+
+		switch (state)
+		{
+		case State::UnReach:
+			{
+				TextRange textRange = statement->GetTextRange();
+				if (statement->GetType() == LuaAstNodeType::AssignStatement
+					|| statement->GetType() == LuaAstNodeType::LocalStatement
+					|| statement->GetType() == LuaAstNodeType::Comment)
+				{
+					auto lastLine = _parser->GetLine(textRange.EndOffset);
+					auto newIt = it;
+					while (nextMatch(newIt, LuaAstNodeType::AssignStatement, statements)
+						|| nextMatch(newIt, LuaAstNodeType::LocalStatement, statements)
+						|| nextMatch(newIt, LuaAstNodeType::Comment, statements))
+					{
+						auto next = nextNode(newIt, statements);
+						auto nextTextRange = next->GetTextRange();
+
+						auto nextTextLine = _parser->GetLine(nextTextRange.StartOffset);
+
+						if (nextTextLine - lastLine > 2)
+						{
+							break;
+						}
+						textRange.EndOffset = nextTextRange.EndOffset;
+						++newIt;
+					}
+					auto statementEndLine = _parser->GetLine(textRange.EndOffset);
+
+					if (statementEndLine >= validRange.StartLine)
+					{
+						state = State::Contain;
+						break;
+					}
+					else
+					{
+						it = newIt;
+						continue;
+					}
+				}
+				else
+				{
+					auto statementEndLine = _parser->GetLine(textRange.EndOffset);
+
+					if (statementEndLine >= validRange.StartLine)
+					{
+						state = State::Contain;
+						break;
+					}
+					else
+					{
+						continue;
+					}
+				}
+				break;
+			}
+		case State::Contain:
+			{
+				auto statementStartLine = _parser->GetLine(statement->GetTextRange().StartOffset);
+				if (statementStartLine > validRange.EndLine)
+				{
+					goto endLoop;
+				}
+				break;
+			}
+		}
+
+
+		switch (statement->GetType())
+		{
+		case LuaAstNodeType::AssignStatement:
+		case LuaAstNodeType::LocalStatement:
+			{
+				if (nextMatch(it, LuaAstNodeType::AssignStatement, statements)
+					|| nextMatch(it, LuaAstNodeType::LocalStatement, statements)
+					|| nextMatch(it, LuaAstNodeType::Comment, statements))
+				{
+					indentEnv->AddChild(FormatAlignStatement(it, statements));
+				}
+				else
+				{
+					auto childEnv = FormatNode(statement);
+					indentEnv->AddChild(childEnv);
+				}
+				indentEnv->AddChild(_options.keep_line_after_local_or_assign_statement);
+				break;
+			}
+		case LuaAstNodeType::RepeatStatement:
+			{
+				auto child = FormatNode(statement);
+				indentEnv->AddChild(child);
+				indentEnv->AddChild(_options.keep_line_after_repeat_statement);
+				break;
+			}
+		case LuaAstNodeType::DoStatement:
+			{
+				indentEnv->AddChild(FormatNode(statement));
+				indentEnv->AddChild(_options.keep_line_after_do_statement);
+				break;
+			}
+		case LuaAstNodeType::ForStatement:
+			{
+				indentEnv->AddChild(FormatNode(statement));
+				indentEnv->AddChild(_options.keep_line_after_for_statement);
+				break;
+			}
+		case LuaAstNodeType::WhileStatement:
+			{
+				indentEnv->AddChild(FormatNode(statement));
+				indentEnv->AddChild(_options.keep_line_after_while_statement);
+				break;
+			}
+		case LuaAstNodeType::IfStatement:
+			{
+				indentEnv->AddChild(FormatNode(statement));
+				indentEnv->AddChild(_options.keep_line_after_if_statement);
+				break;
+			}
+		case LuaAstNodeType::Comment:
+			{
+				auto comment = FormatNode(statement);
+				auto commentStatement = std::make_shared<StatementElement>();
+				commentStatement->AddChild(comment);
+				indentEnv->AddChild(commentStatement);
+
+				indentEnv->Add<KeepLineElement>();
+				break;
+			}
+		case LuaAstNodeType::BreakStatement:
+		case LuaAstNodeType::ReturnStatement:
+		case LuaAstNodeType::GotoStatement:
+		case LuaAstNodeType::ExpressionStatement:
+			{
+				auto statEnv = FormatNode(statement);
+				if (nextMatch(it, LuaAstNodeType::Comment, statements))
+				{
+					auto next = nextNode(it, statements);
+					int currentLine = _parser->GetLine(statement->GetTextRange().EndOffset);
+					int nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
+
+					if (currentLine == nextLine)
+					{
+						statEnv->Add<KeepBlankElement>(1);
+						statEnv->Add<TextElement>(next);
+						++it;
+					}
+				}
+				indentEnv->AddChild(statEnv);
+				indentEnv->Add<KeepLineElement>();
+				break;
+			}
+		case LuaAstNodeType::LocalFunctionStatement:
+		case LuaAstNodeType::FunctionStatement:
+			{
+				indentEnv->AddChild(FormatNode(statement));
+				indentEnv->AddChild(_options.keep_line_after_function_define_statement);
+				break;
+			}
+		case LuaAstNodeType::LabelStatement:
+			{
+				auto childEnv = FormatNode(statement);
+				if (_options.label_no_indent)
+				{
+					auto noIndent = std::make_shared<IndentElement>(0);
+					noIndent->AddChild(childEnv);
+					indentEnv->AddChild(noIndent);
+				}
+				else
+				{
+					indentEnv->AddChild(childEnv);
+				}
+
+				break;
+			}
+		default:
+			{
+				auto childEnv = FormatNode(statement);
+				indentEnv->AddChild(childEnv);
+				indentEnv->Add<KeepLineElement>();
+			}
+		}
+	}
+endLoop:
+	return indentEnv;
 }

@@ -16,7 +16,6 @@ using namespace asio::ip;
 
 int main(int argc, char** argv)
 {
-
     if(argc > 1)
     {
         int port = std::stoi(argv[1]);
@@ -36,8 +35,6 @@ int main(int argc, char** argv)
         LanguageClient::GetInstance().SetSession(std::make_shared<StandardIOSession>());
         LanguageClient::GetInstance().Run();
     }
-
-   
 
     return 0;
 }

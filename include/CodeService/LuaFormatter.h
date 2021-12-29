@@ -17,6 +17,8 @@ public:
 
 	std::string GetFormattedText();
 
+	void BuildRangeFormattedElement(LuaFormatRange& validRange);
+
 	std::string GetRangeFormattedText(LuaFormatRange& validRange);
 
 	std::vector<LuaDiagnosisInfo> GetDiagnosisInfos();
@@ -118,6 +120,9 @@ protected:
 	std::shared_ptr<FormatElement> FormatIndexExpression(std::shared_ptr<LuaAstNode> indexExpression);
 
 	std::shared_ptr<FormatElement> FormatCallExpression(std::shared_ptr<LuaAstNode> callExpression);
+
+	// special handle range format
+	std::shared_ptr<FormatElement> FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode, LuaFormatRange& validRange);
 private:
 	std::shared_ptr<LuaParser> _parser;
 	LuaCodeStyleOptions& _options;
