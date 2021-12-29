@@ -10,11 +10,10 @@ public:
 		std::set<std::string, std::less<>> LocalVariableSet;
 	};
 
-	UnResolveModuleFinder(std::vector<vscode::Diagnostic>& result, std::shared_ptr<LuaCodeStyleOptions> options)
-		: _result(result),
-		  _options(options)
-	{
-	}
+	// UnResolveModuleFinder(std::shared_ptr<LuaCodeStyleOptions> options)
+	// 	: _options(options)
+	// {
+	// }
 
 	void Find()
 	{
@@ -34,21 +33,16 @@ protected:
 	{
 	}
 
-	void VisitExpression(const std::shared_ptr<LuaAstNode>& expression) override
+	void VisitNameIdentify(const std::shared_ptr<LuaAstNode>& expression) override
 	{
-		if(expression->GetChildren().empty())
-		switch (expression->GetType())
-		{
-			// case 
-
-
-
-		}
-
+		// if(IsGlobal(expression))
+		// {
+		// 		
+		// }
 	}
 
 private:
-	std::vector<vscode::Diagnostic>& _result;
+	std::vector<std::shared_ptr<LuaAstNode>>& _result;
 	std::shared_ptr<LuaCodeStyleOptions> _options;
 };
 
@@ -56,10 +50,10 @@ std::vector<vscode::Diagnostic> ModuleService::GetModuleDiagnostics(std::shared_
                                                                     std::shared_ptr<LuaCodeStyleOptions> options)
 {
 	std::vector<vscode::Diagnostic> result;
-	UnResolveModuleFinder finder(result, options);
-	auto ast = parser->GetAst();
-
-	ast->AcceptChildren(finder);
+	// UnResolveModuleFinder finder(options);
+	// auto ast = parser->GetAst();
+	//
+	// ast->AcceptChildren(finder);
 
 	return result;
 }

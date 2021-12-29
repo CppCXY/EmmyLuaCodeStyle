@@ -8,6 +8,8 @@ enum class LuaAstNodeType
 
 	Identify,
 
+	NameIdentify,
+
 	KeyWord,
 
 	EmptyStatement,

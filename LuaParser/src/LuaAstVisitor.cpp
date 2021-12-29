@@ -25,153 +25,158 @@ void LuaAstVisitor::Visit(std::shared_ptr<LuaAstNode> node)
 		}
 	case LuaAstNodeType::ExpressionList:
 		{
-			 VisitExpressionList(node);
-			 break;
+			VisitExpressionList(node);
+			break;
 		}
 	case LuaAstNodeType::Comment:
 		{
-			 VisitComment(node);
-			 break;
+			VisitComment(node);
+			break;
 		}
 	case LuaAstNodeType::LabelStatement:
 		{
-			 VisitLabelStatement(node);
-			 break;
+			VisitLabelStatement(node);
+			break;
 		}
 	case LuaAstNodeType::BreakStatement:
 		{
-			 VisitBreakStatement(node);
-			 break;
+			VisitBreakStatement(node);
+			break;
 		}
 	case LuaAstNodeType::GotoStatement:
 		{
-			 VisitGotoStatement(node);
-			 break;
+			VisitGotoStatement(node);
+			break;
 		}
 	case LuaAstNodeType::ReturnStatement:
 		{
-			 VisitReturnStatement(node);
-			 break;
+			VisitReturnStatement(node);
+			break;
 		}
 	case LuaAstNodeType::Identify:
 		{
-			 VisitIdentify(node);
-			 break;
+			VisitIdentify(node);
+			break;
+		}
+	case LuaAstNodeType::NameIdentify:
+		{
+			VisitNameIdentify(node);
+			break;
 		}
 	case LuaAstNodeType::GeneralOperator:
 		{
-			 VisitGeneralOperator(node);
-			 break;
+			VisitGeneralOperator(node);
+			break;
 		}
 	case LuaAstNodeType::KeyWord:
 		{
-			 VisitKeyWords(node);
-			 break;
+			VisitKeyWords(node);
+			break;
 		}
 	case LuaAstNodeType::WhileStatement:
 		{
-			 VisitWhileStatement(node);
-			 break;
+			VisitWhileStatement(node);
+			break;
 		}
 	case LuaAstNodeType::ForStatement:
 		{
-			 VisitForStatement(node);
-			 break;
+			VisitForStatement(node);
+			break;
 		}
 	case LuaAstNodeType::ForBody:
 		{
-			 VisitForBody(node);
-			 break;
+			VisitForBody(node);
+			break;
 		}
 	case LuaAstNodeType::Attribute:
 		{
-			 VisitAttribute(node);
-			 break;
+			VisitAttribute(node);
+			break;
 		}
 	case LuaAstNodeType::RepeatStatement:
 		{
-			 VisitRepeatStatement(node);
-			 break;
+			VisitRepeatStatement(node);
+			break;
 		}
 	case LuaAstNodeType::DoStatement:
 		{
-			 VisitDoStatement(node);
-			 break;
+			VisitDoStatement(node);
+			break;
 		}
 	case LuaAstNodeType::AssignStatement:
 		{
-			 VisitAssignment(node);
-			 break;
+			VisitAssignment(node);
+			break;
 		}
 	case LuaAstNodeType::IfStatement:
 		{
-			 VisitIfStatement(node);
-			 break;
+			VisitIfStatement(node);
+			break;
 		}
 	case LuaAstNodeType::ExpressionStatement:
 		{
-			 VisitExpressionStatement(node);
-			 break;
+			VisitExpressionStatement(node);
+			break;
 		}
 	case LuaAstNodeType::Expression:
 		{
-			 VisitExpression(node);
-			 break;
+			VisitExpression(node);
+			break;
 		}
 	case LuaAstNodeType::CallExpression:
 		{
-			 VisitCallExpression(node);
-			 break;
+			VisitCallExpression(node);
+			break;
 		}
 	case LuaAstNodeType::CallArgList:
 		{
-			 VisitCallArgList(node);
-			 break;
+			VisitCallArgList(node);
+			break;
 		}
 	case LuaAstNodeType::FunctionStatement:
 		{
-			 VisitFunctionStatement(node);
-			 break;
+			VisitFunctionStatement(node);
+			break;
 		}
 	case LuaAstNodeType::LocalFunctionStatement:
 		{
-			 VisitLocalFunctionStatement(node);
-			 break;
+			VisitLocalFunctionStatement(node);
+			break;
 		}
 	case LuaAstNodeType::ClosureExpression:
 		{
-			 VisitClosureExpression(node);
-			 break;
+			VisitClosureExpression(node);
+			break;
 		}
 	case LuaAstNodeType::NameExpression:
 		{
-			 VisitNameExpression(node);
-			 break;
+			VisitNameExpression(node);
+			break;
 		}
 	case LuaAstNodeType::TableExpression:
 		{
-			 VisitTableExpression(node);
-			 break;
+			VisitTableExpression(node);
+			break;
 		}
 	case LuaAstNodeType::TableField:
 		{
-			 VisitTableField(node);
-			 break;
+			VisitTableField(node);
+			break;
 		}
 	case LuaAstNodeType::ParamList:
 		{
-			 VisitParamList(node);
-			 break;
+			VisitParamList(node);
+			break;
 		}
 	case LuaAstNodeType::FunctionBody:
 		{
-			 VisitFunctionBody(node);
-			 break;
+			VisitFunctionBody(node);
+			break;
 		}
 	case LuaAstNodeType::LiteralExpression:
 		{
-			 VisitLiteralExpression(node);
-			 break;
+			VisitLiteralExpression(node);
+			break;
 		}
 	default:
 		{
@@ -179,7 +184,7 @@ void LuaAstVisitor::Visit(std::shared_ptr<LuaAstNode> node)
 		}
 	}
 
-	for(const auto& child: node->GetChildren())
+	for (const auto& child : node->GetChildren())
 	{
 		Visit(child);
 	}
@@ -222,6 +227,10 @@ void LuaAstVisitor::VisitReturnStatement(const std::shared_ptr<LuaAstNode>& node
 }
 
 void LuaAstVisitor::VisitIdentify(const std::shared_ptr<LuaAstNode>& node)
+{
+}
+
+void LuaAstVisitor::VisitNameIdentify(const std::shared_ptr<LuaAstNode>& node)
 {
 }
 

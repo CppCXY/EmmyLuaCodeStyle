@@ -1056,7 +1056,10 @@ void LuaParser::PrimaryExpression(std::shared_ptr<LuaAstNode> primaryExpression)
 		}
 	case TK_NAME:
 		{
-			CodeName(primaryExpression);
+			auto identify = CreateAstNodeFromCurrentToken(LuaAstNodeType::NameIdentify);
+			primaryExpression->AddChild(identify);
+			_tokenParser->Next();
+			// CodeName(primaryExpression);
 			return;
 		}
 	default:

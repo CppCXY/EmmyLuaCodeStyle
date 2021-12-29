@@ -50,6 +50,8 @@ protected:
 
 	std::shared_ptr<FormatElement> FormatIdentify(std::shared_ptr<LuaAstNode> identify);
 
+	std::shared_ptr<FormatElement> FormatNameIdentify(std::shared_ptr<LuaAstNode> nameIdentify);
+
 	std::shared_ptr<FormatElement> FormatGeneralOperator(std::shared_ptr<LuaAstNode> general);
 
 	std::shared_ptr<FormatElement> FormatKeyWords(std::shared_ptr<LuaAstNode> keywords);

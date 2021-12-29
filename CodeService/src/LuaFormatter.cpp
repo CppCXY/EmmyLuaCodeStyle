@@ -150,6 +150,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNode(std::shared_ptr<LuaAstNo
 		{
 			return FormatIdentify(node);
 		}
+	case LuaAstNodeType::NameIdentify:
+		{
+			return FormatNameIdentify(node);
+		}
 	case LuaAstNodeType::GeneralOperator:
 		{
 			return FormatGeneralOperator(node);
@@ -690,6 +694,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLabelStatement(std::shared_pt
 std::shared_ptr<FormatElement> LuaFormatter::FormatIdentify(std::shared_ptr<LuaAstNode> identify)
 {
 	return std::make_shared<TextElement>(identify);
+}
+
+std::shared_ptr<FormatElement> LuaFormatter::FormatNameIdentify(std::shared_ptr<LuaAstNode> nameIdentify)
+{
+	return std::make_shared<TextElement>(nameIdentify);
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatGeneralOperator(std::shared_ptr<LuaAstNode> general)
@@ -1821,6 +1830,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatPrimaryExpression(std::shared
 			}
 		case LuaAstNodeType::Expression:
 		case LuaAstNodeType::Identify:
+		case LuaAstNodeType::NameIdentify:
 			{
 				env->AddChild(FormatNode(child));
 				env->Add<KeepElement>(0);

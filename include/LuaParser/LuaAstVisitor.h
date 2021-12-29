@@ -20,6 +20,7 @@ protected:
 	virtual void VisitGotoStatement(const std::shared_ptr<LuaAstNode>& node);
 	virtual void VisitReturnStatement(const std::shared_ptr<LuaAstNode>& node);
 	virtual void VisitIdentify(const std::shared_ptr<LuaAstNode>& node);
+	virtual void VisitNameIdentify(const std::shared_ptr<LuaAstNode>& node);
 	virtual void VisitGeneralOperator(const std::shared_ptr<LuaAstNode>& node);
 	virtual void VisitKeyWords(const std::shared_ptr<LuaAstNode>& node);
 	virtual void VisitWhileStatement(const std::shared_ptr<LuaAstNode>& node);
