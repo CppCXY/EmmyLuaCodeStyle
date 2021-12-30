@@ -118,7 +118,7 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 	}
 
 	auto formatDiagnostic = GetService<CodeFormatService>()->Diagnose(filename, parser, options);
-	auto moduleDiagnosis = GetService<ModuleService>()->Diagnose(parser, options);
+	auto moduleDiagnosis = GetService<ModuleService>()->Diagnose(filename, parser, options);
 
 	std::copy(formatDiagnostic.begin(), formatDiagnostic.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
 	std::copy(moduleDiagnosis.begin(), moduleDiagnosis.end(), std::back_inserter(vscodeDiagnosis->diagnostics));

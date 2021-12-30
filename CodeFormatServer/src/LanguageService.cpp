@@ -8,6 +8,7 @@
 #include "CodeService/LuaFormatter.h"
 #include "CodeFormatServer/LanguageClient.h"
 #include "CodeFormatServer/Service/CodeFormatService.h"
+#include "CodeFormatServer/Service/ModuleService.h"
 #include "Util/Url.h"
 
 using namespace std::placeholders;
@@ -23,7 +24,7 @@ LanguageService::~LanguageService()
 bool LanguageService::Initialize()
 {
 	JsonProtocol("initialize", &LanguageService::OnInitialize);
-	JsonProtocol("Initialized", &LanguageService::OnInitialized);
+	JsonProtocol("initialized", &LanguageService::OnInitialized);
 	JsonProtocol("textDocument/didChange", &LanguageService::OnDidChange);
 	JsonProtocol("textDocument/didOpen", &LanguageService::OnDidOpen);
 	JsonProtocol("textDocument/didClose", &LanguageService::OnClose);
@@ -276,7 +277,7 @@ std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::sha
 	auto filePath = url::UrlToFilePath(uri);
 	auto codeActionResult = std::make_shared<vscode::CodeActionResult>();
 
-	if(LanguageClient::GetInstance().GetService<CodeFormatService>()->IsDiagnosticRange(filePath, range))
+	if (LanguageClient::GetInstance().GetService<CodeFormatService>()->IsDiagnosticRange(filePath, range))
 	{
 		auto& action = codeActionResult->actions.emplace_back();
 		std::string title = "reformat me";
@@ -288,7 +289,26 @@ std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::sha
 
 		action.kind = vscode::CodeActionKind::QuickFix;
 	}
+	else if (LanguageClient::GetInstance().GetService<ModuleService>()->IsDiagnosticRange(filePath, range))
+	{
+		auto modules = LanguageClient::GetInstance().GetService<ModuleService>()->GetImportModules(filePath, range);
+		auto& action = codeActionResult->actions.emplace_back();
+		std::string title = "import me";
+		action.title = title;
+		action.command.title = title;
+		action.command.command = "emmylua.import.me";
+		action.command.arguments.push_back(param->textDocument.uri);
+		action.command.arguments.push_back(param->range.Serialize());
+		for (auto& module : modules)
+		{
+			auto object = nlohmann::json::object();
+			object["moduleName"] = module.ModuleName;
+			object["path"] = module.FilePath;
+			action.command.arguments.push_back(object);
+		}
 
+		action.kind = vscode::CodeActionKind::QuickFix;
+	}
 	return codeActionResult;
 }
 
@@ -325,7 +345,8 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 		auto& edit = change.emplace_back();
 		LuaFormatRange formattedRange(static_cast<int>(range.start.line), static_cast<int>(range.end.line));
 
-		auto formatResult = LanguageClient::GetInstance().GetService<CodeFormatService>()->RangeFormat(formattedRange, parser, options);
+		auto formatResult = LanguageClient::GetInstance().GetService<CodeFormatService>()->RangeFormat(
+			formattedRange, parser, options);
 
 		edit.newText = std::move(formatResult);
 
@@ -336,6 +357,8 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 
 		LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
 	}
-
+	else if (param->command == "emmylua.import.me")
+	{
+	}
 	return result;
 }

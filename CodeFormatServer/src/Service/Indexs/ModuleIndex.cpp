@@ -33,10 +33,10 @@ void ModuleIndex::BuildIndex(const std::vector<std::string>& files)
 
 		if (_moduleIndex.count(options->export_root) == 0)
 		{
-			_moduleIndex.insert({options->export_root, std::set<std::string>()});
+			_moduleIndex.insert({options->export_root, std::vector<Module>()});
 		}
 
-		_moduleIndex.at(options->export_root).insert(modulePath);
+		_moduleIndex.at(options->export_root).emplace_back(modulePath, filename);
 	}
 }
 
@@ -46,22 +46,17 @@ void ModuleIndex::RebuildIndex(const std::vector<std::string>& files)
 	BuildIndex(files);
 }
 
-std::vector<std::string> ModuleIndex::GetModules(std::string filename)
+std::vector<ModuleIndex::Module>& ModuleIndex::GetModules(std::shared_ptr<LuaCodeStyleOptions> options)
 {
-	auto options = LanguageClient::GetInstance().GetOptions(filename);
 
-	std::vector<std::string> modules;
 	for (auto& from : options->import_from)
 	{
 		auto it = _moduleIndex.find(from);
 
 		if (it != _moduleIndex.end())
 		{
-			for (auto& modulePath : it->second)
-			{
-				modules.emplace_back(modulePath);
-			}
+			return it->second;
 		}
 	}
-	return modules;
+	return _emptyModules;
 }

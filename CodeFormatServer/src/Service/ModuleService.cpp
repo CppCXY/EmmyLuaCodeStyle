@@ -77,7 +77,7 @@ protected:
 		}
 	}
 
-	void VisitBlock(const std::shared_ptr<LuaAstNode>& block)
+	void VisitBlock(const std::shared_ptr<LuaAstNode>& block) override
 	{
 		_scopeMap.insert({block, Scope()});
 	}
@@ -144,16 +144,56 @@ ModuleService::ModuleService(std::shared_ptr<LanguageClient> owner)
 {
 }
 
-std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::shared_ptr<LuaParser> parser,
+std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePath,
+                                                        std::shared_ptr<LuaParser> parser,
                                                         std::shared_ptr<LuaCodeStyleOptions> options)
 {
-	// std::vector<vscode::Diagnostic> result;
-	// UnResolveModuleFinder finder;
-	// auto& undefinedModules = finder.GetUndefinedModule(parser);
+	std::vector<vscode::Diagnostic> result;
+	UnResolveModuleFinder finder;
+	auto& undefinedModules = finder.GetUndefinedModule(parser);
+	auto& luaModules = _moduleIndex.GetModules(options);
 
+	std::multimap<vscode::Range, ModuleIndex::Module> rangeModule;
+	for (auto& undefinedModule : undefinedModules)
+	{
+		auto undefinedModuleName = undefinedModule->GetText();
+		for (auto& luaModule : luaModules)
+		{
+			std::string name;
 
-	// return result;
-	return {};
+			auto dotPosition = luaModule.ModuleName.find_last_of('.');
+			if (dotPosition == std::string_view::npos)
+			{
+				name = luaModule.ModuleName;
+			}
+			else
+			{
+				name = luaModule.ModuleName.substr(dotPosition + 1);
+			}
+
+			if (undefinedModuleName == name)
+			{
+				auto& diagnostic = result.emplace_back();
+				diagnostic.message = "not import module";
+				auto textRange = undefinedModule->GetTextRange();
+				auto range = vscode::Range(
+					vscode::Position(
+						parser->GetLine(textRange.StartOffset),
+						parser->GetColumn(textRange.StartOffset)
+					),
+					vscode::Position(
+						parser->GetLine(textRange.EndOffset),
+						parser->GetColumn(textRange.EndOffset)
+					)
+				);
+				rangeModule.insert({range, luaModule});
+				diagnostic.range = range;
+				diagnostic.severity = vscode::DiagnosticSeverity::Information;
+			}
+		}
+	}
+	_diagnosticCaches[std::string(filePath)] = std::move(rangeModule);
+	return result;
 }
 
 std::vector<std::string> ModuleService::GetCompleteItems()
@@ -164,4 +204,34 @@ std::vector<std::string> ModuleService::GetCompleteItems()
 void ModuleService::RebuildIndexs(std::vector<std::string> files)
 {
 	_moduleIndex.RebuildIndex(files);
+}
+
+bool ModuleService::IsDiagnosticRange(std::string_view filePath, vscode::Range range)
+{
+	auto it = _diagnosticCaches.find(filePath);
+	if (it == _diagnosticCaches.end())
+	{
+		return false;
+	}
+
+	return it->second.count(range) > 0;
+}
+
+std::vector<ModuleIndex::Module> ModuleService::GetImportModules(std::string_view filePath, vscode::Range range)
+{
+	auto fIt = _diagnosticCaches.find(filePath);
+	if (fIt == _diagnosticCaches.end())
+	{
+		return {};
+	}
+
+	auto& rangeModules = fIt->second;
+	auto equalRange = rangeModules.equal_range(range);
+	std::vector<ModuleIndex::Module> result;
+	for(auto it = equalRange.first; it != equalRange.second; ++it)
+	{
+		result.emplace_back(it->second);
+	}
+
+	return result;
 }
