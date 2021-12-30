@@ -10,6 +10,7 @@
 #include "CodeFormatServer/Service/CodeFormatService.h"
 #include "CodeFormatServer/Service/ModuleService.h"
 #include "Util/Url.h"
+#include "Util/format.h"
 
 using namespace std::placeholders;
 
@@ -359,6 +360,47 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 	}
 	else if (param->command == "emmylua.import.me")
 	{
+		if (param->arguments.size() < 3)
+		{
+			return result;
+		}
+
+		std::string uri = param->arguments[0];
+		vscode::Range range;
+
+		range.Deserialize(param->arguments[1]);
+
+		std::string moduleName = param->arguments[2];
+		auto pos = moduleName.find_last_of('.');
+		std::string moduleDefineName;
+
+		if (pos == std::string_view::npos)
+		{
+			moduleDefineName = moduleName;
+		}
+		else
+		{
+			moduleDefineName = moduleName.substr(pos + 1);
+		}
+
+		std::string requireString = format("local {} = require(\"{}\")\n", moduleDefineName, moduleName);
+		auto parser = LanguageClient::GetInstance().GetFileParser(uri);
+
+		auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();
+		auto it = applyParams->edit.changes.emplace(uri, std::vector<vscode::TextEdit>());
+		auto& change = it.first->second;
+
+		auto& edit = change.emplace_back();
+		LuaFormatRange formattedRange(static_cast<int>(range.start.line), static_cast<int>(range.end.line));
+
+		edit.newText = requireString;
+
+		edit.range = vscode::Range(
+			vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
+			vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
+		);
+
+		LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
 	}
 	return result;
 }

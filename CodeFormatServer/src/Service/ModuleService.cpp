@@ -228,10 +228,77 @@ std::vector<ModuleIndex::Module> ModuleService::GetImportModules(std::string_vie
 	auto& rangeModules = fIt->second;
 	auto equalRange = rangeModules.equal_range(range);
 	std::vector<ModuleIndex::Module> result;
-	for(auto it = equalRange.first; it != equalRange.second; ++it)
+	for (auto it = equalRange.first; it != equalRange.second; ++it)
 	{
 		result.emplace_back(it->second);
 	}
 
 	return result;
+}
+
+vscode::Range ModuleService::FindRequireRange(std::shared_ptr<LuaParser> parser)
+{
+	vscode::Range range;
+	auto chunkAst = parser->GetAst();
+	if (chunkAst->GetChildren().empty())
+	{
+		return range;
+	}
+
+	auto blockNode = chunkAst->GetChildren().front();
+
+	std::shared_ptr<LuaAstNode> lastNode = nullptr;
+
+	auto& children = blockNode->GetChildren();
+	for (auto statement : children)
+	{
+		auto type = statement->GetType();
+
+		switch (type)
+		{
+		case LuaAstNodeType::Comment:
+			{
+				break;
+			}
+		case LuaAstNodeType::LocalStatement:
+			{
+				std::shared_ptr<LuaAstNode> expressionList = statement->FindFirstOf(LuaAstNodeType::ExpressionList);
+				if (expressionList)
+				{
+					auto expression = expressionList->FindFirstOf(LuaAstNodeType::Expression);
+					if (expression)
+					{
+						auto callExpression = expression->FindFirstOf(LuaAstNodeType::CallExpression);
+						if (callExpression)
+						{
+							// 将约定做成规范
+							auto methodNameNode = callExpression->FindFirstOf(LuaAstNodeType::PrimaryExpression);
+							if (methodNameNode)
+							{
+								if (methodNameNode->GetText() == "require")
+								{
+									break;
+								}
+							}
+						}
+					}
+				}
+				goto endLoop;
+			}
+		default:
+			{
+				break;
+			}
+		}
+		lastNode = statement;
+	}
+endLoop:
+	if (lastNode)
+	{
+		vscode::Position insertPosition(parser->GetLine(lastNode->GetTextRange().EndOffset) + 1, 0);
+		range.start = insertPosition;
+		range.end = insertPosition;
+	}
+
+	return range;
 }
