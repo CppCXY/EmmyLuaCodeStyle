@@ -4,6 +4,8 @@
 #include <vector>
 #include <type_traits>
 #include <nlohmann/json.hpp>
+#include <compare>
+
 // 命名风格和vscode一样
 
 namespace vscode
