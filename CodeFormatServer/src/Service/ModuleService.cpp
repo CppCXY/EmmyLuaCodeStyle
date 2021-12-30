@@ -1,5 +1,6 @@
-#include "CodeFormatServer/Service/ModuleService.h"
+ï»¿#include "CodeFormatServer/Service/ModuleService.h"
 #include "LuaParser/LuaAstVisitor.h"
+#include "Util/StringUtil.h"
 
 class UnResolveModuleFinder : public LuaAstVisitor
 {
@@ -153,7 +154,7 @@ std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePat
 	auto& undefinedModules = finder.GetUndefinedModule(parser);
 	auto& luaModules = _moduleIndex.GetModules(options);
 
-	std::multimap<vscode::Range, ModuleIndex::Module> rangeModule;
+	std::multimap<vscode::Range, LuaModule> rangeModule;
 	for (auto& undefinedModule : undefinedModules)
 	{
 		auto undefinedModuleName = undefinedModule->GetText();
@@ -171,10 +172,10 @@ std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePat
 				name = luaModule.ModuleName.substr(dotPosition + 1);
 			}
 
-			if (undefinedModuleName == name)
+			if (StringUtil::IsStringEqualIgnoreCase(undefinedModuleName, name))
 			{
 				auto& diagnostic = result.emplace_back();
-				diagnostic.message = "not import module";
+				diagnostic.message = "need import module";
 				auto textRange = undefinedModule->GetTextRange();
 				auto range = vscode::Range(
 					vscode::Position(
@@ -186,9 +187,17 @@ std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePat
 						parser->GetColumn(textRange.EndOffset)
 					)
 				);
-				rangeModule.insert({range, luaModule});
+
+				rangeModule.insert({
+					range, LuaModule{
+						.ModuleName = luaModule.ModuleName,
+						.FilePath = luaModule.FilePath,
+						.Name = std::string(undefinedModuleName)
+					}
+				});
+
 				diagnostic.range = range;
-				diagnostic.severity = vscode::DiagnosticSeverity::Information;
+				diagnostic.severity = vscode::DiagnosticSeverity::Hint;
 			}
 		}
 	}
@@ -214,10 +223,24 @@ bool ModuleService::IsDiagnosticRange(std::string_view filePath, vscode::Range r
 		return false;
 	}
 
-	return it->second.count(range) > 0;
+	if (range.start == range.end)
+	{
+		for (auto& pair : it->second)
+		{
+			if (pair.first.start <= range.start && pair.first.end >= range.end)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	else
+	{
+		return it->second.count(range) > 0;
+	}
 }
 
-std::vector<ModuleIndex::Module> ModuleService::GetImportModules(std::string_view filePath, vscode::Range range)
+std::vector<ModuleService::LuaModule> ModuleService::GetImportModules(std::string_view filePath, vscode::Range range)
 {
 	auto fIt = _diagnosticCaches.find(filePath);
 	if (fIt == _diagnosticCaches.end())
@@ -225,14 +248,28 @@ std::vector<ModuleIndex::Module> ModuleService::GetImportModules(std::string_vie
 		return {};
 	}
 
+	std::vector<LuaModule> result;
 	auto& rangeModules = fIt->second;
-	auto equalRange = rangeModules.equal_range(range);
-	std::vector<ModuleIndex::Module> result;
-	for (auto it = equalRange.first; it != equalRange.second; ++it)
-	{
-		result.emplace_back(it->second);
-	}
 
+	if (range.start == range.end)
+	{
+		for (auto& pair : rangeModules)
+		{
+			if (pair.first.start <= range.start && pair.first.end >= range.end)
+			{
+				result.push_back(pair.second);
+			}
+		}
+	}
+	else
+	{
+		auto itPair = rangeModules.equal_range(range);
+
+		for (auto it = itPair.first; it != itPair.second; it++)
+		{
+			result.push_back(it->second);
+		}
+	}
 	return result;
 }
 
@@ -271,7 +308,7 @@ vscode::Range ModuleService::FindRequireRange(std::shared_ptr<LuaParser> parser)
 						auto callExpression = expression->FindFirstOf(LuaAstNodeType::CallExpression);
 						if (callExpression)
 						{
-							// ½«Ô¼¶¨×ö³É¹æ·¶
+							// å°†çº¦å®šåšæˆè§„èŒƒ
 							auto methodNameNode = callExpression->FindFirstOf(LuaAstNodeType::PrimaryExpression);
 							if (methodNameNode)
 							{
@@ -287,7 +324,7 @@ vscode::Range ModuleService::FindRequireRange(std::shared_ptr<LuaParser> parser)
 			}
 		default:
 			{
-				break;
+				goto endLoop;
 			}
 		}
 		lastNode = statement;

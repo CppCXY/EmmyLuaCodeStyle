@@ -1,4 +1,5 @@
 #include "Util/StringUtil.h"
+#include <cstdlib>
 
 std::vector<std::string_view> StringUtil::Split(std::string_view source, std::string_view separator)
 {
@@ -85,4 +86,20 @@ std::string StringUtil::Replace(std::string_view source, std::string_view oldStr
 	}
 
 	return result;
+}
+
+bool StringUtil::IsStringEqualIgnoreCase(std::string_view lhs, std::string_view rhs)
+{
+	if(lhs.size() != rhs.size())
+	{
+		return false;
+	}
+	for(std::size_t i = 0;i!=lhs.size();i++)
+	{
+		if(::tolower(lhs[i]) != ::tolower(rhs[i]))
+		{
+			return false;
+		}
+	}
+	return true;
 }

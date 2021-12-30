@@ -62,8 +62,21 @@ bool CodeFormatService::IsDiagnosticRange(std::string_view filePath, vscode::Ran
 	}
 
 	auto& diagnosticSet = it->second;
-
-	return diagnosticSet.count(range) > 0;
+	if(range.start == range.end)
+	{
+		for(auto& validRange: diagnosticSet)
+		{
+			if(validRange.start <= range.start && validRange.end >= range.end)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	else
+	{
+		return diagnosticSet.count(range) > 0;
+	}
 }
 
 std::string CodeFormatService::RangeFormat(LuaFormatRange& range,

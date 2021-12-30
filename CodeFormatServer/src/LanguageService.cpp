@@ -107,7 +107,6 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 	}
 
 	LanguageClient::GetInstance().SetRoot(param->rootPath);
-
 	return result;
 }
 
@@ -305,11 +304,12 @@ std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::sha
 			auto object = nlohmann::json::object();
 			object["moduleName"] = module.ModuleName;
 			object["path"] = module.FilePath;
+			object["name"] = module.Name;
 			action.command.arguments.push_back(object);
 		}
 
 		action.kind = vscode::CodeActionKind::QuickFix;
-	}
+	} 
 	return codeActionResult;
 }
 
@@ -360,7 +360,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 	}
 	else if (param->command == "emmylua.import.me")
 	{
-		if (param->arguments.size() < 3)
+		if (param->arguments.size() < 4)
 		{
 			return result;
 		}
@@ -372,16 +372,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 
 		std::string moduleName = param->arguments[2];
 		auto pos = moduleName.find_last_of('.');
-		std::string moduleDefineName;
-
-		if (pos == std::string_view::npos)
-		{
-			moduleDefineName = moduleName;
-		}
-		else
-		{
-			moduleDefineName = moduleName.substr(pos + 1);
-		}
+		std::string moduleDefineName = param->arguments[3];
 
 		std::string requireString = format("local {} = require(\"{}\")\n", moduleDefineName, moduleName);
 		auto parser = LanguageClient::GetInstance().GetFileParser(uri);
@@ -391,14 +382,10 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 		auto& change = it.first->second;
 
 		auto& edit = change.emplace_back();
-		LuaFormatRange formattedRange(static_cast<int>(range.start.line), static_cast<int>(range.end.line));
 
 		edit.newText = requireString;
 
-		edit.range = vscode::Range(
-			vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
-			vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
-		);
+		edit.range = LanguageClient::GetInstance().GetService<ModuleService>()->FindRequireRange(parser);
 
 		LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
 	}

@@ -25,12 +25,12 @@ public:
 	{
 	};
 
-	template<class T>
+	template <class T>
 	nlohmann::json SerializeArray(std::vector<T>& vec)
 	{
 		nlohmann::json array = nlohmann::json::array();
 
-		for(auto& v: vec)
+		for (auto& v : vec)
 		{
 			if constexpr (std::is_base_of_v<Serializable, T>)
 			{
@@ -40,12 +40,9 @@ public:
 			{
 				array.push_back(v);
 			}
-			
 		}
 		return array;
 	}
-
-	auto operator<=>(const Serializable& rhl) const = default;
 };
 
 class Position : public Serializable
@@ -58,6 +55,33 @@ public:
 
 	nlohmann::json Serialize() override;
 	void Deserialize(nlohmann::json json) override;
+
+	bool operator==(const Position& p) const
+	{
+		return line == p.line && character == p.character;
+	}
+
+	bool operator<(const Position& p) const
+	{
+		if (line != p.line)
+		{
+			return line < p.line;
+		}
+		else
+		{
+			return character < p.character;
+		}
+	}
+
+	bool operator<=(const Position& p) const
+	{
+		return *this == p || *this < p;
+	}
+
+	bool operator>=(const Position& p) const
+	{
+		return *this == p || !(*this < p);
+	}
 };
 
 class Range : public Serializable
@@ -69,6 +93,23 @@ public:
 
 	nlohmann::json Serialize() override;
 	void Deserialize(nlohmann::json json) override;
+
+	bool operator==(const Range& range) const
+	{
+		return start == range.start && end == range.end;
+	}
+
+	bool operator<(const Range& rhs) const
+	{
+		if (start != rhs.start)
+		{
+			return start < rhs.start;
+		}
+		else
+		{
+			return end < rhs.end;
+		}
+	}
 };
 
 class Location : public Serializable
@@ -166,6 +207,20 @@ public:
 	nlohmann::json Serialize() override;
 };
 
+class WorkspaceCapabilities: public Serializable
+{
+public:
+	nlohmann::json Serialize() override;
+};
+
+class CompletionOptions: public Serializable
+{
+public:
+
+
+	nlohmann::json Serialize() override;
+};
+
 class ServerCapabilities : public Serializable
 {
 public:
@@ -175,6 +230,9 @@ public:
 	DocumentOnTypeFormattingOptions documentOnTypeFormattingProvider;
 	bool codeActionProvider = false;
 	ExecuteCommandOptions executeCommandProvider;
+	CompletionOptions completionProvider;
+
+	WorkspaceCapabilities workspace;
 
 	nlohmann::json Serialize() override;
 };
@@ -391,7 +449,7 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
-class OptionalVersionedTextDocumentIdentifier: public TextDocument
+class OptionalVersionedTextDocumentIdentifier : public TextDocument
 {
 public:
 	std::optional<int> version;
@@ -399,7 +457,7 @@ public:
 	nlohmann::json Serialize() override;
 };
 
-class TextDocumentEdit: public Serializable
+class TextDocumentEdit : public Serializable
 {
 public:
 	OptionalVersionedTextDocumentIdentifier textDocument;
@@ -409,10 +467,10 @@ public:
 	nlohmann::json Serialize() override;
 };
 
-class WorkspaceEdit: public Serializable
+class WorkspaceEdit : public Serializable
 {
 public:
-    // std::vector<TextDocumentEdit> documentChanges;
+	// std::vector<TextDocumentEdit> documentChanges;
 	std::map<std::string, std::vector<TextEdit>> changes;
 	nlohmann::json Serialize() override;
 };

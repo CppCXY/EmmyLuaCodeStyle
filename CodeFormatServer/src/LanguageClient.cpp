@@ -219,6 +219,7 @@ void LanguageClient::UpdateAllDiagnosis()
 	finder.AddIgnoreDirectory(".vscode");
 
 	finder.AddFindExtension(".lua");
+	finder.AddFindExtension(".lua.txt");
 
 	GetService<ModuleService>()->RebuildIndexs(finder.FindFiles());
 
