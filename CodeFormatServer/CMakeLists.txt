@@ -31,9 +31,8 @@ target_sources(CodeFormatServer
 	${CodeFormatServer_SOURCE_DIR}/src/CodeFormatServer.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/LanguageClient.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/LanguageService.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/FileManager.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/VirtualFile/VirtualFile.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/Indexs/ModuleIndex.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/Service/Indexs/ModuleIndex.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Session/IOSession.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Session/SocketIOSession.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Session/StandardIOSession.cpp
@@ -45,8 +44,9 @@ target_sources(CodeFormatServer
 	${CodeFormatServer_SOURCE_DIR}/src/VSCode.cpp
 
 	#service
+	${CodeFormatServer_SOURCE_DIR}/src/Service/Service.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Service/ModuleService.cpp
-
+	${CodeFormatServer_SOURCE_DIR}/src/Service/CodeFormatService.cpp
 	# mimalloc
 	${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.3/src/static.c
 )

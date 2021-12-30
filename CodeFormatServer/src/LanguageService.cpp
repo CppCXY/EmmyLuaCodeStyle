@@ -7,6 +7,7 @@
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "CodeService/LuaFormatter.h"
 #include "CodeFormatServer/LanguageClient.h"
+#include "CodeFormatServer/Service/CodeFormatService.h"
 #include "Util/Url.h"
 
 using namespace std::placeholders;
@@ -48,6 +49,8 @@ std::shared_ptr<vscode::Serializable> LanguageService::Dispatch(std::string_view
 
 std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::shared_ptr<vscode::InitializeParams> param)
 {
+	LanguageClient::GetInstance().InitializeService();
+
 	auto result = std::make_shared<vscode::InitializeResult>();
 
 	result->capabilities.documentFormattingProvider = true;
@@ -160,11 +163,10 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnFormatting(
 		return result;
 	}
 
-	LuaFormatter formatter(parser, *options);
-	formatter.BuildFormattedElement();
+	auto newText = LanguageClient::GetInstance().GetService<CodeFormatService>()->Format(parser, options);
 
 	auto& edit = result->edits.emplace_back();
-	edit.newText = formatter.GetFormattedText();
+	edit.newText = std::move(newText);
 	edit.range = vscode::Range(
 		vscode::Position(0, 0),
 		vscode::Position(totalLine + 1, 0)
@@ -218,16 +220,15 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnRangeFormatting(
 		return result;
 	}
 
+	LuaFormatRange formatRange(static_cast<int>(param->range.start.line), static_cast<int>(param->range.end.line));
+	auto formatResult = LanguageClient::GetInstance().GetService<CodeFormatService>()->RangeFormat(
+		formatRange, parser, options);
+
 	auto& edit = result->edits.emplace_back();
-	LuaFormatRange formattedRange(static_cast<int>(param->range.start.line), static_cast<int>(param->range.end.line));
-
-	LuaFormatter formatter(parser, *options);
-	formatter.BuildRangeFormattedElement(formattedRange);
-
-	edit.newText = formatter.GetRangeFormattedText(formattedRange);
+	edit.newText = std::move(formatResult);
 	edit.range = vscode::Range(
-		vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
-		vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
+		vscode::Position(formatRange.StartLine, formatRange.StartCharacter),
+		vscode::Position(formatRange.EndLine + 1, formatRange.EndCharacter)
 	);
 	return result;
 }
@@ -253,13 +254,14 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 		return result;
 	}
 
-	auto& edit = result->edits.emplace_back();
+
 	LuaFormatRange formattedRange(static_cast<int>(position.line) - 1, static_cast<int>(position.line) - 1);
 
-	LuaFormatter formatter(parser, *options);
-	formatter.BuildRangeFormattedElement(formattedRange);
+	auto formatResult = LanguageClient::GetInstance().GetService<CodeFormatService>()->RangeFormat(
+		formattedRange, parser, options);
 
-	edit.newText = formatter.GetRangeFormattedText(formattedRange);
+	auto& edit = result->edits.emplace_back();
+	edit.newText = std::move(formatResult);
 	edit.range = vscode::Range(
 		vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
 		vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
@@ -269,17 +271,24 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 
 std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::shared_ptr<vscode::CodeActionParams> param)
 {
+	auto range = param->range;
+	auto uri = param->textDocument.uri;
+	auto filePath = url::UrlToFilePath(uri);
 	auto codeActionResult = std::make_shared<vscode::CodeActionResult>();
 
-	auto& action = codeActionResult->actions.emplace_back();
-	std::string title = "reformat me";
-	action.title = title;
-	action.command.title = title;
-	action.command.command = "emmylua.reformat.me";
-	action.command.arguments.push_back(param->textDocument.uri);
-	action.command.arguments.push_back(param->range.Serialize());
+	if(LanguageClient::GetInstance().GetService<CodeFormatService>()->IsDiagnosticRange(filePath, range))
+	{
+		auto& action = codeActionResult->actions.emplace_back();
+		std::string title = "reformat me";
+		action.title = title;
+		action.command.title = title;
+		action.command.command = "emmylua.reformat.me";
+		action.command.arguments.push_back(param->textDocument.uri);
+		action.command.arguments.push_back(param->range.Serialize());
 
-	action.kind = vscode::CodeActionKind::QuickFix;
+		action.kind = vscode::CodeActionKind::QuickFix;
+	}
+
 	return codeActionResult;
 }
 
@@ -316,10 +325,10 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 		auto& edit = change.emplace_back();
 		LuaFormatRange formattedRange(static_cast<int>(range.start.line), static_cast<int>(range.end.line));
 
-		LuaFormatter formatter(parser, *options);
-		formatter.BuildRangeFormattedElement(formattedRange);
+		auto formatResult = LanguageClient::GetInstance().GetService<CodeFormatService>()->RangeFormat(formattedRange, parser, options);
 
-		edit.newText = formatter.GetRangeFormattedText(formattedRange);
+		edit.newText = std::move(formatResult);
+
 		edit.range = vscode::Range(
 			vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
 			vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)

@@ -12,7 +12,7 @@ public:
 
 	void BuildIndex(const std::vector<std::string>& files);
 
-	void ReBuildIndex(const std::vector<std::string>& files);
+	void RebuildIndex(const std::vector<std::string>& files);
 
 	std::vector<std::string> GetModules(std::string filename);
 

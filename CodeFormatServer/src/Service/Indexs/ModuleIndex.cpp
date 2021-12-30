@@ -1,4 +1,4 @@
-#include "CodeFormatServer/Indexs/ModuleIndex.h"
+#include "CodeFormatServer/Service/Indexs/ModuleIndex.h"
 #include "CodeFormatServer/LanguageClient.h"
 
 
@@ -40,7 +40,7 @@ void ModuleIndex::BuildIndex(const std::vector<std::string>& files)
 	}
 }
 
-void ModuleIndex::ReBuildIndex(const std::vector<std::string>& files)
+void ModuleIndex::RebuildIndex(const std::vector<std::string>& files)
 {
 	_moduleIndex.clear();
 	BuildIndex(files);

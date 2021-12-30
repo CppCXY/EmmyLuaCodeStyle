@@ -42,6 +42,7 @@ public:
 		return array;
 	}
 
+	auto operator<=>(const Serializable& rhl) const = default;
 };
 
 class Position : public Serializable

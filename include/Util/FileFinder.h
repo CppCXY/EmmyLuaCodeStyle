@@ -4,6 +4,7 @@
 #include <string_view>
 #include <filesystem>
 #include <set>
+#include <vector>
 
 class FileFinder
 {

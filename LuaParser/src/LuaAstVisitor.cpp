@@ -190,11 +190,11 @@ void LuaAstVisitor::Visit(std::shared_ptr<LuaAstNode> node)
 	}
 }
 
-void LuaAstVisitor::VisitBlock(const std::shared_ptr<LuaAstNode>& block)
+void LuaAstVisitor::VisitBlock(const std::shared_ptr<LuaAstNode>& node)
 {
 }
 
-void LuaAstVisitor::VisitLocalStatement(const std::shared_ptr<LuaAstNode>& localStatement)
+void LuaAstVisitor::VisitLocalStatement(const std::shared_ptr<LuaAstNode>& node)
 {
 }
 

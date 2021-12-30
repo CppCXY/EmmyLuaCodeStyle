@@ -1,5 +1,5 @@
 #include "CodeFormatServer/LanguageClient.h"
-
+#include <iterator>
 #include "CodeService/LuaEditorConfig.h"
 #include "CodeService/LuaFormatter.h"
 #include "LuaParser/LuaParser.h"
@@ -7,17 +7,26 @@
 #include "Util/Url.h"
 #include "Util/FileFinder.h"
 
+#include "CodeFormatServer/Service/ModuleService.h"
+#include "CodeFormatServer/Service/CodeFormatService.h"
+
+
 LanguageClient& LanguageClient::GetInstance()
 {
-	static LanguageClient instance;
-	return instance;
+	static auto instance = std::make_shared<LanguageClient>();
+	return *instance;
 }
 
 LanguageClient::LanguageClient()
 	: _defaultOptions(std::make_shared<LuaCodeStyleOptions>()),
-	  _idCounter(0),
-	  _moduleIndex(std::make_shared<ModuleIndex>())
+	  _idCounter(0)
 {
+}
+
+void LanguageClient::InitializeService()
+{
+	AddService<CodeFormatService>();
+	AddService<ModuleService>();
 }
 
 void LanguageClient::SetSession(std::shared_ptr<IOSession> session)
@@ -91,11 +100,12 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 		return;
 	}
 
+	auto vscodeDiagnosis = std::make_shared<vscode::PublishDiagnosticsParams>();
+	vscodeDiagnosis->uri = uri;
+
 	auto options = GetOptions(uri);
 	if (!options->enable_check_codestyle)
 	{
-		auto vscodeDiagnosis = std::make_shared<vscode::PublishDiagnosticsParams>();
-		vscodeDiagnosis->uri = uri;
 		SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
 		return;
 	}
@@ -107,29 +117,11 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 		return;
 	}
 
-	LuaFormatter formatter(parser, *options);
-	formatter.BuildFormattedElement();
+	auto formatDiagnostic = GetService<CodeFormatService>()->Diagnose(filename, parser, options);
+	auto moduleDiagnosis = GetService<ModuleService>()->Diagnose(parser, options);
 
-	auto diagnosisInfos = formatter.GetDiagnosisInfos();
-
-	auto vscodeDiagnosis = std::make_shared<vscode::PublishDiagnosticsParams>();
-	vscodeDiagnosis->uri = uri;
-
-	for (auto diagnosisInfo : diagnosisInfos)
-	{
-		auto& diagnosis = vscodeDiagnosis->diagnostics.emplace_back();
-		diagnosis.message = diagnosisInfo.Message;
-		diagnosis.range = vscode::Range(
-			vscode::Position(
-				diagnosisInfo.Range.Start.Line,
-				diagnosisInfo.Range.Start.Character
-			),
-			vscode::Position(
-				diagnosisInfo.Range.End.Line,
-				diagnosisInfo.Range.End.Character
-			));
-		diagnosis.severity = vscode::DiagnosticSeverity::Warning;
-	}
+	std::copy(formatDiagnostic.begin(), formatDiagnostic.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
+	std::copy(moduleDiagnosis.begin(), moduleDiagnosis.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
 
 	SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
 }
@@ -228,7 +220,7 @@ void LanguageClient::UpdateAllDiagnosis()
 
 	finder.AddFindExtension(".lua");
 
-	_moduleIndex->ReBuildIndex(finder.FindFiles());
+	GetService<ModuleService>()->RebuildIndexs(finder.FindFiles());
 
 	for (auto it : _fileMap)
 	{
