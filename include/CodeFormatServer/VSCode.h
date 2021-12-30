@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <nlohmann/json.hpp>
 #include <compare>
+#include <optional>
 
 // 命名风格和vscode一样
 
