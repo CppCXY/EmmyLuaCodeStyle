@@ -11,16 +11,12 @@
 // 前置声明
 class Service;
 
-#if defined(__GNUC__) && __GNUC__ < 10
-#define ServiceClass typename
-#else
 template <class Derived>
 concept ServiceClass = requires(Derived d)
 {
 	std::is_base_of<Service, Derived>::value;
 	Derived::ServiceIndex;
 };
-#endif
 
 class LanguageClient: public std::enable_shared_from_this<LanguageClient>
 {

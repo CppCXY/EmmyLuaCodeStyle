@@ -22,6 +22,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         ref: refs/heads/master
+    - name: install gcc 11
+      if: startsWith(matrix.os, 'ubuntu')
+      run: |
+        sudo apt-get install -y gcc-11 g++-11
+
     - name: Build
       run: | 
             mkdir build
@@ -30,7 +35,9 @@ jobs:
             cmake --build . --config Release
             ctest -V -C Release
             cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
-          
+      env:
+        CC: gcc-11
+        CXX: g++-11
     - name: Upload
       uses: actions/upload-artifact@v2
       with: 
