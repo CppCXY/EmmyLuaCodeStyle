@@ -4,8 +4,10 @@
 #include <vector>
 #include <type_traits>
 #include <nlohmann/json.hpp>
+#if defined(__GNUC__) && __GNUC__ < 10
+#else
 #include <compare>
-
+#endif
 // 命名风格和vscode一样
 
 namespace vscode
