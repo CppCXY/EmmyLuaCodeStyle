@@ -30,3 +30,4 @@
 .vs
 out
 CMakeSettings.json
+3rd/uriparser/src/config.h
