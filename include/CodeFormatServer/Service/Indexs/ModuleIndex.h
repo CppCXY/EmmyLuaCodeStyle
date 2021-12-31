@@ -13,6 +13,12 @@ public:
 	class Module
 	{
 	public:
+		Module(const std::string& moduleName, const std::string& filePath)
+			: ModuleName(moduleName),
+			  FilePath(filePath)
+		{
+		}
+
 		std::string ModuleName;
 		std::string FilePath;
 	};
