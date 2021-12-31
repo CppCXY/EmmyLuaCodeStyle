@@ -30,12 +30,12 @@ public:
 	                                         std::shared_ptr<LuaCodeStyleOptions> options);
 	std::vector<std::string> GetCompleteItems();
 
-	void RebuildIndexs(std::vector<std::string> files);
 	bool IsDiagnosticRange(std::string_view filePath, vscode::Range range);
 	std::vector<LuaModule> GetImportModules(std::string_view filePath, vscode::Range range);
 
 	vscode::Range FindRequireRange(std::shared_ptr<LuaParser> parser);
 
+	ModuleIndex& GetIndex();
 private:
 	ModuleIndex _moduleIndex;
 	std::map<std::string, std::multimap<vscode::Range, LuaModule>, std::less<>> _diagnosticCaches;

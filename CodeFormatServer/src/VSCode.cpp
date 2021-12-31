@@ -155,6 +155,7 @@ nlohmann::json vscode::ServerCapabilities::Serialize()
 	object["documentOnTypeFormattingProvider"] = documentOnTypeFormattingProvider.Serialize();
 	object["codeActionProvider"] = codeActionProvider;
 	object["executeCommandProvider"] = executeCommandProvider.Serialize();
+	object["completionProvider"] = completionProvider.Serialize();
 
 	return object;
 }
@@ -331,6 +332,15 @@ nlohmann::json vscode::ExecuteCommandOptions::Serialize()
 	return object;
 }
 
+nlohmann::json vscode::CompletionOptions::Serialize()
+{
+	auto object = nlohmann::json::object();
+	object["triggerCharacters"] = SerializeArray(triggerCharacters);
+	object["resolveProvider"] = resolveProvider;
+
+	return object;
+}
+
 void vscode::TextDocumentPositionParams::Deserialize(nlohmann::json json)
 {
 	textDocument.Deserialize(json["textDocument"]);
@@ -365,7 +375,7 @@ nlohmann::json vscode::Command::Serialize()
 
 	auto array = nlohmann::json::array();
 
-	for(auto& arg: arguments)
+	for (auto& arg : arguments)
 	{
 		array.push_back(arg);
 	}
@@ -401,10 +411,12 @@ void vscode::ExecuteCommandParams::Deserialize(nlohmann::json json)
 {
 	command = json["command"];
 	auto args = json["arguments"];
-	if(args.is_array())
+	if (args.is_array())
 	{
-		for (auto arg : args) {
-			if (!arg.is_null()) {
+		for (auto arg : args)
+		{
+			if (!arg.is_null())
+			{
 				arguments.push_back(arg);
 			}
 		}
@@ -414,7 +426,7 @@ void vscode::ExecuteCommandParams::Deserialize(nlohmann::json json)
 nlohmann::json vscode::OptionalVersionedTextDocumentIdentifier::Serialize()
 {
 	auto object = TextDocument::Serialize();
-	if(version.has_value())
+	if (version.has_value())
 	{
 		object["version"] = version.value();
 	}
@@ -443,7 +455,8 @@ nlohmann::json vscode::WorkspaceEdit::Serialize()
 
 	auto changesObject = nlohmann::json::object();
 
-	for (auto it : changes) {
+	for (auto it : changes)
+	{
 		changesObject[it.first] = SerializeArray(it.second);
 	}
 	object["changes"] = changesObject;
@@ -455,7 +468,7 @@ nlohmann::json vscode::ApplyWorkspaceEditParams::Serialize()
 {
 	auto object = nlohmann::json::object();
 
-	if(label.has_value())
+	if (label.has_value())
 	{
 		object["label"] = label.value();
 	}
@@ -467,4 +480,27 @@ nlohmann::json vscode::ApplyWorkspaceEditParams::Serialize()
 	object["edit"] = edit.Serialize();
 
 	return object;
+}
+
+void vscode::FileEvent::Deserialize(nlohmann::json json)
+{
+	uri = json["uri"];
+	type = static_cast<FileChangeType>(static_cast<uint32_t>(json["type"]));
+}
+
+void vscode::DidChangeWatchedFilesParams::Deserialize(nlohmann::json json)
+{
+	if (json["changes"].is_array())
+	{
+		for (auto& v : json["changes"])
+		{
+			changes.emplace_back().Deserialize(v);
+		}
+	}
+}
+
+void vscode::CompletionParams::Deserialize(nlohmann::json json)
+{
+	textDocument.Deserialize(json["textDocument"]);
+	position.Deserialize(json["position"]);
 }

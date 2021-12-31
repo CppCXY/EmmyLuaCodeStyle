@@ -35,6 +35,8 @@ bool LanguageService::Initialize()
 	JsonProtocol("textDocument/onTypeFormatting", &LanguageService::OnTypeFormatting);
 	JsonProtocol("textDocument/codeAction", &LanguageService::OnCodeAction);
 	JsonProtocol("workspace/executeCommand", &LanguageService::OnExecuteCommand);
+	JsonProtocol("workspace/didChangeWatchedFiles", &LanguageService::OnDidChangeWatchedFiles);
+	JsonProtocol("textDocument/completion", &LanguageService::OnCompletion);
 	return true;
 }
 
@@ -72,6 +74,9 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 		"emmylua.reformat.me",
 		"emmylua.import.me"
 	};
+
+	result->capabilities.completionProvider.resolveProvider = false;
+	result->capabilities.completionProvider.triggerCharacters = {};
 
 	auto& configFiles = param->initializationOptions.configFiles;
 	for (auto& configFile : configFiles)
@@ -188,13 +193,13 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnEditorConfigUpdate(
 {
 	switch (param->type)
 	{
-	case vscode::EditorConfigUpdateType::Created:
-	case vscode::EditorConfigUpdateType::Changed:
+	case vscode::FileChangeType::Created:
+	case vscode::FileChangeType::Changed:
 		{
 			LanguageClient::GetInstance().UpdateOptions(param->source.workspace, param->source.path);
 			break;
 		}
-	case vscode::EditorConfigUpdateType::Delete:
+	case vscode::FileChangeType::Delete:
 		{
 			LanguageClient::GetInstance().RemoveOptions(param->source.workspace);
 			break;
@@ -309,7 +314,7 @@ std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::sha
 		}
 
 		action.kind = vscode::CodeActionKind::QuickFix;
-	} 
+	}
 	return codeActionResult;
 }
 
@@ -390,4 +395,33 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 		LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
 	}
 	return result;
+}
+
+std::shared_ptr<vscode::Serializable> LanguageService::OnDidChangeWatchedFiles(
+	std::shared_ptr<vscode::DidChangeWatchedFilesParams> param)
+{
+	for (auto& change : param->changes)
+	{
+		auto filePath = url::UrlToFilePath(change.uri);
+		switch (change.type)
+		{
+		case vscode::FileChangeType::Created:
+			{
+				std::vector<std::string> files = {filePath};
+				LanguageClient::GetInstance().GetService<ModuleService>()->GetIndex().BuildIndex(files);
+				break;
+			}
+		case vscode::FileChangeType::Delete:
+			{
+				LanguageClient::GetInstance().GetService<ModuleService>()->GetIndex().ClearFile(filePath);
+				break;
+			}
+		default:
+			{
+				break;
+			}
+		}
+	}
+
+	return nullptr;
 }

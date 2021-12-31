@@ -21,6 +21,8 @@ public:
 
 	void BuildIndex(const std::vector<std::string>& files);
 
+	void ClearFile(std::string_view filePath);
+
 	void RebuildIndex(const std::vector<std::string>& files);
 
 	std::vector<Module>& GetModules(std::shared_ptr<LuaCodeStyleOptions> options);

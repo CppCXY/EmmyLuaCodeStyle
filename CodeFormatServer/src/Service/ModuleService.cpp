@@ -210,11 +210,6 @@ std::vector<std::string> ModuleService::GetCompleteItems()
 	return {};
 }
 
-void ModuleService::RebuildIndexs(std::vector<std::string> files)
-{
-	_moduleIndex.RebuildIndex(files);
-}
-
 bool ModuleService::IsDiagnosticRange(std::string_view filePath, vscode::Range range)
 {
 	auto it = _diagnosticCaches.find(filePath);
@@ -338,4 +333,9 @@ endLoop:
 	}
 
 	return range;
+}
+
+ModuleIndex& ModuleService::GetIndex()
+{
+	return _moduleIndex;
 }

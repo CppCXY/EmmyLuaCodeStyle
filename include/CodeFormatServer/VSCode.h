@@ -9,8 +9,7 @@
 
 // 命名风格和vscode一样
 
-namespace vscode
-{
+namespace vscode {
 class Serializable
 {
 public:
@@ -160,7 +159,6 @@ public:
 	nlohmann::json Serialize() override;
 };
 
-
 class PublishDiagnosticsParams : public Serializable
 {
 public:
@@ -207,16 +205,11 @@ public:
 	nlohmann::json Serialize() override;
 };
 
-class WorkspaceCapabilities: public Serializable
+class CompletionOptions : public Serializable
 {
 public:
-	nlohmann::json Serialize() override;
-};
-
-class CompletionOptions: public Serializable
-{
-public:
-
+	std::vector<std::string> triggerCharacters;
+	bool resolveProvider;
 
 	nlohmann::json Serialize() override;
 };
@@ -231,8 +224,6 @@ public:
 	bool codeActionProvider = false;
 	ExecuteCommandOptions executeCommandProvider;
 	CompletionOptions completionProvider;
-
-	WorkspaceCapabilities workspace;
 
 	nlohmann::json Serialize() override;
 };
@@ -333,11 +324,11 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
-enum class EditorConfigUpdateType
+enum class FileChangeType
 {
-	Created,
-	Changed,
-	Delete
+	Created = 1,
+	Changed = 2,
+	Delete = 3
 };
 
 class EditorConfigSource : public Serializable
@@ -353,7 +344,7 @@ public:
 class EditorConfigUpdateParams : public Serializable
 {
 public:
-	EditorConfigUpdateType type;
+	FileChangeType type;
 	EditorConfigSource source;
 
 	void Deserialize(nlohmann::json json) override;
@@ -484,4 +475,84 @@ public:
 
 	nlohmann::json Serialize() override;
 };
+
+class FileEvent : public Serializable
+{
+public:
+	std::string uri;
+	FileChangeType type;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+class DidChangeWatchedFilesParams : public Serializable
+{
+public:
+	std::vector<FileEvent> changes;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+class CompletionParams : public Serializable
+{
+public:
+	TextDocument textDocument;
+
+	Position position;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+enum class CompletionItemKind
+{
+	Text = 1,
+	Method = 2,
+	Function = 3,
+	Constructor = 4,
+	Field = 5,
+	Variable = 6,
+	Class = 7,
+	Interface = 8,
+	Module = 9,
+	Property = 10,
+	Unit = 11,
+	Value = 12,
+	Enum = 13,
+	Keyword = 14,
+	Snippet = 15,
+	Color = 16,
+	File = 17,
+	Reference = 18,
+	Folder = 19,
+	EnumMember = 20,
+	Constant = 21,
+	Struct = 22,
+	Event = 23,
+	Operator = 24,
+	TypeParameter = 25
+};
+
+
+class CompletionItem : public Serializable
+{
+public:
+	std::string label;
+	CompletionItemKind kind;
+	std::string detail;
+	std::string documentation;
+	std::string insertText;
+	std::optional<Command> command;
+
+	nlohmann::json Serialize() override;
+};
+
+class CompletionList : public Serializable
+{
+public:
+	bool isIncomplete;
+	std::vector<CompletionItem> completions;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
 }

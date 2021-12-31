@@ -40,6 +40,23 @@ void ModuleIndex::BuildIndex(const std::vector<std::string>& files)
 	}
 }
 
+void ModuleIndex::ClearFile(std::string_view filePath)
+{
+	auto options = LanguageClient::GetInstance().GetOptions(filePath);
+	if (_moduleIndex.count(options->export_root) > 0)
+	{
+		auto& vec = _moduleIndex.at(options->export_root);
+		for(auto it = vec.begin(); it != vec.end(); ++it)
+		{
+			if(it->FilePath == filePath)
+			{
+				vec.erase(it);
+				return;
+			}
+		}
+	}
+}
+
 void ModuleIndex::RebuildIndex(const std::vector<std::string>& files)
 {
 	_moduleIndex.clear();

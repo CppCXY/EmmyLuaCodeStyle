@@ -59,8 +59,13 @@ private:
 
 	std::shared_ptr<vscode::Serializable> OnExecuteCommand(std::shared_ptr<vscode::ExecuteCommandParams> param);
 
+	std::shared_ptr<vscode::Serializable> OnDidChangeWatchedFiles(std::shared_ptr<vscode::DidChangeWatchedFilesParams> param);
+
+	std::shared_ptr<vscode::Serializable> OnCompletion(std::shared_ptr<vscode::CompletionParams> param);
+
 	std::map<std::string, MessageHandle, std::less<>> _handles;
 };
+
 
 
 

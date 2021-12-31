@@ -221,7 +221,7 @@ void LanguageClient::UpdateAllDiagnosis()
 	finder.AddFindExtension(".lua");
 	finder.AddFindExtension(".lua.txt");
 
-	GetService<ModuleService>()->RebuildIndexs(finder.FindFiles());
+	GetService<ModuleService>()->GetIndex().RebuildIndex(finder.FindFiles());
 
 	for (auto it : _fileMap)
 	{
