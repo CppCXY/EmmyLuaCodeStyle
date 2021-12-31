@@ -550,9 +550,9 @@ class CompletionList : public Serializable
 {
 public:
 	bool isIncomplete;
-	std::vector<CompletionItem> completions;
+	std::vector<CompletionItem> items;
 
-	void Deserialize(nlohmann::json json) override;
+	nlohmann::json Serialize() override;
 };
 
 }

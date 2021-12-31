@@ -425,3 +425,8 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChangeWatchedFiles(
 
 	return nullptr;
 }
+
+std::shared_ptr<vscode::Serializable> LanguageService::OnCompletion(std::shared_ptr<vscode::CompletionParams> param)
+{
+	return nullptr;
+}

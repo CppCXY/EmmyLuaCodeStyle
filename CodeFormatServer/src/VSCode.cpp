@@ -504,3 +504,29 @@ void vscode::CompletionParams::Deserialize(nlohmann::json json)
 	textDocument.Deserialize(json["textDocument"]);
 	position.Deserialize(json["position"]);
 }
+
+nlohmann::json vscode::CompletionItem::Serialize()
+{
+	auto object = nlohmann::json::object();
+
+	object["label"] = label;
+	object["kind"] = static_cast<int>(kind);
+	object["detail"] = detail;
+	object["documentation"] = documentation;
+	object["insertText"] = insertText;
+	if (command.has_value())
+	{
+		object["command"] = command->Serialize();
+	}
+
+	return object;
+}
+
+nlohmann::json vscode::CompletionList::Serialize()
+{
+	auto object = nlohmann::json::object();
+	object["isIncomplete"] = isIncomplete;
+	object["items"] = SerializeArray(items);
+
+	return object;
+}
