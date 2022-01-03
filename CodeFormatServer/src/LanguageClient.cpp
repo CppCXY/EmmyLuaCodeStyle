@@ -9,6 +9,7 @@
 
 #include "CodeFormatServer/Service/ModuleService.h"
 #include "CodeFormatServer/Service/CodeFormatService.h"
+#include "CodeFormatServer/Service/CompletionService.h"
 
 
 LanguageClient& LanguageClient::GetInstance()
@@ -27,6 +28,17 @@ void LanguageClient::InitializeService()
 {
 	AddService<CodeFormatService>();
 	AddService<ModuleService>();
+	AddService<CompletionService>();
+
+	for(auto service : _services)
+	{
+		service->Initialize();
+	}
+
+	for(auto service : _services)
+	{
+		service->Start();
+	}
 }
 
 void LanguageClient::SetSession(std::shared_ptr<IOSession> session)
@@ -118,7 +130,7 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 	}
 
 	auto formatDiagnostic = GetService<CodeFormatService>()->Diagnose(filename, parser, options);
-	auto moduleDiagnosis = GetService<ModuleService>()->Diagnose(filename, parser, options);
+	auto moduleDiagnosis = GetService<ModuleService>()->Diagnose(filename, parser);
 
 	std::copy(formatDiagnostic.begin(), formatDiagnostic.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
 	std::copy(moduleDiagnosis.begin(), moduleDiagnosis.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
@@ -172,7 +184,7 @@ std::shared_ptr<LuaCodeStyleOptions> LanguageClient::GetOptions(std::string_view
 	return options;
 }
 
-void LanguageClient::UpdateOptions(std::string_view workspaceUri, std::string_view configPath)
+void LanguageClient::UpdateCodeStyleOptions(std::string_view workspaceUri, std::string_view configPath)
 {
 	auto workspace = url::UrlToFilePath(workspaceUri);
 	for (auto& pair : _editorConfigVector)
@@ -194,7 +206,7 @@ void LanguageClient::UpdateOptions(std::string_view workspaceUri, std::string_vi
 	_editorConfigVector.back().second->SetRootWorkspace(_root);
 }
 
-void LanguageClient::RemoveOptions(std::string_view workspaceUri)
+void LanguageClient::RemoveCodeStyleOptions(std::string_view workspaceUri)
 {
 	auto workspace = url::UrlToFilePath(workspaceUri);
 	for (auto it = _editorConfigVector.begin(); it != _editorConfigVector.end(); it++)
@@ -209,6 +221,15 @@ void LanguageClient::RemoveOptions(std::string_view workspaceUri)
 
 void LanguageClient::UpdateAllDiagnosis()
 {
+	for (auto it : _fileMap)
+	{
+		auto uri = url::FilePathToUrl(it.first);
+		DiagnosticFile(uri);
+	}
+}
+
+void LanguageClient::UpdateModuleInfo()
+{
 	FileFinder finder(_root);
 
 	finder.AddIgnoreDirectory(".git");
@@ -222,19 +243,11 @@ void LanguageClient::UpdateAllDiagnosis()
 	finder.AddFindExtension(".lua.txt");
 
 	GetService<ModuleService>()->GetIndex().RebuildIndex(finder.FindFiles());
-
-	for (auto it : _fileMap)
-	{
-		auto uri = url::FilePathToUrl(it.first);
-		DiagnosticFile(uri);
-	}
 }
 
 void LanguageClient::SetRoot(std::string_view root)
 {
 	_root = root;
-	_defaultOptions->export_root = root;
-	_defaultOptions->import_from.emplace_back(root);
 }
 
 uint64_t LanguageClient::GetRequestId()

@@ -162,16 +162,27 @@ nlohmann::json vscode::ServerCapabilities::Serialize()
 
 void vscode::InitializationOptions::Deserialize(nlohmann::json json)
 {
-	if (json["configFiles"].is_array())
+	if (json["editorConfigFiles"].is_array())
 	{
-		auto configFileArray = json["configFiles"];
+		auto configFileArray = json["editorConfigFiles"];
 
 		for (auto& configSource : configFileArray)
 		{
-			auto& source = configFiles.emplace_back();
+			auto& source = editorConfigFiles.emplace_back();
 			source.Deserialize(configSource);
 		}
 	}
+	if (json["moduleConfigFiles"].is_array())
+	{
+		auto configFileArray = json["moduleConfigFiles"];
+
+		for (auto& configSource : configFileArray)
+		{
+			auto& source = moduleConfigFiles.emplace_back();
+			source.Deserialize(configSource);
+		}
+	}
+
 	if (json["workspaceFolders"].is_array())
 	{
 		auto workspaceFolderArray = json["workspaceFolders"];
@@ -284,14 +295,14 @@ void vscode::DidCloseTextDocumentParams::Deserialize(nlohmann::json json)
 	textDocument.Deserialize(json["textDocument"]);
 }
 
-void vscode::EditorConfigSource::Deserialize(nlohmann::json json)
+void vscode::ConfigSource::Deserialize(nlohmann::json json)
 {
 	uri = json["uri"];
 	path = json["path"];
 	workspace = json["workspace"];
 }
 
-void vscode::EditorConfigUpdateParams::Deserialize(nlohmann::json json)
+void vscode::ConfigUpdateParams::Deserialize(nlohmann::json json)
 {
 	type = json["type"];
 	source.Deserialize(json["source"]);
@@ -505,6 +516,21 @@ void vscode::CompletionParams::Deserialize(nlohmann::json json)
 	position.Deserialize(json["position"]);
 }
 
+
+nlohmann::json vscode::CompletionItemLabelDetails::Serialize()
+{
+	auto object = nlohmann::json::object();
+
+	object["detail"] = detail;
+
+	if (description.has_value())
+	{
+		object["description"] = description.value();
+	}
+
+	return object;
+}
+
 nlohmann::json vscode::CompletionItem::Serialize()
 {
 	auto object = nlohmann::json::object();
@@ -514,9 +540,24 @@ nlohmann::json vscode::CompletionItem::Serialize()
 	object["detail"] = detail;
 	object["documentation"] = documentation;
 	object["insertText"] = insertText;
+
+	if(sortText.has_value())
+	{
+		object["sortText"] = sortText.value();
+	}
+	if (filterText.has_value())
+	{
+		object["filterText"] = filterText.value();
+	}
+
 	if (command.has_value())
 	{
 		object["command"] = command->Serialize();
+	}
+
+	if(labelDetails.has_value())
+	{
+		object["labelDetails"] = labelDetails->Serialize();
 	}
 
 	return object;

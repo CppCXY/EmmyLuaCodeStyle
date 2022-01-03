@@ -110,10 +110,4 @@ public:
 	std::shared_ptr<NameStyleRuleMatcher> class_name_define_style;
 
 
-	// auto import
-	bool auto_import = true;
-
-	// bool root = true;
-	std::string export_root;
-	std::vector<std::string> import_from;
 };

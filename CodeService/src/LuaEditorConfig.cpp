@@ -314,28 +314,28 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 	// {
 	// 	options->root = configMap.at("root") == "true";
 	// }
-
-	if (configMap.count("auto_import"))
-	{
-		options->auto_import = configMap.at("auto_import") == "true";
-	}
-
-	if (configMap.count("export_root"))
-	{
-		options->export_root = StringUtil::Replace(configMap.at("export_root"), "${workspace}", _rootWorkspace);
-	}
-
-	if (configMap.count("import_from"))
-	{
-		auto splitVec = StringUtil::Split(configMap.at("import_from"), ",");
-		std::vector<std::string> from;
-		for (auto view : splitVec)
-		{
-			from.emplace_back(StringUtil::Replace(StringUtil::TrimSpace(view), "${workspace}", _rootWorkspace));
-		}
-
-		options->import_from = from;
-	}
+	//
+	// if (configMap.count("auto_import"))
+	// {
+	// 	options->auto_import = configMap.at("auto_import") == "true";
+	// }
+	//
+	// if (configMap.count("export_root"))
+	// {
+	// 	options->export_root = StringUtil::Replace(configMap.at("export_root"), "${workspace}", _rootWorkspace);
+	// }
+	//
+	// if (configMap.count("import_from"))
+	// {
+	// 	auto splitVec = StringUtil::Split(configMap.at("import_from"), ",");
+	// 	std::vector<std::string> from;
+	// 	for (auto view : splitVec)
+	// 	{
+	// 		from.emplace_back(StringUtil::Replace(StringUtil::TrimSpace(view), "${workspace}", _rootWorkspace));
+	// 	}
+	//
+	// 	options->import_from = from;
+	// }
 
 	if (options->indent_style == IndentStyle::Tab)
 	{

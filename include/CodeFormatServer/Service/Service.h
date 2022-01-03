@@ -16,8 +16,12 @@ public:
 
 	virtual ~Service() = default;
 
+	virtual bool Initialize() { return true; }
+
+	virtual void Start() {};
+
 	template <ServiceClass T>
 	std::shared_ptr<T> GetService() { return _owner->GetService<T>(); }
-private:
+protected:
 	std::shared_ptr<LanguageClient> _owner;
 };

@@ -47,11 +47,13 @@ public:
 
 	std::shared_ptr<LuaCodeStyleOptions> GetOptions(std::string_view uriOrFilename);
 
-	void UpdateOptions(std::string_view workspaceUri, std::string_view configPath);
+	void UpdateCodeStyleOptions(std::string_view workspaceUri, std::string_view configPath);
 
-	void RemoveOptions(std::string_view workspaceUri);
+	void RemoveCodeStyleOptions(std::string_view workspaceUri);
 
 	void UpdateAllDiagnosis();
+
+	void UpdateModuleInfo();
 
 	void SetRoot(std::string_view root);
 
@@ -77,8 +79,6 @@ private:
 	std::string _root;
 
 	std::array<std::shared_ptr<Service>, static_cast<std::size_t>(ServiceType::ServiceCount)> _services;
-	// std::shared_ptr<ModuleIndex> _moduleIndex;
-	// std::shared_ptr<>
 };
 
 template <ServiceClass Service>

@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include <map>
 #include <vector>
 #include <string>
 #include <set>
 #include <memory>
-#include "CodeService/LuaCodeStyleOptions.h"
+#include "CodeFormatServer/Service/Indexs/Config/ModuleConfig.h"
 
 class ModuleIndex
 {
@@ -13,17 +13,25 @@ public:
 	class Module
 	{
 	public:
-		Module(const std::string& moduleName, const std::string& filePath)
+		Module(std::string_view moduleName = "", std::string_view filePath = "", std::string_view matchName = "")
 			: ModuleName(moduleName),
-			  FilePath(filePath)
+			  FilePath(filePath),
+			  MatchName(matchName)
 		{
 		}
 
 		std::string ModuleName;
 		std::string FilePath;
+		std::string MatchName;
 	};
 
 	ModuleIndex();
+
+	void BuildModule(std::string workspaceUri, std::string_view moduleConfigPath);
+
+	void RemoveModule(std::string workspaceUri);
+
+	void SetDefaultModule(std::string workspaceUri);
 
 	void BuildIndex(const std::vector<std::string>& files);
 
@@ -31,9 +39,10 @@ public:
 
 	void RebuildIndex(const std::vector<std::string>& files);
 
-	std::vector<Module>& GetModules(std::shared_ptr<LuaCodeStyleOptions> options);
+	std::vector<std::shared_ptr<Module>> GetModules(std::string_view filePath);
 
+	std::shared_ptr<ModuleConfig> GetConfig(std::string_view filePath);
 private:
-	std::map<std::string, std::vector<Module>> _moduleIndex;
-	std::vector<Module> _emptyModules;
+	std::map<std::string, std::vector<std::shared_ptr<Module>>> _moduleIndex;
+	std::map<std::string, std::shared_ptr<ModuleConfig>> _moduleConfigMap;
 };

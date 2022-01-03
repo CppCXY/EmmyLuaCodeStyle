@@ -13,6 +13,8 @@ public:
 
 	int GetColumn(int offset);
 
+	int GetOffsetFromPosition(int line, int character);
+
 	int GetTotalLine();
 
 	bool IsEmptyLine(int line);

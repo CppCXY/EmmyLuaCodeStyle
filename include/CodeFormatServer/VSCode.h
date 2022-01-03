@@ -9,7 +9,8 @@
 
 // 命名风格和vscode一样
 
-namespace vscode {
+namespace vscode
+{
 class Serializable
 {
 public:
@@ -228,13 +229,14 @@ public:
 	nlohmann::json Serialize() override;
 };
 
-class EditorConfigSource;
+class ConfigSource;
 
 class InitializationOptions : public Serializable
 {
 public:
 	std::vector<std::string> workspaceFolders;
-	std::vector<EditorConfigSource> configFiles;
+	std::vector<ConfigSource> editorConfigFiles;
+	std::vector<ConfigSource> moduleConfigFiles;
 	std::string localeRoot;
 	void Deserialize(nlohmann::json json) override;
 };
@@ -331,7 +333,7 @@ enum class FileChangeType
 	Delete = 3
 };
 
-class EditorConfigSource : public Serializable
+class ConfigSource : public Serializable
 {
 public:
 	std::string uri;
@@ -341,11 +343,11 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
-class EditorConfigUpdateParams : public Serializable
+class ConfigUpdateParams : public Serializable
 {
 public:
 	FileChangeType type;
-	EditorConfigSource source;
+	ConfigSource source;
 
 	void Deserialize(nlohmann::json json) override;
 };
@@ -532,6 +534,14 @@ enum class CompletionItemKind
 	TypeParameter = 25
 };
 
+class CompletionItemLabelDetails : public Serializable
+{
+public:
+	std::string detail;
+	std::optional<std::string> description;
+
+	nlohmann::json Serialize() override;
+};
 
 class CompletionItem : public Serializable
 {
@@ -541,6 +551,9 @@ public:
 	std::string detail;
 	std::string documentation;
 	std::string insertText;
+	std::optional<CompletionItemLabelDetails> labelDetails;
+	std::optional<std::string> sortText;
+	std::optional<std::string> filterText;
 	std::optional<Command> command;
 
 	nlohmann::json Serialize() override;
@@ -554,5 +567,4 @@ public:
 
 	nlohmann::json Serialize() override;
 };
-
 }

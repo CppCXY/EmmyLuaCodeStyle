@@ -1,144 +1,9 @@
 ﻿#include "CodeFormatServer/Service/ModuleService.h"
+#include "CodeFormatServer/Service/AstUtil/ModuleFinder.h"
 #include "LuaParser/LuaAstVisitor.h"
 #include "Util/StringUtil.h"
-
-class UnResolveModuleFinder : public LuaAstVisitor
-{
-public:
-	class Scope
-	{
-	public:
-		std::set<std::string, std::less<>> LocalNameDefineSet;
-	};
-
-	UnResolveModuleFinder()
-	{
-	}
-
-	std::vector<std::shared_ptr<LuaAstNode>>& GetUndefinedModule(std::shared_ptr<LuaParser> parser)
-	{
-		auto ast = parser->GetAst();
-		ast->AcceptChildren(*this);
-
-		return _undefinedModule;
-	}
-
-protected:
-	void VisitParamList(const std::shared_ptr<LuaAstNode>& paramList) override
-	{
-		for (auto param : paramList->GetChildren())
-		{
-			if (param->GetType() == LuaAstNodeType::Identify)
-			{
-				RecordLocalVariable(param);
-			}
-		}
-	}
-
-	void VisitLocalFunctionStatement(const std::shared_ptr<LuaAstNode>& localFunctionStatement) override
-	{
-		auto functionName = localFunctionStatement->FindFirstOf(LuaAstNodeType::Identify);
-
-		if (functionName)
-		{
-			RecordLocalVariable(functionName);
-		}
-	}
-
-	void VisitLocalStatement(const std::shared_ptr<LuaAstNode>& localStatement) override
-	{
-		std::shared_ptr<LuaAstNode> nameDefineList = localStatement->FindFirstOf(LuaAstNodeType::NameDefList);
-
-		if (nameDefineList)
-		{
-			for (auto& nameIdentify : nameDefineList->GetChildren())
-			{
-				if (nameIdentify->GetType() == LuaAstNodeType::Identify)
-				{
-					RecordLocalVariable(nameIdentify);
-				}
-			}
-		}
-	}
-
-	void VisitAssignment(const std::shared_ptr<LuaAstNode>& assignStatement) override
-	{
-		auto leftAssignStatement = assignStatement->FindFirstOf(LuaAstNodeType::ExpressionList);
-
-		for (auto expression : leftAssignStatement->GetChildren())
-		{
-			if (expression->GetType() == LuaAstNodeType::Expression && !expression->GetChildren().empty())
-			{
-				auto expressionFirstChild = expression->GetChildren().front();
-				if (expressionFirstChild->GetType() == LuaAstNodeType::PrimaryExpression)
-				{
-					RecordLocalVariable(expressionFirstChild);
-				}
-			}
-		}
-	}
-
-	void VisitBlock(const std::shared_ptr<LuaAstNode>& block) override
-	{
-		_scopeMap.insert({block, Scope()});
-	}
-
-	void VisitNameIdentify(const std::shared_ptr<LuaAstNode>& node) override
-	{
-		if (IsUndefinedVariable(node))
-		{
-			_undefinedModule.push_back(node);
-		}
-	}
-
-private:
-	void RecordLocalVariable(std::shared_ptr<LuaAstNode> node)
-	{
-		auto parent = node->GetParent();
-		while (parent)
-		{
-			if (parent->GetType() == LuaAstNodeType::Block)
-			{
-				if (_scopeMap.count(parent))
-				{
-					auto& scope = _scopeMap[parent];
-					scope.LocalNameDefineSet.insert(std::string(node->GetText()));
-				}
-				break;
-			}
-			parent = parent->GetParent();
-		}
-	}
-
-	bool IsUndefinedVariable(const std::shared_ptr<LuaAstNode>& node)
-	{
-		auto identifyText = node->GetText();
-
-		auto parent = node->GetParent();
-		while (parent)
-		{
-			if (parent->GetType() == LuaAstNodeType::Block)
-			{
-				if (_scopeMap.count(parent))
-				{
-					auto& scope = _scopeMap[parent];
-					auto it = scope.LocalNameDefineSet.find(identifyText);
-					if (it != scope.LocalNameDefineSet.end())
-					{
-						return false;
-					}
-				}
-			}
-			parent = parent->GetParent();
-		}
-
-		return true;
-	}
-
-	std::shared_ptr<LuaCodeStyleOptions> _options;
-	std::map<std::shared_ptr<LuaAstNode>, Scope> _scopeMap;
-	std::vector<std::shared_ptr<LuaAstNode>> _undefinedModule;
-};
+#include "Util/format.h"
+#include "Util/Url.h"
 
 ModuleService::ModuleService(std::shared_ptr<LanguageClient> owner)
 	: Service(owner)
@@ -146,13 +11,14 @@ ModuleService::ModuleService(std::shared_ptr<LanguageClient> owner)
 }
 
 std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePath,
-                                                        std::shared_ptr<LuaParser> parser,
-                                                        std::shared_ptr<LuaCodeStyleOptions> options)
+                                                        std::shared_ptr<LuaParser> parser)
 {
 	std::vector<vscode::Diagnostic> result;
-	UnResolveModuleFinder finder;
-	auto& undefinedModules = finder.GetUndefinedModule(parser);
-	auto& luaModules = _moduleIndex.GetModules(options);
+	ModuleFinder finder;
+	finder.Analysis(parser);
+
+	auto& undefinedModules = finder.GetUndefinedModule();
+	auto luaModules = _moduleIndex.GetModules(filePath);
 
 	std::multimap<vscode::Range, LuaModule> rangeModule;
 	for (auto& undefinedModule : undefinedModules)
@@ -160,19 +26,7 @@ std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePat
 		auto undefinedModuleName = undefinedModule->GetText();
 		for (auto& luaModule : luaModules)
 		{
-			std::string name;
-
-			auto dotPosition = luaModule.ModuleName.find_last_of('.');
-			if (dotPosition == std::string_view::npos)
-			{
-				name = luaModule.ModuleName;
-			}
-			else
-			{
-				name = luaModule.ModuleName.substr(dotPosition + 1);
-			}
-
-			if (StringUtil::IsStringEqualIgnoreCase(undefinedModuleName, name))
+			if (StringUtil::IsStringEqualIgnoreCase(undefinedModuleName, luaModule->MatchName))
 			{
 				auto& diagnostic = result.emplace_back();
 				diagnostic.message = "need import module";
@@ -190,8 +44,8 @@ std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePat
 
 				rangeModule.insert({
 					range, LuaModule{
-						.ModuleName = luaModule.ModuleName,
-						.FilePath = luaModule.FilePath,
+						.ModuleName = luaModule->ModuleName,
+						.FilePath = luaModule->FilePath,
 						.Name = std::string(undefinedModuleName)
 					}
 				});
@@ -203,11 +57,6 @@ std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePat
 	}
 	_diagnosticCaches[std::string(filePath)] = std::move(rangeModule);
 	return result;
-}
-
-std::vector<std::string> ModuleService::GetCompleteItems()
-{
-	return {};
 }
 
 bool ModuleService::IsDiagnosticRange(std::string_view filePath, vscode::Range range)
@@ -338,4 +187,56 @@ endLoop:
 ModuleIndex& ModuleService::GetIndex()
 {
 	return _moduleIndex;
+}
+
+std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::shared_ptr<LuaAstNode> expression,
+                                                                        std::shared_ptr<LuaParser> parser,
+                                                                        std::shared_ptr<LuaCodeStyleOptions> options,
+                                                                        std::string_view uri)
+{
+	auto path = url::UrlToFilePath(uri);
+	std::vector<vscode::CompletionItem> result;
+	ModuleFinder finder;
+	finder.Analysis(parser);
+
+	auto definedNames = finder.GetDefinedName(expression);
+
+	auto luaModules = _moduleIndex.GetModules(path);
+	auto insertRange = FindRequireRange(parser);
+
+
+	for (auto& luaModule : luaModules)
+	{
+		auto& completion = result.emplace_back();
+
+		std::string& name = luaModule->MatchName;
+		if(definedNames.count(name) > 0)
+		{
+			continue;
+		}
+
+		completion.label = name;
+		completion.detail = format("({})", luaModule->ModuleName);
+		completion.documentation = format("import from {}", luaModule->FilePath);
+		completion.insertText = name;
+		completion.kind = vscode::CompletionItemKind::Module;
+		// vscode::CompletionItemLabelDetails labelDetail;
+		// labelDetail.detail = completion.detail;
+		// labelDetail.description = completion.detail;
+		// completion.labelDetails = labelDetail;
+
+		vscode::Command command;
+		command.title = completion.detail;
+		command.command = "emmylua.import.me";
+		command.arguments.push_back(uri);
+		command.arguments.push_back(insertRange.Serialize());
+		auto object = nlohmann::json::object();
+		object["moduleName"] = luaModule->ModuleName;
+		object["path"] = luaModule->FilePath;
+		object["name"] = name;
+		command.arguments.push_back(object);
+		completion.command = command;
+	}
+
+	return result;
 }

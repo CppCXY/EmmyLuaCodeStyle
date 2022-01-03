@@ -63,6 +63,28 @@ int LuaFile::GetColumn(int offset)
 	return static_cast<int>(utf8::Utf8nLen(_source.data() + lineStartOffset, static_cast<std::size_t>(bytesLength)));
 }
 
+int LuaFile::GetOffsetFromPosition(int line, int character)
+{
+	if (line >= _lineOffsetVec.size() || line < 0)
+	{
+		return -1;
+	}
+
+	int lineStartOffset = _lineOffsetVec[line];
+	int nextOffset = 0;
+	if (line + 1 >= _lineOffsetVec.size())
+	{
+		nextOffset = _source.size();
+	}
+	else
+	{
+		nextOffset = _lineOffsetVec[line + 1];
+	}
+
+	int offset = utf8::Utf8nByteNum(_source.data() + lineStartOffset, nextOffset - lineStartOffset, character);
+	return lineStartOffset + offset; 
+}
+
 int LuaFile::GetTotalLine()
 {
 	return _linenumber;

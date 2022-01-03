@@ -453,7 +453,7 @@ int LuaTokenParser::GetCurrentChar()
 
 bool LuaTokenParser::CheckNext1(int ch)
 {
-	if (_source[_currentParseIndex] == ch)
+	if (_currentParseIndex < _source.size() && _source[_currentParseIndex] == ch)
 	{
 		SaveAndNext();
 		return true;

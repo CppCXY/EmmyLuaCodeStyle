@@ -9,6 +9,7 @@
 #include "CodeFormatServer/LanguageClient.h"
 #include "CodeFormatServer/Service/CodeFormatService.h"
 #include "CodeFormatServer/Service/ModuleService.h"
+#include "CodeFormatServer/Service/CompletionService.h"
 #include "Util/Url.h"
 #include "Util/format.h"
 
@@ -29,7 +30,8 @@ bool LanguageService::Initialize()
 	JsonProtocol("textDocument/didChange", &LanguageService::OnDidChange);
 	JsonProtocol("textDocument/didOpen", &LanguageService::OnDidOpen);
 	JsonProtocol("textDocument/didClose", &LanguageService::OnClose);
-	JsonProtocol("updateEditorConfig", &LanguageService::OnEditorConfigUpdate);
+	JsonProtocol("config/editorconfig/update", &LanguageService::OnEditorConfigUpdate);
+	JsonProtocol("config/moduleconfig/update", &LanguageService::OnModuleConfigUpdate);
 	JsonProtocol("textDocument/formatting", &LanguageService::OnFormatting);
 	JsonProtocol("textDocument/rangeFormatting", &LanguageService::OnRangeFormatting);
 	JsonProtocol("textDocument/onTypeFormatting", &LanguageService::OnTypeFormatting);
@@ -78,11 +80,20 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 	result->capabilities.completionProvider.resolveProvider = false;
 	result->capabilities.completionProvider.triggerCharacters = {};
 
-	auto& configFiles = param->initializationOptions.configFiles;
-	for (auto& configFile : configFiles)
+	auto& editorConfigFiles = param->initializationOptions.editorConfigFiles;
+	for (auto& configFile : editorConfigFiles)
 	{
-		LanguageClient::GetInstance().UpdateOptions(configFile.workspace, configFile.path);
+		LanguageClient::GetInstance().UpdateCodeStyleOptions(configFile.workspace, configFile.path);
 	}
+
+	auto& moduleConfigFiles = param->initializationOptions.moduleConfigFiles;
+	for (auto& configFile : moduleConfigFiles)
+	{
+		LanguageClient::GetInstance().GetService<ModuleService>()->GetIndex().BuildModule(
+			configFile.workspace, configFile.path);
+	}
+
+	LanguageClient::GetInstance().GetService<ModuleService>()->GetIndex().SetDefaultModule(param->rootPath);
 
 	std::filesystem::path localePath = param->initializationOptions.localeRoot;
 	localePath /= param->locale + ".json";
@@ -117,7 +128,7 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 
 std::shared_ptr<vscode::Serializable> LanguageService::OnInitialized(std::shared_ptr<vscode::Serializable> param)
 {
-	LanguageClient::GetInstance().UpdateAllDiagnosis();
+	LanguageClient::GetInstance().UpdateModuleInfo();
 	return nullptr;
 }
 
@@ -189,19 +200,19 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnClose(
 }
 
 std::shared_ptr<vscode::Serializable> LanguageService::OnEditorConfigUpdate(
-	std::shared_ptr<vscode::EditorConfigUpdateParams> param)
+	std::shared_ptr<vscode::ConfigUpdateParams> param)
 {
 	switch (param->type)
 	{
 	case vscode::FileChangeType::Created:
 	case vscode::FileChangeType::Changed:
 		{
-			LanguageClient::GetInstance().UpdateOptions(param->source.workspace, param->source.path);
+			LanguageClient::GetInstance().UpdateCodeStyleOptions(param->source.workspace, param->source.path);
 			break;
 		}
 	case vscode::FileChangeType::Delete:
 		{
-			LanguageClient::GetInstance().RemoveOptions(param->source.workspace);
+			LanguageClient::GetInstance().RemoveCodeStyleOptions(param->source.workspace);
 			break;
 		}
 	}
@@ -210,6 +221,33 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnEditorConfigUpdate(
 
 	return nullptr;
 }
+
+
+std::shared_ptr<vscode::Serializable> LanguageService::OnModuleConfigUpdate(
+	std::shared_ptr<vscode::ConfigUpdateParams> param)
+{
+	switch (param->type)
+	{
+	case vscode::FileChangeType::Created:
+	case vscode::FileChangeType::Changed:
+		{
+			LanguageClient::GetInstance().GetService<ModuleService>()
+			                             ->GetIndex().BuildModule(param->source.workspace, param->source.path);
+			break;
+		}
+	case vscode::FileChangeType::Delete:
+		{
+			LanguageClient::GetInstance().GetService<ModuleService>()
+			                             ->GetIndex().RemoveModule(param->source.workspace);
+			break;
+		}
+	}
+
+	LanguageClient::GetInstance().UpdateModuleInfo();
+
+	return nullptr;
+}
+
 
 std::shared_ptr<vscode::Serializable> LanguageService::OnRangeFormatting(
 	std::shared_ptr<vscode::DocumentRangeFormattingParams> param)
@@ -371,15 +409,22 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 		}
 
 		std::string uri = param->arguments[0];
+		std::string filePath = url::UrlToFilePath(uri);
+		auto config = LanguageClient::GetInstance().GetService<ModuleService>()->GetIndex().GetConfig(filePath);
+		if(!config)
+		{
+			return nullptr;
+		}
 		vscode::Range range;
 
 		range.Deserialize(param->arguments[1]);
 
 		std::string moduleName = param->arguments[2];
-		auto pos = moduleName.find_last_of('.');
+
 		std::string moduleDefineName = param->arguments[3];
 
-		std::string requireString = format("local {} = require(\"{}\")\n", moduleDefineName, moduleName);
+		std::string requireString = format("local {} = {}(\"{}\")\n", moduleDefineName, config->import_function,
+		                                   moduleName);
 		auto parser = LanguageClient::GetInstance().GetFileParser(uri);
 
 		auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();
@@ -426,7 +471,18 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChangeWatchedFiles(
 	return nullptr;
 }
 
-std::shared_ptr<vscode::Serializable> LanguageService::OnCompletion(std::shared_ptr<vscode::CompletionParams> param)
+std::shared_ptr<vscode::CompletionList> LanguageService::OnCompletion(std::shared_ptr<vscode::CompletionParams> param)
 {
-	return nullptr;
+	auto uri = param->textDocument.uri;
+
+	auto parser = LanguageClient::GetInstance().GetFileParser(uri);
+
+	auto options = LanguageClient::GetInstance().GetOptions(uri);
+
+	auto list = std::make_shared<vscode::CompletionList>();
+	list->isIncomplete = true;
+	list->items = LanguageClient::GetInstance().GetService<CompletionService>()->GetCompletions(
+		param->textDocument.uri, param->position, parser, options);
+
+	return list;
 }

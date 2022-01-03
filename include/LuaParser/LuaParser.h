@@ -40,6 +40,8 @@ public:
 	void SetFilename(std::string_view filename);
 
 	std::string_view GetFilename();
+
+	std::shared_ptr<LuaFile> GetLuaFile();
 private:
 	bool BlockFollow(bool withUntil = false);
 

@@ -49,7 +49,9 @@ private:
 
 	std::shared_ptr<vscode::Serializable> OnClose(std::shared_ptr<vscode::DidCloseTextDocumentParams> param);
 
-	std::shared_ptr<vscode::Serializable> OnEditorConfigUpdate(std::shared_ptr<vscode::EditorConfigUpdateParams> param);
+	std::shared_ptr<vscode::Serializable> OnEditorConfigUpdate(std::shared_ptr<vscode::ConfigUpdateParams> param);
+
+	std::shared_ptr<vscode::Serializable> OnModuleConfigUpdate(std::shared_ptr<vscode::ConfigUpdateParams> param);
 
 	std::shared_ptr<vscode::Serializable> OnRangeFormatting(std::shared_ptr<vscode::DocumentRangeFormattingParams> param);
 
@@ -61,11 +63,10 @@ private:
 
 	std::shared_ptr<vscode::Serializable> OnDidChangeWatchedFiles(std::shared_ptr<vscode::DidChangeWatchedFilesParams> param);
 
-	std::shared_ptr<vscode::Serializable> OnCompletion(std::shared_ptr<vscode::CompletionParams> param);
+	std::shared_ptr<vscode::CompletionList> OnCompletion(std::shared_ptr<vscode::CompletionParams> param);
 
 	std::map<std::string, MessageHandle, std::less<>> _handles;
 };
-
 
 
 

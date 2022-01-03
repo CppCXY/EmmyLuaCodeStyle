@@ -2,8 +2,8 @@
 
 VirtualFile::VirtualFile(std::string_view filename, std::string&& text)
 	: _filename(filename),
-	_luaFile(std::make_shared<LuaFile>(std::filesystem::path(filename).filename().string(), std::move(text))),
-	_isOpen(false)
+	_luaFile(std::make_shared<LuaFile>(std::filesystem::path(filename).filename().string(), std::move(text)))
+	// _isOpen(false)
 {
 	MakeParser();
 }

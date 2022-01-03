@@ -116,6 +116,11 @@ std::string_view LuaParser::GetFilename()
 	return _file->GetFilename();
 }
 
+std::shared_ptr<LuaFile> LuaParser::GetLuaFile()
+{
+	return _file;
+}
+
 void LuaParser::BuildAstWithComment()
 {
 	BuildAst();
