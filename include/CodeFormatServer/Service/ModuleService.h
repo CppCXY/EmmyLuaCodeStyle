@@ -32,7 +32,7 @@ public:
 
 	std::vector<LuaModule> GetImportModules(std::string_view filePath, vscode::Range range);
 
-	vscode::Range FindRequireRange(std::shared_ptr<LuaParser> parser);
+	vscode::Range FindRequireRange(std::shared_ptr<LuaParser> parser, std::shared_ptr<ModuleConfig> config);
 
 	ModuleIndex& GetIndex();
 

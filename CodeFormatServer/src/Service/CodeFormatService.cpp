@@ -8,8 +8,8 @@ CodeFormatService::CodeFormatService(std::shared_ptr<LanguageClient> owner)
 }
 
 std::vector<vscode::Diagnostic> CodeFormatService::Diagnose(std::string_view filePath,
-                                                             std::shared_ptr<LuaParser> parser,
-                                                             std::shared_ptr<LuaCodeStyleOptions> options)
+                                                            std::shared_ptr<LuaParser> parser,
+                                                            std::shared_ptr<LuaCodeStyleOptions> options)
 {
 	LuaFormatter formatter(parser, *options);
 	formatter.BuildFormattedElement();
@@ -62,11 +62,11 @@ bool CodeFormatService::IsDiagnosticRange(std::string_view filePath, vscode::Ran
 	}
 
 	auto& diagnosticSet = it->second;
-	if(range.start == range.end)
+	if (range.start == range.end)
 	{
-		for(auto& validRange: diagnosticSet)
+		for (auto& validRange : diagnosticSet)
 		{
-			if(validRange.start <= range.start && validRange.end >= range.end)
+			if (validRange.start <= range.start && validRange.end >= range.end)
 			{
 				return true;
 			}

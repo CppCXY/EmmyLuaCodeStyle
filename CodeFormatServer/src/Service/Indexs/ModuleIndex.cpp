@@ -41,6 +41,7 @@ void ModuleIndex::SetDefaultModule(std::string workspaceUri)
 	moduleConfig->module_root = workspacePath;
 	moduleConfig->name = "root";
 	moduleConfig->separator = '.';
+	_moduleConfigMap[workspacePath] = moduleConfig;
 }
 
 void ModuleIndex::BuildIndex(const std::vector<std::string>& files)
@@ -65,12 +66,11 @@ void ModuleIndex::BuildIndex(const std::vector<std::string>& files)
 			}
 		}
 
+		// .init 特殊规则
 		if (modulePath.ends_with(".init"))
 		{
 			modulePath = modulePath.substr(0, modulePath.size() - 5);
 		}
-
-
 
 		std::string matchName;
 
@@ -89,9 +89,18 @@ void ModuleIndex::BuildIndex(const std::vector<std::string>& files)
 			matchName = config->special_module.at(modulePath).Name;
 		}
 
+		// 一些代码喜欢路径带连字符
+		for (auto& c : matchName)
+		{
+			if(c == '-')
+			{
+				c = '_';
+			}
+		}
+
 		if (_moduleIndex.count(config->name) == 0)
 		{
-			_moduleIndex.insert({ config->name, std::vector<std::shared_ptr<Module>>() });
+			_moduleIndex.insert({config->name, std::vector<std::shared_ptr<Module>>()});
 		}
 
 		_moduleIndex.at(config->name).push_back(std::make_shared<Module>(modulePath, filePath, matchName));

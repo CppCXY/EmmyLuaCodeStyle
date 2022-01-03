@@ -426,7 +426,6 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 		std::string requireString = format("local {} = {}(\"{}\")\n", moduleDefineName, config->import_function,
 		                                   moduleName);
 		auto parser = LanguageClient::GetInstance().GetFileParser(uri);
-
 		auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();
 		auto it = applyParams->edit.changes.emplace(uri, std::vector<vscode::TextEdit>());
 		auto& change = it.first->second;
@@ -435,7 +434,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 
 		edit.newText = requireString;
 
-		edit.range = LanguageClient::GetInstance().GetService<ModuleService>()->FindRequireRange(parser);
+		edit.range = LanguageClient::GetInstance().GetService<ModuleService>()->FindRequireRange(parser, config);
 
 		LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
 	}

@@ -117,7 +117,7 @@ std::vector<ModuleService::LuaModule> ModuleService::GetImportModules(std::strin
 	return result;
 }
 
-vscode::Range ModuleService::FindRequireRange(std::shared_ptr<LuaParser> parser)
+vscode::Range ModuleService::FindRequireRange(std::shared_ptr<LuaParser> parser, std::shared_ptr<ModuleConfig> config)
 {
 	vscode::Range range;
 	auto chunkAst = parser->GetAst();
@@ -156,7 +156,20 @@ vscode::Range ModuleService::FindRequireRange(std::shared_ptr<LuaParser> parser)
 							auto methodNameNode = callExpression->FindFirstOf(LuaAstNodeType::PrimaryExpression);
 							if (methodNameNode)
 							{
-								if (methodNameNode->GetText() == "require")
+								if (methodNameNode->GetText() == config->import_function)
+								{
+									break;
+								}
+							}
+						}
+							// 一些代码会有 local require = require的规则, 勉为其难支持一下
+						else
+						{
+							auto primary = expression->FindFirstOf(LuaAstNodeType::PrimaryExpression);
+							if (primary)
+							{
+								auto nameIdentify = primary->FindFirstOf(LuaAstNodeType::NameIdentify);
+								if (nameIdentify && nameIdentify->GetText() == config->import_function)
 								{
 									break;
 								}
@@ -200,9 +213,9 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 	finder.Analysis(parser);
 
 	auto definedNames = finder.GetDefinedName(expression);
-
+	auto config = _moduleIndex.GetConfig(path);
 	auto luaModules = _moduleIndex.GetModules(path);
-	auto insertRange = FindRequireRange(parser);
+	auto insertRange = FindRequireRange(parser, config);
 
 
 	for (auto& luaModule : luaModules)
@@ -210,7 +223,7 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 		auto& completion = result.emplace_back();
 
 		std::string& name = luaModule->MatchName;
-		if(definedNames.count(name) > 0)
+		if (definedNames.count(name) > 0)
 		{
 			continue;
 		}
