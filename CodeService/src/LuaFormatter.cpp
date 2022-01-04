@@ -995,10 +995,14 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 	{
 		switch (child->GetType())
 		{
-			// 目前表达式语句上只有调用表达式
 		case LuaAstNodeType::CallExpression:
 			{
 				env->AddChild(FormatNode(child));
+				break;
+			}
+		case LuaAstNodeType::Expression:
+			{
+				FormatExpression(child, env);
 				break;
 			}
 			// default 一般只有一个分号
@@ -1902,7 +1906,16 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 		case LuaAstNodeType::CallExpression:
 			{
 				env->AddChild(FormatNode(child));
-				env->Add<KeepElement>(0);
+				auto callArg = child->FindFirstOf(LuaAstNodeType::CallArgList);
+				if (callArg->GetChildren().size() <= 1)
+				{
+					env->Add<KeepElement>(1);
+				}
+				else
+				{
+					env->Add<KeepElement>(0);
+				}
+
 				break;
 			}
 		case LuaAstNodeType::CallArgList:
