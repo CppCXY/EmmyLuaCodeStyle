@@ -79,6 +79,30 @@ std::shared_ptr<ModuleConfig> ModuleConfig::LoadFromFile(std::string_view filePa
 				}
 			}
 		}
+
+		if(json["export.rule"].is_array())
+		{
+			for (auto rule : json["export.rule"])
+			{
+				if (rule.is_string())
+				{
+					std::string strRule = rule;
+					if(strRule == "init_to_dir_module")
+					{
+						moduleConfig->_exportRules.push_back(ExportRule::init_to_dir_module);
+					}
+					else if(strRule == "only_filename")
+					{
+						moduleConfig->_exportRules.push_back(ExportRule::only_filename);
+					}
+				}
+			}
+		}
+		else
+		{
+			moduleConfig->_exportRules.push_back(ExportRule::init_to_dir_module);
+		}
+
 	}
 	catch (nlohmann::json::exception& e)
 	{
@@ -91,4 +115,51 @@ ModuleConfig::ModuleConfig()
 	: separator('.'),
 	  import_function("require")
 {
+}
+
+std::string ModuleConfig::GetModuleName(std::string_view path)
+{
+	std::string moduleName(path);
+	for (auto& c : moduleName)
+	{
+		if (c == '/' || c == '\\')
+		{
+			c = separator;
+		}
+	}
+
+	for (auto rule : _exportRules)
+	{
+		switch (rule)
+		{
+		case ExportRule::init_to_dir_module:
+			{
+				// .init 特殊规则
+				if (moduleName.ends_with(".init"))
+				{
+					return moduleName.substr(0, moduleName.size() - 5);
+				}
+				break;
+			}
+		case ExportRule::only_filename:
+			{
+				auto dotPosition = moduleName.find_last_of(separator);
+				if (dotPosition == std::string::npos)
+				{
+					return moduleName;
+				}
+				else
+				{
+					return moduleName.substr(dotPosition + 1);
+				}
+				break;
+			}
+		default:
+			{
+				break;
+			}
+		}
+	}
+
+	return moduleName;
 }

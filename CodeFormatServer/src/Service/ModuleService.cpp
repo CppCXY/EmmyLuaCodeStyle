@@ -217,37 +217,60 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 	auto luaModules = _moduleIndex.GetModules(path);
 	auto insertRange = FindRequireRange(parser, config);
 
+	std::map<std::string, std::vector<std::shared_ptr<Module>>> completionMap;
 
 	for (auto& luaModule : luaModules)
 	{
-		auto& completion = result.emplace_back();
+		if(completionMap.count(luaModule->MatchName) == 0)
+		{
+			completionMap.insert({ luaModule->MatchName, { luaModule} });
+		}
+		else
+		{
+			completionMap.at(luaModule->MatchName).push_back(luaModule);
+		}
+	}
 
-		std::string& name = luaModule->MatchName;
+	for (auto pair : completionMap)
+	{
+		auto& completion = result.emplace_back();
+		const std::string& name = pair.first;
 		if (definedNames.count(name) > 0)
 		{
 			continue;
 		}
 
 		completion.label = name;
-		completion.detail = format("({})", luaModule->ModuleName);
-		completion.documentation = format("import from {}", luaModule->FilePath);
 		completion.insertText = name;
 		completion.kind = vscode::CompletionItemKind::Module;
-		// vscode::CompletionItemLabelDetails labelDetail;
-		// labelDetail.detail = completion.detail;
-		// labelDetail.description = completion.detail;
-		// completion.labelDetails = labelDetail;
-
 		vscode::Command command;
 		command.title = completion.detail;
 		command.command = "emmylua.import.me";
 		command.arguments.push_back(uri);
 		command.arguments.push_back(insertRange.Serialize());
-		auto object = nlohmann::json::object();
-		object["moduleName"] = luaModule->ModuleName;
-		object["path"] = luaModule->FilePath;
-		object["name"] = name;
-		command.arguments.push_back(object);
+
+		if (pair.second.size() == 1) {
+			auto& luaModule = pair.second.front();
+			completion.detail = format("({})", name);
+			completion.documentation = format("import from {}", luaModule->FilePath);
+			auto object = nlohmann::json::object();
+			object["moduleName"] = luaModule->ModuleName;
+			object["path"] = luaModule->FilePath;
+			object["name"] = name;
+			command.arguments.push_back(object);
+
+		}
+		else
+		{
+			completion.detail = "import multi choice";
+			for (auto& luaModule : pair.second) {
+				auto object = nlohmann::json::object();
+				object["moduleName"] = luaModule->ModuleName;
+				object["path"] = luaModule->FilePath;
+				object["name"] = name;
+				command.arguments.push_back(object);
+			}
+		}
 		completion.command = command;
 	}
 

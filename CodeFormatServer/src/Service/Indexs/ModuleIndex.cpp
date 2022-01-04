@@ -41,6 +41,7 @@ void ModuleIndex::SetDefaultModule(std::string workspaceUri)
 	moduleConfig->module_root = workspacePath;
 	moduleConfig->name = "root";
 	moduleConfig->separator = '.';
+	moduleConfig->_exportRules.push_back(ExportRule::init_to_dir_module);
 	_moduleConfigMap[workspacePath] = moduleConfig;
 }
 
@@ -58,19 +59,7 @@ void ModuleIndex::BuildIndex(const std::vector<std::string>& files)
 		auto relativePath = std::filesystem::relative(filePath, config->module_root);
 		std::string modulePath = relativePath.replace_extension("").string();
 
-		for (auto& c : modulePath)
-		{
-			if (c == '/' || c == '\\')
-			{
-				c = config->separator;
-			}
-		}
-
-		// .init 特殊规则
-		if (modulePath.ends_with(".init"))
-		{
-			modulePath = modulePath.substr(0, modulePath.size() - 5);
-		}
+		modulePath = config->GetModuleName(modulePath);
 
 		std::string matchName;
 
@@ -92,7 +81,7 @@ void ModuleIndex::BuildIndex(const std::vector<std::string>& files)
 		// 一些代码喜欢路径带连字符
 		for (auto& c : matchName)
 		{
-			if(c == '-')
+			if (c == '-')
 			{
 				c = '_';
 			}
@@ -135,7 +124,7 @@ void ModuleIndex::RebuildIndex(const std::vector<std::string>& files)
 	BuildIndex(files);
 }
 
-std::vector<std::shared_ptr<ModuleIndex::Module>> ModuleIndex::GetModules(std::string_view filePath)
+std::vector<std::shared_ptr<Module>> ModuleIndex::GetModules(std::string_view filePath)
 {
 	std::vector<std::shared_ptr<Module>> result;
 

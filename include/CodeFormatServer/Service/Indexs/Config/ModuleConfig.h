@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "ExportRule.h"
 
 class ModuleConfig
 {
@@ -22,6 +23,9 @@ public:
 	static std::shared_ptr<ModuleConfig> LoadFromFile(std::string_view filePath);
 
 	ModuleConfig();
+
+	std::string GetModuleName(std::string_view path);
+
 	// 配置项采用 snake_case 命名
 
 	std::string name;
@@ -30,4 +34,5 @@ public:
 	char separator;
 	std::string import_function;
 	std::map<std::string, SpecialModule> special_module;
+	std::vector<ExportRule> _exportRules;
 };

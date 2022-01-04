@@ -6,25 +6,11 @@
 #include <set>
 #include <memory>
 #include "CodeFormatServer/Service/Indexs/Config/ModuleConfig.h"
+#include "Module.h"
 
 class ModuleIndex
 {
 public:
-	class Module
-	{
-	public:
-		Module(std::string_view moduleName = "", std::string_view filePath = "", std::string_view matchName = "")
-			: ModuleName(moduleName),
-			  FilePath(filePath),
-			  MatchName(matchName)
-		{
-		}
-
-		std::string ModuleName;
-		std::string FilePath;
-		std::string MatchName;
-	};
-
 	ModuleIndex();
 
 	void BuildModule(std::string workspaceUri, std::string_view moduleConfigPath);
