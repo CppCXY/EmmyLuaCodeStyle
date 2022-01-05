@@ -26,7 +26,7 @@ void TextElement::Serialize(FormatContext& ctx, std::optional<FormatElement::Chi
 void TextElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
 {
 	const int character = ctx.GetColumn(_textRange.EndOffset);
-	ctx.SetCharacterCount(character);
+	ctx.SetCharacterCount(character + 1);
 
 	if (character > ctx.GetOptions().max_line_length)
 	{

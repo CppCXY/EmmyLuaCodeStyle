@@ -1000,12 +1000,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 				env->AddChild(FormatNode(child));
 				break;
 			}
-		case LuaAstNodeType::Expression:
-			{
-				FormatExpression(child, env);
-				break;
-			}
-			// default 一般只有一个分号
+		// case LuaAstNodeType::Expression:
+		// 	{
+		// 		FormatExpression(child, env);
+		// 		break;
+		// 	}
+		// default 一般只有一个分号
 		default:
 			{
 				DefaultHandle(child, env);
