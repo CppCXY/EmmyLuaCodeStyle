@@ -5,7 +5,7 @@ local t3 = - -2 + - - - -5
 
 (function() end)()
 call(123, 456)(789)
-call "12313"(456)
+call "12313" (456)
 call(123)"456"
 print [[
     12313
