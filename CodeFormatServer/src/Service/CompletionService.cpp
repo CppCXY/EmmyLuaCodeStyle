@@ -15,6 +15,10 @@ void CompletionService::Start()
 	AddCompleteContributor({LuaAstNodeType::NameIdentify},
 	                       std::bind(&ModuleService::GetModuleCompletions, GetService<ModuleService>().get(),
 	                                 _1, _2, _3, _4));
+	// AddCompleteContributor({LuaAstNodeType::LiteralExpression},
+	//                        std::bind(&ModuleService::GetRequireCompletions, GetService<ModuleService>().get(),
+	//                                  _1, _2, _3, _4)
+	// );
 }
 
 std::vector<vscode::CompletionItem> CompletionService::GetCompletions(std::string_view uri,
@@ -74,11 +78,10 @@ std::shared_ptr<LuaAstNode> CompletionService::FindAstFromPosition(vscode::Posit
 			}
 		}
 
-		if(!hasNext)
+		if (!hasNext)
 		{
 			return ast;
 		}
-
 	}
 
 	return nullptr;

@@ -129,7 +129,7 @@ vscode::Range ModuleService::FindRequireRange(std::shared_ptr<LuaParser> parser,
 	auto blockNode = chunkAst->GetChildren().front();
 
 	std::shared_ptr<LuaAstNode> lastNode = nullptr;
-
+	int lastLine = -1;
 	auto& children = blockNode->GetChildren();
 	for (auto statement : children)
 	{
@@ -184,7 +184,13 @@ vscode::Range ModuleService::FindRequireRange(std::shared_ptr<LuaParser> parser,
 				goto endLoop;
 			}
 		}
+
+		if (parser->GetLine(statement->GetTextRange().StartOffset) - lastLine > 2)
+		{
+			goto endLoop;
+		}
 		lastNode = statement;
+		lastLine = parser->GetLine(lastNode->GetTextRange().EndOffset);
 	}
 endLoop:
 	if (lastNode)
@@ -221,9 +227,9 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 
 	for (auto& luaModule : luaModules)
 	{
-		if(completionMap.count(luaModule->MatchName) == 0)
+		if (completionMap.count(luaModule->MatchName) == 0)
 		{
-			completionMap.insert({ luaModule->MatchName, { luaModule} });
+			completionMap.insert({luaModule->MatchName, {luaModule}});
 		}
 		else
 		{
@@ -249,7 +255,8 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 		command.arguments.push_back(uri);
 		command.arguments.push_back(insertRange.Serialize());
 
-		if (pair.second.size() == 1) {
+		if (pair.second.size() == 1)
+		{
 			auto& luaModule = pair.second.front();
 			completion.detail = format("({})", name);
 			completion.documentation = format("import from {}", luaModule->FilePath);
@@ -258,12 +265,12 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 			object["path"] = luaModule->FilePath;
 			object["name"] = name;
 			command.arguments.push_back(object);
-
 		}
 		else
 		{
 			completion.detail = "import multi choice";
-			for (auto& luaModule : pair.second) {
+			for (auto& luaModule : pair.second)
+			{
 				auto object = nlohmann::json::object();
 				object["moduleName"] = luaModule->ModuleName;
 				object["path"] = luaModule->FilePath;
@@ -276,3 +283,11 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 
 	return result;
 }
+
+// std::vector<vscode::CompletionItem> ModuleService::GetRequireCompletions(std::shared_ptr<LuaAstNode> expression,
+//                                                                          std::shared_ptr<LuaParser> parser,
+//                                                                          std::shared_ptr<LuaCodeStyleOptions> options,
+//                                                                          std::string_view uri)
+// {
+//
+// }
