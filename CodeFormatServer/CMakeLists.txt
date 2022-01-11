@@ -67,7 +67,7 @@ target_link_libraries(CodeFormatServer PUBLIC CodeService)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	target_compile_definitions(CodeFormatServer PUBLIC -D_WIN32_WINNT=0x0601)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
-	target_link_libraries(CodeFormatServer PUBLIC pthread)
+	target_link_libraries(CodeFormatServer PUBLIC pthread -static-libstdc++ -static-libgcc)
 endif()
 
 install(
