@@ -21,7 +21,7 @@ public:
 
 	void PushLine(int offset);
 
-	std::string_view GetSource();
+	std::string& GetSource();
 
 	void SetTotalLine(int line);
 

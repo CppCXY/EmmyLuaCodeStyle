@@ -15,44 +15,42 @@ void VirtualFile::UpdateFile(vscode::Range range, std::string&& content)
 		return UpdateFile(std::move(content));
 	}
 
+	std::string text;
+	text.swap(_luaFile->GetSource());
 	auto startOffset = _luaFile->GetOffsetFromPosition(range.start.line, range.start.character);
 	auto endOffset = _luaFile->GetOffsetFromPosition(range.end.line, range.end.character);
-	auto oldSize = _text.size();
+	auto oldSize = text.size();
 	auto newSize = oldSize + (content.size() - (endOffset - startOffset));
-	if (newSize > _text.capacity())
+	if (newSize > text.capacity())
 	{
 		auto suitableCapacity = newSize + 4096;
-		_text.reserve(suitableCapacity);
+		text.reserve(suitableCapacity);
 	}
 
 	if(newSize > oldSize)
 	{
-		_text.resize(newSize);
-		std::copy_backward(_text.begin() + endOffset, _text.begin() + oldSize, _text.end());
-		std::copy(content.begin(), content.end(), _text.begin() + startOffset);
+		text.resize(newSize);
+		std::copy_backward(text.begin() + endOffset, text.begin() + oldSize, text.end());
+		std::copy(content.begin(), content.end(), text.begin() + startOffset);
 	}
 	else
 	{
-		std::copy(_text.begin() + endOffset, _text.end(), _text.begin() + startOffset + content.size());
+		std::copy(text.begin() + endOffset, text.end(), text.begin() + startOffset + content.size());
 		if(content.size() > 0)
 		{
-			std::copy(content.begin(), content.end(), _text.begin() + startOffset);
+			std::copy(content.begin(), content.end(), text.begin() + startOffset);
 		}
-		_text.resize(newSize);
+		text.resize(newSize);
 	}
 
-	std::string fileText = _text;
 	_luaFile = std::make_shared<LuaFile>(std::filesystem::path(url::UrlToFilePath(_fileUri)).filename().string(),
-	                                     std::move(fileText));
-	MakeParser();
+	                                     std::move(text));
 }
 
 void VirtualFile::UpdateFile(std::string&& text)
 {
-	_text = text;
 	_luaFile = std::make_shared<LuaFile>(std::filesystem::path(url::UrlToFilePath(_fileUri)).filename().string(),
 	                                     std::move(text));
-	MakeParser();
 }
 
 void VirtualFile::Reset()

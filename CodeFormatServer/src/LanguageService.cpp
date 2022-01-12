@@ -137,7 +137,6 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 {
 	for (auto& content : param->contentChanges)
 	{
-		// LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
 		if (content.range.has_value())
 		{
 			LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, content.range.value(),
@@ -149,6 +148,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 		}
 	}
 
+	LanguageClient::GetInstance().ParseFile(param->textDocument.uri);
 	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
 	return nullptr;
 }
@@ -156,8 +156,8 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidOpen(
 	std::shared_ptr<vscode::DidOpenTextDocumentParams> param)
 {
-	// LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
 	LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, {}, std::move(param->textDocument.text));
+	LanguageClient::GetInstance().ParseFile(param->textDocument.uri);
 	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
 	return nullptr;
 }
@@ -199,7 +199,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnFormatting(
 std::shared_ptr<vscode::Serializable> LanguageService::OnClose(
 	std::shared_ptr<vscode::DidCloseTextDocumentParams> param)
 {
-	LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
+	LanguageClient::GetInstance().ParseFile(param->textDocument.uri);
 
 	return nullptr;
 }

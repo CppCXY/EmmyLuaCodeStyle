@@ -16,11 +16,11 @@ public:
 	void Reset();
 
 	std::shared_ptr<LuaParser> GetLuaParser();
-private:
+
 	void MakeParser();
+private:
 
 	std::string _fileUri;
-	std::string _text;
 	std::shared_ptr<LuaFile> _luaFile;
 	std::shared_ptr<LuaParser> _luaParser;
 

@@ -102,13 +102,13 @@ void LanguageClient::UpdateFile(std::string_view uri, vscode::Range range, std::
 	}
 }
 
-void LanguageClient::ReleaseFile(std::string_view uri)
+void LanguageClient::ParseFile(std::string_view uri)
 {
 	auto filename = url::UrlToFilePath(uri);
 	auto it = _fileMap.find(filename);
 	if (it != _fileMap.end())
 	{
-		_fileMap.erase(it);
+		it->second->MakeParser();
 	}
 }
 
