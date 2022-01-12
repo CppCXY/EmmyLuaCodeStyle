@@ -7,20 +7,20 @@
 class VirtualFile
 {
 public:
-	VirtualFile(std::string_view filename, std::string&& text);
+	VirtualFile(std::string_view fileUri);
 
-	void UpdateFile(vscode::Range range, std::string& content);
+	void UpdateFile(vscode::Range range, std::string&& content);
 
-	void UpdateFile(std::string& text);
+	void UpdateFile(std::string&& text);
 
 	void Reset();
 
 	std::shared_ptr<LuaParser> GetLuaParser();
-
 private:
 	void MakeParser();
 
-	std::string _filename;
+	std::string _fileUri;
+	std::string _text;
 	std::shared_ptr<LuaFile> _luaFile;
 	std::shared_ptr<LuaParser> _luaParser;
 

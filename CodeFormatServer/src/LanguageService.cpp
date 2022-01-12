@@ -68,7 +68,7 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 
 	result->capabilities.documentOnTypeFormattingProvider = typeOptions;
 
-	result->capabilities.textDocumentSync.change = vscode::TextDocumentSyncKind::Full;
+	result->capabilities.textDocumentSync.change = vscode::TextDocumentSyncKind::Incremental;
 	result->capabilities.textDocumentSync.openClose = true;
 
 	result->capabilities.codeActionProvider = true;
@@ -135,24 +135,29 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnInitialized(std::shared
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 	std::shared_ptr<vscode::DidChangeTextDocumentParams> param)
 {
-	// std::string_view fileText;
 	for (auto& content : param->contentChanges)
 	{
-		LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
-
-		LanguageClient::GetInstance().CacheFile(param->textDocument.uri, std::move(content.text));
-
-		LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
+		// LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
+		if (content.range.has_value())
+		{
+			LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, content.range.value(),
+			                                         std::move(content.text));
+		}
+		else
+		{
+			LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, {}, std::move(content.text));
+		}
 	}
 
+	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
 	return nullptr;
 }
 
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidOpen(
 	std::shared_ptr<vscode::DidOpenTextDocumentParams> param)
 {
-	LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
-	LanguageClient::GetInstance().CacheFile(param->textDocument.uri, std::move(param->textDocument.text));
+	// LanguageClient::GetInstance().ReleaseFile(param->textDocument.uri);
+	LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, {}, std::move(param->textDocument.text));
 	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
 	return nullptr;
 }
@@ -411,7 +416,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 		std::string uri = param->arguments[0];
 		std::string filePath = url::UrlToFilePath(uri);
 		auto config = LanguageClient::GetInstance().GetService<ModuleService>()->GetIndex().GetConfig(filePath);
-		if(!config)
+		if (!config)
 		{
 			return nullptr;
 		}

@@ -86,11 +86,20 @@ void LanguageClient::SendRequest(std::string_view method, std::shared_ptr<vscode
 	}
 }
 
-void LanguageClient::CacheFile(std::string_view uri, std::string&& text)
+void LanguageClient::UpdateFile(std::string_view uri, vscode::Range range, std::string&& text)
 {
 	auto filename = url::UrlToFilePath(uri);
-	auto virtualFile = std::make_shared<VirtualFile>(filename, std::move(text));
-	_fileMap[filename] = virtualFile;
+	auto it = _fileMap.find(filename);
+	if(it == _fileMap.end())
+	{
+		auto virtualFile = std::make_shared<VirtualFile>(filename);
+		virtualFile->UpdateFile(std::move(text));
+		_fileMap[filename] = virtualFile;
+	}
+	else
+	{
+		it->second->UpdateFile(range, std::move(text));
+	}
 }
 
 void LanguageClient::ReleaseFile(std::string_view uri)

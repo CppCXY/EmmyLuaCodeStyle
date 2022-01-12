@@ -35,7 +35,7 @@ public:
 
 	void SendRequest(std::string_view method, std::shared_ptr<vscode::Serializable> param);
 
-	void CacheFile(std::string_view uri, std::string&& text);
+	void UpdateFile(std::string_view uri, vscode::Range range, std::string&& text);
 
 	void ReleaseFile(std::string_view uri);
 
