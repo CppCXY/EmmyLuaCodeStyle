@@ -135,8 +135,9 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnInitialized(std::shared
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 	std::shared_ptr<vscode::DidChangeTextDocumentParams> param)
 {
-	for (auto& content : param->contentChanges)
+	if (param->contentChanges.size() == 1)
 	{
+		auto& content = param->contentChanges.front();
 		if (content.range.has_value())
 		{
 			LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, content.range.value(),
@@ -144,8 +145,14 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 		}
 		else
 		{
-			LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, {}, std::move(content.text));
+			LanguageClient::GetInstance().UpdateFile(param->textDocument.uri,
+			                                         {vscode::Position(-1, 0), vscode::Position(-1, 0)},
+			                                         std::move(content.text));
 		}
+	}
+	else
+	{
+		LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, param->contentChanges);
 	}
 
 	LanguageClient::GetInstance().ParseFile(param->textDocument.uri);

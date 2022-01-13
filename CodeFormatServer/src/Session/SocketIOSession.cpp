@@ -39,7 +39,6 @@ void SocketIOSession::Run()
 
 		do {
 			auto content = _protocolBuffer.ReadOneProtocol();
-			// std::cout << content << std::endl;
 			std::string result = Handle(content);
 
 			_protocolBuffer.Reset();

@@ -126,7 +126,7 @@ void LuaFile::PushLine(int offset)
 	_lineOffsetVec.push_back(offset);
 }
 
-std::string_view LuaFile::GetSource()
+std::string& LuaFile::GetSource()
 {
 	return _source;
 }

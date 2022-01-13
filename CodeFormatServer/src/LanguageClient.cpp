@@ -96,9 +96,23 @@ void LanguageClient::UpdateFile(std::string_view uri, vscode::Range range, std::
 		virtualFile->UpdateFile(std::move(text));
 		_fileMap[filename] = virtualFile;
 	}
+	else if(range.start.line == -1)
+	{
+		it->second->UpdateFile(std::move(text));
+	}
 	else
 	{
 		it->second->UpdateFile(range, std::move(text));
+	}
+}
+
+void LanguageClient::UpdateFile(std::string_view uri, std::vector<vscode::TextDocumentContentChangeEvent>& changeEvent)
+{
+	auto filename = url::UrlToFilePath(uri);
+	auto it = _fileMap.find(filename);
+	if (it != _fileMap.end())
+	{
+		it->second->UpdateFile(changeEvent);
 	}
 }
 

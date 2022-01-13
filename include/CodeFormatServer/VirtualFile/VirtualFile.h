@@ -11,6 +11,8 @@ public:
 
 	void UpdateFile(vscode::Range range, std::string&& content);
 
+	void UpdateFile(std::vector<vscode::TextDocumentContentChangeEvent>& changeEvent);
+
 	void UpdateFile(std::string&& text);
 
 	void Reset();
@@ -19,6 +21,7 @@ public:
 
 	void MakeParser();
 private:
+
 
 	std::string _fileUri;
 	std::shared_ptr<LuaFile> _luaFile;

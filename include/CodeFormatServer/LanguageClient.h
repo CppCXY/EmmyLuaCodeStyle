@@ -37,7 +37,9 @@ public:
 
 	void UpdateFile(std::string_view uri, vscode::Range range, std::string&& text);
 
-	void ReleaseFile(std::string_view uri);
+	void UpdateFile(std::string_view uri, std::vector<vscode::TextDocumentContentChangeEvent>& changeEvent);
+
+	void ParseFile(std::string_view uri);
 
 	void DiagnosticFile(std::string_view uri);
 
