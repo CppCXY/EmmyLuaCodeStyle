@@ -103,8 +103,7 @@ void VirtualFile::UpdateFile(std::vector<vscode::TextDocumentContentChangeEvent>
 		}
 	}
 
-	_luaFile->UpdateLineInfo();
-	_luaParser = nullptr;
+	UpdateFile(std::move(text));
 }
 
 void VirtualFile::UpdateFile(std::string&& text)
