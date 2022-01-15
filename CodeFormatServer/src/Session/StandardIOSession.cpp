@@ -77,6 +77,7 @@ bool StandardIO::HasError()
 void StandardIO::Write(std::string_view content)
 {
 	std::cout.write(content.data(), content.size());
+	std::cout.flush();
 }
 
 #endif
@@ -84,6 +85,8 @@ void StandardIO::Write(std::string_view content)
 
 int StandardIOSession::Run(asio::io_context& ioc)
 {
+	// std::this_thread::sleep_for(std::chrono::seconds(15));
+	IOSession::Run(ioc);
 	while (true)
 	{
 		do

@@ -25,7 +25,7 @@ int IOSession::Run(asio::io_context& ioc)
 		while(true)
 		{
 			ioc.run();
-			std::this_thread::yield();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 	});
 	t.detach();
@@ -47,10 +47,10 @@ std::string IOSession::Handle(std::shared_ptr<ProtocolParser> parser)
 			{
 				return parser->SerializeProtocol(result);
 			}
-			std::cerr << format("request {}, it cost: {}ms\n", parser->GetMethod(),
-			                    chrono::duration_cast<chrono::milliseconds>(
-				                    chrono::system_clock::now() - start
-			                    ).count());
+			// std::cerr << format("request {}, it cost: {}ms\n", parser->GetMethod(),
+			//                     chrono::duration_cast<chrono::milliseconds>(
+			// 	                    chrono::system_clock::now() - start
+			//                     ).count());
 		}
 	}
 	catch (std::exception& e)
