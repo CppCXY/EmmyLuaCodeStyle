@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <optional>
-#include "LuaParser/LuaAstNode.h"
+#include "LuaParser/LuaAstNode/LuaAstNode.h"
 #include "FormatElementType.h"
 #include "FormatContext.h"
 #include "DiagnosisContext.h"

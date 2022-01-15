@@ -6,7 +6,7 @@
 #include "Util/format.h"
 #include "Util/Url.h"
 #include "Util/FileFinder.h"
-
+#include "asio.hpp"
 #include "CodeFormatServer/Service/ModuleService.h"
 #include "CodeFormatServer/Service/CodeFormatService.h"
 #include "CodeFormatServer/Service/CompletionService.h"
@@ -20,7 +20,8 @@ LanguageClient& LanguageClient::GetInstance()
 
 LanguageClient::LanguageClient()
 	: _defaultOptions(std::make_shared<LuaCodeStyleOptions>()),
-	  _idCounter(0)
+	  _idCounter(0),
+	  _ioc(nullptr)
 {
 }
 
@@ -30,12 +31,12 @@ void LanguageClient::InitializeService()
 	AddService<ModuleService>();
 	AddService<CompletionService>();
 
-	for(auto service : _services)
+	for (auto service : _services)
 	{
 		service->Initialize();
 	}
 
-	for(auto service : _services)
+	for (auto service : _services)
 	{
 		service->Start();
 	}
@@ -90,13 +91,13 @@ void LanguageClient::UpdateFile(std::string_view uri, vscode::Range range, std::
 {
 	auto filename = url::UrlToFilePath(uri);
 	auto it = _fileMap.find(filename);
-	if(it == _fileMap.end())
+	if (it == _fileMap.end())
 	{
 		auto virtualFile = std::make_shared<VirtualFile>(filename);
 		virtualFile->UpdateFile(std::move(text));
 		_fileMap[filename] = virtualFile;
 	}
-	else if(range.start.line == -1)
+	else if (range.start.line == -1)
 	{
 		it->second->UpdateFile(std::move(text));
 	}
@@ -116,13 +117,13 @@ void LanguageClient::UpdateFile(std::string_view uri, std::vector<vscode::TextDo
 	}
 }
 
-void LanguageClient::ParseFile(std::string_view uri)
+void LanguageClient::ClearFile(std::string_view uri)
 {
 	auto filename = url::UrlToFilePath(uri);
 	auto it = _fileMap.find(filename);
 	if (it != _fileMap.end())
 	{
-		it->second->MakeParser();
+		_fileMap.erase(it);
 	}
 }
 
@@ -161,6 +162,35 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 	SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
 }
 
+void LanguageClient::DelayDiagnosticFile(std::string_view uri)
+{
+	auto stringUri = std::string(uri);
+	auto task = std::make_shared<asio::steady_timer>(GetIOContext(), std::chrono::milliseconds(500));
+	auto it = _fileDiagnosticTask.find(uri);
+	if (it != _fileDiagnosticTask.end())
+	{
+		it->second->cancel();
+		it->second = task;
+	}
+	else {
+		_fileDiagnosticTask.insert({ stringUri, task });
+	}
+
+	task->async_wait([this, stringUri](const asio::error_code& code)
+	{
+		if (code == asio::error::operation_aborted)
+		{
+			return;
+		}
+		DiagnosticFile(stringUri);
+		auto it = _fileDiagnosticTask.find(stringUri);
+		if (it != _fileDiagnosticTask.end())
+		{
+			_fileDiagnosticTask.erase(it);
+		}
+	});
+}
+
 std::shared_ptr<LuaParser> LanguageClient::GetFileParser(std::string_view uri)
 {
 	auto filename = url::UrlToFilePath(uri);
@@ -173,12 +203,14 @@ std::shared_ptr<LuaParser> LanguageClient::GetFileParser(std::string_view uri)
 	return nullptr;
 }
 
-void LanguageClient::Run()
+int LanguageClient::Run(std::shared_ptr<asio::io_context> ioc)
 {
+	_ioc = ioc;
 	if (_session)
 	{
-		_session->Run();
+		return _session->Run(*ioc);
 	}
+	return 1;
 }
 
 std::shared_ptr<LuaCodeStyleOptions> LanguageClient::GetOptions(std::string_view uriOrFilename)
@@ -271,6 +303,11 @@ void LanguageClient::UpdateModuleInfo()
 void LanguageClient::SetRoot(std::string_view root)
 {
 	_root = root;
+}
+
+asio::io_context& LanguageClient::GetIOContext()
+{
+	return *_ioc;
 }
 
 uint64_t LanguageClient::GetRequestId()

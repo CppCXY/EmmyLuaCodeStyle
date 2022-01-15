@@ -28,6 +28,10 @@ public:
 	void SetFilename(std::string_view filename);
 
 	std::string_view GetFilename() const;
+
+	void UpdateLineInfo(int startLine = 0);
+
+	void Reset();
 protected:
 	std::string _source;
 	std::string _filename;

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "CodeService/NameStyle/NameDefineType.h"
-#include "LuaParser/LuaAstNode.h"
+#include "LuaParser/LuaAstNode/LuaAstNode.h"
 
 class CheckElement
 {

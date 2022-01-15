@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 #include "CodeFormatServer/Protocol/ProtocolParser.h"
 #include <chrono>
+#include <thread>
 #include "Util/format.h"
 
 namespace chrono = std::chrono;
@@ -17,31 +18,39 @@ IOSession::~IOSession()
 {
 }
 
-void IOSession::Run()
+int IOSession::Run(asio::io_context& ioc)
 {
+	std::thread t([&ioc]()
+	{
+		while(true)
+		{
+			ioc.run();
+			std::this_thread::yield();
+		}
+	});
+	t.detach();
+	return 0;
 }
 
-std::string IOSession::Handle(std::string_view msg)
+std::string IOSession::Handle(std::shared_ptr<ProtocolParser> parser)
 {
 	try
 	{
-		ProtocolParser parser;
 
-		parser.Parse(msg);
-
-		auto params = parser.GetParams();
+		auto params = parser->GetParams();
 
 		if (!params.is_null())
 		{
 			auto start = chrono::system_clock::now();
-			auto result = _service.Dispatch(parser.GetMethod(), params);
+			auto result = _service.Dispatch(parser->GetMethod(), params);
 			if (result)
 			{
-				return parser.SerializeProtocol(result);
+				return parser->SerializeProtocol(result);
 			}
-			std::cerr << format("request {}, it cost: {}ms\n", parser.GetMethod(), chrono::duration_cast<chrono::milliseconds>(
-				chrono::system_clock::now() - start
-				).count());
+			std::cerr << format("request {}, it cost: {}ms\n", parser->GetMethod(),
+			                    chrono::duration_cast<chrono::milliseconds>(
+				                    chrono::system_clock::now() - start
+			                    ).count());
 		}
 	}
 	catch (std::exception& e)

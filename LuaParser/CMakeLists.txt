@@ -18,15 +18,15 @@ target_sources(LuaParser PUBLIC
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenParser.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaParser.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaFile.h
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaAstNode.h
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaAstNodeType.h
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaAstNode/LuaAstNode.h
+	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaAstNode/LuaAstNodeType.h
 	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/TextRange.h
 	#src
 	PRIVATE
 	${LuaParser_SOURCE_DIR}/src/LuaParser.cpp	
 	${LuaParser_SOURCE_DIR}/src/LuaTokenParser.cpp	
 	${LuaParser_SOURCE_DIR}/src/LuaParseException.cpp
-	${LuaParser_SOURCE_DIR}/src/LuaAstNode.cpp
+	${LuaParser_SOURCE_DIR}/src/LuaAstNode/LuaAstNode.cpp
 	${LuaParser_SOURCE_DIR}/src/TextRange.cpp
 	${LuaParser_SOURCE_DIR}/src/LuaAstVisitor.cpp
 	${LuaParser_SOURCE_DIR}/src/LuaFile.cpp

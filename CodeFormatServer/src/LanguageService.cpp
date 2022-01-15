@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include "nlohmann/json.hpp"
+#include "asio.hpp"
 #include "CodeFormatServer/VSCode.h"
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "CodeService/LuaFormatter.h"
@@ -155,8 +156,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 		LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, param->contentChanges);
 	}
 
-	LanguageClient::GetInstance().ParseFile(param->textDocument.uri);
-	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
+	LanguageClient::GetInstance().DelayDiagnosticFile(param->textDocument.uri);
 	return nullptr;
 }
 
@@ -164,7 +164,6 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidOpen(
 	std::shared_ptr<vscode::DidOpenTextDocumentParams> param)
 {
 	LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, {}, std::move(param->textDocument.text));
-	LanguageClient::GetInstance().ParseFile(param->textDocument.uri);
 	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
 	return nullptr;
 }
@@ -206,7 +205,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnFormatting(
 std::shared_ptr<vscode::Serializable> LanguageService::OnClose(
 	std::shared_ptr<vscode::DidCloseTextDocumentParams> param)
 {
-	LanguageClient::GetInstance().ParseFile(param->textDocument.uri);
+	LanguageClient::GetInstance().ClearFile(param->textDocument.uri);
 
 	return nullptr;
 }

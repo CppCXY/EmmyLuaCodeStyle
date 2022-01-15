@@ -59,6 +59,7 @@ LuaTokenParser::LuaTokenParser(std::shared_ptr<LuaFile> file)
 
 bool LuaTokenParser::Parse()
 {
+	_file->Reset();
 	while (true)
 	{
 		auto type = Lex();

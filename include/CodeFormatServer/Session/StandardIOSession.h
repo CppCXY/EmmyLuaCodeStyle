@@ -7,6 +7,6 @@ class StandardIOSession: public IOSession
 {
 public:
 
-	void Run() override;
+	int Run(asio::io_context& ioc) override;
 	void Send(std::string_view content) override;
 };

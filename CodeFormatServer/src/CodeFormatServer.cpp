@@ -16,25 +16,20 @@ using namespace asio::ip;
 
 int main(int argc, char** argv)
 {
-    if(argc > 1)
-    {
-        int port = std::stoi(argv[1]);
-        asio::io_context ioc(1);
+	auto ioc = std::make_shared<asio::io_context>(1);
+	if (argc > 1)
+	{
+		int port = std::stoi(argv[1]);
+		tcp::acceptor acceptor(*ioc, tcp::endpoint(tcp::v4(), port));
 
-    	tcp::acceptor acceptor(ioc, tcp::endpoint(tcp::v4(), port));
-        while(true)
-        {
-            auto socket = acceptor.accept();
-            LanguageClient::GetInstance().SetSession(std::make_shared<SocketIOSession>(std::move(socket)));
-            LanguageClient::GetInstance().Run();
-        }
-    }
-    else
-    {
-        SET_BINARY_MODE();
-        LanguageClient::GetInstance().SetSession(std::make_shared<StandardIOSession>());
-        LanguageClient::GetInstance().Run();
-    }
+		auto socket = acceptor.accept();
+		LanguageClient::GetInstance().SetSession(std::make_shared<SocketIOSession>(std::move(socket)));
+	}
+	else
+	{
+		SET_BINARY_MODE();
+		LanguageClient::GetInstance().SetSession(std::make_shared<StandardIOSession>());
+	}
 
-    return 0;
+	return LanguageClient::GetInstance().Run(ioc);
 }

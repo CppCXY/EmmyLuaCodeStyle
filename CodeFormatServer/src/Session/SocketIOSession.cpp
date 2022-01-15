@@ -9,8 +9,9 @@ SocketIOSession::SocketIOSession(asio::ip::tcp::socket&& socket)
 {
 }
 
-void SocketIOSession::Run()
+int SocketIOSession::Run(asio::io_context& ioc)
 {
+	IOSession::Run(ioc);
 	while (true)
 	{
 		do
@@ -37,18 +38,26 @@ void SocketIOSession::Run()
 		}
 		while (true);
 
-		do {
+		do
+		{
 			auto content = _protocolBuffer.ReadOneProtocol();
-			std::string result = Handle(content);
-
+			auto parser = std::make_shared<ProtocolParser>();
+			parser->Parse(content);
 			_protocolBuffer.Reset();
-			if (!result.empty()) {
-				Send(result);
-			}
-		} while (_protocolBuffer.CanReadOneProtocol());
+			asio::post(ioc, [this, parser]()
+			{
+				std::string result = Handle(parser);
+
+				if (!result.empty())
+				{
+					Send(result);
+				}
+			});
+		}
+		while (_protocolBuffer.CanReadOneProtocol());
 	}
 endLoop:
-	return;
+	return 0;
 }
 
 void SocketIOSession::Send(std::string_view content)

@@ -1,14 +1,12 @@
 #include "CodeFormatServer/Session/StandardIOSession.h"
 
 #include <iostream>
-
-#ifndef _WIN32
 #include <asio.hpp>
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 #include "CodeFormatServer/Protocol/ProtocolParser.h"
 #include "CodeFormatServer/Protocol/ProtocolBuffer.h"
-
 
 class StandardIO
 {
@@ -81,13 +79,11 @@ void StandardIO::Write(std::string_view content)
 	std::cout.write(content.data(), content.size());
 }
 
-
 #endif
 
 
-void StandardIOSession::Run()
+int StandardIOSession::Run(asio::io_context& ioc)
 {
-
 	while (true)
 	{
 		do
@@ -115,18 +111,24 @@ void StandardIOSession::Run()
 
 		do
 		{
-			std::string result = Handle(_protocolBuffer.ReadOneProtocol());
-
+			auto content = _protocolBuffer.ReadOneProtocol();
+			auto parser = std::make_shared<ProtocolParser>();
+			parser->Parse(content);
 			_protocolBuffer.Reset();
-			if (!result.empty())
-			{
-				Send(result);
-			}
+			asio::post(ioc, [this, parser]()
+				{
+					std::string result = Handle(parser);
+
+					if (!result.empty())
+					{
+						Send(result);
+					}
+				});
 		}
 		while (_protocolBuffer.CanReadOneProtocol());
 	}
 endLoop:
-	return;
+	return 0;
 }
 
 void StandardIOSession::Send(std::string_view content)

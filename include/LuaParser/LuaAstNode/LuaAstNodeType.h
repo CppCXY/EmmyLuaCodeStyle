@@ -2,7 +2,9 @@
 
 enum class LuaAstNodeType
 {
-	Chunk,
+	LuaAstNode = -1,
+
+	Chunk = 0,
 
 	Block,
 
@@ -43,14 +45,23 @@ enum class LuaAstNodeType
 	AssignStatement,
 
 	Expression,
+
 	PrimaryExpression,
+
 	LiteralExpression,
+
 	ClosureExpression,
+
 	UnaryExpression,
+
 	BinaryExpression,
+
 	TableExpression,
+
 	CallExpression,
+
 	IndexExpression,
+
 	NameExpression,
 
 	UnaryOperator,
@@ -93,5 +104,9 @@ enum class LuaAstNodeType
 
 	LongComment,
 
-	ShebangComment,
+	ShebangComment
 };
+
+
+#define LUA_AST(ASTClass)\
+    inline static constexpr LuaAstNodeType ASTIndex = LuaAstNodeType::ASTClass

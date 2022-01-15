@@ -1,7 +1,6 @@
 #pragma once
 
 #include "FormatElement.h"
-#include "LuaParser/LuaAstNode.h"
 #include "TextDefineType.h"
 
 class TextElement : public FormatElement

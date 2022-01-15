@@ -4,7 +4,6 @@
 #include <set>
 
 #include "CodeService/LuaCodeStyleOptions.h"
-#include "LuaParser/LuaAstNode.h"
 #include "LuaParser/LuaParser.h"
 #include "LuaParser/LuaAstVisitor.h"
 

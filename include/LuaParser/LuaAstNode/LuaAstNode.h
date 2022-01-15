@@ -2,17 +2,18 @@
 
 #include <string_view>
 #include <vector>
-#include <list>
 #include <memory>
 #include "LuaAstNodeType.h"
-#include "TextRange.h"
-#include "LuaToken.h"
+#include "LuaParser/TextRange.h"
+#include "LuaParser/LuaToken.h"
 
 class LuaAstVisitor;
 
 class LuaAstNode: public std::enable_shared_from_this<LuaAstNode>
 {
 public:
+	LUA_AST(LuaAstNode);
+
 	using ChildrenContainer = std::vector<std::shared_ptr<LuaAstNode>>;
 	using ChildIterator = ChildrenContainer::iterator;
 
@@ -40,14 +41,26 @@ public:
 
 	LuaAstNodeType GetType() const;
 
-	void SetType(LuaAstNodeType type);
-
-	void AddComment(std::shared_ptr<LuaAstNode> comment);
+	virtual void AddComment(std::shared_ptr<LuaAstNode> comment);
 
 	std::shared_ptr<LuaAstNode> GetParent();
 
 	const char* GetSource();
-private:
+
+	// luaParser 保持在C++17
+	template<class T>
+	bool Is()
+	{
+		return _type == T::TypeIndex;
+	}
+
+	template<class T>
+	std::shared_ptr<T> As()
+	{
+		return std::dynamic_pointer_cast<T>(shared_from_this());
+	}
+
+protected:
 	void AddChildBefore(ChildIterator it, std::shared_ptr<LuaAstNode> child);
 
 	LuaAstNodeType _type;

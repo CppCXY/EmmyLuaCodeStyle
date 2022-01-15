@@ -1,4 +1,4 @@
-﻿#include "LuaParser/LuaAstNode.h"
+﻿#include "LuaParser/LuaAstNode/LuaAstNode.h"
 #include "LuaParser/LuaAstVisitor.h"
 
 LuaAstNode::LuaAstNode(LuaAstNodeType type, std::string_view text, TextRange range)
@@ -109,11 +109,6 @@ void LuaAstNode::AddChild(std::shared_ptr<LuaAstNode> child)
 LuaAstNodeType LuaAstNode::GetType() const
 {
 	return _type;
-}
-
-void LuaAstNode::SetType(LuaAstNodeType type)
-{
-	_type = type;
 }
 
 void LuaAstNode::AddComment(std::shared_ptr<LuaAstNode> comment)

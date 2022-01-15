@@ -44,8 +44,8 @@ void VirtualFile::UpdateFile(vscode::Range range, std::string&& content)
 		text.resize(newSize);
 	}
 
-	_luaFile = std::make_shared<LuaFile>(std::filesystem::path(url::UrlToFilePath(_fileUri)).filename().string(),
-	                                     std::move(text));
+	_luaFile->UpdateLineInfo(range.start.line);
+	_luaParser = nullptr;
 }
 
 void VirtualFile::UpdateFile(std::vector<vscode::TextDocumentContentChangeEvent>& changeEvent)
@@ -72,10 +72,10 @@ void VirtualFile::UpdateFile(std::vector<vscode::TextDocumentContentChangeEvent>
 		totalSize += content.size() - (endOffset - startOffset);
 	}
 
-	std::stable_sort(textChanges.begin(), textChanges.end(), [](auto& x, auto& y)->bool
-		{
-			return x.first.StartOffset < y.first.StartOffset;
-		});
+	std::stable_sort(textChanges.begin(), textChanges.end(), [](auto& x, auto& y)-> bool
+	{
+		return x.first.StartOffset < y.first.StartOffset;
+	});
 
 	if (totalSize > 0)
 	{
@@ -103,14 +103,15 @@ void VirtualFile::UpdateFile(std::vector<vscode::TextDocumentContentChangeEvent>
 		}
 	}
 
-	_luaFile = std::make_shared<LuaFile>(std::filesystem::path(url::UrlToFilePath(_fileUri)).filename().string(),
-	                                     std::move(text));
+	_luaFile->UpdateLineInfo();
+	_luaParser = nullptr;
 }
 
 void VirtualFile::UpdateFile(std::string&& text)
 {
 	_luaFile = std::make_shared<LuaFile>(std::filesystem::path(url::UrlToFilePath(_fileUri)).filename().string(),
 	                                     std::move(text));
+	MakeParser();
 }
 
 void VirtualFile::Reset()
@@ -119,6 +120,11 @@ void VirtualFile::Reset()
 
 std::shared_ptr<LuaParser> VirtualFile::GetLuaParser()
 {
+	if (!_luaParser)
+	{
+		MakeParser();
+	}
+
 	return _luaParser;
 }
 

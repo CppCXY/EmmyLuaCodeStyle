@@ -3,8 +3,8 @@
 #include <memory>
 #include "LuaTokenParser.h"
 #include "LuaOperatorType.h"
-#include "LuaAstNode.h"
 #include "LuaAttribute.h"
+#include "LuaAstNode/LuaAstNode.h"
 
 class LuaParser
 {

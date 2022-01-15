@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "LuaAstNode.h"
+#include "LuaAstNode/LuaAstNode.h"
 
 class LuaAstVisitor
 {
