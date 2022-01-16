@@ -57,7 +57,7 @@ std::shared_ptr<LuaAstNode> CompletionService::FindAstFromPosition(vscode::Posit
 {
 	auto ast = parser->GetAst();
 	auto luaFile = parser->GetLuaFile();
-	auto offset = luaFile->GetOffsetFromPosition(position.line, position.character);
+	auto offset = luaFile->GetOffsetFromPosition(position.line, position.character > 0 ? position.character - 1 : 0);
 
 	auto textOffset = TextRange(offset, offset);
 	while (true)

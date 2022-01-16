@@ -80,6 +80,7 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 
 	result->capabilities.completionProvider.resolveProvider = false;
 	result->capabilities.completionProvider.triggerCharacters = {};
+	result->capabilities.completionProvider.completionItem.labelDetailsSupport = true;
 
 	auto& editorConfigFiles = param->initializationOptions.editorConfigFiles;
 	for (auto& configFile : editorConfigFiles)

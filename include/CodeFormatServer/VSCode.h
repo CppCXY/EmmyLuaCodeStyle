@@ -206,11 +206,20 @@ public:
 	nlohmann::json Serialize() override;
 };
 
+class CompletionItemOptions : public Serializable
+{
+public:
+	bool labelDetailsSupport = true;
+
+	nlohmann::json Serialize() override;
+};
+
 class CompletionOptions : public Serializable
 {
 public:
 	std::vector<std::string> triggerCharacters;
 	bool resolveProvider;
+	CompletionItemOptions completionItem;
 
 	nlohmann::json Serialize() override;
 };

@@ -343,12 +343,20 @@ nlohmann::json vscode::ExecuteCommandOptions::Serialize()
 	return object;
 }
 
+nlohmann::json vscode::CompletionItemOptions::Serialize()
+{
+	auto object = nlohmann::json::object();
+
+	object["labelDetailsSupport"] = labelDetailsSupport;
+	return object;
+}
+
 nlohmann::json vscode::CompletionOptions::Serialize()
 {
 	auto object = nlohmann::json::object();
 	object["triggerCharacters"] = SerializeArray(triggerCharacters);
 	object["resolveProvider"] = resolveProvider;
-
+	object["completionItem"] = completionItem.Serialize();
 	return object;
 }
 

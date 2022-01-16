@@ -254,7 +254,7 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 		command.command = "emmylua.import.me";
 		command.arguments.push_back(uri);
 		command.arguments.push_back(insertRange.Serialize());
-
+		vscode::CompletionItemLabelDetails labelDetails;
 		if (pair.second.size() == 1)
 		{
 			auto& luaModule = pair.second.front();
@@ -265,6 +265,8 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 			object["path"] = luaModule->FilePath;
 			object["name"] = name;
 			command.arguments.push_back(object);
+			labelDetails.detail = format("[{}]", luaModule->ModuleName);
+			labelDetails.description = format("[{}]", luaModule->ModuleName);
 		}
 		else
 		{
@@ -277,8 +279,11 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 				object["name"] = name;
 				command.arguments.push_back(object);
 			}
+			labelDetails.detail = format("[{}]", completion.detail);
+			labelDetails.description = format("[{}]", completion.detail);
 		}
 		completion.command = command;
+		completion.labelDetails = labelDetails;
 	}
 
 	return result;

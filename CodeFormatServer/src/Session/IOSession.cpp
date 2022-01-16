@@ -43,14 +43,15 @@ std::string IOSession::Handle(std::shared_ptr<ProtocolParser> parser)
 		{
 			auto start = chrono::system_clock::now();
 			auto result = _service.Dispatch(parser->GetMethod(), params);
+			std::cerr << format("request {}, it cost: {}ms\n", parser->GetMethod(),
+				chrono::duration_cast<chrono::milliseconds>(
+					chrono::system_clock::now() - start
+					).count());
 			if (result)
 			{
 				return parser->SerializeProtocol(result);
 			}
-			// std::cerr << format("request {}, it cost: {}ms\n", parser->GetMethod(),
-			//                     chrono::duration_cast<chrono::milliseconds>(
-			// 	                    chrono::system_clock::now() - start
-			//                     ).count());
+
 		}
 	}
 	catch (std::exception& e)
