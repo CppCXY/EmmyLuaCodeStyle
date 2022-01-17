@@ -165,7 +165,7 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 void LanguageClient::DelayDiagnosticFile(std::string_view uri)
 {
 	auto stringUri = std::string(uri);
-	auto task = std::make_shared<asio::steady_timer>(GetIOContext(), std::chrono::milliseconds(500));
+	auto task = std::make_shared<asio::steady_timer>(GetIOContext(), std::chrono::milliseconds(300));
 	auto it = _fileDiagnosticTask.find(uri);
 	if (it != _fileDiagnosticTask.end())
 	{
