@@ -30,7 +30,7 @@ target_sources(LuaParser PUBLIC
 	${LuaParser_SOURCE_DIR}/src/TextRange.cpp
 	${LuaParser_SOURCE_DIR}/src/LuaAstVisitor.cpp
 	${LuaParser_SOURCE_DIR}/src/LuaFile.cpp
-	${LuaParser_SOURCE_DIR}/src/LuaDefine.h
+	${LuaParser_SOURCE_DIR}/src/LuaIdentify.cpp
 )
 
 target_link_libraries(LuaParser Util)

@@ -1,10 +1,10 @@
 ﻿#include "LuaParser/LuaTokenParser.h"
 #include <limits>
 #include "LuaDefine.h"
+#include "LuaParser/LuaIdentify.h"
 #include "LuaParser/LuaTokenTypeDetail.h"
 #include "Util/format.h"
 #include "Util/Utf8.h"
-
 
 std::map<std::string, LuaTokenType, std::less<>> LuaTokenParser::LuaReserved = {
 	{"and", TK_AND},

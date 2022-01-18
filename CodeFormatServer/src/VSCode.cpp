@@ -196,6 +196,11 @@ void vscode::InitializationOptions::Deserialize(nlohmann::json json)
 	{
 		localeRoot = json["localeRoot"];
 	}
+
+	if(json["extensionChars"].is_string())
+	{
+		extensionChars = json["extensionChars"];
+	}
 }
 
 void vscode::InitializeParams::Deserialize(nlohmann::json json)

@@ -13,6 +13,7 @@
 #include "CodeFormatServer/Service/CompletionService.h"
 #include "Util/Url.h"
 #include "Util/format.h"
+#include "LuaParser/LuaIdentify.h"
 
 using namespace std::placeholders;
 
@@ -121,6 +122,14 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 
 				LanguageTranslator::GetInstance().SetLanguageMap(std::move(languageMap));
 			}
+		}
+	}
+
+	if(!param->initializationOptions.extensionChars.empty())
+	{
+		for(auto& c:param->initializationOptions.extensionChars)
+		{
+			LuaIdentify::AddIdentifyChar(c);
 		}
 	}
 

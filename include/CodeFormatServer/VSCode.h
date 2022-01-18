@@ -247,6 +247,7 @@ public:
 	std::vector<ConfigSource> editorConfigFiles;
 	std::vector<ConfigSource> moduleConfigFiles;
 	std::string localeRoot;
+	std::string extensionChars;
 	void Deserialize(nlohmann::json json) override;
 };
 
