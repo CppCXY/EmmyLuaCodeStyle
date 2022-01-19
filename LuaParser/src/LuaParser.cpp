@@ -13,8 +13,7 @@ using namespace std::filesystem;
 
 std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 {
-	path filePath(filename);
-	std::string realPath = filePath.string();
+	std::string realPath(filename);
 	std::fstream fin(realPath, std::ios::in | std::ios::binary);
 
 	if (fin.is_open())
@@ -22,7 +21,7 @@ std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 		std::stringstream s;
 		s << fin.rdbuf();
 		auto parser = LoadFromBuffer(s.str());
-		parser->SetFilename(filePath.filename().string());
+		parser->SetFilename(realPath);
 		return parser;
 	}
 
@@ -106,10 +105,10 @@ bool LuaParser::IsEmptyLine(int line)
 
 void LuaParser::SetFilename(std::string_view filename)
 {
-	std::filesystem::path path(filename);
 #ifdef NOT_SURPPORT_FILE_SYSTEM
-	_file->SetFilename(path.string());
+	_file->SetFilename(filename);
 #else
+	std::filesystem::path path(filename);
 	_file->SetFilename(path.replace_extension().string());
 #endif
 
