@@ -186,7 +186,7 @@ std::string format(std::string_view fmt, ARGS ... args)
 	else
 	{
 		// 拼接字符串
-		std:size_t replaceCount = 0;
+		std::size_t replaceCount = 0;
 		std::size_t start = 0;
 		for (std::size_t index = 0; index != replaceExpresses.size(); index++)
 		{

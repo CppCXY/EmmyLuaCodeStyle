@@ -3,8 +3,8 @@
 #include "Util/format.h"
 
 DiagnosisContext::DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options)
-	: _parser(parser),
-	  _options(options)
+	: _options(options),
+	  _parser(parser)
 {
 }
 
@@ -119,7 +119,7 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 	if (_options.insert_final_newline && !_parser->IsEmptyLine(_parser->GetTotalLine()))
 	{
 		LuaDiagnosisPosition start(_parser->GetTotalLine(), _parser->GetColumn(
-			static_cast<int>(_parser->GetSource().size())));
+			                           static_cast<int>(_parser->GetSource().size())));
 		LuaDiagnosisPosition end(_parser->GetTotalLine() + 1, 0);
 		PushDiagnosis(LText("The code must end with a new line"), start, end);
 	}
