@@ -3,7 +3,7 @@
 #include "LuaParser/LuaTokenTypeDetail.h"
 #include "Util/format.h"
 #include "CodeService/LanguageTranslator.h"
-
+#include "Util/StringUtil.h"
 
 NameStyleRuleMatcher::NameStyleRule::NameStyleRule(NameStyleType type)
 	: Type(type)
@@ -433,7 +433,8 @@ bool NameStyleRuleMatcher::Same(DiagnosisContext& ctx, std::shared_ptr<CheckElem
 			return SameSimple(filename, checkElement);
 		}
 	}
-	else if (firstParam.size() > 2 && (firstParam.starts_with("\'") || firstParam.starts_with("\"")))
+	else if (firstParam.size() > 2 && (StringUtil::StartWith(firstParam, "\'") || StringUtil::StartWith(
+		firstParam, "\"")))
 	{
 		auto name = firstParam.substr(1, firstParam.size() - 2);
 		return checkElement->Node->GetText() == name;
@@ -488,7 +489,7 @@ bool NameStyleRuleMatcher::SameCamel(std::string_view text, std::shared_ptr<Chec
 
 	for (auto it = textParts.rbegin(); it != textParts.rend(); ++it)
 	{
-		if (checkText.ends_with(*it))
+		if (StringUtil::EndWith(checkText, *it))
 		{
 			if (checkText.size() == it->size())
 			{
@@ -518,7 +519,7 @@ bool NameStyleRuleMatcher::SamePascal(std::string_view text, std::shared_ptr<Che
 
 	for (auto it = textParts.rbegin(); it != textParts.rend(); --it)
 	{
-		if (checkText.ends_with(*it))
+		if (StringUtil::EndWith(checkText, *it))
 		{
 			if (checkText.size() == it->size())
 			{
