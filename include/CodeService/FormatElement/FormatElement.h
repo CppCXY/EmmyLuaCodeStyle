@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <optional>
 #include "LuaParser/LuaAstNode/LuaAstNode.h"
 #include "FormatElementType.h"
 #include "FormatContext.h"
