@@ -4,6 +4,12 @@
 #include "CodeService/LuaFormatter.h"
 #include "LuaParser/LuaParser.h"
 
+// workaround for C++17
+bool StartWith(const std::string& source, const std::string& str)
+{
+	return source.find(str) == 0;
+}
+
 LuaCodeFormat& LuaCodeFormat::GetInstance()
 {
 	static LuaCodeFormat instance;
@@ -42,9 +48,9 @@ void LuaCodeFormat::UpdateCodeStyle(const std::string& workspaceUri, const std::
 
 void LuaCodeFormat::RemoveCodeStyle(const std::string& workspaceUri)
 {
-	for(auto it = _editorConfigVector.begin();it != _editorConfigVector.end();++it)
+	for (auto it = _editorConfigVector.begin(); it != _editorConfigVector.end(); ++it)
 	{
-		if(it->first == workspaceUri)
+		if (it->first == workspaceUri)
 		{
 			_editorConfigVector.erase(it);
 			return;
@@ -79,7 +85,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaCodeFormat::GetOptions(const std::string
 	std::shared_ptr<LuaCodeStyleOptions> options = _defaultOptions;
 	for (auto it = _editorConfigVector.begin(); it != _editorConfigVector.end(); it++)
 	{
-		if (uri.starts_with(it->first) && it->first.size() > matchLength)
+		if (StartWith(uri, it->first) && it->first.size() > matchLength)
 		{
 			matchLength = it->first.size();
 			options = it->second->Generate(uri);
