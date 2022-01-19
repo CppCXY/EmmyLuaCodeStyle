@@ -18,12 +18,12 @@ FormatElementType TextElement::GetType()
 	return FormatElementType::TextElement;
 }
 
-void TextElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
+void TextElement::Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatElement& parent)
 {
 	ctx.Print(*this);
 }
 
-void TextElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
+void TextElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt, FormatElement& parent)
 {
 	const int character = ctx.GetColumn(_textRange.EndOffset);
 	ctx.SetCharacterCount(character + 1);

@@ -289,10 +289,10 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 	return result;
 }
 
-// std::vector<vscode::CompletionItem> ModuleService::GetRequireCompletions(std::shared_ptr<LuaAstNode> expression,
-//                                                                          std::shared_ptr<LuaParser> parser,
-//                                                                          std::shared_ptr<LuaCodeStyleOptions> options,
-//                                                                          std::string_view uri)
-// {
-//
-// }
+std::vector<vscode::CompletionItem> ModuleService::GetRequireCompletions(std::shared_ptr<LuaAstNode> expression,
+                                                                         std::shared_ptr<LuaParser> parser,
+                                                                         std::shared_ptr<LuaCodeStyleOptions> options,
+                                                                         std::string_view uri)
+{
+	return {};
+}

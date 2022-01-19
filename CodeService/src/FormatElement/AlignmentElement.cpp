@@ -12,7 +12,7 @@ FormatElementType AlignmentElement::GetType()
 	return FormatElementType::AlignmentElement;
 }
 
-void AlignmentElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt,
+void AlignmentElement::Serialize(FormatContext& ctx, ChildIterator& selfIt,
                                  FormatElement& parent)
 {
 	const int blank = _alignmentPosition - static_cast<int>(ctx.GetCharacterCount());
@@ -22,15 +22,10 @@ void AlignmentElement::Serialize(FormatContext& ctx, std::optional<FormatElement
 	}
 }
 
-void AlignmentElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt,
+void AlignmentElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt,
                                  FormatElement& parent)
 {
-	if (!selfIt.has_value())
-	{
-		return;
-	}
-	auto it = selfIt.value();
-	const int nextOffset = GetNextValidOffset(it, parent);
+	const int nextOffset = GetNextValidOffset(selfIt, parent);
 	if (nextOffset == -1)
 	{
 		return;

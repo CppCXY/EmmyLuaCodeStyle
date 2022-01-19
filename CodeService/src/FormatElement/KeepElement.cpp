@@ -12,16 +12,12 @@ FormatElementType KeepElement::GetType()
 	return FormatElementType::KeepElement;
 }
 
-void KeepElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt,
+void KeepElement::Serialize(FormatContext& ctx, ChildIterator& selfIt,
                             FormatElement& parent)
 {
-	if (!selfIt.has_value())
-	{
-		return;
-	}
 
-	const int lastElementLine = GetLastValidLine(ctx, selfIt.value(), parent);
-	const int nextElementLine = GetNextValidLine(ctx, selfIt.value(), parent);
+	const int lastElementLine = GetLastValidLine(ctx, selfIt, parent);
+	const int nextElementLine = GetNextValidLine(ctx, selfIt, parent);
 
 	if (nextElementLine == -1)
 	{
@@ -43,22 +39,17 @@ void KeepElement::Serialize(FormatContext& ctx, std::optional<FormatElement::Chi
 	}
 }
 
-void KeepElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt,
+void KeepElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt,
                             FormatElement& parent)
 {
-	if (!selfIt.has_value())
+
+	if(selfIt == parent.GetChildren().begin())
 	{
 		return;
 	}
 
-	const auto it = selfIt.value();
-	if(it == parent.GetChildren().begin())
-	{
-		return;
-	}
-
-	const int lastOffset = GetLastValidOffset(it, parent);
-	const int nextOffset = GetNextValidOffset(it, parent);
+	const int lastOffset = GetLastValidOffset(selfIt, parent);
+	const int nextOffset = GetNextValidOffset(selfIt, parent);
 
 	if (nextOffset == -1)
 	{

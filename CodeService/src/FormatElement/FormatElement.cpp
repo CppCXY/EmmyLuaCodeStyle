@@ -61,7 +61,7 @@ std::shared_ptr<FormatElement> FormatElement::LastValidElement() const
 	return nullptr;
 }
 
-void FormatElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
+void FormatElement::Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatElement& parent)
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
@@ -69,7 +69,7 @@ void FormatElement::Serialize(FormatContext& ctx, std::optional<FormatElement::C
 	}
 }
 
-void FormatElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
+void FormatElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt, FormatElement& parent)
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
@@ -80,13 +80,19 @@ void FormatElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement
 void FormatElement::Format(FormatContext& ctx)
 {
 	// workaround
-	return Serialize(ctx, {}, *this);
+	for (auto it = _children.begin(); it != _children.end(); ++it)
+	{
+		(*it)->Serialize(ctx, it, *this);
+	}
 }
 
 void FormatElement::DiagnosisCodeStyle(DiagnosisContext& ctx)
 {
 	// workaround
-	return Diagnosis(ctx, {}, *this);
+	for (auto it = _children.begin(); it != _children.end(); ++it)
+	{
+		(*it)->Diagnosis(ctx, it, *this);
+	}
 }
 
 void FormatElement::AddTextRange(TextRange range)
@@ -126,10 +132,10 @@ int FormatElement::GetNextValidLine(FormatContext& ctx, ChildIterator it, Format
 	}
 }
 
-int FormatElement::GetLastValidOffset(ChildIterator it, FormatElement& parent)
+int FormatElement::GetLastValidOffset(ChildIterator& it, FormatElement& parent)
 {
 	auto& siblings = parent.GetChildren();
-	auto rIt = std::reverse_iterator<decltype(it)>(it);
+	auto rIt = std::reverse_iterator<std::remove_reference_t<decltype(it)>>(it);
 
 	for (; rIt != siblings.rend(); ++rIt)
 	{
@@ -145,7 +151,7 @@ int FormatElement::GetLastValidOffset(ChildIterator it, FormatElement& parent)
 	return parent.GetTextRange().StartOffset;
 }
 
-int FormatElement::GetNextValidOffset(ChildIterator it, FormatElement& parent)
+int FormatElement::GetNextValidOffset(ChildIterator& it, FormatElement& parent)
 {
 
 	auto& siblings = parent.GetChildren();

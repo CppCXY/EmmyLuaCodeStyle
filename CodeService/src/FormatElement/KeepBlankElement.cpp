@@ -12,29 +12,21 @@ FormatElementType KeepBlankElement::GetType()
 	return FormatElementType::KeepBlankElement;
 }
 
-void KeepBlankElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
+void KeepBlankElement::Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatElement& parent)
 {
-	if(selfIt.has_value())
+	int nextOffset = GetNextValidOffset(selfIt, parent);
+	if (nextOffset != -1)
 	{
-		int nextOffset = GetNextValidOffset(selfIt.value(), parent);
-		if (nextOffset != -1)
-		{
-			ctx.PrintBlank(_blank);
-		}
+		ctx.PrintBlank(_blank);
 	}
 }
 
-void KeepBlankElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
+void KeepBlankElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt, FormatElement& parent)
 {
-	if(!selfIt.has_value())
-	{
-		return;
-	}
+	const int lastOffset = GetLastValidOffset(selfIt, parent);
+	const int nextOffset = GetNextValidOffset(selfIt, parent);
 
-	const int lastOffset = GetLastValidOffset(selfIt.value(), parent);
-	const int nextOffset = GetNextValidOffset(selfIt.value(), parent);
-
- 	if (nextOffset == -1)
+	if (nextOffset == -1)
 	{
 		return;
 	}

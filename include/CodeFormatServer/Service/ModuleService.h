@@ -41,10 +41,10 @@ public:
 	                                                         std::shared_ptr<LuaCodeStyleOptions> options,
 	                                                         std::string_view uri);
 
-	// std::vector<vscode::CompletionItem> GetRequireCompletions(std::shared_ptr<LuaAstNode> expression,
-	//                                                           std::shared_ptr<LuaParser> parser,
-	//                                                           std::shared_ptr<LuaCodeStyleOptions> options,
-	//                                                           std::string_view uri);
+	std::vector<vscode::CompletionItem> GetRequireCompletions(std::shared_ptr<LuaAstNode> expression,
+	                                                          std::shared_ptr<LuaParser> parser,
+	                                                          std::shared_ptr<LuaCodeStyleOptions> options,
+	                                                          std::string_view uri);
 
 private:
 	ModuleIndex _moduleIndex;

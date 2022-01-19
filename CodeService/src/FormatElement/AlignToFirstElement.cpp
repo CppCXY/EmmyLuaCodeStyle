@@ -10,7 +10,7 @@ FormatElementType AlignToFirstElement::GetType()
 	return FormatElementType::AlignToFirstElement;
 }
 
-void AlignToFirstElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
+void AlignToFirstElement::Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatElement& parent)
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
@@ -46,7 +46,7 @@ void AlignToFirstElement::Serialize(FormatContext& ctx, std::optional<FormatElem
 	}
 }
 
-void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt, FormatElement& parent)
+void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt, FormatElement& parent)
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{

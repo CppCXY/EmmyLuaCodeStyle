@@ -8,7 +8,7 @@
 #include "CodeService/LanguageTranslator.h"
 #include "CodeService/LuaFormatRange.h"
 
-// 智能指针对多态支持可能有问题
+
 class FormatElement //: std::enable_shared_from_this<FormatElement>
 {
 public:
@@ -20,9 +20,9 @@ public:
 
 	virtual FormatElementType GetType();
 
-	virtual void Serialize(FormatContext& ctx, std::optional<ChildIterator> selfIt, FormatElement& parent);
+	virtual void Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatElement& parent);
 
-	virtual void Diagnosis(DiagnosisContext& ctx, std::optional<ChildIterator> selfIt, FormatElement& parent);
+	virtual void Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt, FormatElement& parent);
 
 	void Format(FormatContext& ctx);
 
@@ -47,8 +47,8 @@ public:
 	}
 
 protected:
-	static int GetLastValidOffset(ChildIterator it, FormatElement& parent);
-	static int GetNextValidOffset(ChildIterator it, FormatElement& parent);
+	static int GetLastValidOffset(ChildIterator& it, FormatElement& parent);
+	static int GetNextValidOffset(ChildIterator& it, FormatElement& parent);
 
 	static int GetLastValidLine(FormatContext& ctx, ChildIterator it, FormatElement& parent);
 	static int GetNextValidLine(FormatContext& ctx, ChildIterator it, FormatElement& parent);

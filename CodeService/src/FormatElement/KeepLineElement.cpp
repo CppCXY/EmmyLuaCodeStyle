@@ -12,16 +12,11 @@ FormatElementType KeepLineElement::GetType()
 	return FormatElementType::KeepLineElement;
 }
 
-void KeepLineElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt,
+void KeepLineElement::Serialize(FormatContext& ctx, ChildIterator& selfIt,
                                 FormatElement& parent)
 {
-	if (!selfIt.has_value())
-	{
-		return;
-	}
-
-	const int lastElementLine = GetLastValidLine(ctx, selfIt.value(), parent);
-	const int nextElementLine = GetNextValidLine(ctx, selfIt.value(), parent);
+	const int lastElementLine = GetLastValidLine(ctx, selfIt, parent);
+	const int nextElementLine = GetNextValidLine(ctx, selfIt, parent);
 
 	if (nextElementLine == -1)
 	{
@@ -41,18 +36,13 @@ void KeepLineElement::Serialize(FormatContext& ctx, std::optional<FormatElement:
 	ctx.PrintLine(line);
 }
 
-void KeepLineElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt,
+void KeepLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt,
                                 FormatElement& parent)
 {
 	ctx.SetCharacterCount(0);
 
-	if (!selfIt.has_value())
-	{
-		return;
-	}
-
-	const int lastElementOffset = GetLastValidOffset(selfIt.value(), parent);
-	const int nextElementOffset = GetNextValidOffset(selfIt.value(), parent);
+	const int lastElementOffset = GetLastValidOffset(selfIt, parent);
+	const int nextElementOffset = GetNextValidOffset(selfIt, parent);
 
 	if (nextElementOffset == -1)
 	{

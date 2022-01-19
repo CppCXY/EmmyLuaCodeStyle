@@ -50,6 +50,7 @@ target_sources(CodeFormatServer
 
 	#Service/AstUtil
 	${CodeFormatServer_SOURCE_DIR}/src/Service/AstUtil/ModuleFinder.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/Service/AstUtil/AstPattern.cpp
 
 	#service
 	${CodeFormatServer_SOURCE_DIR}/src/Service/Service.cpp

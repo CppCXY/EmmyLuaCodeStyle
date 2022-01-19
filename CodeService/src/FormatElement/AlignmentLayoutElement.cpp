@@ -22,7 +22,7 @@ FormatElementType AlignmentLayoutElement::GetType()
 	return FormatElementType::AlignmentLayoutElement;
 }
 
-void AlignmentLayoutElement::Serialize(FormatContext& ctx, std::optional<FormatElement::ChildIterator> selfIt,
+void AlignmentLayoutElement::Serialize(FormatContext& ctx, ChildIterator& selfIt,
                                        FormatElement& parent)
 {
 	const auto eqPosition = GetAlignPosition(ctx.GetParser());
@@ -37,7 +37,7 @@ void AlignmentLayoutElement::Serialize(FormatContext& ctx, std::optional<FormatE
 	}
 }
 
-void AlignmentLayoutElement::Diagnosis(DiagnosisContext& ctx, std::optional<FormatElement::ChildIterator> selfIt,
+void AlignmentLayoutElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt,
                                        FormatElement& parent)
 {
 	const auto eqPosition = GetAlignPosition(ctx.GetParser());
@@ -103,7 +103,7 @@ int AlignmentLayoutElement::GetAlignPosition(std::shared_ptr<LuaParser> luaParse
 	return eqAlignedPosition;
 }
 
-void AlignmentLayoutElement::AlignmentSerialize(FormatContext& ctx, std::optional<ChildIterator> selfIt, int eqPosition,
+void AlignmentLayoutElement::AlignmentSerialize(FormatContext& ctx, ChildIterator& selfIt, int eqPosition,
                                                 FormatElement& parent)
 {
 	for (const auto& statChild : _children)
@@ -132,7 +132,7 @@ void AlignmentLayoutElement::AlignmentSerialize(FormatContext& ctx, std::optiona
 }
 
 void AlignmentLayoutElement::AlignmentDiagnosis(DiagnosisContext& ctx,
-                                                std::optional<FormatElement::ChildIterator> selfIt,
+                                                ChildIterator& selfIt,
                                                 int eqPosition, FormatElement& parent)
 {
 	for (const auto& statChild : _children)
