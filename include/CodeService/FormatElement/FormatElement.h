@@ -8,7 +8,7 @@
 #include "CodeService/LuaFormatRange.h"
 
 
-class FormatElement //: std::enable_shared_from_this<FormatElement>
+class FormatElement : public std::enable_shared_from_this<FormatElement>
 {
 public:
 	using ChildContainer = std::vector<std::shared_ptr<FormatElement>>;
@@ -19,9 +19,9 @@ public:
 
 	virtual FormatElementType GetType();
 
-	virtual void Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatElement& parent);
+	virtual void Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent);
 
-	virtual void Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt, FormatElement& parent);
+	virtual void Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent);
 
 	void Format(FormatContext& ctx);
 

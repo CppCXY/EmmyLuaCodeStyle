@@ -13,7 +13,7 @@ FormatElementType IndentElement::GetType()
 	return FormatElementType::IndentElement;
 }
 
-void IndentElement::Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatElement& parent)
+void IndentElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	ctx.AddIndent(_specialIndent);
 
@@ -22,7 +22,7 @@ void IndentElement::Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatE
 	ctx.RecoverIndent();
 }
 
-void IndentElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt, FormatElement& parent)
+void IndentElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	ctx.AddIndent(_specialIndent);
 

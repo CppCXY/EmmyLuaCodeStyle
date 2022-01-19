@@ -12,8 +12,8 @@ public:
 
 	FormatElementType GetType() override;
 
-	void Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatElement& parent) override;
-	void Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt, FormatElement& parent) override;
+	void Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
+	void Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
 
 	std::string_view GetText() const;
 	void SetTextDefineType(TextDefineType textDefineType);

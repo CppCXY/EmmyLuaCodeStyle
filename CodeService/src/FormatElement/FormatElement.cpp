@@ -61,7 +61,7 @@ std::shared_ptr<FormatElement> FormatElement::LastValidElement() const
 	return nullptr;
 }
 
-void FormatElement::Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatElement& parent)
+void FormatElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
@@ -69,30 +69,30 @@ void FormatElement::Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatE
 	}
 }
 
-void FormatElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt, FormatElement& parent)
+void FormatElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
 		(*it)->Diagnosis(ctx, it, *this);
 	}
-} 
+}
 
 void FormatElement::Format(FormatContext& ctx)
 {
 	// workaround
-	for (auto it = _children.begin(); it != _children.end(); ++it)
-	{
-		(*it)->Serialize(ctx, it, *this);
-	}
+	auto root = std::make_shared<FormatElement>();
+	root->AddChild(shared_from_this());
+	auto it = root->GetChildren().begin();
+	Serialize(ctx, it, *root);
 }
 
 void FormatElement::DiagnosisCodeStyle(DiagnosisContext& ctx)
 {
 	// workaround
-	for (auto it = _children.begin(); it != _children.end(); ++it)
-	{
-		(*it)->Diagnosis(ctx, it, *this);
-	}
+	auto root = std::make_shared<FormatElement>();
+	root->AddChild(shared_from_this());
+	auto it = root->GetChildren().begin();
+	Diagnosis(ctx, it, *root);
 }
 
 void FormatElement::AddTextRange(TextRange range)
@@ -139,7 +139,6 @@ int FormatElement::GetLastValidOffset(ChildIterator& it, FormatElement& parent)
 
 	for (; rIt != siblings.rend(); ++rIt)
 	{
-
 		auto sibling = *rIt;
 		if (sibling->HasValidTextRange())
 		{
@@ -153,7 +152,6 @@ int FormatElement::GetLastValidOffset(ChildIterator& it, FormatElement& parent)
 
 int FormatElement::GetNextValidOffset(ChildIterator& it, FormatElement& parent)
 {
-
 	auto& siblings = parent.GetChildren();
 	++it;
 	for (; it != siblings.end(); ++it)

@@ -12,8 +12,7 @@ FormatElementType AlignmentElement::GetType()
 	return FormatElementType::AlignmentElement;
 }
 
-void AlignmentElement::Serialize(FormatContext& ctx, ChildIterator& selfIt,
-                                 FormatElement& parent)
+void AlignmentElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	const int blank = _alignmentPosition - static_cast<int>(ctx.GetCharacterCount());
 	if (blank > 0)
@@ -22,8 +21,7 @@ void AlignmentElement::Serialize(FormatContext& ctx, ChildIterator& selfIt,
 	}
 }
 
-void AlignmentElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt,
-                                 FormatElement& parent)
+void AlignmentElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	const int nextOffset = GetNextValidOffset(selfIt, parent);
 	if (nextOffset == -1)

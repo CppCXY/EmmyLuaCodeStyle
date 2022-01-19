@@ -12,7 +12,7 @@ FormatElementType KeepElement::GetType()
 	return FormatElementType::KeepElement;
 }
 
-void KeepElement::Serialize(FormatContext& ctx, ChildIterator& selfIt,
+void KeepElement::Serialize(FormatContext& ctx, ChildIterator selfIt,
                             FormatElement& parent)
 {
 
@@ -39,7 +39,7 @@ void KeepElement::Serialize(FormatContext& ctx, ChildIterator& selfIt,
 	}
 }
 
-void KeepElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt,
+void KeepElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
                             FormatElement& parent)
 {
 

@@ -12,7 +12,7 @@ FormatElementType KeepLineElement::GetType()
 	return FormatElementType::KeepLineElement;
 }
 
-void KeepLineElement::Serialize(FormatContext& ctx, ChildIterator& selfIt,
+void KeepLineElement::Serialize(FormatContext& ctx, ChildIterator selfIt,
                                 FormatElement& parent)
 {
 	const int lastElementLine = GetLastValidLine(ctx, selfIt, parent);
@@ -36,7 +36,7 @@ void KeepLineElement::Serialize(FormatContext& ctx, ChildIterator& selfIt,
 	ctx.PrintLine(line);
 }
 
-void KeepLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt,
+void KeepLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
                                 FormatElement& parent)
 {
 	ctx.SetCharacterCount(0);

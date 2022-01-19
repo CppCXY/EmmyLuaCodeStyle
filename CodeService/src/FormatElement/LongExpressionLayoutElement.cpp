@@ -12,7 +12,7 @@ FormatElementType LongExpressionLayoutElement::GetType()
 	return FormatElementType::LongExpressionLayoutElement;
 }
 
-void LongExpressionLayoutElement::Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatElement& parent)
+void LongExpressionLayoutElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	SerializeSubExpression(ctx, *this);
 	if (_hasContinuation)
@@ -21,7 +21,7 @@ void LongExpressionLayoutElement::Serialize(FormatContext& ctx, ChildIterator& s
 	}
 }
 
-void LongExpressionLayoutElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt, FormatElement& parent)
+void LongExpressionLayoutElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	DiagnosisSubExpression(ctx, *this);
 	if (_hasContinuation)

@@ -12,7 +12,7 @@ FormatElementType KeepBlankElement::GetType()
 	return FormatElementType::KeepBlankElement;
 }
 
-void KeepBlankElement::Serialize(FormatContext& ctx, ChildIterator& selfIt, FormatElement& parent)
+void KeepBlankElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	int nextOffset = GetNextValidOffset(selfIt, parent);
 	if (nextOffset != -1)
@@ -21,7 +21,7 @@ void KeepBlankElement::Serialize(FormatContext& ctx, ChildIterator& selfIt, Form
 	}
 }
 
-void KeepBlankElement::Diagnosis(DiagnosisContext& ctx, ChildIterator& selfIt, FormatElement& parent)
+void KeepBlankElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	const int lastOffset = GetLastValidOffset(selfIt, parent);
 	const int nextOffset = GetNextValidOffset(selfIt, parent);
