@@ -20,7 +20,7 @@ public:
 
 	std::string Reformat(const std::string& uri, std::string&& text);
 
-	std::string RangeFormat(const std::string uri, LuaFormatRange range, std::string&& text);
+	std::string RangeFormat(const std::string uri, LuaFormatRange& range, std::string&& text);
 
 	std::shared_ptr<LuaCodeStyleOptions> GetOptions(const std::string& uri);
 private:

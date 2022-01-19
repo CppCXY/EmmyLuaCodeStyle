@@ -69,9 +69,20 @@ std::string LuaCodeFormat::Reformat(const std::string& uri, std::string&& text)
 	return formatter.GetFormattedText();
 }
 
-std::string LuaCodeFormat::RangeFormat(const std::string uri, LuaFormatRange range, std::string&& text)
+std::string LuaCodeFormat::RangeFormat(const std::string uri, LuaFormatRange& range, std::string&& text)
 {
-	return "";
+	auto parser = LuaParser::LoadFromBuffer(std::move(text));
+	parser->BuildAstWithComment();
+
+	if (!parser->GetErrors().empty())
+	{
+		return "";
+	}
+	auto options = GetOptions(uri);
+	LuaFormatter formatter(parser, *options);
+	formatter.BuildRangeFormattedElement(range);
+
+	return formatter.GetFormattedText();
 }
 
 std::shared_ptr<LuaCodeStyleOptions> LuaCodeFormat::GetOptions(const std::string& uri)
