@@ -80,13 +80,13 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 	for (auto& [sectionPattern, section] : _sectionMap)
 	{
 		// [*] [*.lua] [*.{lua,js,ts}]
-		if (sectionPattern == "*" || sectionPattern == "*.lua" || sectionPattern.starts_with("*.{"))
+		if (sectionPattern == "*" || sectionPattern == "*.lua" || StringUtil::StartWith(sectionPattern, "*.{"))
 		{
 			patternKey.append("#").append(sectionPattern);
 			luaSections.push_back(section);
 		}
 			// [{test.lua,lib.lua}]
-		else if (sectionPattern.starts_with("{") && sectionPattern.ends_with("}"))
+		else if (StringUtil::StartWith(sectionPattern,"{") && StringUtil::EndWith(sectionPattern, "}"))
 		{
 			auto fileListText = sectionPattern.substr(1, sectionPattern.size() - 2);
 			auto fileList = StringUtil::Split(fileListText, ",");
@@ -101,7 +101,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 			}
 		}
 			// [lib/**.lua]
-		else if (sectionPattern.ends_with("**.lua"))
+		else if (StringUtil::EndWith(sectionPattern, "**.lua"))
 		{
 			std::string prefix = sectionPattern.substr(0, sectionPattern.size() - 6);
 			std::filesystem::path workspace(_workspace);
@@ -110,7 +110,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 			std::filesystem::path file(fileUri);
 			auto dirNormal = dirname.lexically_normal();
 			auto fileNormal = file.lexically_normal();
-			if (fileNormal.string().starts_with(dirNormal.string()))
+			if (StringUtil::StartWith(fileNormal.string(),dirNormal.string()))
 			{
 				patternKey.append("#").append(sectionPattern);
 				luaSections.push_back(section);

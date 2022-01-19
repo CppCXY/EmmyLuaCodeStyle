@@ -1,5 +1,6 @@
 #include "Util/StringUtil.h"
 #include <cstdlib>
+#include <cstring>
 
 std::vector<std::string_view> StringUtil::Split(std::string_view source, std::string_view separator)
 {
@@ -64,7 +65,7 @@ std::string_view StringUtil::TrimSpace(std::string_view source)
 
 std::string StringUtil::Replace(std::string_view source, std::string_view oldString, std::string_view newString)
 {
-	if(oldString.empty())
+	if (oldString.empty())
 	{
 		return std::string(source);
 	}
@@ -73,11 +74,11 @@ std::string StringUtil::Replace(std::string_view source, std::string_view oldStr
 	// 假设只有一次替换
 	result.reserve(source.size() - oldString.size() + newString.size());
 
-	while(true)
+	while (true)
 	{
 		auto findPosition = source.find_first_of(oldString);
 		result.append(source.substr(0, findPosition));
-		if(findPosition == std::string_view::npos)
+		if (findPosition == std::string_view::npos)
 		{
 			break;
 		}
@@ -88,15 +89,35 @@ std::string StringUtil::Replace(std::string_view source, std::string_view oldStr
 	return result;
 }
 
-bool StringUtil::IsStringEqualIgnoreCase(std::string_view lhs, std::string_view rhs)
+bool StringUtil::StartWith(const std::string& source, const std::string& str)
 {
-	if(lhs.size() != rhs.size())
+	if (source.size() < str.size())
 	{
 		return false;
 	}
-	for(std::size_t i = 0;i!=lhs.size();i++)
+
+	return strncmp(source.data(), str.data(), str.size()) == 0;
+}
+
+bool StringUtil::EndWith(const std::string& source, const std::string& str)
+{
+	if (source.size() < str.size())
 	{
-		if(::tolower(lhs[i]) != ::tolower(rhs[i]))
+		return false;
+	}
+
+	return strncmp(source.data() + source.size() - str.size(), str.data(), str.size()) == 0;
+}
+
+bool StringUtil::IsStringEqualIgnoreCase(std::string_view lhs, std::string_view rhs)
+{
+	if (lhs.size() != rhs.size())
+	{
+		return false;
+	}
+	for (std::size_t i = 0; i != lhs.size(); i++)
+	{
+		if (::tolower(lhs[i]) != ::tolower(rhs[i]))
 		{
 			return false;
 		}
