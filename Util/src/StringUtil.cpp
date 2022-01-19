@@ -89,7 +89,7 @@ std::string StringUtil::Replace(std::string_view source, std::string_view oldStr
 	return result;
 }
 
-bool StringUtil::StartWith(const std::string& source, const std::string& str)
+bool StringUtil::StartWith(std::string_view source, std::string_view str)
 {
 	if (source.size() < str.size())
 	{
@@ -99,7 +99,7 @@ bool StringUtil::StartWith(const std::string& source, const std::string& str)
 	return strncmp(source.data(), str.data(), str.size()) == 0;
 }
 
-bool StringUtil::EndWith(const std::string& source, const std::string& str)
+bool StringUtil::EndWith(std::string_view source, std::string_view str)
 {
 	if (source.size() < str.size())
 	{

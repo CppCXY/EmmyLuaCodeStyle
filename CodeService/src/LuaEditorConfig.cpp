@@ -92,7 +92,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 			auto fileList = StringUtil::Split(fileListText, ",");
 			for (auto fileMatchUri : fileList)
 			{
-				if (fileUri.ends_with(StringUtil::TrimSpace(fileMatchUri)))
+				if (StringUtil::EndWith(fileUri,StringUtil::TrimSpace(fileMatchUri)))
 				{
 					patternKey.append("#").append(sectionPattern);
 					luaSections.push_back(section);
