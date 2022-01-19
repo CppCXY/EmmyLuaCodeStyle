@@ -80,9 +80,9 @@ std::string LuaCodeFormat::RangeFormat(const std::string uri, LuaFormatRange& ra
 	}
 	auto options = GetOptions(uri);
 	LuaFormatter formatter(parser, *options);
-	formatter.BuildRangeFormattedElement(range);
+	formatter.BuildFormattedElement();
 
-	return formatter.GetFormattedText();
+	return formatter.GetRangeFormattedText(range);
 }
 
 std::shared_ptr<LuaCodeStyleOptions> LuaCodeFormat::GetOptions(const std::string& uri)
