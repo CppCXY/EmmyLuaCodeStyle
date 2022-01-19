@@ -21,7 +21,7 @@ public:
 
 	LuaAstNode(LuaAstNodeType type, LuaToken& token);
 
-	~LuaAstNode();
+	virtual ~LuaAstNode();
 
 	std::shared_ptr<LuaAstNode> Copy();
 

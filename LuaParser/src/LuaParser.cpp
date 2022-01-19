@@ -107,8 +107,12 @@ bool LuaParser::IsEmptyLine(int line)
 void LuaParser::SetFilename(std::string_view filename)
 {
 	std::filesystem::path path(filename);
-
+#ifdef NOT_SURPPORT_FILE_SYSTEM
+	_file->SetFilename(path.string());
+#else
 	_file->SetFilename(path.replace_extension().string());
+#endif
+
 }
 
 std::string_view LuaParser::GetFilename()
