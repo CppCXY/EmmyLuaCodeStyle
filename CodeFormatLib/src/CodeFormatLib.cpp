@@ -1,5 +1,5 @@
 #include "lua.hpp"
-#include "CodeService/LuaFormatter.h"
+#include "LuaCodeFormat.h"
 
 #ifdef MSVC
 #define EXPORT    __declspec(dllexport)
@@ -7,44 +7,106 @@
 #define EXPORT   
 #endif
 
-
 int format(lua_State* L)
 {
 	int top = lua_gettop(L);
 
-	if (top == 0)
+	if (top < 2)
 	{
 		return 0;
 	}
 
-	if (lua_isstring(L, 1))
+	if (lua_isstring(L, 1) && lua_isstring(L, 2))
 	{
-		std::string buffer = lua_tostring(L, 1);
-		auto parser = LuaParser::LoadFromBuffer(std::move(buffer));
-		parser->BuildAstWithComment();
-
-		if (!parser->GetErrors().empty())
+		try
 		{
-			lua_pushboolean(L, false);
-			return 1;
+			std::string filename = lua_tostring(L, 1);
+			std::string text = lua_tostring(L, 2);
+			auto formattedText = LuaCodeFormat::GetInstance().Reformat(filename, std::move(text));
+			if (formattedText.empty())
+			{
+				lua_pushboolean(L, false);
+				return 1;
+			}
+			lua_pushboolean(L, true);
+			lua_pushlstring(L, formattedText.c_str(), formattedText.size());
+			return 2;
 		}
-		LuaFormatOptions options;
-		LuaFormatter formatter(parser, options);
-		formatter.BuildFormattedElement();
-
-		std::string formattedText = formatter.GetFormattedText();
-		lua_pushboolean(L, true);
-		lua_pushlstring(L, formattedText.c_str(), formattedText.size());
-		return 2;
+		catch (std::exception& e)
+		{
+			std::string err = e.what();
+			lua_settop(L, top);
+			lua_pushboolean(L, false);
+			lua_pushlstring(L, err.c_str(), err.size());
+			return 2;
+		}
 	}
 	return 0;
 }
 
-static const luaL_Reg lib[] = {
-	{"format",format},
-	{nullptr, nullptr}
+enum class UpdateType
+{
+	Created = 1,
+	Changed = 2,
+	Deleted = 3
 };
 
+int range_format(lua_State* L)
+{
+	return 0;
+}
+
+int update_config(lua_State* L)
+{
+	int top = lua_gettop(L);
+
+	if (top < 3)
+	{
+		return 0;
+	}
+
+	if (lua_isinteger(L, 1) && lua_isstring(L, 2) && lua_isstring(L, 3))
+	{
+		try {
+			auto type = static_cast<UpdateType>(lua_tointeger(L, 1));
+			std::string workspaceUri = lua_tostring(L, 2);
+			std::string configPath = lua_tostring(L, 3);
+			switch (type)
+			{
+			case UpdateType::Created:
+			case UpdateType::Changed:
+			{
+				LuaCodeFormat::GetInstance().UpdateCodeStyle(workspaceUri, configPath);
+				break;
+			}
+			case UpdateType::Deleted:
+			{
+				LuaCodeFormat::GetInstance().RemoveCodeStyle(workspaceUri);
+				break;
+			}
+			}
+
+			lua_pushboolean(L, true);
+			return 1;
+		}
+		catch (std::exception& e)
+		{
+			std::string err = e.what();
+			lua_settop(L, top);
+			lua_pushboolean(L, false);
+			lua_pushlstring(L, err.c_str(), err.size());
+			return 2;
+		}
+	}
+
+	return 0;
+}
+
+static const luaL_Reg lib[] = {
+	{"format", format},
+	{"update_config", update_config},
+	{nullptr, nullptr}
+};
 
 extern "C"
 EXPORT int luaopen_code_format(lua_State* L)

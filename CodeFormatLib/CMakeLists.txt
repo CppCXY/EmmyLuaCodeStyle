@@ -19,6 +19,7 @@ target_include_directories(CodeFormatLib PUBLIC
 target_sources(CodeFormatLib
 	PUBLIC
 	${CodeFormatLib_SOURCE_DIR}/src/CodeFormatLib.cpp
+	${CodeFormatLib_SOURCE_DIR}/src/LuaCodeFormat.cpp
 )
 
 if(NOT WIN32)
