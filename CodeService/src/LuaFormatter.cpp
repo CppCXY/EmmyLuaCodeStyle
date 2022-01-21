@@ -395,7 +395,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalStatement(std::shared_pt
 				}
 
 				env->Add<TextElement>(node);
-				env->Add<KeepBlankElement>(1);
+				env->Add<KeepElement>(1);
 				break;
 			}
 		case LuaAstNodeType::NameDefList:
@@ -477,7 +477,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
 		{
 		case LuaAstNodeType::Identify:
 			{
-				env->Add<TextElement>(node, TextDefineType::LocalNameDefine);
+				env->Add<TextElement>(node);
 				break;
 			}
 		case LuaAstNodeType::GeneralOperator:
@@ -490,6 +490,16 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
 			{
 				env->AddChild(FormatNode(node));
 				env->Add<KeepElement>(1);
+				break;
+			}
+		case LuaAstNodeType::Attribute:
+			{
+				if(_options.keep_one_space_between_namedef_and_attribute)
+				{
+					env->Add<KeepBlankElement>(1);
+				}
+
+				env->AddChild(FormatNode(node));
 				break;
 			}
 		default:
@@ -1000,12 +1010,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 				env->AddChild(FormatNode(child));
 				break;
 			}
-		// case LuaAstNodeType::Expression:
-		// 	{
-		// 		FormatExpression(child, env);
-		// 		break;
-		// 	}
-		// default 一般只有一个分号
+			// case LuaAstNodeType::Expression:
+			// 	{
+			// 		FormatExpression(child, env);
+			// 		break;
+			// 	}
+			// default 一般只有一个分号
 		default:
 			{
 				DefaultHandle(child, env);

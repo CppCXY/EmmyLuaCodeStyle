@@ -64,6 +64,11 @@ public:
 	bool keep_one_space_between_table_and_bracket = true;
 
 	/*
+	 * 设定namedef 和 他的attribute之间是否间距一个空格
+	 */
+	bool keep_one_space_between_namedef_and_attribute = false;
+
+	/*
 	 * 既然大佬们觉得不好那就不开放选项的设置
 	 */
 	bool label_no_indent = false;

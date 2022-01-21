@@ -206,6 +206,12 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("keep_one_space_between_table_and_bracket") == "true";
 	}
 
+	if(configMap.count("keep_one_space_between_namedef_and_attribute"))
+	{
+		options->keep_one_space_between_namedef_and_attribute =
+			configMap.at("keep_one_space_between_namedef_and_attribute") == "true";
+	}
+
 	if (configMap.count("align_table_field_to_first_field"))
 	{
 		options->align_table_field_to_first_field = configMap.at("align_table_field_to_first_field") == "true";
