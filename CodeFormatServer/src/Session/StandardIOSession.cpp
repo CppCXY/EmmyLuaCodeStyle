@@ -5,6 +5,8 @@
 #ifndef _WIN32
 #include <unistd.h>
 #endif
+#include <thread>
+
 #include "CodeFormatServer/Protocol/ProtocolParser.h"
 #include "CodeFormatServer/Protocol/ProtocolBuffer.h"
 
@@ -56,7 +58,6 @@ bool StandardIO::HasError()
 void StandardIO::Write(std::string_view content)
 {
 	asio::write(*_out, asio::buffer(content.data(), content.size()));
-	std::cout.flush();
 }
 
 #else

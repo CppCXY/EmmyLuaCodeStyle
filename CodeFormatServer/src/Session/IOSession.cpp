@@ -25,6 +25,7 @@ int IOSession::Run(asio::io_context& ioc)
 		while(true)
 		{
 			ioc.run();
+			ioc.reset();
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 	});
