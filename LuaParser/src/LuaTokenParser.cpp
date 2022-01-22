@@ -1,5 +1,6 @@
 ﻿#include "LuaParser/LuaTokenParser.h"
 #include <limits>
+#include <cstdlib>
 #include "LuaDefine.h"
 #include "LuaParser/LuaIdentify.h"
 #include "LuaParser/LuaTokenTypeDetail.h"
@@ -520,8 +521,9 @@ LuaTokenType LuaTokenParser::ReadNumeral()
 			break;
 		}
 	}
-
-	if (lislalpha(GetCurrentChar())) /* is numeral touching a letter? */
+	
+	// fix bug:这里不能使用lislalpha,否则会错误的解析下一个unicode字符
+	if (std::isalpha(GetCurrentChar())) /* is numeral touching a letter? */
 	{
 		// luajit
 		if (CheckNext1('U'))
