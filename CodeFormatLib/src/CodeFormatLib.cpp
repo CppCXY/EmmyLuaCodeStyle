@@ -203,11 +203,11 @@ int diagnose_file(lua_State* L)
 					// end table
 					lua_newtable(L);
 					lua_pushstring(L, "line");
-					lua_pushinteger(L, diagnosticInfo.Range.Start.Line);
+					lua_pushinteger(L, diagnosticInfo.Range.End.Line);
 					lua_rawset(L, -3);
 
 					lua_pushstring(L, "character");
-					lua_pushinteger(L, diagnosticInfo.Range.Start.Character);
+					lua_pushinteger(L, diagnosticInfo.Range.End.Character);
 					lua_rawset(L, -3);
 
 					lua_rawset(L, -3); // set end = {}
