@@ -1,4 +1,4 @@
-#include "lua.hpp"
+﻿#include "lua.hpp"
 #include "LuaCodeFormat.h"
 
 #ifdef MSVC
@@ -142,10 +142,104 @@ int update_config(lua_State* L)
 	return 0;
 }
 
+int diagnose_file(lua_State* L)
+{
+	int top = lua_gettop(L);
+
+	if (top < 2)
+	{
+		return 0;
+	}
+
+	if (lua_isstring(L, 1) && lua_isstring(L, 2))
+	{
+		try
+		{
+			std::string filename = lua_tostring(L, 1);
+			std::string text = lua_tostring(L, 2);
+			auto result = LuaCodeFormat::GetInstance().Diagnose(filename, std::move(text));
+			if (!result.first)
+			{
+				lua_pushboolean(L, false);
+				return 1;
+			}
+			auto& diagnosticInfos = result.second;
+
+			lua_pushboolean(L, true);
+			int count = 1;
+			lua_newtable(L);
+			for (auto& diagnosticInfo : diagnosticInfos)
+			{
+				// 诊断信息表
+				lua_newtable(L);
+
+				//message
+				{
+					lua_pushstring(L, "message");
+					lua_pushlstring(L, diagnosticInfo.Message.c_str(), diagnosticInfo.Message.size());
+					lua_rawset(L, -3);
+				}
+
+				// range
+				{
+					lua_pushstring(L, "range");
+					//range table
+					lua_newtable(L);
+
+					lua_pushstring(L, "start");
+					// start table
+					lua_newtable(L);
+					lua_pushstring(L, "line");
+					lua_pushinteger(L, diagnosticInfo.Range.Start.Line);
+					lua_rawset(L, -3);
+
+					lua_pushstring(L, "character");
+					lua_pushinteger(L, diagnosticInfo.Range.Start.Character);
+					lua_rawset(L, -3);
+
+					lua_rawset(L, -3); // set start = {}
+
+					lua_pushstring(L, "end");
+					// end table
+					lua_newtable(L);
+					lua_pushstring(L, "line");
+					lua_pushinteger(L, diagnosticInfo.Range.Start.Line);
+					lua_rawset(L, -3);
+
+					lua_pushstring(L, "character");
+					lua_pushinteger(L, diagnosticInfo.Range.Start.Character);
+					lua_rawset(L, -3);
+
+					lua_rawset(L, -3); // set end = {}
+
+					lua_rawset(L, -3); // set range = {}
+				}
+
+				// 不确认lua会不会把他改成宏，所以不要在这里用++count
+				lua_rawseti(L, -2, count);
+				count++;
+			}
+
+			return 2;
+		}
+		catch (std::exception& e)
+		{
+			std::string err = e.what();
+			lua_settop(L, top);
+			lua_pushboolean(L, false);
+			lua_pushlstring(L, err.c_str(), err.size());
+			return 2;
+		}
+	}
+	return 0;
+}
+
+
 static const luaL_Reg lib[] = {
 	{"format", format},
 	{"range_format", range_format},
 	{"update_config", update_config},
+	{"diagnose_file", diagnose_file},
 	{nullptr, nullptr}
 };
 
