@@ -18,32 +18,41 @@ void FormatContext::AddIndent()
 	{
 		if (_indentStack.empty())
 		{
-			_indentStack.push_back({0, IndentStyle::Space});
+			_indentStack.push_back({0, 0, IndentStyle::Space});
 			return;
 		}
 
 		auto& topIndent = _indentStack.back();
-		std::size_t newIndent = _options.indent_size + topIndent.Indent;
+		std::size_t newIndent = _options.indent_size + topIndent.SpaceIndent;
 
-		_indentStack.push_back({newIndent, IndentStyle::Space});
+		_indentStack.push_back({newIndent, 0, IndentStyle::Space});
 	}
 	else
 	{
 		if (_indentStack.empty())
 		{
-			_indentStack.push_back({0, IndentStyle::Tab});
+			_indentStack.push_back({0, 0, IndentStyle::Tab});
 			return;
 		}
 
 		auto& topIndent = _indentStack.back();
+		IndentState state{topIndent.SpaceIndent, topIndent.TabIndent, IndentStyle::Tab};
+		if (topIndent.SpaceIndent != 0)
+		{
+			state.SpaceIndent += _options.tab_width;
+		}
+		else
+		{
+			state.TabIndent += 1;
+		}
 
-		_indentStack.push_back({1 + topIndent.Indent, IndentStyle::Tab});
+		_indentStack.push_back(state);
 	}
 }
 
-void FormatContext::AddIndent(std::size_t specialIndent, IndentStyle style)
+void FormatContext::AddIndent(IndentState state)
 {
-	_indentStack.push_back({specialIndent, style});
+	_indentStack.push_back(state);
 }
 
 void FormatContext::RecoverIndent()
@@ -66,29 +75,60 @@ int FormatContext::GetColumn(int offset)
 	return _parser->GetColumn(offset);
 }
 
+FormatContext::IndentState FormatContext::CalculateIndentState(int offset)
+{
+	auto file = _parser->GetLuaFile();
+	auto source = file->GetSource();
+	auto line = file->GetLine(offset);
+	auto start = file->GetOffsetFromPosition(line, 0);
+
+
+	IndentState state = {0, 0, IndentStyle::Space};
+	for (; start < offset; start++)
+	{
+		auto ch = source[start];
+		if (ch == '\t')
+		{
+			state.IndentStyle = IndentStyle::Tab;
+			state.TabIndent++;
+		}
+		else
+		{
+			state.SpaceIndent++;
+		}
+	}
+
+	if(state.TabIndent == 0 && state.SpaceIndent == 0)
+	{
+		state.IndentStyle = _options.indent_style;
+	}
+
+	return state;
+}
+
 std::size_t FormatContext::GetCharacterCount() const
 {
 	return _characterCount;
 }
 
-std::size_t FormatContext::GetCurrentIndent() const
+FormatContext::IndentState FormatContext::GetCurrentIndent() const
 {
 	if (_indentStack.empty())
 	{
-		return 0;
+		return IndentState{0, 0, _options.indent_style};
 	}
 
-	return _indentStack.back().Indent;
+	return _indentStack.back();
 }
 
-std::size_t FormatContext::GetLastIndent() const
+FormatContext::IndentState FormatContext::GetLastIndent() const
 {
 	if (_indentStack.size() < 2)
 	{
-		return 0;
+		return IndentState(0, 0, _options.indent_style);
 	}
 
-	return _indentStack[_indentStack.size() - 2].Indent;
+	return _indentStack[_indentStack.size() - 2];
 }
 
 std::shared_ptr<LuaParser> FormatContext::GetParser()

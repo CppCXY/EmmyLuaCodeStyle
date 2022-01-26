@@ -14,6 +14,8 @@ enum class IndentStyle
 	Space,
 };
 
+std::string GetIndentStyleName(IndentStyle style);
+
 class LuaCodeStyleOptions
 {
 public:

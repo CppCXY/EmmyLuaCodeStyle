@@ -11,27 +11,51 @@ void SerializeContext::Print(TextElement& textElement)
 	if (!_indentStack.empty())
 	{
 		auto& indentState = _indentStack.back();
-		if (_characterCount < indentState.Indent)
+		if (indentState.IndentStyle == IndentStyle::Space)
 		{
-			PrintIndent(indentState.Indent - _characterCount, indentState.IndentStyle);
+			if (_characterCount < indentState.SpaceIndent)
+			{
+				PrintIndent(indentState.SpaceIndent - _characterCount, indentState.IndentStyle);
+			}
+		}
+		else
+		{
+			if (_characterCount == 0)
+			{
+				PrintIndent(indentState.TabIndent, indentState.IndentStyle);
+				PrintIndent(indentState.SpaceIndent, IndentStyle::Space);
+			}
+			else if (_characterCount >= indentState.TabIndent && (indentState.SpaceIndent + indentState.TabIndent >
+				_characterCount))
+			{
+				PrintIndent(indentState.SpaceIndent - (_characterCount - indentState.TabIndent), IndentStyle::Space);
+			}
 		}
 	}
 	_os << textElement.GetText();
 	_characterCount += textElement.GetText().size();
 }
 
-void SerializeContext::PrintLine(std::size_t line)
+void SerializeContext::PrintLine(int line)
 {
-	for (std::size_t i = 0; i < line; i++)
+	if (line <= 0)
+	{
+		return;
+	}
+	for (int i = 0; i < line; i++)
 	{
 		_os << _options.end_of_line;
 		_characterCount = 0;
 	}
 }
 
-void SerializeContext::PrintBlank(std::size_t blank)
+void SerializeContext::PrintBlank(int blank)
 {
-	for (std::size_t i = 0; i < blank; i++)
+	if (blank <= 0)
+	{
+		return;
+	}
+	for (int i = 0; i < blank; i++)
 	{
 		_os << ' ';
 		_characterCount++;

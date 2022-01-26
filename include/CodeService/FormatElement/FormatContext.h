@@ -12,7 +12,8 @@ class FormatContext
 public:
 	struct IndentState
 	{
-		std::size_t Indent = 0;
+		std::size_t SpaceIndent = 0;
+		std::size_t TabIndent = 0;
 		IndentStyle IndentStyle = IndentStyle::Space;
 	};
 
@@ -21,7 +22,7 @@ public:
 
 	void AddIndent();
 
-	void AddIndent(std::size_t specialIndent, IndentStyle style);
+	void AddIndent(IndentState state);
 
 	void RecoverIndent();
 
@@ -29,11 +30,13 @@ public:
 
 	int GetColumn(int offset);
 
+	IndentState CalculateIndentState(int offset);
+
 	std::size_t GetCharacterCount() const;
 
-	std::size_t GetCurrentIndent() const;
+	IndentState GetCurrentIndent() const;
 
-	std::size_t GetLastIndent() const;
+	IndentState GetLastIndent() const;
 
 	std::shared_ptr<LuaParser> GetParser();
 

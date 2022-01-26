@@ -1058,11 +1058,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 				auto exprListEnv = FormatNode(child);
 				if (_options.align_call_args)
 				{
-					auto alignToFirstEnv = std::make_shared<AlignToFirstElement>(_options.continuation_indent_size);
+					auto alignToFirstEnv = std::make_shared<AlignToFirstElement>();
 					alignToFirstEnv->AddChildren(exprListEnv->GetChildren());
 					env->AddChild(alignToFirstEnv);
 				}
-				else
+				else 
 				{
 					auto& exprListChildren = exprListEnv->GetChildren();
 					auto keepElement = std::make_shared<KeepElement>(0);
@@ -1163,7 +1163,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 
 	if (_options.align_function_define_params)
 	{
-		paramListLayoutEnv = std::make_shared<AlignToFirstElement>(_options.continuation_indent_size);
+		paramListLayoutEnv = std::make_shared<AlignToFirstElement>();
 	}
 	else
 	{
@@ -1507,7 +1507,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 	std::shared_ptr<FormatElement> env = nullptr;
 	if (_options.align_table_field_to_first_field)
 	{
-		env = std::make_shared<AlignToFirstElement>(_options.indent_size);
+		env = std::make_shared<AlignToFirstElement>();
 	}
 	else
 	{
@@ -1580,7 +1580,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 	// 认为tableField 可以(但不是必须这样做)按照等号对齐
 	if (alignToEq && _options.continuous_assign_table_field_align_to_equal_sign)
 	{
-		auto newEnv = std::make_shared<AlignToFirstElement>(_options.indent_size);
+		auto newEnv = std::make_shared<AlignToFirstElement>();
 		auto alignmentLayoutElement = std::make_shared<AlignmentLayoutElement>();
 		for (auto child : env->GetChildren())
 		{

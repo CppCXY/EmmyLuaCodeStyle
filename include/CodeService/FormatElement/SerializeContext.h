@@ -11,9 +11,9 @@ public:
 
 	virtual void Print(TextElement& textElement);
 
-	virtual void PrintLine(std::size_t line);
+	virtual void PrintLine(int line);
 
-	virtual void PrintBlank(std::size_t blank);
+	virtual void PrintBlank(int blank);
 
 	virtual std::string GetText();
 protected:

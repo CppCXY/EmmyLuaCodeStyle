@@ -8,8 +8,8 @@ class RangeFormatContext : public SerializeContext
 public:
 	RangeFormatContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options, LuaFormatRange validRange);
 	void Print(TextElement& textElement) override;
-	void PrintBlank(std::size_t blank) override;
-	void PrintLine(std::size_t line) override;
+	void PrintBlank(int blank) override;
+	void PrintLine(int line) override;
 	std::string GetText() override;
 
 	LuaFormatRange GetFormattedRange();

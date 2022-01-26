@@ -25,42 +25,61 @@ void RangeFormatContext::Print(TextElement& textElement)
 	}
 
 	_inValidRange = true;
-	auto& indentState = _indentStack.back();
-	if (_characterCount < indentState.Indent)
+	if (!_indentStack.empty())
 	{
-		PrintIndent(indentState.Indent - _characterCount, indentState.IndentStyle);
+		auto& indentState = _indentStack.back();
+		if (indentState.IndentStyle == IndentStyle::Space)
+		{
+			if (_characterCount < indentState.SpaceIndent)
+			{
+				PrintIndent(indentState.SpaceIndent - _characterCount, indentState.IndentStyle);
+			}
+		}
+		else
+		{
+			if (_characterCount == 0)
+			{
+				PrintIndent(indentState.TabIndent, indentState.IndentStyle);
+				PrintIndent(indentState.SpaceIndent, IndentStyle::Space);
+			}
+			else if (_characterCount >= indentState.TabIndent && (indentState.SpaceIndent + indentState.TabIndent >
+				_characterCount))
+			{
+				PrintIndent(indentState.SpaceIndent - (_characterCount - indentState.TabIndent), IndentStyle::Space);
+			}
+		}
 	}
 	_os << textElement.GetText();
 	_characterCount += textElement.GetText().size();
 
-	if(startLine < _formattedRange.StartLine)
+	if (startLine < _formattedRange.StartLine)
 	{
 		_formattedRange.StartLine = startLine;
 		_formattedRange.StartCharacter = _parser->GetColumn(startOffset);
 	}
 
-	if(endLine > _formattedRange.EndLine)
+	if (endLine > _formattedRange.EndLine)
 	{
 		_formattedRange.EndLine = endLine;
 	}
 }
 
-void RangeFormatContext::PrintBlank(std::size_t blank)
+void RangeFormatContext::PrintBlank(int blank)
 {
-	for (std::size_t i = 0; i < blank; i++)
+	for (int i = 0; i < blank; i++)
 	{
 		_characterCount++;
 	}
 	if (_inValidRange)
 	{
-		for (std::size_t i = 0; i < blank; i++)
+		for (int i = 0; i < blank; i++)
 		{
 			_os << ' ';
 		}
 	}
 }
 
-void RangeFormatContext::PrintLine(std::size_t line)
+void RangeFormatContext::PrintLine(int line)
 {
 	_characterCount = 0;
 	if (_inValidRange)

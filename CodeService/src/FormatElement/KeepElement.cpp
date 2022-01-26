@@ -35,6 +35,7 @@ void KeepElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 		{
 			line--;
 		}
+
 		ctx.PrintLine(line);
 	}
 }

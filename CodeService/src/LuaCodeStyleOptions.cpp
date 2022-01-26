@@ -4,6 +4,22 @@
 #include "CodeService/FormatElement/KeepLineElement.h"
 #include "CodeService/NameStyle/NameStyleRuleMatcher.h"
 
+std::string GetIndentStyleName(IndentStyle style)
+{
+	switch (style)
+	{
+	case IndentStyle::Tab:
+		{
+			return "tab";
+		}
+	case IndentStyle::Space:
+		{
+			return "space";
+		}
+	}
+	return "unknown";
+}
+
 LuaCodeStyleOptions::LuaCodeStyleOptions()
 	:
 	keep_line_after_if_statement(std::make_shared<MinLineElement>(1)),

@@ -50,7 +50,9 @@ void LongExpressionLayoutElement::SerializeSubExpression(SerializeContext& ctx, 
 			if (ctx.GetCharacterCount() == 0 && !_hasContinuation)
 			{
 				_hasContinuation = true;
-				ctx.AddIndent(ctx.GetCurrentIndent() + _continuationIndent, IndentStyle::Space);
+				auto state = ctx.GetCurrentIndent();
+				state.SpaceIndent = _continuationIndent;
+				ctx.AddIndent(state);
 			}
 		}
 	}
@@ -59,7 +61,7 @@ void LongExpressionLayoutElement::SerializeSubExpression(SerializeContext& ctx, 
 void LongExpressionLayoutElement::DiagnosisSubExpression(DiagnosisContext& ctx, FormatElement& parent)
 {
 	auto& children = parent.GetChildren();
-	for (auto it = children.begin();it != children.end(); ++it)
+	for (auto it = children.begin(); it != children.end(); ++it)
 	{
 		auto child = *it;
 
@@ -76,7 +78,9 @@ void LongExpressionLayoutElement::DiagnosisSubExpression(DiagnosisContext& ctx, 
 			if (ctx.GetCharacterCount() == 0 && !_hasContinuation)
 			{
 				_hasContinuation = true;
-				ctx.AddIndent(ctx.GetCurrentIndent() + _continuationIndent, IndentStyle::Space);
+				auto state = ctx.GetCurrentIndent();
+				state.SpaceIndent = _continuationIndent;
+				ctx.AddIndent(state);
 			}
 		}
 	}

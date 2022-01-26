@@ -1,7 +1,6 @@
 #include "CodeService/FormatElement/AlignToFirstElement.h"
 
-AlignToFirstElement::AlignToFirstElement(int lowestIndent)
-	: _lowestIndent(lowestIndent)
+AlignToFirstElement::AlignToFirstElement()
 {
 }
 
@@ -14,28 +13,53 @@ void AlignToFirstElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
-		auto child = *it;
+		const auto child = *it;
 		if (it == _children.begin())
 		{
 			auto writeCount = ctx.GetCharacterCount();
-			auto indentCount = ctx.GetCurrentIndent();
-			if (writeCount > indentCount)
+			auto indentState = ctx.GetCurrentIndent();
+			switch (indentState.IndentStyle)
 			{
-				ctx.AddIndent(writeCount, ctx.GetOptions().indent_style);
-			}
-			else
-			{
-				indentCount += _lowestIndent;
-				const auto column = ctx.GetColumn(child->GetTextRange().StartOffset);
-				if (column > static_cast<int>(indentCount))
+			case IndentStyle::Space:
 				{
-					ctx.AddIndent(column, ctx.GetOptions().indent_style);
+					if (writeCount > indentState.SpaceIndent)
+					{
+						indentState.SpaceIndent = writeCount;
+					}
+					else
+					{
+						indentState.SpaceIndent = ctx.GetColumn(child->GetTextRange().StartOffset);
+					}
+					break;
 				}
-				else
+			case IndentStyle::Tab:
 				{
-					ctx.AddIndent(indentCount, ctx.GetOptions().indent_style);
+					if (writeCount > indentState.TabIndent)
+					{
+						indentState.SpaceIndent += writeCount - indentState.TabIndent;
+					}
+					else
+					{
+						auto& options = ctx.GetOptions();
+						auto state = ctx.CalculateIndentState(child->GetTextRange().StartOffset);
+						if (state.TabIndent < indentState.TabIndent)
+						{
+							auto diff = (indentState.TabIndent - state.TabIndent) * options.tab_width;
+							if (state.SpaceIndent > diff)
+							{
+								indentState.SpaceIndent = state.SpaceIndent - diff;
+							}
+						}
+						else
+						{
+							indentState.SpaceIndent = (state.TabIndent - indentState.TabIndent) * options.tab_width +
+								state.SpaceIndent;
+						}
+					}
+					break;
 				}
 			}
+			ctx.AddIndent(indentState);
 		}
 
 		child->Serialize(ctx, it, *this);
@@ -51,28 +75,53 @@ void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
-		auto child = *it;
+		const auto child = *it;
 		if (it == _children.begin())
 		{
 			auto writeCount = ctx.GetCharacterCount();
-			auto indentCount = ctx.GetCurrentIndent();
-			if (writeCount > indentCount)
+			auto indentState = ctx.GetCurrentIndent();
+			switch (indentState.IndentStyle)
 			{
-				ctx.AddIndent(writeCount, ctx.GetOptions().indent_style);
-			}
-			else
+			case IndentStyle::Space:
 			{
-				indentCount += _lowestIndent;
-				const auto column = ctx.GetColumn(child->GetTextRange().StartOffset);
-				if (column > static_cast<int>(indentCount))
+				if (writeCount > indentState.SpaceIndent)
 				{
-					ctx.AddIndent(column, ctx.GetOptions().indent_style);
+					indentState.SpaceIndent = writeCount;
 				}
 				else
 				{
-					ctx.AddIndent(indentCount, ctx.GetOptions().indent_style);
+					indentState.SpaceIndent = ctx.GetColumn(child->GetTextRange().StartOffset);
 				}
+				break;
 			}
+			case IndentStyle::Tab:
+			{
+				if (writeCount > indentState.TabIndent)
+				{
+					indentState.SpaceIndent += writeCount - indentState.TabIndent;
+				}
+				else
+				{
+					auto& options = ctx.GetOptions();
+					auto state = ctx.CalculateIndentState(child->GetTextRange().StartOffset);
+					if (state.TabIndent < indentState.TabIndent)
+					{
+						auto diff = (indentState.TabIndent - state.TabIndent) * options.tab_width;
+						if (state.SpaceIndent > diff)
+						{
+							indentState.SpaceIndent = state.SpaceIndent - diff;
+						}
+					}
+					else
+					{
+						indentState.SpaceIndent = (state.TabIndent - indentState.TabIndent) * options.tab_width +
+							state.SpaceIndent;
+					}
+				}
+				break;
+			}
+			}
+			ctx.AddIndent(indentState);
 		}
 
 		child->Diagnosis(ctx, it, *this);
