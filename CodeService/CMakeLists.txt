@@ -43,9 +43,11 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/KeepBlankElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/FormatElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/LineElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/NoIndentElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignmentElement.cpp	
-	${CodeService_SOURCE_DIR}/src/FormatElement/ExpressionElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/ExpressionElement.cpp
 	${CodeService_SOURCE_DIR}/src/FormatElement/FormatContext.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/SerializeContext.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignmentLayoutElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/LongExpressionLayoutElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignToFirstElement.cpp	
@@ -59,6 +61,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleChecker.cpp
 	${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleRuleMatcher.cpp
 	${CodeService_SOURCE_DIR}/src/NameStyle/CheckElement.cpp
+
 )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

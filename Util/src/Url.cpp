@@ -4,7 +4,7 @@
 std::string url::UrlToFilePath(std::string_view url)
 {
 	std::string absUri(url);
-	const int byteNeeded = url.size() + 1;
+	const int byteNeeded = static_cast<int>(url.size()) + 1;
 	std::string filepath;
 	filepath.resize(byteNeeded);
 #ifdef _WIN32
@@ -26,7 +26,7 @@ std::string url::UrlToFilePath(std::string_view url)
 std::string url::FilePathToUrl(std::string_view path)
 {
 	std::string absFilename(path);
-	const int byteNeeded = 8 + 3 * path.size() + 1;
+	const int byteNeeded = 8 + 3 * static_cast<int>(path.size()) + 1;
 	std::string uri;
 	uri.resize(byteNeeded);
 #ifdef _WIN32

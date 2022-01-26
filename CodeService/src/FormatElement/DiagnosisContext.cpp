@@ -3,61 +3,8 @@
 #include "Util/format.h"
 
 DiagnosisContext::DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options)
-	: _options(options),
-	  _parser(parser)
+	: FormatContext(parser, options)
 {
-}
-
-void DiagnosisContext::AddIndent(int specialIndent)
-{
-	if (_options.indent_style == IndentStyle::Space)
-	{
-		int newIndent = 0;
-		if (specialIndent == -1)
-		{
-			if (_indentStack.empty())
-			{
-				_indentStack.push(0);
-				return;
-			}
-
-			auto topIndent = _indentStack.top();
-			newIndent = _options.indent_size + topIndent;
-		}
-		else
-		{
-			newIndent = specialIndent;
-		}
-		_indentStack.push(newIndent);
-	}
-	else //这个算法可能会有问题
-	{
-		int newIndent = 0;
-		if (specialIndent == -1)
-		{
-			if (_indentStack.empty())
-			{
-				_indentStack.push(0);
-				return;
-			}
-
-			auto topIndent = _indentStack.top();
-			// 一次只增一个\t
-			newIndent = 1 + topIndent;
-		}
-		else
-		{
-			// 我会认为存在一个换算
-			// 当你制定了一个缩进，则我会认为保底有一个缩进
-			newIndent = std::max(1, specialIndent / _options.tab_width);
-		}
-		_indentStack.push(newIndent);
-	}
-}
-
-void DiagnosisContext::RecoverIndent()
-{
-	_indentStack.pop();
 }
 
 
@@ -73,21 +20,6 @@ void DiagnosisContext::PushDiagnosis(std::string_view message, LuaDiagnosisPosit
 	_diagnosisInfos.push_back(LuaDiagnosisInfo{std::string(message), LuaDiagnosisRange(start, end)});
 }
 
-int DiagnosisContext::GetLine(int offset)
-{
-	return _parser->GetLine(offset);
-}
-
-int DiagnosisContext::GetColumn(int offset)
-{
-	return _parser->GetColumn(offset);
-}
-
-std::size_t DiagnosisContext::GetCharacterCount() const
-{
-	return _characterCount;
-}
-
 void DiagnosisContext::SetCharacterCount(int character)
 {
 	_characterCount = character;
@@ -96,11 +28,6 @@ void DiagnosisContext::SetCharacterCount(int character)
 void DiagnosisContext::SetLineMaxLength(int line, int character)
 {
 	_lineMaxLengthMap[line] = character;
-}
-
-std::size_t DiagnosisContext::GetCurrentIndent() const
-{
-	return _indentStack.top();
 }
 
 std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
@@ -124,14 +51,4 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 		PushDiagnosis(LText("The code must end with a new line"), start, end);
 	}
 	return _diagnosisInfos;
-}
-
-const LuaCodeStyleOptions& DiagnosisContext::GetOptions()
-{
-	return _options;
-}
-
-std::shared_ptr<LuaParser> DiagnosisContext::GetParser()
-{
-	return _parser;
 }

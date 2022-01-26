@@ -5,12 +5,15 @@
 class IndentElement : public FormatElement
 {
 public:
-	IndentElement(int specialIndent = -1);
+	IndentElement();
+	IndentElement(std::size_t specialIndent, IndentStyle style);
 
 	FormatElementType GetType() override;
 
-	void Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
+	void Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
 	void Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
 private:
-	int _specialIndent;
+	std::size_t _specialIndent;
+	IndentStyle _style;
+	bool _defaultIndent;
 };

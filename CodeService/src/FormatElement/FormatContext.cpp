@@ -12,94 +12,48 @@ FormatContext::~FormatContext()
 {
 }
 
-void FormatContext::Print(TextElement& textElement)
-{
-	auto& indentState = _indentStack.top();
-	if (static_cast<int>(_characterCount) < indentState.Indent)
-	{
-		PrintIndent(indentState.Indent - static_cast<int>(_characterCount), indentState.IndentString);
-	}
-	_os << textElement.GetText();
-	_characterCount += textElement.GetText().size();
-}
-
-void FormatContext::PrintLine(int line)
-{
-	for (int i = 0; i < line; i++)
-	{
-		_os << _options.end_of_line;
-		_characterCount = 0;
-	}
-}
-
-void FormatContext::PrintBlank(int blank)
-{
-	for (int i = 0; i < blank; i ++)
-	{
-		_os << ' ';
-		_characterCount++;
-	}
-}
-
-void FormatContext::PrintIndent(int indent, const std::string& indentString)
-{
-	for (int i = 0; i < indent; i++)
-	{
-		_os << indentString;
-		_characterCount += indentString.size();
-	}
-}
-
-void FormatContext::AddIndent(int specialIndent)
+void FormatContext::AddIndent()
 {
 	if (_options.indent_style == IndentStyle::Space)
 	{
-		int newIndent = 0;
-		if (specialIndent == -1)
+		if (_indentStack.empty())
 		{
-			if (_indentStack.empty())
-			{
-				_indentStack.push({0, ""});
-				return;
-			}
+			_indentStack.push_back({0, IndentStyle::Space});
+			return;
+		}
 
-			auto& topIndent = _indentStack.top();
-			newIndent = _options.indent_size + topIndent.Indent;
-		}
-		else
-		{
-			newIndent = specialIndent;
-		}
-		_indentStack.push({newIndent, " "});
+		auto& topIndent = _indentStack.back();
+		std::size_t newIndent = _options.indent_size + topIndent.Indent;
+
+		_indentStack.push_back({newIndent, IndentStyle::Space});
 	}
-	else //这个算法可能会有问题
+	else
 	{
-		int newIndent = 0;
-		if (specialIndent == -1)
+		if (_indentStack.empty())
 		{
-			if (_indentStack.empty())
-			{
-				_indentStack.push({0, ""});
-				return;
-			}
+			_indentStack.push_back({0, IndentStyle::Tab});
+			return;
+		}
 
-			auto& topIndent = _indentStack.top();
-			// 一次只增一个\t
-			newIndent = 1 + topIndent.Indent;
-		}
-		else
-		{
-			// 我会认为存在一个换算
-			// 当你制定了一个缩进，则我会认为保底有一个缩进
-			newIndent = std::max(1, specialIndent / _options.tab_width);
-		}
-		_indentStack.push({newIndent, "\t"});
+		auto& topIndent = _indentStack.back();
+
+		_indentStack.push_back({1 + topIndent.Indent, IndentStyle::Tab});
 	}
+}
+
+void FormatContext::AddIndent(std::size_t specialIndent, IndentStyle style)
+{
+	_indentStack.push_back({specialIndent, style});
 }
 
 void FormatContext::RecoverIndent()
 {
-	_indentStack.pop();
+	if (_indentStack.empty())
+	{
+		return;
+	}
+
+	_indentStack.resize(_indentStack.size() - 1);
 }
 
 int FormatContext::GetLine(int offset)
@@ -124,15 +78,25 @@ std::size_t FormatContext::GetCurrentIndent() const
 		return 0;
 	}
 
-	return _indentStack.top().Indent;
+	return _indentStack.back().Indent;
 }
 
-std::string FormatContext::GetText()
+std::size_t FormatContext::GetLastIndent() const
 {
-	return _os.str();
+	if (_indentStack.size() < 2)
+	{
+		return 0;
+	}
+
+	return _indentStack[_indentStack.size() - 2].Indent;
 }
 
 std::shared_ptr<LuaParser> FormatContext::GetParser()
 {
 	return _parser;
+}
+
+LuaCodeStyleOptions& FormatContext::GetOptions()
+{
+	return _options;
 }

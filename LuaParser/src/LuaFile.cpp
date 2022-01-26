@@ -71,8 +71,8 @@ int LuaFile::GetOffsetFromPosition(int line, int character)
 	}
 
 	int lineStartOffset = _lineOffsetVec[line];
-	int nextOffset = 0;
-	if (line + 1 >= _lineOffsetVec.size())
+	std::size_t nextOffset = 0;
+	if (static_cast<std::size_t>(line) + 1 >= _lineOffsetVec.size())
 	{
 		nextOffset = _source.size();
 	}

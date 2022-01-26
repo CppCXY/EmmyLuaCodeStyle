@@ -2,7 +2,7 @@
 
 #include "LuaParser/LuaAstNode/LuaAstNode.h"
 #include "FormatElementType.h"
-#include "FormatContext.h"
+#include "SerializeContext.h"
 #include "DiagnosisContext.h"
 #include "CodeService/LanguageTranslator.h"
 #include "CodeService/LuaFormatRange.h"
@@ -19,11 +19,11 @@ public:
 
 	virtual FormatElementType GetType();
 
-	virtual void Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent);
+	virtual void Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent);
 
 	virtual void Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent);
 
-	void Format(FormatContext& ctx);
+	void Format(SerializeContext& ctx);
 
 	void DiagnosisCodeStyle(DiagnosisContext& ctx);
 
@@ -44,6 +44,8 @@ public:
 	{
 		AddChild(std::make_shared<T>(std::forward<ARGS>(args)...));
 	}
+
+	void CopyFrom(std::shared_ptr<FormatElement> node);
 
 protected:
 	static int GetLastValidOffset(ChildIterator& it, FormatElement& parent);

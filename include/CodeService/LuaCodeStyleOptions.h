@@ -49,7 +49,7 @@ public:
 	 * 函数调用的括号和参数之间保持一个空格
 	 *
 	 */
-	bool keep_one_space_between_call_args_and_bracket = false;
+	bool keep_one_space_between_call_args_and_parentheses = false;
 
 	/*
 	 * 函数定义的参数保持对齐到第一个参数
@@ -72,6 +72,11 @@ public:
 	 * 既然大佬们觉得不好那就不开放选项的设置
 	 */
 	bool label_no_indent = false;
+
+	/*
+	 * do语句块内可以无缩进
+	 */
+	bool do_statement_no_indent = false;
 
 	/*
 	 * 表内每一个表项对齐到第一个表项

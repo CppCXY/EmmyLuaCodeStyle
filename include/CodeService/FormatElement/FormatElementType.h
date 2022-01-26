@@ -12,6 +12,7 @@ enum class FormatElementType
 	AlignToFirstElement,
 	SubExpressionElement,
 	LongExpressionLayoutElement,
+	NoIndentElement,
 
 	ControlStart,
 	KeepLineElement,
@@ -21,4 +22,5 @@ enum class FormatElementType
 	AlignmentElement,
 	AlignToElement,
 	KeepElement,
+	
 };

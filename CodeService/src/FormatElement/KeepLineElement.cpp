@@ -12,7 +12,7 @@ FormatElementType KeepLineElement::GetType()
 	return FormatElementType::KeepLineElement;
 }
 
-void KeepLineElement::Serialize(FormatContext& ctx, ChildIterator selfIt,
+void KeepLineElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
                                 FormatElement& parent)
 {
 	const int lastElementLine = GetLastValidLine(ctx, selfIt, parent);

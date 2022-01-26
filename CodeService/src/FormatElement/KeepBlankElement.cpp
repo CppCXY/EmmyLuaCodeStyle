@@ -12,7 +12,7 @@ FormatElementType KeepBlankElement::GetType()
 	return FormatElementType::KeepBlankElement;
 }
 
-void KeepBlankElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void KeepBlankElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	int nextOffset = GetNextValidOffset(selfIt, parent);
 	if (nextOffset != -1)

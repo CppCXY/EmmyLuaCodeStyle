@@ -11,7 +11,7 @@ FormatElementType LineElement::GetType()
 	return FormatElementType::LineElement;
 }
 
-void LineElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void LineElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	ctx.PrintLine(1);
 }

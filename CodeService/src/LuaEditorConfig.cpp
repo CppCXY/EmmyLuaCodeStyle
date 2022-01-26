@@ -194,10 +194,10 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		options->align_call_args = configMap.at("align_call_args") == "true";
 	}
 
-	if (configMap.count("keep_one_space_between_call_args_and_bracket"))
+	if (configMap.count("keep_one_space_between_call_args_and_parentheses"))
 	{
-		options->keep_one_space_between_call_args_and_bracket =
-			configMap.at("keep_one_space_between_call_args_and_bracket") == "true";
+		options->keep_one_space_between_call_args_and_parentheses =
+			configMap.at("keep_one_space_between_call_args_and_parentheses") == "true";
 	}
 
 	if (configMap.count("keep_one_space_between_table_and_bracket"))
@@ -210,6 +210,16 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 	{
 		options->keep_one_space_between_namedef_and_attribute =
 			configMap.at("keep_one_space_between_namedef_and_attribute") == "true";
+	}
+
+	if(configMap.count("label_no_indent"))
+	{
+		options->label_no_indent = configMap.at("label_no_indent") == "true";
+	}
+
+	if(configMap.count("do_statement_no_indent"))
+	{
+		options->do_statement_no_indent = configMap.at("do_statement_no_indent") == "true";
 	}
 
 	if (configMap.count("align_table_field_to_first_field"))

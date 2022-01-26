@@ -5,7 +5,7 @@ FormatElementType StatementElement::GetType()
 	return FormatElementType::StatementElement;
 }
 
-void StatementElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void StatementElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	FormatElement::Serialize(ctx, selfIt, parent);
 

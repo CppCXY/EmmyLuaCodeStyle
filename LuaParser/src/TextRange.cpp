@@ -6,6 +6,13 @@ TextRange::TextRange(int startOffset, int endOffset)
 {
 }
 
+TextRange::TextRange(std::size_t startOffset, std::size_t endOffset)
+	:
+	StartOffset(static_cast<int>(startOffset)),
+	EndOffset(static_cast<int>(endOffset))
+{
+}
+
 bool TextRange::IsEmpty() const
 {
 	return StartOffset == 0 && EndOffset == -1;

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <string_view>
 #include <sstream>
 #include <vector>
@@ -7,27 +7,21 @@
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "LuaParser/LuaParser.h"
 
-class TextElement;
-
 class FormatContext
 {
 public:
 	struct IndentState
 	{
-		int Indent = 0;
-		std::string IndentString = "";
+		std::size_t Indent = 0;
+		IndentStyle IndentStyle = IndentStyle::Space;
 	};
 
 	FormatContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options);
 	virtual ~FormatContext();
 
-	virtual void Print(TextElement& textElement);
+	void AddIndent();
 
-	virtual void PrintLine(int line);
-
-	virtual void PrintBlank(int blank);
-
-	void AddIndent(int specialIndent = -1);
+	void AddIndent(std::size_t specialIndent, IndentStyle style);
 
 	void RecoverIndent();
 
@@ -39,16 +33,17 @@ public:
 
 	std::size_t GetCurrentIndent() const;
 
-	virtual std::string GetText();
+	std::size_t GetLastIndent() const;
 
 	std::shared_ptr<LuaParser> GetParser();
 
-protected:
-	void PrintIndent(int indent, const std::string& indentString);
+	LuaCodeStyleOptions& GetOptions();
 
-	std::stack<IndentState, std::vector<IndentState>> _indentStack;
-	std::map<int, std::string> _indentMap;
-	std::stringstream _os;
+protected:
+	// 不用std::stack
+	std::vector<IndentState> _indentStack;
+	std::map<std::size_t, std::string> _indentMap;
+
 	LuaCodeStyleOptions& _options;
 
 	std::size_t _characterCount;

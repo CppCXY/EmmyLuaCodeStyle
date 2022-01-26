@@ -61,7 +61,7 @@ std::shared_ptr<FormatElement> FormatElement::LastValidElement() const
 	return nullptr;
 }
 
-void FormatElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void FormatElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
@@ -77,7 +77,7 @@ void FormatElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, Forma
 	}
 }
 
-void FormatElement::Format(FormatContext& ctx)
+void FormatElement::Format(SerializeContext& ctx)
 {
 	// workaround
 	auto root = std::make_shared<FormatElement>();
@@ -130,6 +130,12 @@ int FormatElement::GetNextValidLine(FormatContext& ctx, ChildIterator it, Format
 	{
 		return -1;
 	}
+}
+
+void FormatElement::CopyFrom(std::shared_ptr<FormatElement> node)
+{
+	_textRange = node->_textRange;
+	_children = node->_children;
 }
 
 int FormatElement::GetLastValidOffset(ChildIterator& it, FormatElement& parent)

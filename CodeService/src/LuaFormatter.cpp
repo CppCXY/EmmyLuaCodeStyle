@@ -2,7 +2,6 @@
 #include "CodeService/FormatElement/IndentElement.h"
 #include "CodeService/FormatElement/StatementElement.h"
 #include "CodeService/FormatElement/TextElement.h"
-#include "CodeService/FormatElement/FormatContext.h"
 #include "CodeService/FormatElement/KeepLineElement.h"
 #include "CodeService/FormatElement/MinLineElement.h"
 #include "CodeService/FormatElement/KeepBlankElement.h"
@@ -15,6 +14,8 @@
 #include "CodeService/FormatElement/RangeFormatContext.h"
 #include "CodeService/FormatElement/SubExpressionElement.h"
 #include "CodeService/NameStyle/NameStyleChecker.h"
+#include "CodeService/FormatElement/NoIndentElement.h"
+#include "CodeService/FormatElement/SerializeContext.h"
 
 bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
 {
@@ -58,7 +59,7 @@ void LuaFormatter::BuildFormattedElement()
 
 std::string LuaFormatter::GetFormattedText()
 {
-	FormatContext ctx(_parser, _options);
+	SerializeContext ctx(_parser, _options);
 
 	_env->Format(ctx);
 
@@ -354,7 +355,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				auto childEnv = FormatNode(statement);
 				if (_options.label_no_indent)
 				{
-					auto noIndent = std::make_shared<IndentElement>(0);
+					auto noIndent = std::make_shared<NoIndentElement>();
 					noIndent->AddChild(childEnv);
 					indentEnv->AddChild(noIndent);
 				}
@@ -494,7 +495,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
 			}
 		case LuaAstNodeType::Attribute:
 			{
-				if(_options.keep_one_space_between_namedef_and_attribute)
+				if (_options.keep_one_space_between_namedef_and_attribute)
 				{
 					env->Add<KeepBlankElement>(1);
 				}
@@ -723,12 +724,24 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatKeyWords(std::shared_ptr<LuaA
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatDoStatement(std::shared_ptr<LuaAstNode> doStatement)
 {
-	auto env = std::make_shared<StatementElement>();
-
+	std::shared_ptr<FormatElement> env = std::make_shared<StatementElement>();
 	auto& children = doStatement->GetChildren();
 	auto it = children.begin();
 	bool singleLine = false;
-	env->AddChild(FormatNodeAndBlockOrEnd(it, singleLine, children));
+	auto block = FormatNodeAndBlockOrEnd(it, singleLine, children);
+
+	std::shared_ptr<FormatElement> childEnv = nullptr;
+	if (_options.do_statement_no_indent)
+	{
+		childEnv = std::make_shared<NoIndentElement>();
+		childEnv->AddChild(block);
+	}
+	else
+	{
+		childEnv = block;
+	}
+
+	env->AddChild(childEnv);
 	return env;
 }
 
@@ -1058,7 +1071,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 					env->AddChild(exprListEnv);
 				}
 
-				if (_options.keep_one_space_between_call_args_and_bracket)
+				if (_options.keep_one_space_between_call_args_and_parentheses)
 				{
 					env->Add<KeepElement>(1);
 				}
@@ -1076,8 +1089,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 				{
 					env->Add<KeepElement>(1);
 				}
-				else if (child->GetText() == "(" && _options.keep_one_space_between_call_args_and_bracket && children.
-					size() > 2)
+				else if (child->GetText() == "(" && _options.keep_one_space_between_call_args_and_parentheses
+					&& children.size() > 2)
 				{
 					env->Add<KeepElement>(1);
 				}
@@ -2123,7 +2136,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<Lu
 				auto childEnv = FormatNode(statement);
 				if (_options.label_no_indent)
 				{
-					auto noIndent = std::make_shared<IndentElement>(0);
+					auto noIndent = std::make_shared<NoIndentElement>();
 					noIndent->AddChild(childEnv);
 					indentEnv->AddChild(noIndent);
 				}

@@ -18,7 +18,7 @@ FormatElementType TextElement::GetType()
 	return FormatElementType::TextElement;
 }
 
-void TextElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void TextElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	ctx.Print(*this);
 }

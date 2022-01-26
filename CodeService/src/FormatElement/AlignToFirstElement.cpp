@@ -10,7 +10,7 @@ FormatElementType AlignToFirstElement::GetType()
 	return FormatElementType::AlignToFirstElement;
 }
 
-void AlignToFirstElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void AlignToFirstElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
@@ -21,7 +21,7 @@ void AlignToFirstElement::Serialize(FormatContext& ctx, ChildIterator selfIt, Fo
 			auto indentCount = ctx.GetCurrentIndent();
 			if (writeCount > indentCount)
 			{
-				ctx.AddIndent(static_cast<int>(writeCount));
+				ctx.AddIndent(writeCount, ctx.GetOptions().indent_style);
 			}
 			else
 			{
@@ -29,11 +29,11 @@ void AlignToFirstElement::Serialize(FormatContext& ctx, ChildIterator selfIt, Fo
 				const auto column = ctx.GetColumn(child->GetTextRange().StartOffset);
 				if (column > static_cast<int>(indentCount))
 				{
-					ctx.AddIndent(column);
+					ctx.AddIndent(column, ctx.GetOptions().indent_style);
 				}
 				else
 				{
-					ctx.AddIndent(static_cast<int>(indentCount));
+					ctx.AddIndent(indentCount, ctx.GetOptions().indent_style);
 				}
 			}
 		}
@@ -41,7 +41,8 @@ void AlignToFirstElement::Serialize(FormatContext& ctx, ChildIterator selfIt, Fo
 		child->Serialize(ctx, it, *this);
 	}
 
-	if (!_children.empty()) {
+	if (!_children.empty())
+	{
 		ctx.RecoverIndent();
 	}
 }
@@ -57,7 +58,7 @@ void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 			auto indentCount = ctx.GetCurrentIndent();
 			if (writeCount > indentCount)
 			{
-				ctx.AddIndent(static_cast<int>(writeCount));
+				ctx.AddIndent(writeCount, ctx.GetOptions().indent_style);
 			}
 			else
 			{
@@ -65,11 +66,11 @@ void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 				const auto column = ctx.GetColumn(child->GetTextRange().StartOffset);
 				if (column > static_cast<int>(indentCount))
 				{
-					ctx.AddIndent(column);
+					ctx.AddIndent(column, ctx.GetOptions().indent_style);
 				}
 				else
 				{
-					ctx.AddIndent(static_cast<int>(indentCount));
+					ctx.AddIndent(indentCount, ctx.GetOptions().indent_style);
 				}
 			}
 		}
@@ -77,7 +78,8 @@ void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 		child->Diagnosis(ctx, it, *this);
 	}
 
-	if (!_children.empty()) {
+	if (!_children.empty())
+	{
 		ctx.RecoverIndent();
 	}
 }

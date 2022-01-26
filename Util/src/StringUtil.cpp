@@ -46,7 +46,7 @@ std::string_view StringUtil::TrimSpace(std::string_view source)
 		}
 	}
 
-	int end = source.size() - 1;
+	int end = static_cast<int>(source.size()) - 1;
 	for (; end >= 0; end--)
 	{
 		char ch = source[end];

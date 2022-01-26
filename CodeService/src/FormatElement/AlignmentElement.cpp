@@ -12,7 +12,7 @@ FormatElementType AlignmentElement::GetType()
 	return FormatElementType::AlignmentElement;
 }
 
-void AlignmentElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void AlignmentElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	const int blank = _alignmentPosition - static_cast<int>(ctx.GetCharacterCount());
 	if (blank > 0)

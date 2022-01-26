@@ -12,7 +12,7 @@ FormatElementType MinLineElement::GetType()
 	return FormatElementType::MinLineElement;
 }
 
-void MinLineElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void MinLineElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	auto minLine = 0;
 	if (_line > 0)

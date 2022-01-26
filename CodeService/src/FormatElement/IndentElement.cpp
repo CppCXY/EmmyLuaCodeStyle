@@ -2,9 +2,19 @@
 #include "Util/format.h"
 #include "CodeService/FormatElement/FormatElement.h"
 
-IndentElement::IndentElement(int specialIndent)
+IndentElement::IndentElement()
 	: FormatElement(),
-	  _specialIndent(specialIndent)
+	  _specialIndent(0),
+	  _style(IndentStyle::Space),
+	  _defaultIndent(true)
+{
+}
+
+IndentElement::IndentElement(std::size_t specialIndent, IndentStyle style)
+	: FormatElement(),
+	  _specialIndent(specialIndent),
+	  _style(style),
+	  _defaultIndent(false)
 {
 }
 
@@ -13,9 +23,16 @@ FormatElementType IndentElement::GetType()
 	return FormatElementType::IndentElement;
 }
 
-void IndentElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void IndentElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
-	ctx.AddIndent(_specialIndent);
+	if (_defaultIndent)
+	{
+		ctx.AddIndent();
+	}
+	else
+	{
+		ctx.AddIndent(_specialIndent, _style);
+	}
 
 	FormatElement::Serialize(ctx, selfIt, parent);
 
@@ -24,14 +41,22 @@ void IndentElement::Serialize(FormatContext& ctx, ChildIterator selfIt, FormatEl
 
 void IndentElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
-	ctx.AddIndent(_specialIndent);
+	if (_defaultIndent)
+	{
+		ctx.AddIndent();
+	}
+	else
+	{
+		ctx.AddIndent(_specialIndent, _style);
+	}
 
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
 		const auto child = *it;
 
-		if (child->HasValidTextRange() && ctx.GetOptions().indent_style == IndentStyle::Space && child->GetType() !=
-			FormatElementType::IndentElement)
+		if (child->HasValidTextRange() && ctx.GetOptions().indent_style == IndentStyle::Space
+			&& child->GetType() != FormatElementType::IndentElement && child->GetType() !=
+			FormatElementType::NoIndentElement)
 		{
 			auto range = child->GetTextRange();
 			auto character = ctx.GetColumn(range.StartOffset);

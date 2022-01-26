@@ -7,6 +7,8 @@ class TextRange
 public:
 	explicit TextRange(int startOffset = 0, int endOffset = -1);
 
+	explicit TextRange(std::size_t startOffset, std::size_t endOffset);
+
 	bool IsEmpty() const;
 
 	bool Contain(TextRange& range) const;
