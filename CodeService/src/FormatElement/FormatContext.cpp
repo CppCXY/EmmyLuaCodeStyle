@@ -125,7 +125,7 @@ FormatContext::IndentState FormatContext::GetLastIndent() const
 {
 	if (_indentStack.size() < 2)
 	{
-		return IndentState(0, 0, _options.indent_style);
+		return IndentState{ 0, 0, _options.indent_style };
 	}
 
 	return _indentStack[_indentStack.size() - 2];
