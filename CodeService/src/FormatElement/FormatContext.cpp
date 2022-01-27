@@ -89,7 +89,7 @@ FormatContext::IndentState FormatContext::CalculateIndentState(int offset)
 		auto ch = source[start];
 		if (ch == '\t')
 		{
-			state.IndentStyle = IndentStyle::Tab;
+			state.Style = IndentStyle::Tab;
 			state.TabIndent++;
 		}
 		else
@@ -100,7 +100,7 @@ FormatContext::IndentState FormatContext::CalculateIndentState(int offset)
 
 	if(state.TabIndent == 0 && state.SpaceIndent == 0)
 	{
-		state.IndentStyle = _options.indent_style;
+		state.Style = _options.indent_style;
 	}
 
 	return state;

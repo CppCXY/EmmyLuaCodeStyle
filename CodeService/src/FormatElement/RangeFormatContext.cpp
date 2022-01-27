@@ -28,18 +28,18 @@ void RangeFormatContext::Print(TextElement& textElement)
 	if (!_indentStack.empty())
 	{
 		auto& indentState = _indentStack.back();
-		if (indentState.IndentStyle == IndentStyle::Space)
+		if (indentState.Style == IndentStyle::Space)
 		{
 			if (_characterCount < indentState.SpaceIndent)
 			{
-				PrintIndent(indentState.SpaceIndent - _characterCount, indentState.IndentStyle);
+				PrintIndent(indentState.SpaceIndent - _characterCount, indentState.Style);
 			}
 		}
 		else
 		{
 			if (_characterCount == 0)
 			{
-				PrintIndent(indentState.TabIndent, indentState.IndentStyle);
+				PrintIndent(indentState.TabIndent, indentState.Style);
 				PrintIndent(indentState.SpaceIndent, IndentStyle::Space);
 			}
 			else if (_characterCount >= indentState.TabIndent && (indentState.SpaceIndent + indentState.TabIndent >

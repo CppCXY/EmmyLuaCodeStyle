@@ -38,12 +38,12 @@ void NoIndentElement::Diagnosis(DiagnosisContext& ctx, ChildIterator shared_ptr,
 			auto character = ctx.GetColumn(range.StartOffset);
 			auto indentState = ctx.CalculateIndentState(range.StartOffset);
 			auto state = ctx.GetCurrentIndent();
-			if (ctx.GetOptions().indent_style != indentState.IndentStyle)
+			if (ctx.GetOptions().indent_style != indentState.Style)
 			{
 				ctx.PushDiagnosis(
 					format(LText("incorrect indentation style, expect {}, but here is {}"),
-					       GetIndentStyleName(state.IndentStyle),
-					       GetIndentStyleName(indentState.IndentStyle)
+					       GetIndentStyleName(state.Style),
+					       GetIndentStyleName(indentState.Style)
 					),
 					LuaDiagnosisPosition(line, 0),
 					LuaDiagnosisPosition(line, character)
@@ -51,7 +51,7 @@ void NoIndentElement::Diagnosis(DiagnosisContext& ctx, ChildIterator shared_ptr,
 				goto endIndentDiagnose;
 			}
 
-			if (indentState.IndentStyle == IndentStyle::Space)
+			if (indentState.Style == IndentStyle::Space)
 			{
 				if (state.SpaceIndent != indentState.SpaceIndent)
 				{

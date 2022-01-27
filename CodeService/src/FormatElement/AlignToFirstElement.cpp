@@ -18,7 +18,7 @@ void AlignToFirstElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 		{
 			auto writeCount = ctx.GetCharacterCount();
 			auto indentState = ctx.GetCurrentIndent();
-			switch (indentState.IndentStyle)
+			switch (indentState.Style)
 			{
 			case IndentStyle::Space:
 				{
@@ -80,7 +80,7 @@ void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 		{
 			auto writeCount = ctx.GetCharacterCount();
 			auto indentState = ctx.GetCurrentIndent();
-			switch (indentState.IndentStyle)
+			switch (indentState.Style)
 			{
 			case IndentStyle::Space:
 			{

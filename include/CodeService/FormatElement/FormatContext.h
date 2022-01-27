@@ -14,7 +14,7 @@ public:
 	{
 		std::size_t SpaceIndent = 0;
 		std::size_t TabIndent = 0;
-		IndentStyle IndentStyle = IndentStyle::Space;
+		IndentStyle Style = IndentStyle::Space;
 	};
 
 	FormatContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options);

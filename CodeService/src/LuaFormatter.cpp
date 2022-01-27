@@ -728,20 +728,24 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatDoStatement(std::shared_ptr<L
 	auto& children = doStatement->GetChildren();
 	auto it = children.begin();
 	bool singleLine = false;
-	auto block = FormatNodeAndBlockOrEnd(it, singleLine, children);
+	auto doBlockEnd = FormatNodeAndBlockOrEnd(it, singleLine, children);
 
-	std::shared_ptr<FormatElement> childEnv = nullptr;
-	if (_options.do_statement_no_indent)
+	if (_options.do_statement_no_indent && !singleLine)
 	{
-		childEnv = std::make_shared<NoIndentElement>();
-		childEnv->AddChild(block);
-	}
-	else
-	{
-		childEnv = block;
+		for (auto& child : doBlockEnd->GetChildren())
+		{
+			if (child->GetType() == FormatElementType::IndentElement)
+			{
+				auto indentElement = std::make_shared<IndentElement>();
+				auto noIndent = std::make_shared<NoIndentElement>();
+				noIndent->AddChildren(child->GetChildren());
+				indentElement->AddChild(noIndent);
+				child = indentElement;
+			}
+		}
 	}
 
-	env->AddChild(childEnv);
+	env->AddChild(doBlockEnd);
 	return env;
 }
 
@@ -1062,7 +1066,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 					alignToFirstEnv->AddChildren(exprListEnv->GetChildren());
 					env->AddChild(alignToFirstEnv);
 				}
-				else 
+				else
 				{
 					auto& exprListChildren = exprListEnv->GetChildren();
 					auto keepElement = std::make_shared<KeepElement>(0);

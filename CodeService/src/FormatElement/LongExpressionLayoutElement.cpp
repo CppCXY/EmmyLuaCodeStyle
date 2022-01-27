@@ -51,7 +51,7 @@ void LongExpressionLayoutElement::SerializeSubExpression(SerializeContext& ctx, 
 			{
 				_hasContinuation = true;
 				auto state = ctx.GetCurrentIndent();
-				state.SpaceIndent = _continuationIndent;
+				state.SpaceIndent += _continuationIndent;
 				ctx.AddIndent(state);
 			}
 		}
@@ -79,7 +79,7 @@ void LongExpressionLayoutElement::DiagnosisSubExpression(DiagnosisContext& ctx, 
 			{
 				_hasContinuation = true;
 				auto state = ctx.GetCurrentIndent();
-				state.SpaceIndent = _continuationIndent;
+				state.SpaceIndent += _continuationIndent;
 				ctx.AddIndent(state);
 			}
 		}
