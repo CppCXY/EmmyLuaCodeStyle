@@ -1,7 +1,7 @@
 #include "CodeService/FormatElement/LongExpressionLayoutElement.h"
 #include "CodeService/FormatElement/KeepElement.h"
 
-LongExpressionLayoutElement::LongExpressionLayoutElement(int continuationIndent, bool isAssignLeftExprList)
+LongExpressionLayoutElement::LongExpressionLayoutElement(int continuationIndent)
 	: _hasContinuation(false),
 	  _continuationIndent(continuationIndent)
 {

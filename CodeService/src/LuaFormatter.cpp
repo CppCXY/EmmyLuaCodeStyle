@@ -554,7 +554,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_pt
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatAssignLeftExpressionList(std::shared_ptr<LuaAstNode> expressionList)
 {
-	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent_size, true);
+	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent_size);
 
 	for (auto& node : expressionList->GetChildren())
 	{

@@ -54,6 +54,7 @@ protected:
 	static int GetLastValidLine(FormatContext& ctx, ChildIterator it, FormatElement& parent);
 	static int GetNextValidLine(FormatContext& ctx, ChildIterator it, FormatElement& parent);
 
+	void GeneralIndentDiagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent);
 	void AddTextRange(TextRange range);
 
 	TextRange _textRange;

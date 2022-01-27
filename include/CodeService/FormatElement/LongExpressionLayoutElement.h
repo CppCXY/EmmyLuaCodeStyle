@@ -5,7 +5,7 @@
 class LongExpressionLayoutElement : public FormatElement
 {
 public:
-	LongExpressionLayoutElement(int continuationIndent, bool isAssignLeftExprList = false);
+	LongExpressionLayoutElement(int continuationIndent);
 
 	FormatElementType GetType() override;
 
