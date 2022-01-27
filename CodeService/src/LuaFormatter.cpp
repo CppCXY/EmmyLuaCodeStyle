@@ -1093,7 +1093,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 				{
 					env->Add<KeepElement>(1);
 				}
-				else if (child->GetText() == "(" 
+				else if (child->GetText() == "("
 					&& _options.keep_one_space_between_call_args_and_parentheses
 					&& children.size() > 2)
 				{
@@ -1191,7 +1191,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 				else if (child->GetText() == ")")
 				{
 					env->AddChild(paramListLayoutEnv);
-					env->Add<KeepElement>(0);
+					if (!paramListLayoutEnv->GetChildren().empty())
+					{
+						env->Add<KeepElement>(0);
+					}
+
 					env->Add<TextElement>(child);
 				}
 				else

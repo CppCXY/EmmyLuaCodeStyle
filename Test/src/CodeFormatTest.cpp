@@ -122,7 +122,6 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-
 	std::filesystem::path workRoot(commandLine.Get<std::string>("work-directory"));
 	std::vector<std::string> luaFiles;
 
@@ -151,6 +150,10 @@ int main(int argc, char* argv[])
 
 			success &= passed;
 			std::cout << format("test format {} ... {}", path, passed ? "passed" : "false") << std::endl;
+
+			passed = TestFormatted(formattedText, formattedText, options);
+			success &= passed;
+			std::cout << format("test format stability {} ... {}", path, passed ? "passed" : "false") << std::endl;
 		}
 	}
 	else if (target == "CheckGrammar")

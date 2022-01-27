@@ -4,7 +4,7 @@ project(LuaCodeStyle)
 
 set(CMAKE_CXX_STANDARD 20)
 
-option(BuildAsLuaLib "Build for lua dll" ON)
+option(BuildAsLuaLib "Build for lua dll" OFF)
 option(BuildCodeFormat "Build CodeFormat" ON)
 option(BuildCodeFormatServer "Build CodeFormatServer" ON)
 option(EnableTest "Test project" ON)

@@ -6,7 +6,7 @@ local t2 = c2(function()
 end), bbbb, ccc, function() end,
     function(
 
-        )
+    )
     end
 
 function ff()
