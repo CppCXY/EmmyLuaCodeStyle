@@ -205,6 +205,12 @@ void FormatElement::CopyFrom(std::shared_ptr<FormatElement> node)
 	_children = node->_children;
 }
 
+void FormatElement::Reset()
+{
+	_textRange = TextRange();
+	_children.clear();
+}
+
 int FormatElement::GetLastValidOffset(ChildIterator& it, FormatElement& parent)
 {
 	auto& siblings = parent.GetChildren();

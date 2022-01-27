@@ -71,7 +71,7 @@ public:
 	bool keep_one_space_between_namedef_and_attribute = false;
 
 	/*
-	 * 既然大佬们觉得不好那就不开放选项的设置
+	 * 标签无缩进
 	 */
 	bool label_no_indent = false;
 

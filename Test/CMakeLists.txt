@@ -19,4 +19,5 @@ target_sources(CodeFormatTest
 target_link_libraries(CodeFormatTest CodeService Util)
 
 add_test(NAME GrammarTest COMMAND CodeFormatTest CheckGrammar -w ${CodeFormatTest_SOURCE_DIR}/test_script/grammar)
-add_test(NAME FormatTest COMMAND CodeFormatTest CheckFormatResult -w ${CodeFormatTest_SOURCE_DIR}/test_script/format_text -f ${CodeFormatTest_SOURCE_DIR}/test_script/format_text_shouldbe) 
+add_test(NAME FormatTest COMMAND CodeFormatTest CheckFormatResult -w ${CodeFormatTest_SOURCE_DIR}/test_script/format_tex/wait_format -f ${CodeFormatTest_SOURCE_DIR}/test_script/format_text/wait_format_should_be) 
+#add_test(NAME FormatByOptionTest COMMAND CodeFormatTest CheckFormatResultByOption -w ${CodeFormatTest_SOURCE_DIR}/test_script/format_tex/wait_format_by_option -f ${CodeFormatTest_SOURCE_DIR}/test_script/format_text/wait_format_by_option_should_be) 

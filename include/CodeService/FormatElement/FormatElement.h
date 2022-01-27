@@ -47,6 +47,7 @@ public:
 
 	void CopyFrom(std::shared_ptr<FormatElement> node);
 
+	void Reset();
 protected:
 	static int GetLastValidOffset(ChildIterator& it, FormatElement& parent);
 	static int GetNextValidOffset(ChildIterator& it, FormatElement& parent);
