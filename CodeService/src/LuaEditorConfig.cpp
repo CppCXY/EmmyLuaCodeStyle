@@ -222,6 +222,11 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		options->do_statement_no_indent = configMap.at("do_statement_no_indent") == "true";
 	}
 
+	if(configMap.count("if_condition_no_continuation_indent"))
+	{
+		options->if_condition_no_continuation_indent = configMap.at("if_condition_no_continuation_indent") == "true";
+	}
+
 	if (configMap.count("align_table_field_to_first_field"))
 	{
 		options->align_table_field_to_first_field = configMap.at("align_table_field_to_first_field") == "true";

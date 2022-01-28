@@ -81,6 +81,10 @@ public:
 	bool do_statement_no_indent = false;
 
 	/*
+	 * if语句的条件可以无延续行缩进
+	 */
+	bool if_condition_no_continuation_indent = false;
+	/*
 	 * 表内每一个表项对齐到第一个表项
 	 */
 	bool align_table_field_to_first_field = true;

@@ -102,6 +102,14 @@ void CommandLine::PrintUsage()
 	}
 	std::cerr << std::endl;
 
+	std::cerr << "first param must be target:" << std::endl;
+	for (auto& target : _targets)
+	{
+		std::cerr << format("{}", target) << std::endl;
+	}
+
+	std::cerr << std::endl;
+
 	for (auto& it : _shortMap)
 	{
 		auto& shortName = it.first;

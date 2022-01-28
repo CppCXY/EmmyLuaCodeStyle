@@ -999,7 +999,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 			}
 		case LuaAstNodeType::Expression:
 			{
-				env->AddChild(FormatNode(child));
+				std::shared_ptr<FormatElement> expression = nullptr;
+				if (_options.if_condition_no_continuation_indent)
+				{
+					expression = std::make_shared<LongExpressionLayoutElement>(0);
+				}
+
+				env->AddChild(FormatExpression(child, expression));
 				env->Add<KeepBlankElement>(1);
 				break;
 			}

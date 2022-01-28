@@ -65,4 +65,10 @@ indent_style = space
 [{indent_style-eq-tab.lua}]
 # optional space/tab
 indent_style = tab
-align_table_field_to_first_field = true
+[{indent_size-eq-2.lua}]
+indent_style = space
+indent_size = 2
+[{indent_size-eq-4.lua}]
+indent_style = space
+indent_size = 4
+

@@ -7,6 +7,7 @@
 #include "Util/format.h"
 #include "Util/CommandLine.h"
 #include "Util/StringUtil.h"
+#include "CodeService/LuaEditorConfig.h"
 
 
 bool TestFormatted(std::string input, const std::string& shouldBe, std::shared_ptr<LuaCodeStyleOptions> options)
@@ -57,10 +58,10 @@ bool TestGrammar(std::string input)
 	{
 		for (auto& error : formattedParser->GetErrors())
 			std::cout << format("error after formatted: {}, from [{},{}] to [{},{}]", error.ErrorMessage,
-				formattedParser->GetLine(error.ErrorRange.StartOffset),
-				formattedParser->GetColumn(error.ErrorRange.StartOffset),
-				formattedParser->GetLine(error.ErrorRange.EndOffset),
-				formattedParser->GetColumn(error.ErrorRange.EndOffset)
+			                    formattedParser->GetLine(error.ErrorRange.StartOffset),
+			                    formattedParser->GetColumn(error.ErrorRange.StartOffset),
+			                    formattedParser->GetLine(error.ErrorRange.EndOffset),
+			                    formattedParser->GetColumn(error.ErrorRange.EndOffset)
 			) << std::endl;
 	}
 
@@ -112,6 +113,7 @@ int main(int argc, char* argv[])
 
 	commandLine.AddTarget("CheckGrammar");
 	commandLine.AddTarget("CheckFormatResult");
+	commandLine.AddTarget("CheckFormatResultByOption");
 
 	commandLine.Add<std::string>("work-directory", "w", "special base work directory");
 	commandLine.Add<std::string>("formatted-work-directory", "f", "special formatted work directory");
@@ -139,6 +141,41 @@ int main(int argc, char* argv[])
 		std::filesystem::path formattedRoot(commandLine.Get<std::string>("formatted-work-directory"));
 		for (auto& path : luaFiles)
 		{
+			auto waitFormattingFilePath = workRoot / path;
+			auto waitFormattingText = ReadFile(waitFormattingFilePath.string());
+
+			auto formattedFilePath = formattedRoot / path;
+
+			auto formattedText = ReadFile(formattedFilePath.string());
+
+			bool passed = TestFormatted(waitFormattingText, formattedText, options);
+
+			success &= passed;
+			std::cout << format("test format {} ... {}", path, passed ? "passed" : "false") << std::endl;
+
+			passed = TestFormatted(formattedText, formattedText, options);
+			success &= passed;
+			std::cout << format("test format stability {} ... {}", path, passed ? "passed" : "false") << std::endl;
+		}
+	}
+	else if (target == "CheckFormatResultByOption")
+	{
+		auto editorconfigPath = workRoot / ".editorconfig";
+		auto editorConfig = LuaEditorConfig::LoadFromFile(editorconfigPath.string());
+		editorConfig->SetWorkspace(workRoot.string());
+		if (!editorConfig)
+		{
+			std::cerr << "can not find editorconfig file" << std::endl;
+			return -1;
+		}
+		std::filesystem::path formattedRoot(commandLine.Get<std::string>("formatted-work-directory"));
+		for (auto& path : luaFiles)
+		{
+			auto options = editorConfig->Generate(path);
+#ifndef _WIN32
+			options->end_of_line = "\n";
+#endif
+
 			auto waitFormattingFilePath = workRoot / path;
 			auto waitFormattingText = ReadFile(waitFormattingFilePath.string());
 
