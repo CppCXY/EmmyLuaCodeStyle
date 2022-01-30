@@ -34,7 +34,8 @@ protected:
 
 	std::shared_ptr<FormatElement> FormatNameDefList(std::shared_ptr<LuaAstNode> nameDefList);
 
-	std::shared_ptr<FormatElement> FormatExpressionList(std::shared_ptr<LuaAstNode> expressionList);
+	std::shared_ptr<FormatElement> FormatExpressionList(std::shared_ptr<LuaAstNode> expressionList,
+	                                                    std::shared_ptr<FormatElement> env = nullptr);
 
 	std::shared_ptr<FormatElement> FormatAssignLeftExpressionList(std::shared_ptr<LuaAstNode> expressionList);
 

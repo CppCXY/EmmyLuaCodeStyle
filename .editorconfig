@@ -2,4 +2,7 @@
 [*]
 
 # ReSharper properties
-resharper_namespace_indentation = none
+resharper_namespace_indentation=none
+indent_style=tab
+tab_width=4
+

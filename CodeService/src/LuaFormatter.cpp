@@ -406,7 +406,32 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalStatement(std::shared_pt
 			}
 		case LuaAstNodeType::ExpressionList:
 			{
-				env->AddChild(FormatNode(node));
+				std::shared_ptr<FormatElement> layout = nullptr;
+				if (_options.local_assign_continuation_align_to_first_expression)
+				{
+					bool canAligned = true;
+					// 但是如果表达式列表中出现跨行表达式,则采用长表达式对齐
+					for (auto& expression : node->GetChildren())
+					{
+						if (expression->GetType() == LuaAstNodeType::Expression)
+						{
+							auto startLine = _parser->GetLine(expression->GetTextRange().StartOffset);
+							auto endLine = _parser->GetLine(expression->GetTextRange().EndOffset);
+
+							if (startLine != endLine)
+							{
+								canAligned = false;
+								break;
+							}
+						}
+					}
+					if (canAligned)
+					{
+						layout = std::make_shared<AlignToFirstElement>();
+					}
+				}
+
+				env->AddChild(FormatExpressionList(node, layout));
 				break;
 			}
 		case LuaAstNodeType::Comment:
@@ -522,9 +547,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
  *     cccc,eeee
  *	   ,fff
  */
-std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_ptr<LuaAstNode> expressionList)
+std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_ptr<LuaAstNode> expressionList,
+                                                                  std::shared_ptr<FormatElement> env)
 {
-	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent_size);
+	if (env == nullptr)
+	{
+		env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent_size);
+	}
 
 	for (auto& node : expressionList->GetChildren())
 	{
@@ -1033,12 +1062,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 				env->AddChild(FormatNode(child));
 				break;
 			}
-			// case LuaAstNodeType::Expression:
-			// 	{
-			// 		FormatExpression(child, env);
-			// 		break;
-			// 	}
-			// default 一般只有一个分号
+		// case LuaAstNodeType::Expression:
+		// 	{
+		// 		FormatExpression(child, env);
+		// 		break;
+		// 	}
+		// default 一般只有一个分号
 		default:
 			{
 				DefaultHandle(child, env);
@@ -1065,21 +1094,33 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 			}
 		case LuaAstNodeType::ExpressionList:
 			{
-				auto exprListEnv = FormatNode(child);
+				std::shared_ptr<FormatElement> layout = nullptr;
 				if (_options.align_call_args)
 				{
-					auto alignToFirstEnv = std::make_shared<AlignToFirstElement>();
-					alignToFirstEnv->AddChildren(exprListEnv->GetChildren());
-					env->AddChild(alignToFirstEnv);
-				}
-				else
-				{
-					auto& exprListChildren = exprListEnv->GetChildren();
-					auto keepElement = std::make_shared<KeepElement>(0);
-					exprListChildren.insert(exprListChildren.begin(), keepElement);
+					bool canAligned = true;
+					// 但是如果表达式列表中出现跨行表达式,则采用长表达式对齐
+					for (auto& expression : child->GetChildren())
+					{
+						if (expression->GetType() == LuaAstNodeType::Expression)
+						{
+							auto startLine = _parser->GetLine(expression->GetTextRange().StartOffset);
+							auto endLine = _parser->GetLine(expression->GetTextRange().EndOffset);
 
-					env->AddChild(exprListEnv);
+							if (startLine != endLine)
+							{
+								canAligned = false;
+								break;
+							}
+						}
+					}
+
+					if (canAligned)
+					{
+						layout = std::make_shared<AlignToFirstElement>();
+					}
 				}
+
+				env->AddChild(FormatExpressionList(child, layout));
 
 				if (_options.keep_one_space_between_call_args_and_parentheses)
 				{
@@ -1434,7 +1475,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 	std::shared_ptr<FormatElement> env = nullptr;
 	if (_options.continuous_assign_statement_align_to_equal_sign)
 	{
-		env = std::make_shared<AlignmentLayoutElement>();
+		env = std::make_shared<AlignmentLayoutElement>("=");
 	}
 	else
 	{
@@ -1596,7 +1637,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 	// 认为tableField 可以(但不是必须这样做)按照等号对齐
 	if (alignToEq && _options.continuous_assign_table_field_align_to_equal_sign)
 	{
-		auto alignmentLayoutElement = std::make_shared<AlignmentLayoutElement>();
+		auto alignmentLayoutElement = std::make_shared<AlignmentLayoutElement>("=");
 		alignmentLayoutElement->CopyFrom(env);
 		env->Reset();
 		env->AddChild(alignmentLayoutElement);
