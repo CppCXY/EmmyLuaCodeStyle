@@ -189,6 +189,12 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		options->continuation_indent_size = std::stoi(configMap.at("continuation_indent_size"));
 	}
 
+	if(configMap.count("local_assign_continuation_align_to_first_expression"))
+	{
+		options->local_assign_continuation_align_to_first_expression =
+			configMap.at("local_assign_continuation_align_to_first_expression") == "true";
+	}
+
 	if (configMap.count("align_call_args"))
 	{
 		options->align_call_args = configMap.at("align_call_args") == "true";

@@ -41,13 +41,12 @@ function ff()
 end
 
 -- translate tab to space
--- TODO
--- pcall {
--- 	function()
--- 		local t = 13
--- 	end,
--- 	a, b, c,
--- }
+pcall {
+	function()
+		local t = 13
+	end,
+	a, b, c,
+}
 
 function fff()
     do 

@@ -19,3 +19,5 @@ function fff2()
 cc or d,a, function ()end
 end
 
+local t3 = {1,2,3},
+{4,5,6} 

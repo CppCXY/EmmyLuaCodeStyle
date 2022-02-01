@@ -41,7 +41,7 @@ public:
 	 */
 	int continuation_indent_size = 4;
 
-	bool local_assign_continuation_align_to_first_expression = true;
+	bool local_assign_continuation_align_to_first_expression = false;
 	/*
 	 * 调用参数对齐到第一个参数，经过实际体验这种风格在vscode上会因为垂直对齐线的标注而显得极为难看
 	 * 

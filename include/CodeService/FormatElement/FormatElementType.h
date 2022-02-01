@@ -13,6 +13,7 @@ enum class FormatElementType
 	SubExpressionElement,
 	LongExpressionLayoutElement,
 	NoIndentElement,
+	IndentOnLineBreakElement,
 
 	ControlStart,
 	KeepLineElement,

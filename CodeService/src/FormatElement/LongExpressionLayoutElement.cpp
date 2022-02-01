@@ -49,10 +49,7 @@ void LongExpressionLayoutElement::SerializeSubExpression(SerializeContext& ctx, 
 		{
 			if (ctx.GetCharacterCount() == 0 && !_hasContinuation)
 			{
-				_hasContinuation = true;
-				auto state = ctx.GetCurrentIndent();
-				state.SpaceIndent += _continuationIndent;
-				ctx.AddIndent(state);
+				IndentSubExpression(ctx);
 			}
 		}
 	}
@@ -77,11 +74,31 @@ void LongExpressionLayoutElement::DiagnosisSubExpression(DiagnosisContext& ctx, 
 		{
 			if (ctx.GetCharacterCount() == 0 && !_hasContinuation)
 			{
-				_hasContinuation = true;
-				auto state = ctx.GetCurrentIndent();
-				state.SpaceIndent += _continuationIndent;
-				ctx.AddIndent(state);
+				IndentSubExpression(ctx);
 			}
 		}
+	}
+}
+
+void LongExpressionLayoutElement::IndentSubExpression(FormatContext& ctx)
+{
+	_hasContinuation = true;
+	if (_continuationIndent != -1) {
+		auto& options = ctx.GetOptions();
+		auto state = ctx.GetCurrentIndent();
+		if (options.indent_style == IndentStyle::Space)
+		{
+			state.SpaceIndent += _continuationIndent;
+		}
+		else
+		{
+			state.TabIndent += _continuationIndent / options.tab_width;
+			state.SpaceIndent += _continuationIndent % options.tab_width;
+		}
+		ctx.AddIndent(state);
+	}
+	else
+	{
+		ctx.AddIndent();
 	}
 }

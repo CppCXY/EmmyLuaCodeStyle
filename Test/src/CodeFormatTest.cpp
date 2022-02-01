@@ -162,12 +162,12 @@ int main(int argc, char* argv[])
 	{
 		auto editorconfigPath = workRoot / ".editorconfig";
 		auto editorConfig = LuaEditorConfig::LoadFromFile(editorconfigPath.string());
-		editorConfig->SetWorkspace(workRoot.string());
 		if (!editorConfig)
 		{
 			std::cerr << "can not find editorconfig file" << std::endl;
 			return -1;
 		}
+		editorConfig->SetWorkspace(workRoot.string());
 		std::filesystem::path formattedRoot(commandLine.Get<std::string>("formatted-work-directory"));
 		for (auto& path : luaFiles)
 		{

@@ -16,6 +16,7 @@
 #include "CodeService/NameStyle/NameStyleChecker.h"
 #include "CodeService/FormatElement/NoIndentElement.h"
 #include "CodeService/FormatElement/SerializeContext.h"
+#include "CodeService/FormatElement/IndentOnLineBreakElement.h"
 
 bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
 {
@@ -1568,7 +1569,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 	}
 	else
 	{
-		env = std::make_shared<IndentElement>();
+		env = std::make_shared<IndentOnLineBreakElement>();
 	}
 
 	env->AddChild(FormatNode(*it));
