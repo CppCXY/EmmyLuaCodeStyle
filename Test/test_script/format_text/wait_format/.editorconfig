@@ -6,7 +6,7 @@ indent_style = space
 # if indent_style is space, this is valid
 indent_size = 4
 # if indent_style is tab, this is valid
-tab_width = 8
+tab_width = 4
 continuation_indent_size = 4
 align_call_args = false
 keep_one_space_between_call_args_and_bracket = false
