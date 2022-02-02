@@ -133,6 +133,12 @@ label_no_indent = true
 do_statement_no_indent = true
 [{if_condition_no_continuation_indent-eq-true.lua}]
 if_condition_no_continuation_indent = true
-[{keep_line_after_if_statement-eq-minLine-1.lua}]
-keep_line_after_if_statement=minLine:1
+[{minLine-eq-1.lua}]
+keep_line_after_if_statement = minLine:1
+keep_line_after_do_statement = minLine:1
+keep_line_after_while_statement = minLine:1
+keep_line_after_repeat_statement = minLine:1
+keep_line_after_for_statement = minLine:1
+keep_line_after_local_or_assign_statement = minLine:1
+keep_line_after_function_define_statement = minLine:1
 
