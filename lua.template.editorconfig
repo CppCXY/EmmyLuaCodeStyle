@@ -26,6 +26,11 @@ keep_one_space_between_table_and_bracket = true
 align_table_field_to_first_field = false
 # if true, ormat like this "local t <const> = 1"
 keep_one_space_between_namedef_and_attribute = false
+# continous line distance
+max_continuous_line_distance = 1
+# if true, iff any one of the consecutive rows meets the condition of aligning to the equal sign,
+# the consecutive rows will be aligned to the equal sign
+weak_alignment_rule = false
 # see document for detail
 continuous_assign_statement_align_to_equal_sign = true
 # see document for detail
@@ -36,6 +41,7 @@ label_no_indent = false
 do_statement_no_indent = false
 # if true, the conditional expression of the if statement will not be a continuation line indent
 if_condition_no_continuation_indent = false
+
 
 # optional crlf/lf
 end_of_line = crlf

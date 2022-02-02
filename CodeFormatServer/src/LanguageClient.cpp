@@ -208,7 +208,9 @@ int LanguageClient::Run(std::shared_ptr<asio::io_context> ioc)
 	_ioc = ioc;
 	if (_session)
 	{
-		return _session->Run(*ioc);
+		int ret = _session->Run(*ioc);
+		_session = nullptr;
+		return ret;
 	}
 	return 1;
 }

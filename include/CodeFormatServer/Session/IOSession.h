@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-
+#include <thread>
 #include "asio/io_context.hpp"
 #include "CodeFormatServer/LanguageService.h"
 #include "CodeFormatServer/Protocol/ProtocolBuffer.h"
@@ -19,4 +19,5 @@ protected:
 	ProtocolBuffer _protocolBuffer;
 private:
 	LanguageService _service;
+	std::shared_ptr<std::jthread> _logicThread;
 };
