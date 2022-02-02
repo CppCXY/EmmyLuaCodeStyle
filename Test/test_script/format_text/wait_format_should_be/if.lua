@@ -1,5 +1,4 @@
 if aaa then end
-
 if aaa + bbb + ccc == 123 then end
 
 if aaa + bbb and
@@ -12,7 +11,6 @@ if aaa + bbb and
     else --hahh
     end
 end
-
 if a then
 elseif aa then
 elseif ccc then
