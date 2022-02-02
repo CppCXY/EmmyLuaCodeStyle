@@ -87,6 +87,7 @@ bool LuaTokenParser::Parse()
 		if (!_errors.empty())
 		{
 			_file->SetTotalLine(_linenumber);
+			_file->UpdateLineInfo(_linenumber);
 			return false;
 		}
 	}
