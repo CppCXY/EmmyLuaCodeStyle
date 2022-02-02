@@ -105,3 +105,34 @@ continuation_indent_size = 4
 continuation_indent_size = 8
 [{local_assign_continuation_align_to_first_expression-eq-true.lua}]
 local_assign_continuation_align_to_first_expression = true
+[{align_call_args-eq-true.lua}]
+align_call_args = true
+[{keep_one_space_between_call_args_and_parentheses-eq-true.lua}]
+keep_one_space_between_call_args_and_parentheses = true
+[{align_function_define_params-eq-true.lua}]
+align_function_define_params = true
+[{keep_one_space_between_table_and_bracket-eq-true.lua}]
+keep_one_space_between_table_and_bracket = true
+[{keep_one_space_between_table_and_bracket-eq-false.lua}]
+keep_one_space_between_table_and_bracket = false
+[{align_table_field_to_first_field-eq-true.lua}]
+align_table_field_to_first_field = true
+[{keep_one_space_between_namedef_and_attribute-eq-true.lua}]
+keep_one_space_between_namedef_and_attribute = true
+[{continuous_assign_statement_align_to_equal_sign-eq-true.lua}]
+continuous_assign_statement_align_to_equal_sign = true
+[{continuous_assign_statement_align_to_equal_sign-eq-false.lua}]
+continuous_assign_statement_align_to_equal_sign = false
+[{continuous_assign_table_field_align_to_equal_sign-eq-true.lua}]
+continuous_assign_table_field_align_to_equal_sign = true
+[{continuous_assign_table_field_align_to_equal_sign-eq-false.lua}]
+continuous_assign_table_field_align_to_equal_sign = false
+[{label_no_indent-eq-true.lua}]
+label_no_indent = true
+[{do_statement_no_indent-eq-true.lua}]
+do_statement_no_indent = true
+[{if_condition_no_continuation_indent-eq-true.lua}]
+if_condition_no_continuation_indent = true
+[{keep_line_after_if_statement-eq-minLine-1.lua}]
+keep_line_after_if_statement=minLine:1
+

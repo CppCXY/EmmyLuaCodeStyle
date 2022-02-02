@@ -16,3 +16,21 @@ local t5 = aaaa,
 local t6 = cccc,
     function()
     end
+
+t7 = { 123, 456, 678 },
+     { 890, 678 }
+
+t9 = calls(aa, bb, ccc),
+     dddd(eeee)
+
+t10 = function()
+end
+
+t11 = {
+    aa = 13,
+    bbb = 456
+}
+
+t12 = {
+    ccc = 789,
+}
