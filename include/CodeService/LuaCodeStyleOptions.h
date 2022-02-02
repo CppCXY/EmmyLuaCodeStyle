@@ -42,6 +42,7 @@ public:
 	int continuation_indent_size = 4;
 
 	bool local_assign_continuation_align_to_first_expression = false;
+	bool table_field_continuation_align_to_first_sub_expression = false;
 	/*
 	 * 调用参数对齐到第一个参数，经过实际体验这种风格在vscode上会因为垂直对齐线的标注而显得极为难看
 	 * 
@@ -89,6 +90,16 @@ public:
 	 * 表内每一个表项对齐到第一个表项
 	 */
 	bool align_table_field_to_first_field = true;
+
+	/*
+	 * 如何认定连续行,相距超过该选项的值则认为不连续
+	 */
+	int max_continuous_line_distance = 1;
+
+	/*
+	 * 如果采用弱对齐规则,则连续行内的等号只要有一个等号与左边的元素间距超过一个空格则连续行内对齐到等号
+	 */
+	bool weak_alignment_rule = false;
 
 	bool continuous_assign_statement_align_to_equal_sign = true;
 

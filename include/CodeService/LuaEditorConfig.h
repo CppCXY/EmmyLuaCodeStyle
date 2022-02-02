@@ -25,7 +25,7 @@ public:
 	void SetWorkspace(std::string_view workspace);
 
 	void SetRootWorkspace(std::string_view rootWorkspace);
-private:
+private:                        
 	void ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> options,
 	                      std::map<std::string, std::string, std::less<>>& configMap);
 

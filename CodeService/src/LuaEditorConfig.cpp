@@ -9,6 +9,18 @@
 #include "CodeService/FormatElement/MinLineElement.h"
 #include "CodeService/NameStyle/NameStyleRuleMatcher.h"
 
+bool isNumber(std::string_view source)
+{
+	for (auto c : source)
+	{
+		if (c > '9' || c < '0')
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 std::shared_ptr<LuaEditorConfig> LuaEditorConfig::LoadFromFile(const std::string& path)
 {
 	std::fstream fin(path, std::ios::in);
@@ -85,14 +97,14 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 			patternKey.append("#").append(sectionPattern);
 			luaSections.push_back(section);
 		}
-			// [{test.lua,lib.lua}]
-		else if (StringUtil::StartWith(sectionPattern,"{") && StringUtil::EndWith(sectionPattern, "}"))
+		// [{test.lua,lib.lua}]
+		else if (StringUtil::StartWith(sectionPattern, "{") && StringUtil::EndWith(sectionPattern, "}"))
 		{
 			auto fileListText = sectionPattern.substr(1, sectionPattern.size() - 2);
 			auto fileList = StringUtil::Split(fileListText, ",");
 			for (auto fileMatchUri : fileList)
 			{
-				if (StringUtil::EndWith(fileUri,StringUtil::TrimSpace(fileMatchUri)))
+				if (StringUtil::EndWith(fileUri, StringUtil::TrimSpace(fileMatchUri)))
 				{
 					patternKey.append("#").append(sectionPattern);
 					luaSections.push_back(section);
@@ -101,7 +113,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 			}
 		}
 #ifndef NOT_SURPPORT_FILE_SYSTEM
-			// [lib/**.lua]
+		// [lib/**.lua]
 		else if (StringUtil::EndWith(sectionPattern, "**.lua"))
 		{
 			std::string prefix = sectionPattern.substr(0, sectionPattern.size() - 6);
@@ -111,13 +123,13 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 			std::filesystem::path file(fileUri);
 			auto dirNormal = dirname.lexically_normal();
 			auto fileNormal = file.lexically_normal();
-			if (StringUtil::StartWith(fileNormal.string(),dirNormal.string()))
+			if (StringUtil::StartWith(fileNormal.string(), dirNormal.string()))
 			{
 				patternKey.append("#").append(sectionPattern);
 				luaSections.push_back(section);
 			}
 		}
-			//[aaa/bbb.lua]
+		//[aaa/bbb.lua]
 		else
 		{
 			std::filesystem::path workspace(_workspace);
@@ -129,7 +141,6 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 			}
 		}
 #endif
-
 	}
 
 	if (_optionPatternMap.count(patternKey) > 0)
@@ -174,25 +185,35 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		}
 	}
 
-	if (configMap.count("indent_size"))
+	if (configMap.count("indent_size")
+		&& isNumber(configMap.at("indent_size"))
+	)
 	{
 		options->indent_size = std::stoi(configMap.at("indent_size"));
 	}
 
-	if (configMap.count("tab_width"))
+	if (configMap.count("tab_width")
+		&& isNumber(configMap.at("tab_width")))
 	{
 		options->tab_width = std::stoi(configMap.at("tab_width"));
 	}
 
-	if (configMap.count("continuation_indent_size"))
+	if (configMap.count("continuation_indent_size")
+		&& isNumber(configMap.at("continuation_indent_size")))
 	{
 		options->continuation_indent_size = std::stoi(configMap.at("continuation_indent_size"));
 	}
 
-	if(configMap.count("local_assign_continuation_align_to_first_expression"))
+	if (configMap.count("local_assign_continuation_align_to_first_expression"))
 	{
 		options->local_assign_continuation_align_to_first_expression =
 			configMap.at("local_assign_continuation_align_to_first_expression") == "true";
+	}
+
+	if (configMap.count("table_field_continuation_align_to_first_sub_expression"))
+	{
+		options->table_field_continuation_align_to_first_sub_expression =
+			configMap.at("table_field_continuation_align_to_first_sub_expression") == "true";
 	}
 
 	if (configMap.count("align_call_args"))
@@ -212,23 +233,23 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("keep_one_space_between_table_and_bracket") == "true";
 	}
 
-	if(configMap.count("keep_one_space_between_namedef_and_attribute"))
+	if (configMap.count("keep_one_space_between_namedef_and_attribute"))
 	{
 		options->keep_one_space_between_namedef_and_attribute =
 			configMap.at("keep_one_space_between_namedef_and_attribute") == "true";
 	}
 
-	if(configMap.count("label_no_indent"))
+	if (configMap.count("label_no_indent"))
 	{
 		options->label_no_indent = configMap.at("label_no_indent") == "true";
 	}
 
-	if(configMap.count("do_statement_no_indent"))
+	if (configMap.count("do_statement_no_indent"))
 	{
 		options->do_statement_no_indent = configMap.at("do_statement_no_indent") == "true";
 	}
 
-	if(configMap.count("if_condition_no_continuation_indent"))
+	if (configMap.count("if_condition_no_continuation_indent"))
 	{
 		options->if_condition_no_continuation_indent = configMap.at("if_condition_no_continuation_indent") == "true";
 	}
@@ -236,6 +257,19 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 	if (configMap.count("align_table_field_to_first_field"))
 	{
 		options->align_table_field_to_first_field = configMap.at("align_table_field_to_first_field") == "true";
+	}
+
+	if (configMap.count("max_continuous_line_distance")
+		&& isNumber(configMap.at("max_continuous_line_distance")))
+	{
+		options->max_continuous_line_distance =
+			std::stoi(configMap.at("max_continuous_line_distance"));
+	}
+
+	if(configMap.count("weak_alignment_rule"))
+	{
+		options->weak_alignment_rule =
+			configMap.at("weak_alignment_rule") == "true";
 	}
 
 	if (configMap.count("continuous_assign_statement_align_to_equal_sign"))
@@ -263,7 +297,8 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		}
 	}
 
-	if (configMap.count("max_line_length"))
+	if (configMap.count("max_line_length")
+		&& isNumber(configMap.at("max_line_length")))
 	{
 		options->max_line_length = std::stoi(configMap.at("max_line_length"));
 	}
@@ -340,7 +375,7 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		}
 	}
 
-	if(options->indent_style == IndentStyle::Tab)
+	if (options->indent_style == IndentStyle::Tab)
 	{
 		options->align_table_field_to_first_field = false;
 	}

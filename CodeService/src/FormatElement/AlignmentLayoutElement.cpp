@@ -59,6 +59,27 @@ void AlignmentLayoutElement::Diagnosis(DiagnosisContext& ctx, ChildIterator self
 int AlignmentLayoutElement::GetAlignPosition(FormatContext& ctx)
 {
 	auto indentState = ctx.GetCurrentIndent();
+	int alignOffset = 0;
+
+	if (!ctx.GetOptions().weak_alignment_rule)
+	{
+		alignOffset = GetAlignOffset(ctx);
+	}
+	else
+	{
+		alignOffset = GetAlignOffsetWithWeakRule(ctx);
+	}
+
+	if (alignOffset == -1)
+	{
+		return alignOffset;
+	}
+
+	return alignOffset + static_cast<int>(indentState.SpaceIndent + indentState.TabIndent);
+}
+
+int AlignmentLayoutElement::GetAlignOffset(FormatContext& ctx)
+{
 	int alignSignOffset = 0;
 	bool firstContainAlignSign = true;
 	// 先寻找等号对齐的位置，并且判断连续的带等号的语句是否应该对齐到等号
@@ -98,14 +119,59 @@ int AlignmentLayoutElement::GetAlignPosition(FormatContext& ctx)
 
 
 					alignSignOffset = std::max(alignSignOffset,
-						signPosition - ctx.GetColumn(statement->GetTextRange().StartOffset)
-						);
+					                           signPosition - ctx.GetColumn(statement->GetTextRange().StartOffset)
+					);
+				}
+			}
+		}
+	}
+	return alignSignOffset;
+}
+
+int AlignmentLayoutElement::GetAlignOffsetWithWeakRule(FormatContext& ctx)
+{
+	int alignSignOffset = 0;
+	bool canAlignToSign = false;
+	// 先寻找等号对齐的位置，并且判断连续的带等号的语句是否应该对齐到等号
+	// 连续的带等号的语句是否应该对齐到等号，这个行为由所有连续语句共同决定
+	for (auto statIt = _children.begin(); statIt != _children.end(); ++statIt)
+	{
+		const auto statement = *statIt;
+
+		auto& statementChildren = statement->GetChildren();
+
+		for (auto it = statementChildren.begin(); it != statementChildren.end(); ++it)
+		{
+			auto textChild = *it;
+			if (textChild->GetType() == FormatElementType::TextElement)
+			{
+				const auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
+				if (textElement->GetText() == _alignSign)
+				{
+					const auto signPosition = ctx.GetColumn(textElement->GetTextRange().StartOffset);
+
+					auto lastStatChild = FindLastValidChild(it, statementChildren);
+					if (lastStatChild == nullptr)
+					{
+						return -1;
+					}
+
+					const auto lastPosition = ctx.GetColumn(lastStatChild->GetTextRange().EndOffset);
+
+					if (signPosition - lastPosition >= 2)
+					{
+						canAlignToSign = true;
+					}
+
+					alignSignOffset = std::max(alignSignOffset,
+					                           signPosition - ctx.GetColumn(statement->GetTextRange().StartOffset)
+					);
 				}
 			}
 		}
 	}
 
-	return alignSignOffset + indentState.SpaceIndent + indentState.TabIndent;
+	return canAlignToSign ? alignSignOffset : -1;
 }
 
 void AlignmentLayoutElement::AlignmentSerialize(SerializeContext& ctx, ChildIterator selfIt, int alignSignPosition,

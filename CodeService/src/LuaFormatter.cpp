@@ -474,7 +474,32 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignment(std::shared_ptr<Lu
 				}
 				else
 				{
-					env->AddChild(FormatNode(node));
+					std::shared_ptr<FormatElement> layout = nullptr;
+					if (_options.local_assign_continuation_align_to_first_expression)
+					{
+						bool canAligned = true;
+						// 但是如果表达式列表中出现跨行表达式,则采用长表达式对齐
+						for (auto& expression : node->GetChildren())
+						{
+							if (expression->GetType() == LuaAstNodeType::Expression)
+							{
+								auto startLine = _parser->GetLine(expression->GetTextRange().StartOffset);
+								auto endLine = _parser->GetLine(expression->GetTextRange().EndOffset);
+
+								if (startLine != endLine)
+								{
+									canAligned = false;
+									break;
+								}
+							}
+						}
+						if (canAligned)
+						{
+							layout = std::make_shared<AlignToFirstElement>();
+						}
+					}
+
+					env->AddChild(FormatExpressionList(node, layout));
 				}
 
 				break;
@@ -1425,7 +1450,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<LuaAstNode> tableField)
 {
 	auto env = std::make_shared<ExpressionElement>();
-
+	auto eqSignFounded = false;
 	for (auto& child : tableField->GetChildren())
 	{
 		switch (child->GetType())
@@ -1434,6 +1459,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 			{
 				if (child->GetText() == "=")
 				{
+					eqSignFounded = true;
 					env->Add<KeepBlankElement>(1);
 					env->Add<TextElement>(child);
 					env->Add<KeepBlankElement>(1);
@@ -1453,6 +1479,36 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 			{
 				env->AddChild(FormatNode(child));
 				env->Add<KeepElement>(1);
+				break;
+			}
+		case LuaAstNodeType::Expression:
+			{
+				std::shared_ptr<FormatElement> layout = nullptr;
+				if (_options.table_field_continuation_align_to_first_sub_expression && eqSignFounded)
+				{
+					bool canAligned = true;
+					// 但是如果表达式列表中出现跨行表达式,则采用长表达式对齐
+					for (auto& expression : child->GetChildren())
+					{
+						if (expression->GetType() == LuaAstNodeType::Expression)
+						{
+							auto startLine = _parser->GetLine(expression->GetTextRange().StartOffset);
+							auto endLine = _parser->GetLine(expression->GetTextRange().EndOffset);
+
+							if (startLine != endLine)
+							{
+								canAligned = false;
+								break;
+							}
+						}
+					}
+					if (canAligned)
+					{
+						layout = std::make_shared<AlignToFirstElement>();
+					}
+				}
+
+				env->AddChild(FormatExpression(child, layout));
 				break;
 			}
 		default:
@@ -1499,7 +1555,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 		int currentLine = _parser->GetLine(currentChild->GetTextRange().EndOffset);
 		int nextLine = _parser->GetLine(nextChild->GetTextRange().StartOffset);
 		// 这个规则是下一个连续的赋值/local/注释语句如果和上一个赋值/local/注释语句 间距2行以上，则不认为是连续
-		if (nextLine - currentLine > 2)
+		if (nextLine - currentLine > _options.max_continuous_line_distance)
 		{
 			break;
 		}
