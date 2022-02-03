@@ -19,5 +19,11 @@ protected:
 	ProtocolBuffer _protocolBuffer;
 private:
 	LanguageService _service;
+#ifndef __APPLE__
 	std::shared_ptr<std::jthread> _logicThread;
+#else
+	std::shared_ptr<std::thread> _logicThread = nullptr;
+	volatile bool _running = true;
+#endif
+
 };

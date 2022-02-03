@@ -18,12 +18,19 @@ IOSession::~IOSession()
 {
 	if(_logicThread)
 	{
+#ifndef __APPLE__
 		_logicThread->request_stop();
+#else
+		_running = false;
+		_logicThread->join();
+#endif
 	}
 }
 
 int IOSession::Run(asio::io_context& ioc)
 {
+	//苹果暂未支持 这个jthread
+#ifndef __APPLE__
 	_logicThread = std::make_shared<std::jthread>([&ioc](std::stop_token st)
 	{
 		while (!st.stop_requested())
@@ -33,6 +40,17 @@ int IOSession::Run(asio::io_context& ioc)
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 	});
+#else
+	_logicThread = std::make_shared<std::thread>([&ioc, this]()
+		{
+			while (_running)
+			{
+				ioc.run();
+				ioc.reset();
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
+		});
+#endif
 
 	return 0;
 }
