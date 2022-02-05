@@ -106,6 +106,22 @@ if aaa == 123
 end
 ```
 
+## local_assign_continuation_align_to_first_expression
+
+This parameter represents a list of local or right expressions of an assignment statement. If there is more than one line, it will be aligned to the first expression, for example:
+````lua
+local t = aaa,bbb,ccc,
+     ddd,eee,fff
+````
+will be formatted as
+````lua
+local t = aaa,bbb,ccc,
+           ddd,eee,fff
+````
+
+When this option is in effect, the continuation_indent_size option has no effect on local and assignment statements.
+When a cross-line expression appears in the expression list, such as function and table defined across lines, this option is invalid. 
+
 ## align_call_args
 
 This parameter indicates whether the calling parameter is aligned to the first parameter, the default value is false
@@ -130,7 +146,9 @@ helloWorld(aaa, bbb, ccc,
 
 ```
 
-## keep_one_space_between_call_args_and_bracket
+The behavior defined by this option has no effect when a cross-line expression appears in the call parameter list 
+
+## keep_one_space_between_call_args_and_parentheses
 
 This option indicates whether there is a space between the parameters of the function call expression and the left and right parentheses. The default value of the option is false
 
@@ -147,7 +165,7 @@ print(123,456)
 after formatting：
 
 ```lua
---keep_one_space_between_call_args_and_bracket = true
+--keep_one_space_between_call_args_and_parentheses = true
 
 helloWorld( aaa, bbb, ccc,
     eee, ddd )
@@ -262,6 +280,25 @@ local t2 = { aaa, bbbb,
 }
 ```
 
+## keep_one_space_between_namedef_and_attribute
+
+This option indicates that a space should be maintained between the name definition in the name list of the local statement and its attribute.
+
+Before formatting:
+````lua
+local t<const> = 1
+````
+
+After formatting:
+
+````lua
+local t <const> = 1
+````
+
+## max_continuous_line_distance
+
+This option indicates the definition of continuous lines, and its value determines the same continuous when the spacing between lines is less than or equal to how much. 
+
 ## continuous_assign_statement_align_to_equal_sign
 
 This option means that if the first line of the continuous assignment statement is more than one space between the equal sign and the left symbol, it will be aligned to the largest equal sign of the continuous assignment statement. The default value of this option is true.
@@ -294,7 +331,9 @@ eeeeeeeee  = 654 -- this is a comment2
 
 -- no continuous
 local c = 132
+```
 
+```lua
 -- false
 local t = 123
 local cccc = 456
@@ -336,6 +375,95 @@ local t = {
     bbb = 456,
     ddd = 789
 }
+```
+
+## weak_alignment_rule
+
+This option indicates whether it is a weak alignment rule. If so, if any of the equal signs of the continuous local/assignment statement and the element to the left are greater than one space, the continuous statement will be aligned to the equal sign
+
+## label_no_indent
+
+This option means that the labels are not indented.
+
+Before formatting:
+````lua
+function fff()
+
+    for i=1,2,3 do
+        if true then
+            goto continue
+        end
+
+        ::continue::
+    end
+
+end
+````
+After formatting:
+````lua
+function fff()
+
+    for i=1,2,3 do
+        if true then
+            goto continue
+        end
+
+    ::continue::
+    end
+
+end
+````
+## do_statement_no_indent
+
+This option means no indentation inside the do statement block.
+
+
+Before formatting:
+```lua
+function fff()
+    do
+        for i=1,2,3 do
+            if true then
+                goto continue
+            end
+
+            ::continue::
+        end
+    end
+end
+```
+After formatting:
+```lua
+function fff()
+    do
+    for i=1,2,3 do
+        if true then
+            goto continue
+        end
+
+        ::continue::
+    end
+    end
+end
+```
+
+## if_condition_no_continuation_indent
+
+This option indicates that the conditional expression of the if statement does not need to be indented if it spans lines.
+
+Before formatting:
+```lua
+if a
+    and b then
+
+end
+```
+After formatting:
+```lua
+if a
+and b then
+
+end
 ```
 
 ## end_of_line

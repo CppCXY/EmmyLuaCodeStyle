@@ -19,8 +19,8 @@ end
 
 --use tab
 function ff()
-        local t = 123
-        local c = 456
+    local t = 123
+    local c = 456
 end
 ```
 
@@ -104,6 +104,22 @@ if aaa == 123
         or bbb == 456 then
 end
 ```
+## local_assign_continuation_align_to_first_expression
+
+该参数表示local或者赋值语句的右表达式列表，如果存在不止一行则对齐到首个表达式，例如：
+```lua
+local t = aaa,bbb,ccc,
+    ddd,eee,fff
+```
+会被格式化为
+```lua
+local t = aaa,bbb,ccc,
+          ddd,eee,fff
+```
+
+当该选项有效时，continuation_indent_size选项对local和赋值语句无效。
+当表达式列表中出现跨行表达式，例如跨行定义的function 和 table，则该选项无效。
+
 
 ## align_call_args
 
@@ -130,7 +146,9 @@ helloWorld(aaa, bbb, ccc,
 
 ```
 
-## keep_one_space_between_call_args_and_bracket
+当调用参数列表中出现跨行表达式时，该选项定义的行为无效
+
+## keep_one_space_between_call_args_and_parentheses
 
 该选项表示函数调用表达式的参数和左右括号之间是否保持一个空格，选项默认值是false
 
@@ -147,7 +165,7 @@ print(123,456)
 格式化后：
 
 ```lua
---keep_one_space_between_call_args_and_bracket = true
+--keep_one_space_between_call_args_and_parentheses = true
 
 helloWorld( aaa, bbb, ccc,
     eee, ddd )
@@ -259,6 +277,26 @@ local t2 = { aaa, bbbb,
 }
 ```
 
+## keep_one_space_between_namedef_and_attribute
+
+该选项表示local语句的名称列表中的名称定义和他的attribute之间保持一个空格。
+
+格式化前：
+```lua
+local t<const> = 1
+```
+
+格式化后：
+
+```lua
+local t <const> = 1
+```
+
+## max_continuous_line_distance
+
+该选项表示连续行的定义，它的值决定行之间的间距小于等于多少时为同一连续。
+
+
 ## continuous_assign_statement_align_to_equal_sign
 
 该选项表示连续赋值语句的首行语句如果等号与左边符号相距大于一个空格，则对齐到连续赋值语句的等号最大的位置，该选项默认值为true.
@@ -291,7 +329,9 @@ eeeeeeeee  = 654 -- this is a comment2
 
 -- no continuous
 local c = 132
+```
 
+```lua
 -- false
 local t = 123
 local cccc = 456
@@ -335,6 +375,96 @@ local t = {
 }
 ```
 
+## weak_alignment_rule
+
+该选项表示是否为弱对齐规则，如果是，则连续local/赋值语句的等号中任意一个与左边的元素大于一个空格则该连续语句会对齐到等号
+
+## label_no_indent
+
+该选项表示标签无缩进。
+
+格式化前：
+```lua
+function fff()
+
+    for i=1,2,3 do
+        if true then
+            goto continue
+        end
+
+        ::continue::
+    end
+
+end
+```
+格式化后:
+```lua
+function fff()
+
+    for i=1,2,3 do
+        if true then
+            goto continue
+        end
+
+    ::continue::
+    end
+
+end
+```
+## do_statement_no_indent
+
+该选项表示do语句块内无缩进。
+
+
+格式化前：
+```lua
+function fff()
+    do
+        for i=1,2,3 do
+            if true then
+                goto continue
+            end
+
+            ::continue::
+        end
+    end
+end
+```
+格式化后:
+```lua
+function fff()
+    do
+    for i=1,2,3 do
+        if true then
+            goto continue
+        end
+
+        ::continue::
+    end
+    end
+end
+```
+
+## if_condition_no_continuation_indent
+
+该选项表示if语句的条件表达式如果跨行，则无需缩进。
+
+格式化前：
+```lua
+if a
+    and b then
+
+end
+```
+格式化后：
+```lua
+if a
+and b then
+
+end
+```
+
+
 ## end_of_line
 
 该选项表示行尾的符号，默认为crlf，也可选为lf
@@ -345,13 +475,13 @@ local t = {
 
 这些选项名称和默认值分别是：
 ```
-keep_line_after_if_statement = minLine:1
-keep_line_after_do_statement = minLine:1
-keep_line_after_while_statement = minLine:1
-keep_line_after_repeat_statement = minLine:1
-keep_line_after_for_statement = minLine:1
+keep_line_after_if_statement = minLine:0
+keep_line_after_do_statement = minLine:0
+keep_line_after_while_statement = minLine:0
+keep_line_after_repeat_statement = minLine:0
+keep_line_after_for_statement = minLine:0
 keep_line_after_local_or_assign_statement = keepLine
-keep_line_after_function_define_statement = keepLine:1
+keep_line_after_function_define_statement = keepLine:0
 ```
 
 所有选项支持三种值表达：
