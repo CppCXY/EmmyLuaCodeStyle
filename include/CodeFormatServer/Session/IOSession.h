@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <thread>
+#include <atomic>
 #include "asio/io_context.hpp"
 #include "CodeFormatServer/LanguageService.h"
 #include "CodeFormatServer/Protocol/ProtocolBuffer.h"
@@ -23,7 +24,7 @@ private:
 	std::shared_ptr<std::jthread> _logicThread;
 #else
 	std::shared_ptr<std::thread> _logicThread = nullptr;
-	volatile bool _running = true;
+	std::atomic<bool> _running = true;
 #endif
 
 };
