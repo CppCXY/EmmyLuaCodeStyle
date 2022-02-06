@@ -21,7 +21,7 @@ LanguageClient& LanguageClient::GetInstance()
 LanguageClient::LanguageClient()
 	: _defaultOptions(std::make_shared<LuaCodeStyleOptions>()),
 	  _idCounter(0),
-	  _ioc(nullptr)
+	  _ioc(1)
 {
 }
 
@@ -203,12 +203,11 @@ std::shared_ptr<LuaParser> LanguageClient::GetFileParser(std::string_view uri)
 	return nullptr;
 }
 
-int LanguageClient::Run(std::shared_ptr<asio::io_context> ioc)
+int LanguageClient::Run()
 {
-	_ioc = ioc;
 	if (_session)
 	{
-		int ret = _session->Run(*ioc);
+		int ret = _session->Run(_ioc);
 		_session = nullptr;
 		return ret;
 	}
@@ -309,7 +308,7 @@ void LanguageClient::SetRoot(std::string_view root)
 
 asio::io_context& LanguageClient::GetIOContext()
 {
-	return *_ioc;
+	return _ioc;
 }
 
 uint64_t LanguageClient::GetRequestId()

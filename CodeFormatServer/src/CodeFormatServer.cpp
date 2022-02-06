@@ -16,7 +16,7 @@ using namespace asio::ip;
 
 int main(int argc, char** argv)
 {
-	auto ioc = std::make_shared<asio::io_context>(1);
+	auto& ioc = LanguageClient::GetInstance().GetIOContext();
 	if (argc > 1)
 	{
 		int port = std::stoi(argv[1]);

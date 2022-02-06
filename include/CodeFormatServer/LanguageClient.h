@@ -50,7 +50,7 @@ public:
 
 	std::shared_ptr<LuaParser> GetFileParser(std::string_view uri);
 
-	int Run(std::shared_ptr<asio::io_context> ioc);
+	int Run();
 
 	std::shared_ptr<LuaCodeStyleOptions> GetOptions(std::string_view uriOrFilename);
 
@@ -88,7 +88,7 @@ private:
 
 	std::string _root;
 
-	std::shared_ptr<asio::io_context> _ioc;
+	asio::io_context _ioc;
 
 	std::array<std::shared_ptr<Service>, static_cast<std::size_t>(ServiceType::ServiceCount)> _services;
 };
