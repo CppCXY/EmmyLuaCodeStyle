@@ -1,4 +1,4 @@
-#include "CodeFormatServer/Session/IOSession.h"
+ï»¿#include "CodeFormatServer/Session/IOSession.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include "CodeFormatServer/Protocol/ProtocolParser.h"
@@ -29,7 +29,7 @@ IOSession::~IOSession()
 
 int IOSession::Run(asio::io_context& ioc)
 {
-	//Æ»¹ûÔİÎ´Ö§³Ö Õâ¸öjthread
+	//è‹¹æœæš‚æœªæ”¯æŒ è¿™ä¸ªjthread
 #ifndef __APPLE__
 	_logicThread = std::make_shared<std::jthread>([&ioc](std::stop_token st)
 	{

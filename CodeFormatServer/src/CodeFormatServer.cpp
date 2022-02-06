@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 	if (argc > 1)
 	{
 		int port = std::stoi(argv[1]);
-		tcp::acceptor acceptor(*ioc, tcp::endpoint(tcp::v4(), port));
+		tcp::acceptor acceptor(ioc, tcp::endpoint(tcp::v4(), port));
 
 		auto socket = acceptor.accept();
 		LanguageClient::GetInstance().SetSession(std::make_shared<SocketIOSession>(std::move(socket)));
@@ -31,5 +31,5 @@ int main(int argc, char** argv)
 		LanguageClient::GetInstance().SetSession(std::make_shared<StandardIOSession>());
 	}
 
-	return LanguageClient::GetInstance().Run(ioc);
+	return LanguageClient::GetInstance().Run();
 }

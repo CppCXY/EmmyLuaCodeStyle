@@ -45,7 +45,7 @@ void LuaParser::BuildAst()
 	{
 		Block(_chunkAstNode);
 	}
-	catch (LuaParseException& e)
+	catch (LuaParseException&)
 	{
 		// ignore
 	}
@@ -111,7 +111,6 @@ void LuaParser::SetFilename(std::string_view filename)
 	std::filesystem::path path(filename);
 	_file->SetFilename(path.replace_extension().string());
 #endif
-
 }
 
 std::string_view LuaParser::GetFilename()

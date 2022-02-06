@@ -3,12 +3,14 @@
 #include <filesystem>
 #include <vector>
 #include <fstream>
+#include <chrono>
 #include "CodeService/LuaFormatter.h"
 #include "Util/format.h"
 #include "Util/CommandLine.h"
 #include "Util/StringUtil.h"
 #include "CodeService/LuaEditorConfig.h"
 
+using namespace std::chrono;
 
 bool TestFormatted(std::string input, const std::string& shouldBe, std::shared_ptr<LuaCodeStyleOptions> options)
 {
@@ -22,6 +24,21 @@ bool TestFormatted(std::string input, const std::string& shouldBe, std::shared_p
 	auto formattedText = formatter.GetFormattedText();
 
 	return StringUtil::TrimSpace(formattedText) == StringUtil::TrimSpace(shouldBe);
+}
+
+uint64_t TestPerformance(std::string input, std::shared_ptr<LuaCodeStyleOptions> options)
+{
+	auto start = steady_clock::now();
+	auto parser = LuaParser::LoadFromBuffer(std::move(input));
+	parser->BuildAstWithComment();
+
+	LuaFormatter formatter(parser, *options);
+
+	formatter.BuildFormattedElement();
+
+	volatile auto formattedText = formatter.GetFormattedText();
+
+	return duration_cast<milliseconds>(steady_clock::now() - start).count();
 }
 
 bool TestGrammar(std::string input)
@@ -114,6 +131,7 @@ int main(int argc, char* argv[])
 	commandLine.AddTarget("CheckGrammar");
 	commandLine.AddTarget("CheckFormatResult");
 	commandLine.AddTarget("CheckFormatResultByOption");
+	commandLine.AddTarget("Performance");
 
 	commandLine.Add<std::string>("work-directory", "w", "special base work directory");
 	commandLine.Add<std::string>("formatted-work-directory", "f", "special formatted work directory");
@@ -204,6 +222,21 @@ int main(int argc, char* argv[])
 
 			success &= passed;
 			std::cout << format("test check grammar {} ... {}", path, passed ? "passed" : "false") << std::endl;
+		}
+	}
+	else if(target == "Performance")
+	{
+		auto options = std::make_shared<LuaCodeStyleOptions>();
+#ifndef _WIN32
+		options->end_of_line = "\n";
+#endif
+		for (auto& path : luaFiles)
+		{
+			auto waitFormattingFilePath = workRoot / path;
+			auto waitFormattingText = ReadFile(waitFormattingFilePath.string());
+
+			auto time = TestPerformance(waitFormattingText, options);
+			std::cout << format("test format Performance {} ...it cost {}ms", path, time ) << std::endl;
 		}
 	}
 
