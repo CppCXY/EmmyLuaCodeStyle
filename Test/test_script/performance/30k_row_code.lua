@@ -10024,7 +10024,6 @@ end
 
 print'OK'
 
-#!../lua
 -- $Id: testes/all.lua $
 -- See Copyright Notice at the end of this file
 
@@ -20050,7 +20049,6 @@ end
 
 print'OK'
 
-#!../lua
 -- $Id: testes/all.lua $
 -- See Copyright Notice at the end of this file
 
