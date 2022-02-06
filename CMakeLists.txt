@@ -13,6 +13,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_definitions(-DMSVC)
 endif ()
 
+if (CMAKE_BUILD_TYPE STREQUAL "Release" )
+	set(CMAKE_C_FLAGS_RELEASE "-DNDEBUG -O3")
+	set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3")
+endif()
+
 add_subdirectory(LuaParser)
 add_subdirectory(CodeService)
 add_subdirectory(Util)
