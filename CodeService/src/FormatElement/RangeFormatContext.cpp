@@ -49,7 +49,7 @@ void RangeFormatContext::Print(TextElement& textElement)
 			}
 		}
 	}
-	_os << textElement.GetText();
+	_buffer.append(textElement.GetText());
 	_characterCount += textElement.GetText().size();
 
 	if (startLine < _formattedRange.StartLine)
@@ -74,7 +74,7 @@ void RangeFormatContext::PrintBlank(int blank)
 	{
 		for (int i = 0; i < blank; i++)
 		{
-			_os << ' ';
+			_buffer.push_back(' ');
 		}
 	}
 }
@@ -86,7 +86,7 @@ void RangeFormatContext::PrintLine(int line)
 	{
 		for (int i = 0; i < line; i++)
 		{
-			_os << _options.end_of_line;
+			_buffer.append(_options.end_of_line);
 		}
 	}
 }

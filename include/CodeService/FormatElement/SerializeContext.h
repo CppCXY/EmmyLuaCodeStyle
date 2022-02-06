@@ -16,8 +16,10 @@ public:
 	virtual void PrintBlank(int blank);
 
 	virtual std::string GetText();
+
+	void SetReadySize(std::size_t size);
 protected:
 	void PrintIndent(std::size_t indent, IndentStyle style);
-	std::stringstream _os;
+	std::string _buffer;
 };
 

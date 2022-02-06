@@ -61,6 +61,7 @@ void LuaFormatter::BuildFormattedElement()
 std::string LuaFormatter::GetFormattedText()
 {
 	SerializeContext ctx(_parser, _options);
+	ctx.SetReadySize(_parser->GetSource().size() + _parser->GetSource().size() / 2);
 
 	_env->Format(ctx);
 

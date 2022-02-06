@@ -32,7 +32,7 @@ void SerializeContext::Print(TextElement& textElement)
 			}
 		}
 	}
-	_os << textElement.GetText();
+	_buffer.append(textElement.GetText());
 	_characterCount += textElement.GetText().size();
 }
 
@@ -44,7 +44,7 @@ void SerializeContext::PrintLine(int line)
 	}
 	for (int i = 0; i < line; i++)
 	{
-		_os << _options.end_of_line;
+		_buffer.append(_options.end_of_line);
 		_characterCount = 0;
 	}
 }
@@ -57,14 +57,19 @@ void SerializeContext::PrintBlank(int blank)
 	}
 	for (int i = 0; i < blank; i++)
 	{
-		_os << ' ';
+		_buffer.push_back(' ');
 		_characterCount++;
 	}
 }
 
 std::string SerializeContext::GetText()
 {
-	return _os.str();
+	return std::move(_buffer);
+}
+
+void SerializeContext::SetReadySize(std::size_t size)
+{
+	_buffer.reserve(size);
 }
 
 void SerializeContext::PrintIndent(std::size_t indent, IndentStyle style)
@@ -75,7 +80,7 @@ void SerializeContext::PrintIndent(std::size_t indent, IndentStyle style)
 		{
 			for (std::size_t i = 0; i < indent; i++)
 			{
-				_os << ' ';
+				_buffer.push_back(' ');
 			}
 			_characterCount += indent;
 			break;
@@ -84,7 +89,7 @@ void SerializeContext::PrintIndent(std::size_t indent, IndentStyle style)
 		{
 			for (std::size_t i = 0; i < indent; i++)
 			{
-				_os << '\t';
+				_buffer.push_back('\t');
 			}
 			_characterCount += indent;
 			break;
