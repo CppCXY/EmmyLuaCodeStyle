@@ -99,6 +99,7 @@ protected:
 	                                                    const LuaAstNode::ChildrenContainer& children);
 
 	std::shared_ptr<FormatElement> FormatAlignTableField(LuaAstNode::ChildIterator& it,
+	                                                     bool allowAlignToEq,
 	                                                     const LuaAstNode::ChildrenContainer& children);
 	//意思其实是格式化任意节点加上Block和可选的接受一个end
 	std::shared_ptr<FormatElement> FormatNodeAndBlockOrEnd(LuaAstNode::ChildIterator& it,

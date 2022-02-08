@@ -1089,12 +1089,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 				env->AddChild(FormatNode(child));
 				break;
 			}
-		// case LuaAstNodeType::Expression:
-		// 	{
-		// 		FormatExpression(child, env);
-		// 		break;
-		// 	}
-		// default 一般只有一个分号
+			// case LuaAstNodeType::Expression:
+			// 	{
+			// 		FormatExpression(child, env);
+			// 		break;
+			// 	}
+			// default 一般只有一个分号
 		default:
 			{
 				DefaultHandle(child, env);
@@ -1417,6 +1417,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 				if (child->GetText() == "{")
 				{
 					env->Add<TextElement>(child);
+					auto operatorLine = _parser->GetLine(child->GetTextRange().StartOffset);
 					auto next = nextNode(it, children);
 					if (next)
 					{
@@ -1428,7 +1429,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 
 						env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
 						++it;
-						env->AddChild(FormatAlignTableField(it, children));
+						bool allowAlign = _options.continuous_assign_table_field_align_to_equal_sign
+							&& _parser->GetLine((*it)->GetTextRange().StartOffset) != operatorLine;
+						env->AddChild(FormatAlignTableField(it, allowAlign ,children));
 						env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
 					}
 				}
@@ -1617,6 +1620,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::ChildIterator& it,
+                                                                   bool allowAlignToEq,
                                                                    const LuaAstNode::ChildrenContainer& children)
 {
 	std::shared_ptr<FormatElement> env = nullptr;
@@ -1657,8 +1661,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 				env->Add<KeepBlankElement>(1);
 				env->Add<TextElement>(nextChild);
 			}
-			else if ((currentChild->GetType() == LuaAstNodeType::TableFieldSep) && nextChild->GetType() ==
-				LuaAstNodeType::TableField)
+			else if ((currentChild->GetType() == LuaAstNodeType::TableFieldSep)
+				&& nextChild->GetType() == LuaAstNodeType::TableField)
 			{
 				// 此时认为table 不应该考虑对齐到等号
 				alignToEq = false;
@@ -1693,7 +1697,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 	}
 
 	// 认为tableField 可以(但不是必须这样做)按照等号对齐
-	if (alignToEq && _options.continuous_assign_table_field_align_to_equal_sign)
+	if (alignToEq && allowAlignToEq)
 	{
 		auto alignmentLayoutElement = std::make_shared<AlignmentLayoutElement>("=");
 		alignmentLayoutElement->CopyFrom(env);

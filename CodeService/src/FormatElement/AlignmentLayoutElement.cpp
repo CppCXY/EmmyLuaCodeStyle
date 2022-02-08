@@ -158,7 +158,7 @@ int AlignmentLayoutElement::GetAlignOffsetWithWeakRule(FormatContext& ctx)
 
 					const auto lastPosition = ctx.GetColumn(lastStatChild->GetTextRange().EndOffset);
 
-					if (signPosition - lastPosition >= 2)
+					if (signPosition - lastPosition > 2)
 					{
 						canAlignToSign = true;
 					}

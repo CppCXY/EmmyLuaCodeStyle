@@ -5,8 +5,8 @@ local t2 = {
 local t3 = {}
 local t4 =
 { aaa,
-bbbb,
-ccc }
+    bbbb,
+    ccc }
 
 local t5 = { aaa,
     bbb, ccc, ddd, eee
