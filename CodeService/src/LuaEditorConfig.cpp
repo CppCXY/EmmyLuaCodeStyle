@@ -284,6 +284,12 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("continuous_assign_table_field_align_to_equal_sign") == "true";
 	}
 
+	if (configMap.count("table_append_expression_no_space"))
+	{
+		options->table_append_expression_no_space =
+			configMap.at("table_append_expression_no_space") == "true";
+	}
+
 	if (configMap.count("end_of_line"))
 	{
 		auto lineSeparatorSymbol = configMap.at("end_of_line");

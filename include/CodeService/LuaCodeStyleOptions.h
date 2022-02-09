@@ -105,6 +105,8 @@ public:
 
 	bool continuous_assign_table_field_align_to_equal_sign = true;
 
+	bool table_append_expression_no_space = false;
+
 	std::string end_of_line = "\r\n";
 
 	bool insert_final_newline = true;

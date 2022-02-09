@@ -17,6 +17,7 @@
 #include "CodeService/FormatElement/NoIndentElement.h"
 #include "CodeService/FormatElement/SerializeContext.h"
 #include "CodeService/FormatElement/IndentOnLineBreakElement.h"
+#include "Util/StringUtil.h"
 
 bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
 {
@@ -1431,7 +1432,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 						++it;
 						bool allowAlign = _options.continuous_assign_table_field_align_to_equal_sign
 							&& _parser->GetLine((*it)->GetTextRange().StartOffset) != operatorLine;
-						env->AddChild(FormatAlignTableField(it, allowAlign ,children));
+						env->AddChild(FormatAlignTableField(it, allowAlign, children));
 						env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
 					}
 				}
@@ -1988,17 +1989,53 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatPrimaryExpression(std::shared
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_ptr<LuaAstNode> indexExpression)
 {
+	bool expressionAfterIndexOperator = false;
 	auto env = std::make_shared<SubExpressionElement>();
 	for (auto& child : indexExpression->GetChildren())
 	{
-		FormatSubExpressionNode(child, env);
-		if (child->GetType() == LuaAstNodeType::Comment)
+		switch (child->GetType())
 		{
-			env->Add<KeepElement>(1);
-		}
-		else
-		{
-			env->Add<KeepElement>(0);
+		case LuaAstNodeType::IndexOperator:
+			{
+				if (_options.table_append_expression_no_space)
+				{
+					if (child->GetText() == "[")
+					{
+						expressionAfterIndexOperator = true;
+					}
+				}
+				env->Add<TextElement>(child);
+				env->Add<KeepElement>(0);
+				break;
+			}
+		case LuaAstNodeType::Comment:
+			{
+				env->Add<TextElement>(child);
+				env->Add<KeepElement>(1);
+				break;
+			}
+		case LuaAstNodeType::Expression:
+			{
+				if (_options.table_append_expression_no_space && expressionAfterIndexOperator)
+				{
+					auto text = child->GetText();
+					if (StringUtil::StartWith(text, "#"))
+					{
+						env->AddChild(FormatTableAppendExpression(child));
+						env->Add<KeepElement>(0);
+						continue;
+					}
+				}
+
+				FormatSubExpressionNode(child, env);
+				env->Add<KeepElement>(0);
+				break;
+			}
+		default:
+			{
+				FormatSubExpressionNode(child, env);
+				env->Add<KeepElement>(0);
+			}
 		}
 	}
 	return env;
@@ -2068,6 +2105,35 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 	}
 	return env;
 }
+
+std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::shared_ptr<LuaAstNode> expression)
+{
+	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent_size);
+
+	if (expression->GetChildren().size() == 1)
+	{
+		auto root = expression->GetChildren().front();
+		if (root->GetType() == LuaAstNodeType::BinaryExpression && root->GetChildren().size() == 3)
+		{
+			auto& binaryExpressionChildren = root->GetChildren();
+			if (binaryExpressionChildren[0]->GetType() == LuaAstNodeType::UnaryExpression
+				&& (binaryExpressionChildren[1]->GetType() == LuaAstNodeType::BinaryOperator
+					&& binaryExpressionChildren[1]->GetText() == "+")
+				&& binaryExpressionChildren[2]->GetText() == "1")
+			{
+				FormatSubExpressionNode(binaryExpressionChildren[0], env);
+				env->Add<KeepElement>(0);
+				env->Add<TextElement>(binaryExpressionChildren[1]);
+				env->Add<KeepElement>(0);
+				env->Add<TextElement>(binaryExpressionChildren[2]);
+				return env;
+			}
+		}
+	}
+
+	return FormatExpression(expression, env);
+}
+
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode,
                                                               LuaFormatRange& validRange)

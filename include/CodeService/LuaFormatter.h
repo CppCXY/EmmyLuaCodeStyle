@@ -125,6 +125,8 @@ protected:
 
 	std::shared_ptr<FormatElement> FormatCallExpression(std::shared_ptr<LuaAstNode> callExpression);
 
+	// special rule [#8](https://github.com/CppCXY/EmmyLuaCodeStyle/issues/8)
+	std::shared_ptr<FormatElement> FormatTableAppendExpression(std::shared_ptr<LuaAstNode> expression);
 	// special handle range format
 	std::shared_ptr<FormatElement> FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode, LuaFormatRange& validRange);
 private:
@@ -132,3 +134,4 @@ private:
 	LuaCodeStyleOptions& _options;
 	std::shared_ptr<FormatElement> _env;
 };
+
