@@ -1408,6 +1408,19 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 {
 	auto env = std::make_shared<ExpressionElement>();
 	auto& children = tableExpression->GetChildren();
+
+	std::shared_ptr<FormatElement> tableFieldLayout = nullptr;
+	if (_options.align_table_field_to_first_field)
+	{
+		tableFieldLayout = std::make_shared<AlignToFirstElement>();
+	}
+	else
+	{
+		tableFieldLayout = std::make_shared<IndentOnLineBreakElement>();
+	}
+
+	int leftBraceLine = 0;
+
 	for (auto it = children.begin(); it != children.end(); ++it)
 	{
 		const auto child = *it;
@@ -1418,26 +1431,21 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 				if (child->GetText() == "{")
 				{
 					env->Add<TextElement>(child);
-					auto operatorLine = _parser->GetLine(child->GetTextRange().StartOffset);
-					auto next = nextNode(it, children);
-					if (next)
-					{
-						if (next->GetType() == LuaAstNodeType::GeneralOperator)
-						{
-							env->Add<KeepElement>(0);
-							break;
-						}
-
-						env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
-						++it;
-						bool allowAlign = _options.continuous_assign_table_field_align_to_equal_sign
-							&& _parser->GetLine((*it)->GetTextRange().StartOffset) != operatorLine;
-						env->AddChild(FormatAlignTableField(it, allowAlign, children));
-						env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
-					}
+					leftBraceLine = _parser->GetLine(child->GetTextRange().EndOffset);
 				}
 				else if (child->GetText() == "}")
 				{
+					if (tableFieldLayout->GetChildren().empty())
+					{
+						env->Add<KeepElement>(0);
+					}
+					else
+					{
+						env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
+						env->AddChild(tableFieldLayout);
+						tableFieldLayout = nullptr;
+						env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
+					}
 					env->Add<TextElement>(child);
 				}
 
@@ -1445,7 +1453,15 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 			}
 		default:
 			{
-				DefaultHandle(child, env);
+				if (tableFieldLayout)
+				{
+					tableFieldLayout->AddChild(FormatAlignTableField(it, leftBraceLine, children));
+					tableFieldLayout->Add<KeepElement>(1);
+				}
+				else
+				{
+					DefaultHandle(child, env);
+				}
 			}
 		}
 	}
@@ -1621,92 +1637,93 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::ChildIterator& it,
-                                                                   bool allowAlignToEq,
-                                                                   const LuaAstNode::ChildrenContainer& children)
+                                                                   int leftBraceLine,
+                                                                   const LuaAstNode::ChildrenContainer& siblings)
 {
-	std::shared_ptr<FormatElement> env = nullptr;
-	if (_options.align_table_field_to_first_field)
+	bool canAlign = true;
+	std::shared_ptr<FormatElement> layout = std::make_shared<ExpressionElement>();
+	if (leftBraceLine == _parser->GetLine((*it)->GetTextRange().StartOffset))
 	{
-		env = std::make_shared<AlignToFirstElement>();
-	}
-	else
-	{
-		env = std::make_shared<IndentOnLineBreakElement>();
+		canAlign = false;
 	}
 
-	env->AddChild(FormatNode(*it));
-
-	auto nextChild = nextNode(it, children);
-	if (nextChild == nullptr)
+	for (; it != siblings.end(); ++it)
 	{
-		return env;
-	}
+		auto current = *it;
+		auto nextSibling = nextNode(it, siblings);
 
-	bool alignToEq = true;
-	while (nextChild->GetType() == LuaAstNodeType::TableField
-		|| nextChild->GetType() == LuaAstNodeType::TableFieldSep
-		|| nextChild->GetType() == LuaAstNodeType::Comment)
-	{
-		auto currentChild = *it;
-		int currentLine = _parser->GetLine(currentChild->GetTextRange().EndOffset);
-		int nextLine = _parser->GetLine(nextChild->GetTextRange().StartOffset);
-		if (nextLine == currentLine)
+		if (nextSibling == nullptr)
 		{
-			// 检查是否会是内联注释
-			// 比如 t = 123, -- inline comment
-			// 或者 c = 456 --fff
-			// 或者 ddd = 123 --[[ffff]] ,
-			if ((currentChild->GetType() == LuaAstNodeType::TableField || currentChild->GetType() ==
-				LuaAstNodeType::TableFieldSep) && nextChild->GetType() == LuaAstNodeType::Comment)
+			layout->AddChild(FormatNode(current));
+			return layout;
+		}
+
+		if (nextSibling->GetType() == LuaAstNodeType::TableField
+			|| nextSibling->GetType() == LuaAstNodeType::TableFieldSep
+			|| nextSibling->GetType() == LuaAstNodeType::Comment)
+		{
+			int currentLine = _parser->GetLine(current->GetTextRange().EndOffset);
+			int nextLine = _parser->GetLine(nextSibling->GetTextRange().StartOffset);
+
+			if (nextLine == currentLine)
 			{
-				env->Add<KeepBlankElement>(1);
-				env->Add<TextElement>(nextChild);
+				// 检查是否会是内联注释
+				// 比如 t = 123, -- inline comment
+				// 或者 c = 456 --fff
+				// 或者 ddd = 123 --[[ffff]] ,
+				if ((current->GetType() == LuaAstNodeType::TableField
+						|| current->GetType() == LuaAstNodeType::TableFieldSep)
+					&& nextSibling->GetType() == LuaAstNodeType::Comment)
+				{
+					layout->AddChild(FormatNode(current));
+					layout->Add<KeepBlankElement>(1);
+				}
+				else if (current->GetType() == LuaAstNodeType::TableFieldSep
+					&& nextSibling->GetType() == LuaAstNodeType::TableField)
+				{
+					canAlign = false;
+					layout->AddChild(FormatNode(current));
+					// 此时认为table 不应该考虑对齐到等号
+					layout->Add<KeepBlankElement>(1);
+				}
+				else if (current->GetType() == LuaAstNodeType::TableField
+					&& nextSibling->GetType() == LuaAstNodeType::TableFieldSep)
+				{
+					layout->AddChild(FormatNode(current));
+					layout->Add<KeepBlankElement>(0);
+				}
+				else
+				{
+					layout->AddChild(FormatNode(current));
+					layout->Add<KeepElement>(1);
+				}
 			}
-			else if ((currentChild->GetType() == LuaAstNodeType::TableFieldSep)
-				&& nextChild->GetType() == LuaAstNodeType::TableField)
+			else if (nextLine - currentLine <= _options.max_continuous_line_distance)
 			{
-				// 此时认为table 不应该考虑对齐到等号
-				alignToEq = false;
-				env->Add<KeepBlankElement>(1);
-				env->AddChild(FormatNode(nextChild));
-			}
-			else if ((currentChild->GetType() == LuaAstNodeType::TableField) && nextChild->GetType() ==
-				LuaAstNodeType::TableFieldSep)
-			{
-				env->AddChild(FormatNode(nextChild));
+				layout->AddChild(FormatNode(current));
+				layout->Add<KeepElement>(1);
 			}
 			else
 			{
-				env->Add<KeepBlankElement>(1);
-				env->AddChild(FormatNode(nextChild));
+				layout->AddChild(FormatNode(current));
+				break;
 			}
 		}
-		else
+		else if (nextSibling->GetType() == LuaAstNodeType::GeneralOperator)
 		{
-			env->Add<LineElement>();
-			env->Add<KeepLineElement>();
-			env->AddChild(FormatNode(nextChild));
-		}
-
-		++it;
-
-		nextChild = nextNode(it, children);
-		if (nextChild == nullptr)
-		{
+			layout->AddChild(FormatNode(current));
 			break;
 		}
 	}
 
-	// 认为tableField 可以(但不是必须这样做)按照等号对齐
-	if (alignToEq && allowAlignToEq)
+	if (canAlign && _options.continuous_assign_table_field_align_to_equal_sign && layout->GetChildren().size() > 1)
 	{
 		auto alignmentLayoutElement = std::make_shared<AlignmentLayoutElement>("=");
-		alignmentLayoutElement->CopyFrom(env);
-		env->Reset();
-		env->AddChild(alignmentLayoutElement);
+		alignmentLayoutElement->CopyFrom(layout);
+		layout = alignmentLayoutElement;
 	}
 
-	return env;
+	return layout;
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode::ChildIterator& it,
