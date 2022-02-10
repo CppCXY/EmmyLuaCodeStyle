@@ -279,7 +279,7 @@ bool NameStyleRuleMatcher::CamelCase(std::shared_ptr<CheckElement> checkElement)
 			{
 				if (ch == '_')
 				{
-					if (source.size() > 1 && !::islower(ch))
+					if (source.size() > 1 && !::islower(source[index + 1]))
 					{
 						return false;
 					}

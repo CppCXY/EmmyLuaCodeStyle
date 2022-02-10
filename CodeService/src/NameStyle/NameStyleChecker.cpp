@@ -280,7 +280,7 @@ void NameStyleChecker::VisitAssignment(const std::shared_ptr<LuaAstNode>& assign
 				if (lastElement && lastElement->GetType() == LuaAstNodeType::Identify)
 				{
 					_nameStyleCheckVector.push_back(
-						std::make_shared<CheckElement>(NameDefineType::FunctionDefineName, lastElement));
+						std::make_shared<CheckElement>(NameDefineType::TableFieldDefineName, lastElement));
 				}
 			}
 		}
