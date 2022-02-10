@@ -1698,6 +1698,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 					layout->Add<KeepElement>(1);
 				}
 			}
+			else if (currentLine == leftBraceLine)
+			{
+				layout->AddChild(FormatNode(current));
+				break;
+			}
 			else if (nextLine - currentLine <= _options.max_continuous_line_distance)
 			{
 				layout->AddChild(FormatNode(current));
