@@ -50,3 +50,14 @@ local t9 = {
     fwhoifwjofgjw                = 353,
     ljeogjeprjgpege              = 13131,
 }
+
+local t10 = {
+    aaa  = 123131,
+    bb   = 123131,
+
+    dd = 1313131,
+    ee = 12313131,
+
+    ccc                  = 12313131,
+    dddddddddddddddddddd = 123
+}
