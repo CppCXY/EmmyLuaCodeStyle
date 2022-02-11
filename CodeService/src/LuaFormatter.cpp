@@ -17,6 +17,7 @@
 #include "CodeService/FormatElement/NoIndentElement.h"
 #include "CodeService/FormatElement/SerializeContext.h"
 #include "CodeService/FormatElement/IndentOnLineBreakElement.h"
+#include "CodeService/FormatElement/PlaceHolderElement.h"
 #include "Util/StringUtil.h"
 
 bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
@@ -1029,6 +1030,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 {
 	auto env = std::make_shared<StatementElement>();
 	auto& children = ifStatement->GetChildren();
+
+	std::vector<std::shared_ptr<PlaceholderElement>> placeholderExpressions;
+
 	for (auto it = children.begin(); it != children.end(); ++it)
 	{
 		const auto child = *it;
@@ -1056,13 +1060,21 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 			}
 		case LuaAstNodeType::Expression:
 			{
-				std::shared_ptr<FormatElement> expression = nullptr;
-				if (_options.if_condition_no_continuation_indent)
+				if (_options.if_condition_align_with_each_other)
 				{
-					expression = std::make_shared<LongExpressionLayoutElement>(0);
+					placeholderExpressions.push_back(std::make_shared<PlaceholderElement>(env, child));
+					env->AddChild(placeholderExpressions.back());
 				}
+				else
+				{
+					std::shared_ptr<FormatElement> expression = nullptr;
+					if (_options.if_condition_no_continuation_indent)
+					{
+						expression = std::make_shared<LongExpressionLayoutElement>(0);
+					}
 
-				env->AddChild(FormatExpression(child, expression));
+					env->AddChild(FormatExpression(child, expression));
+				}
 				env->Add<KeepBlankElement>(1);
 				break;
 			}
@@ -1072,6 +1084,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 				break;
 			}
 		}
+	}
+
+	if (!placeholderExpressions.empty())
+	{
+		FormatIfConditionAlign(placeholderExpressions);
 	}
 
 	return env;
@@ -2156,6 +2173,19 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 	return FormatExpression(expression, env);
 }
 
+void LuaFormatter::FormatIfConditionAlign(std::vector<std::shared_ptr<PlaceholderElement>>& placeholders)
+{
+	bool canAlign = true;
+	for(auto placeholder: placeholders)
+	{
+		
+	}
+	
+
+
+
+
+}
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode,
                                                               LuaFormatRange& validRange)

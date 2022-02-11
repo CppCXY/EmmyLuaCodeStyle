@@ -14,6 +14,7 @@ enum class FormatElementType
 	LongExpressionLayoutElement,
 	NoIndentElement,
 	IndentOnLineBreakElement,
+	PlaceholderElement,
 
 	ControlStart,
 	KeepLineElement,

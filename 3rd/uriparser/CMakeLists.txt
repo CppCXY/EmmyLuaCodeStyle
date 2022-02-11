@@ -92,4 +92,3 @@ target_compile_definitions(uriparser PRIVATE URI_LIBRARY_BUILD)
 
 target_compile_definitions(uriparser PUBLIC URI_STATIC_BUILD)
 
-target_compile_definitions(uriparser PUBLIC URI_NO_UNICODE)
