@@ -17,7 +17,7 @@
 #include "CodeService/FormatElement/NoIndentElement.h"
 #include "CodeService/FormatElement/SerializeContext.h"
 #include "CodeService/FormatElement/IndentOnLineBreakElement.h"
-#include "CodeService/FormatElement/PlaceHolderElement.h"
+#include "CodeService/FormatElement/PlaceholderElement.h"
 #include "Util/StringUtil.h"
 
 bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
