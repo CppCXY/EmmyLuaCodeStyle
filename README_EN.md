@@ -43,4 +43,4 @@ cmake --build .
 
 ## License
 
-no License
+[MIT](LICENSE)
