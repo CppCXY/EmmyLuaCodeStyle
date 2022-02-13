@@ -18,6 +18,7 @@
 #include "CodeService/FormatElement/SerializeContext.h"
 #include "CodeService/FormatElement/IndentOnLineBreakElement.h"
 #include "CodeService/FormatElement/PlaceholderElement.h"
+#include "CodeService/FormatElement/AlignIfLayoutElement.h"
 #include "Util/StringUtil.h"
 
 bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
@@ -1029,6 +1030,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRepeatStatement(std::shared_p
 std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<LuaAstNode> ifStatement)
 {
 	auto env = std::make_shared<StatementElement>();
+	bool canAlignCondition = false;
 	auto& children = ifStatement->GetChildren();
 
 	std::vector<std::shared_ptr<PlaceholderElement>> placeholderExpressions;
@@ -1050,6 +1052,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 				{
 					env->Add<TextElement>(child);
 					env->Add<KeepBlankElement>(1);
+					if (_options.if_condition_align_with_each_other && child->GetText() == "elseif")
+					{
+						canAlignCondition = true;
+					}
 				}
 				else // 然而end是在 FormatNodeAndBlockOrEnd 中完成的
 				{
@@ -1060,21 +1066,14 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 			}
 		case LuaAstNodeType::Expression:
 			{
-				if (_options.if_condition_align_with_each_other)
+				std::shared_ptr<FormatElement> expression = nullptr;
+				if (_options.if_condition_no_continuation_indent
+					|| _options.if_condition_align_with_each_other)
 				{
-					placeholderExpressions.push_back(std::make_shared<PlaceholderElement>(env, child));
-					env->AddChild(placeholderExpressions.back());
+					expression = std::make_shared<LongExpressionLayoutElement>(0);
 				}
-				else
-				{
-					std::shared_ptr<FormatElement> expression = nullptr;
-					if (_options.if_condition_no_continuation_indent)
-					{
-						expression = std::make_shared<LongExpressionLayoutElement>(0);
-					}
 
-					env->AddChild(FormatExpression(child, expression));
-				}
+				env->AddChild(FormatExpression(child, expression));
 				env->Add<KeepBlankElement>(1);
 				break;
 			}
@@ -1086,9 +1085,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 		}
 	}
 
-	if (!placeholderExpressions.empty())
+	if(canAlignCondition)
 	{
-		FormatIfConditionAlign(placeholderExpressions);
+		auto ifAlignLayout = std::make_shared<AlignIfElement>();
+		ifAlignLayout->CopyFrom(env);
+		env->Reset();
+		env->AddChild(ifAlignLayout);
 	}
 
 	return env;
@@ -2171,20 +2173,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 	}
 
 	return FormatExpression(expression, env);
-}
-
-void LuaFormatter::FormatIfConditionAlign(std::vector<std::shared_ptr<PlaceholderElement>>& placeholders)
-{
-	bool canAlign = true;
-	for(auto placeholder: placeholders)
-	{
-		
-	}
-	
-
-
-
-
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode,

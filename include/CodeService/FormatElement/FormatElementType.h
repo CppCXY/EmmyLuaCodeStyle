@@ -15,6 +15,7 @@ enum class FormatElementType
 	NoIndentElement,
 	IndentOnLineBreakElement,
 	PlaceholderElement,
+	AlignIfLayoutElement,
 
 	ControlStart,
 	KeepLineElement,

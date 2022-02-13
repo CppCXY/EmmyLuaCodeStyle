@@ -38,6 +38,8 @@ public:
 
 	IndentState GetLastIndent() const;
 
+	bool OnlyEmptyCharBefore(int offset);
+
 	std::shared_ptr<LuaParser> GetParser();
 
 	LuaCodeStyleOptions& GetOptions();

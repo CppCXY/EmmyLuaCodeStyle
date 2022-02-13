@@ -51,6 +51,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignmentLayoutElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/LongExpressionLayoutElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignToFirstElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/AlignIfLayoutElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/IndentOnLineBreakElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/KeepElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/PlaceholderElement.cpp	

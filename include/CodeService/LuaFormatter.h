@@ -129,7 +129,6 @@ protected:
 	// special rule [#8](https://github.com/CppCXY/EmmyLuaCodeStyle/issues/8)
 	std::shared_ptr<FormatElement> FormatTableAppendExpression(std::shared_ptr<LuaAstNode> expression);
 
-	void FormatIfConditionAlign(std::vector<std::shared_ptr<PlaceholderElement>>& placeholders);
 	// special handle range format
 	std::shared_ptr<FormatElement> FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode, LuaFormatRange& validRange);
 private:

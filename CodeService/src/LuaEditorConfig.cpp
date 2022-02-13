@@ -290,6 +290,12 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("table_append_expression_no_space") == "true";
 	}
 
+	if (configMap.count("if_condition_align_with_each_other"))
+	{
+		options->if_condition_align_with_each_other =
+			configMap.at("if_condition_align_with_each_other") == "true";
+	}
+
 	if (configMap.count("end_of_line"))
 	{
 		auto lineSeparatorSymbol = configMap.at("end_of_line");
