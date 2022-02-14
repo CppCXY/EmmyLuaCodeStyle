@@ -100,6 +100,33 @@ local d = {
     eee  = 131231,
 }
 ```
+## if语句对齐
+
+lua没有switch语句，一般都是通过if/elseif模拟出一个匹配列表，对于其他有switch语句的语言，格式化会将case对齐，这里也支持这种行为：
+
+```lua
+if aa.isDDDD()
+and bb == fwfwfw
+or hi == 123 then
+    print(1313)
+elseif cc == 123
+or dd == 13131 and ddd == 123 then
+    local ccc = 123
+end
+```
+会被格式化为：
+```lua
+if     aa.isDDDD()
+and    bb == fwfwfw
+or     hi == 123 then
+    print(1313)
+elseif cc == 123
+or     dd == 13131 and ddd == 123 then
+    local ccc = 123
+end
+```
+
+该特性不是默认行为
 
 ## 长表达式列表
 

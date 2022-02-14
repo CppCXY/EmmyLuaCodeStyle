@@ -466,6 +466,41 @@ and b then
 end
 ```
 
+## table_append_expression_no_space
+
+This option represents an expression of the form t[#t+1], which will not be formatted as t[#t + 1]
+
+##if_condition_align_with_each_other
+
+This option means that the conditional expressions of the if statement will be aligned with each other. This option is valid if and only if there is an elseif statement, and when this option is valid, the conditional expressions of the if statement must be without indentation.
+Alignment with each other refers to typesetting like a switch case:
+
+````lua
+local t = {1,2,3}
+local c = {
+     aaa, bbb, eee
+}
+local d = {
+     aa =123,
+     bbbb = 4353,
+     eee = 131231,
+}
+````
+
+After formatting:
+
+````lua
+local t = { 1, 2, 3 }
+local c = {
+     aaa, bbb, eee
+}
+local d = {
+     aa = 123,
+     bbbb = 4353,
+     eee = 131231,
+}
+```` 
+
 ## end_of_line
 
 This option represents the symbol at the end of the line, the default is crlf, and it can also be lf 

@@ -464,6 +464,40 @@ and b then
 end
 ```
 
+## table_append_expression_no_space
+
+该选项表示形如t[#t+1]的表达式，不会被格式化为t[#t + 1]
+
+## if_condition_align_with_each_other 
+
+该选项表示if语句的条件表达式会互相对齐，该选项当且仅当存在 elseif语句时有效，并且该选项有效时，if语句的条件表达式一定会无缩进。
+互相对齐指的是像switch case一样排版:
+
+```lua
+local t = {1,2,3}
+local c = {
+    aaa, bbb, eee
+}
+local d = {
+    aa  =123,
+    bbbb = 4353,
+    eee  = 131231,
+}
+```
+
+格式化后：
+
+```lua
+local t = { 1, 2, 3 }
+local c = {
+    aaa, bbb, eee
+}
+local d = {
+    aa   = 123,
+    bbbb = 4353,
+    eee  = 131231,
+}
+```
 
 ## end_of_line
 
