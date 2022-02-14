@@ -470,36 +470,32 @@ end
 
 This option represents an expression of the form t[#t+1], which will not be formatted as t[#t + 1]
 
-##if_condition_align_with_each_other
+## if_condition_align_with_each_other
 
 This option means that the conditional expressions of the if statement will be aligned with each other. This option is valid if and only if there is an elseif statement, and when this option is valid, the conditional expressions of the if statement must be without indentation.
 Alignment with each other refers to typesetting like a switch case:
 
-````lua
-local t = {1,2,3}
-local c = {
-     aaa, bbb, eee
-}
-local d = {
-     aa =123,
-     bbbb = 4353,
-     eee = 131231,
-}
-````
-
-After formatting:
-
-````lua
-local t = { 1, 2, 3 }
-local c = {
-     aaa, bbb, eee
-}
-local d = {
-     aa = 123,
-     bbbb = 4353,
-     eee = 131231,
-}
-```` 
+```lua
+if aa.isDDDD()
+and bb == fwfwfw
+or hi == 123 then
+    print(1313)
+elseif cc == 123
+or dd == 13131 and ddd == 123 then
+    local ccc = 123
+end
+```
+after formatting：
+```lua
+if     aa.isDDDD()
+and    bb == fwfwfw
+or     hi == 123 then
+    print(1313)
+elseif cc == 123
+or     dd == 13131 and ddd == 123 then
+    local ccc = 123
+end
+```
 
 ## end_of_line
 

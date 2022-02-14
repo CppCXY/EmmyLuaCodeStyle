@@ -474,29 +474,25 @@ end
 互相对齐指的是像switch case一样排版:
 
 ```lua
-local t = {1,2,3}
-local c = {
-    aaa, bbb, eee
-}
-local d = {
-    aa  =123,
-    bbbb = 4353,
-    eee  = 131231,
-}
+if aa.isDDDD()
+and bb == fwfwfw
+or hi == 123 then
+    print(1313)
+elseif cc == 123
+or dd == 13131 and ddd == 123 then
+    local ccc = 123
+end
 ```
-
-格式化后：
-
+会被格式化为：
 ```lua
-local t = { 1, 2, 3 }
-local c = {
-    aaa, bbb, eee
-}
-local d = {
-    aa   = 123,
-    bbbb = 4353,
-    eee  = 131231,
-}
+if     aa.isDDDD()
+and    bb == fwfwfw
+or     hi == 123 then
+    print(1313)
+elseif cc == 123
+or     dd == 13131 and ddd == 123 then
+    local ccc = 123
+end
 ```
 
 ## end_of_line
