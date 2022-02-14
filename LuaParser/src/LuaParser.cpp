@@ -70,7 +70,7 @@ std::vector<LuaError>& LuaParser::GetErrors()
 
 bool LuaParser::HasError() const
 {
-	return !_errors.empty();
+	return !_errors.empty() || !_tokenParser->ConsumeAllTokens();
 }
 
 std::vector<LuaToken>& LuaParser::GetAllComments()
@@ -159,7 +159,6 @@ void LuaParser::BuildAstWithComment()
 		}
 	}
 
-	_tokenParser->ReleaseTokens();
 }
 
 LuaParser::LuaParser(std::shared_ptr<LuaTokenParser> tokenParser)

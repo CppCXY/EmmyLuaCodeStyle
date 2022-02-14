@@ -171,6 +171,11 @@ std::shared_ptr<LuaFile> LuaTokenParser::GetFile()
 	return _file;
 }
 
+bool LuaTokenParser::ConsumeAllTokens()
+{
+	return Current().TokenType == _eosToken.TokenType;
+}
+
 LuaTokenType LuaTokenParser::Lex()
 {
 	ResetBuffer();
