@@ -60,7 +60,7 @@ local ttt  = 123 --first
 cd        = 345 --second
 ```
 
-格式化后：
+Will be formatted as:
 
 ```lua
 local ttt  = 123 --first
@@ -100,6 +100,35 @@ local d = {
     eee  = 131231,
 }
 ```
+
+## if statement is aligned
+
+lua does not have a switch statement, generally simulates a match list through if/elseif, for other languages with switch statements, the format will align the case, and this behavior is also supported here:
+
+```lua
+if aa.isDDDD()
+and bb == fwfwfw
+or hi == 123 then
+    print(1313)
+elseif cc == 123
+or dd == 13131 and ddd == 123 then
+    local ccc = 123
+end
+```
+will be formatted as:
+```lua
+if     aa.isDDDD()
+and    bb == fwfwfw
+or     hi == 123 then
+    print(1313)
+elseif cc == 123
+or     dd == 13131 and ddd == 123 then
+    local ccc = 123
+end
+```
+
+This attribute is not the default behavior
+
 
 ## Long expression list 
 
