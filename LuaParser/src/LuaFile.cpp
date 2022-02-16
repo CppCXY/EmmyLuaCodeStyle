@@ -126,6 +126,24 @@ void LuaFile::PushLine(int offset)
 	_lineOffsetVec.push_back(offset);
 }
 
+bool LuaFile::OnlyEmptyCharBefore(int offset)
+{
+	auto source = GetSource();
+	auto line = GetLine(offset);
+	auto start = GetOffsetFromPosition(line, 0);
+
+	for (; start < offset; start++)
+	{
+		auto ch = source[start];
+		if (ch != '\t' && ch != ' ')
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 std::string& LuaFile::GetSource()
 {
 	return _source;

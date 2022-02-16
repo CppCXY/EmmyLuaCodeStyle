@@ -19,6 +19,7 @@
 #include "CodeService/FormatElement/IndentOnLineBreakElement.h"
 #include "CodeService/FormatElement/PlaceholderElement.h"
 #include "CodeService/FormatElement/AlignIfLayoutElement.h"
+#include "CodeService/FormatElement/MaxSpaceElement.h"
 #include "Util/StringUtil.h"
 
 bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
@@ -1080,7 +1081,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 		}
 	}
 
-	if(_options.if_condition_align_with_each_other)
+	if (_options.if_condition_align_with_each_other)
 	{
 		auto ifAlignLayout = std::make_shared<AlignIfElement>();
 		ifAlignLayout->CopyFrom(env);
@@ -2040,8 +2041,20 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 						expressionAfterIndexOperator = true;
 					}
 				}
+
 				env->Add<TextElement>(child);
+				if (_options.long_chain_expression_allow_one_space_after_colon)
+				{
+					if (child->GetText() == ":" && _parser->GetLuaFile()->OnlyEmptyCharBefore(
+						child->GetTextRange().StartOffset))
+					{
+						env->Add<MaxSpaceElement>(1);
+						continue;
+					}
+				}
+
 				env->Add<KeepElement>(0);
+
 				break;
 			}
 		case LuaAstNodeType::Comment:

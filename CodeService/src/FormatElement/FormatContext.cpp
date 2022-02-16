@@ -134,20 +134,7 @@ FormatContext::IndentState FormatContext::GetLastIndent() const
 bool FormatContext::OnlyEmptyCharBefore(int offset)
 {
 	auto file = _parser->GetLuaFile();
-	auto source = file->GetSource();
-	auto line = file->GetLine(offset);
-	auto start = file->GetOffsetFromPosition(line, 0);
-
-	for (; start < offset; start++)
-	{
-		auto ch = source[start];
-		if (ch != '\t' && ch != ' ')
-		{
-			return false;
-		}
-	}
-
-	return true;
+	return file->OnlyEmptyCharBefore(offset);
 }
 
 std::shared_ptr<LuaParser> FormatContext::GetParser()

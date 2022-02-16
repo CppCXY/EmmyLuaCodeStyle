@@ -21,6 +21,8 @@ public:
 
 	void PushLine(int offset);
 
+	bool OnlyEmptyCharBefore(int offset);
+
 	std::string& GetSource();
 
 	void SetTotalLine(int line);

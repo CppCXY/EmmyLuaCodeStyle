@@ -45,6 +45,8 @@ if_condition_no_continuation_indent = false
 table_append_expression_no_space = false
 # if statement will align like switch case 
 if_condition_align_with_each_other = false
+
+long_chain_expression_allow_one_space_after_colon = false
 # optional crlf/lf
 end_of_line = crlf
 

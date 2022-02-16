@@ -296,6 +296,12 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("if_condition_align_with_each_other") == "true";
 	}
 
+	if(configMap.count("long_chain_expression_allow_one_space_after_colon"))
+	{
+		options->long_chain_expression_allow_one_space_after_colon =
+			configMap.at("long_chain_expression_allow_one_space_after_colon") == "true";
+	}
+
 	if (configMap.count("end_of_line"))
 	{
 		auto lineSeparatorSymbol = configMap.at("end_of_line");

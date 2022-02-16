@@ -44,6 +44,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/FormatElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/LineElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/NoIndentElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/MaxSpaceElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignmentElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/ExpressionElement.cpp
 	${CodeService_SOURCE_DIR}/src/FormatElement/FormatContext.cpp	

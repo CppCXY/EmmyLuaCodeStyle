@@ -25,5 +25,6 @@ enum class FormatElementType
 	AlignmentElement,
 	AlignToElement,
 	KeepElement,
+	MaxSpaceElement
 	
 };
