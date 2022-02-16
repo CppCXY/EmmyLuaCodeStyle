@@ -117,9 +117,9 @@ end
 ```
 will be formatted as:
 ```lua
-if     aa.isDDDD()
-and    bb == fwfwfw
-or     hi == 123 then
+if  aa.isDDDD()
+and bb == fwfwfw
+or  hi == 123 then
     print(1313)
 elseif cc == 123
 or     dd == 13131 and ddd == 123 then

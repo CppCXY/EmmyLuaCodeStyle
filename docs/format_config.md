@@ -485,9 +485,9 @@ end
 ```
 会被格式化为：
 ```lua
-if     aa.isDDDD()
-and    bb == fwfwfw
-or     hi == 123 then
+if  aa.isDDDD()
+and bb == fwfwfw
+or  hi == 123 then
     print(1313)
 elseif cc == 123
 or     dd == 13131 and ddd == 123 then

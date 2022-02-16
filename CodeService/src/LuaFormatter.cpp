@@ -1030,7 +1030,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRepeatStatement(std::shared_p
 std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<LuaAstNode> ifStatement)
 {
 	auto env = std::make_shared<StatementElement>();
-	bool canAlignCondition = false;
 	auto& children = ifStatement->GetChildren();
 
 	std::vector<std::shared_ptr<PlaceholderElement>> placeholderExpressions;
@@ -1052,10 +1051,6 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 				{
 					env->Add<TextElement>(child);
 					env->Add<KeepBlankElement>(1);
-					if (_options.if_condition_align_with_each_other && child->GetText() == "elseif")
-					{
-						canAlignCondition = true;
-					}
 				}
 				else // 然而end是在 FormatNodeAndBlockOrEnd 中完成的
 				{
@@ -1085,7 +1080,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 		}
 	}
 
-	if(canAlignCondition)
+	if(_options.if_condition_align_with_each_other)
 	{
 		auto ifAlignLayout = std::make_shared<AlignIfElement>();
 		ifAlignLayout->CopyFrom(env);
