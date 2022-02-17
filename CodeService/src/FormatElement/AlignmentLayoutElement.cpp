@@ -59,16 +59,14 @@ void AlignmentLayoutElement::Diagnosis(DiagnosisContext& ctx, ChildIterator self
 int AlignmentLayoutElement::GetAlignPosition(FormatContext& ctx)
 {
 	auto indentState = ctx.GetCurrentIndent();
-	int alignOffset = 0;
-
-	if (!ctx.GetOptions().weak_alignment_rule)
-	{
-		alignOffset = GetAlignOffset(ctx);
-	}
-	else
-	{
-		alignOffset = GetAlignOffsetWithWeakRule(ctx);
-	}
+	// if (!ctx.GetOptions().weak_alignment_rule)
+	// {
+	// 	alignOffset = GetAlignOffset(ctx);
+	// }
+	// else
+	// {
+	int alignOffset = GetAlignOffsetWithWeakRule(ctx);
+	// }
 
 	if (alignOffset == -1)
 	{
@@ -78,55 +76,55 @@ int AlignmentLayoutElement::GetAlignPosition(FormatContext& ctx)
 	return alignOffset + static_cast<int>(indentState.SpaceIndent + indentState.TabIndent);
 }
 
-int AlignmentLayoutElement::GetAlignOffset(FormatContext& ctx)
-{
-	int alignSignOffset = 0;
-	bool firstContainAlignSign = true;
-	// 先寻找等号对齐的位置，并且判断连续的带等号的语句是否应该对齐到等号
-	// 连续的带等号的语句是否应该对齐到等号，这个行为应该由连续语句的首行决定
-	// 如果被子节点内的其他语句共同决定则很难将连续对齐还原为普通排版
-	for (auto statIt = _children.begin(); statIt != _children.end(); ++statIt)
-	{
-		const auto statement = *statIt;
-
-		auto& statementChildren = statement->GetChildren();
-
-		for (auto it = statementChildren.begin(); it != statementChildren.end(); ++it)
-		{
-			auto textChild = *it;
-			if (textChild->GetType() == FormatElementType::TextElement)
-			{
-				const auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
-				if (textElement->GetText() == _alignSign)
-				{
-					const auto signPosition = ctx.GetColumn(textElement->GetTextRange().StartOffset);
-					if (firstContainAlignSign && it != statementChildren.begin())
-					{
-						firstContainAlignSign = false;
-						auto lastStatChild = FindLastValidChild(it, statementChildren);
-						if (lastStatChild == nullptr)
-						{
-							return -1;
-						}
-
-						const auto lastPosition = ctx.GetColumn(lastStatChild->GetTextRange().EndOffset);
-
-						if (signPosition - lastPosition <= 2)
-						{
-							return -1;
-						}
-					}
-
-
-					alignSignOffset = std::max(alignSignOffset,
-					                           signPosition - ctx.GetColumn(statement->GetTextRange().StartOffset)
-					);
-				}
-			}
-		}
-	}
-	return alignSignOffset;
-}
+// int AlignmentLayoutElement::GetAlignOffset(FormatContext& ctx)
+// {
+// 	int alignSignOffset = 0;
+// 	bool firstContainAlignSign = true;
+// 	// 先寻找等号对齐的位置，并且判断连续的带等号的语句是否应该对齐到等号
+// 	// 连续的带等号的语句是否应该对齐到等号，这个行为应该由连续语句的首行决定
+// 	// 如果被子节点内的其他语句共同决定则很难将连续对齐还原为普通排版
+// 	for (auto statIt = _children.begin(); statIt != _children.end(); ++statIt)
+// 	{
+// 		const auto statement = *statIt;
+//
+// 		auto& statementChildren = statement->GetChildren();
+//
+// 		for (auto it = statementChildren.begin(); it != statementChildren.end(); ++it)
+// 		{
+// 			auto textChild = *it;
+// 			if (textChild->GetType() == FormatElementType::TextElement)
+// 			{
+// 				const auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
+// 				if (textElement->GetText() == _alignSign)
+// 				{
+// 					const auto signPosition = ctx.GetColumn(textElement->GetTextRange().StartOffset);
+// 					if (firstContainAlignSign && it != statementChildren.begin())
+// 					{
+// 						firstContainAlignSign = false;
+// 						auto lastStatChild = FindLastValidChild(it, statementChildren);
+// 						if (lastStatChild == nullptr)
+// 						{
+// 							return -1;
+// 						}
+//
+// 						const auto lastPosition = ctx.GetColumn(lastStatChild->GetTextRange().EndOffset);
+//
+// 						if (signPosition - lastPosition <= 2)
+// 						{
+// 							return -1;
+// 						}
+// 					}
+//
+//
+// 					alignSignOffset = std::max(alignSignOffset,
+// 					                           signPosition - ctx.GetColumn(statement->GetTextRange().StartOffset)
+// 					);
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return alignSignOffset;
+// }
 
 int AlignmentLayoutElement::GetAlignOffsetWithWeakRule(FormatContext& ctx)
 {
@@ -162,9 +160,9 @@ int AlignmentLayoutElement::GetAlignOffsetWithWeakRule(FormatContext& ctx)
 					{
 						canAlignToSign = true;
 					}
-
+					// 采用最小对齐原则
 					alignSignOffset = std::max(alignSignOffset,
-					                           signPosition - ctx.GetColumn(statement->GetTextRange().StartOffset)
+					                           lastPosition + 2 - ctx.GetColumn(statement->GetTextRange().StartOffset)
 					);
 				}
 			}

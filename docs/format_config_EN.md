@@ -301,7 +301,7 @@ This option indicates the definition of continuous lines, and its value determin
 
 ## continuous_assign_statement_align_to_equal_sign
 
-This option means that if the first line of the continuous assignment statement is more than one space between the equal sign and the left symbol, it will be aligned to the largest equal sign of the continuous assignment statement. The default value of this option is true.
+This option means that any line of a continuous assignment statement that is aligned to the equal sign using the principle of least alignment if the equal sign is greater than one space apart from the left symbol, and the default value for this option is true.
 
 Before formatting: 
 
@@ -365,9 +365,9 @@ after formatting：
 ```lua
 -- true
 local t = {
-    aadddd  = 123,
-    bbb     = 456,
-    ddd     = 789
+    aadddd = 123,
+    bbb    = 456,
+    ddd    = 789
 }
 -- false
 local t = {
@@ -376,10 +376,6 @@ local t = {
     ddd = 789
 }
 ```
-
-## weak_alignment_rule
-
-This option indicates whether it is a weak alignment rule. If so, if any of the equal signs of the continuous local/assignment statement and the element to the left are greater than one space, the continuous statement will be aligned to the equal sign
 
 ## label_no_indent
 

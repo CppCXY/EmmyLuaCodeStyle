@@ -135,8 +135,6 @@ do_statement_no_indent = true
 if_condition_no_continuation_indent = true
 [{max_continuous_line_distance-eq-2.lua}]
 max_continuous_line_distance = 2
-[{weak_alignment_rule-eq-true.lua}]
-weak_alignment_rule = true
 [{table_append_expression_no_space-eq-true.lua}]
 table_append_expression_no_space = true
 [{if_condition_align_with_each_other-eq-true.lua}]

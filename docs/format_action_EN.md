@@ -49,11 +49,12 @@ end
 
 ## Continuous assignment statement 
 
-For consecutive assignments or local statements, when the algorithm recognizes that the code tries to align to the equal sign, it will typeset in the manner of aligning to the equal sign. The basic principle of identifying alignment is:
+For continuous assignment or local statements, when the algorithm recognizes that the code is trying to align to the equal sign, it will take the alignment to the equal sign layout, and the basic principles for identifying the alignment are: 
     
-* For consecutive assignment/local/comment statements, when the equal sign of the first assignment/local statement is more than 1 space away from the element to its left, the consecutive assignment/local statement will be aligned to the equal sign.
-* The definition of continuous alignment here is: no more than 2 lines between statements
-* Alignment will be aligned to the furthest equal sign 
+* Continuous assignment /local/ comment statements, when the equal sign of the arbitrary assignment /local statement is greater than 1 space away from the element to its left, the continuous assignment /local statement will align to the equal sign.
+* The definition of continuous alignment here is: statements are no more than 2 lines apart
+* Alignment uses minimal alignment
+
 
 ```lua
 local ttt  = 123 --first
@@ -63,17 +64,18 @@ cd        = 345 --second
 Will be formatted as:
 
 ```lua
-local ttt  = 123 --first
-cd         = 345 --second
+local ttt = 123 --first
+cd        = 345 --second
 ```
 
 ## Table layout 
 
-For common table expressions, the default formatting method is:
-* The field in the table will be spaced a blank from the braces of the table or keep relative line spacing
-* Different fields in the table will keep their relative positions unchanged
-* If all the fields are in different rows and are in the form of key = value, when different fields try to align to the equal sign, the algorithm will align to the equal sign
-* The basic principle of trying to align to the equal sign is key = value/comment field. When the distance between the equal sign of the first line of field and the element to its left is greater than 1 space, the key = value field in the table will be aligned to the equal sign 
+For common table expressions, the layout is as follows by default:
+* The field in the table will be spaced one blank space or relative to the table's curly braces
+* The different fields in the table will remain in the same relative position
+* If all fields are on different lines and are all in the form of key = value, then when different fields try to align to the equal sign, the algorithm will align to the equal sign
+* The basic principle for attempting to align to the equal sign is a continuous key = value/comment field, and when the equal sign of any row of field is greater than 1 space away from the element to its left, the continuous key = value field will align to the equal sign
+* Alignment uses minimal alignment
 
 ```lua
 local t = {1,2,3}

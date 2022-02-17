@@ -96,11 +96,6 @@ public:
 	 */
 	int max_continuous_line_distance = 1;
 
-	/*
-	 * 如果采用弱对齐规则,则连续行内的等号只要有一个等号与左边的元素间距超过一个空格则连续行内对齐到等号
-	 */
-	bool weak_alignment_rule = false;
-
 	bool continuous_assign_statement_align_to_equal_sign = true;
 
 	bool continuous_assign_table_field_align_to_equal_sign = true;

@@ -12,7 +12,7 @@ public:
 	void Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
 private:
 	int GetAlignPosition(FormatContext& ctx);
-	int GetAlignOffset(FormatContext& ctx);
+	// int GetAlignOffset(FormatContext& ctx);
 	int GetAlignOffsetWithWeakRule(FormatContext& ctx);
 	void AlignmentSerialize(SerializeContext& ctx, ChildIterator selfIt, int alignSignPosition,
 				FormatElement& parent);

@@ -266,12 +266,6 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			std::stoi(configMap.at("max_continuous_line_distance"));
 	}
 
-	if(configMap.count("weak_alignment_rule"))
-	{
-		options->weak_alignment_rule =
-			configMap.at("weak_alignment_rule") == "true";
-	}
-
 	if (configMap.count("continuous_assign_statement_align_to_equal_sign"))
 	{
 		options->continuous_assign_statement_align_to_equal_sign =

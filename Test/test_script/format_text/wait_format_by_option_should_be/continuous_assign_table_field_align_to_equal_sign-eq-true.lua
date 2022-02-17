@@ -19,8 +19,8 @@ local t4 = {
 }
 
 local t5 = {
-    aaaa   = 123131,
-    bbbbb  = 1231313131,
+    aaaa  = 123131,
+    bbbbb = 1231313131,
 }
 
 local t6 = {
@@ -29,9 +29,9 @@ local t6 = {
 }
 
 local t7 = {
-    aaaaa   = 12313,
-    ccccc   = 1231,
-    ddddd   = 12313131,
-    hhhh    = 12313131,
+    aaaaa = 12313,
+    ccccc = 1231,
+    ddddd = 12313131,
+    hhhh  = 12313131,
 
 }
