@@ -198,6 +198,17 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		options->tab_width = std::stoi(configMap.at("tab_width"));
 	}
 
+	if (configMap.count("quote_style"))
+	{
+		if (configMap.at("quote_style") == "single") {
+			options->quote_style = QuoteStyle::Single;
+		}
+		else if(configMap.at("quote_style") == "double")
+		{
+			options->quote_style = QuoteStyle::Double;
+		}
+	}
+
 	if (configMap.count("continuation_indent_size")
 		&& isNumber(configMap.at("continuation_indent_size")))
 	{
@@ -295,6 +306,7 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		options->long_chain_expression_allow_one_space_after_colon =
 			configMap.at("long_chain_expression_allow_one_space_after_colon") == "true";
 	}
+
 
 	if (configMap.count("end_of_line"))
 	{

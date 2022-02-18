@@ -158,7 +158,6 @@ void LuaParser::BuildAstWithComment()
 			blockNode->AddComment(commentAst);
 		}
 	}
-
 }
 
 LuaParser::LuaParser(std::shared_ptr<LuaTokenParser> tokenParser)
@@ -682,13 +681,19 @@ void LuaParser::SimpleExpression(std::shared_ptr<LuaAstNode> expressionNode)
 	{
 	case TK_FLT:
 	case TK_INT:
-	case TK_STRING:
 	case TK_NIL:
 	case TK_TRUE:
 	case TK_FALSE:
 	case TK_DOTS:
 		{
-			auto tokenNode = CreateAstNodeFromToken(LuaAstNodeType::LiteralExpression, _tokenParser->Current());
+			auto tokenNode = CreateAstNodeFromCurrentToken(LuaAstNodeType::LiteralExpression);
+			expressionNode->AddChild(tokenNode);
+			_tokenParser->Next();
+			break;
+		}
+	case TK_STRING:
+		{
+			auto tokenNode = CreateAstNodeFromCurrentToken(LuaAstNodeType::StringLiteralExpression);
 			expressionNode->AddChild(tokenNode);
 			_tokenParser->Next();
 			break;
@@ -933,7 +938,7 @@ void LuaParser::FunctionCallArgs(std::shared_ptr<LuaAstNode>& expressionNode)
 		}
 	case TK_STRING:
 		{
-			auto stringNode = CreateAstNodeFromCurrentToken(LuaAstNodeType::LiteralExpression);
+			auto stringNode = CreateAstNodeFromCurrentToken(LuaAstNodeType::StringLiteralExpression);
 			callArgsNode->AddChild(stringNode);
 			_tokenParser->Next();
 			break;

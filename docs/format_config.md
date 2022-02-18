@@ -61,6 +61,12 @@ end
 该选项仅当indent_style为tab时有效
 该选项的效果通常与编辑器有关，这里不做展示。
 
+## quote_style
+
+该选项表示所有使用引号表达的字符串字面值是否统一到单引号或者双一样或者保持原状，该选项有三个可选值 none/single/double
+
+当quote_style = single 或者double时，如果字符串内存在未转义的目标引号类型，则不予格式化。
+
 ## continuation_indent_size
 
 该选项表示长表达式或者表达式列表在换行表达时的后续缩进列数，该选项默认值是4，常见的还有8

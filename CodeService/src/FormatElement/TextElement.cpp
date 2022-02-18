@@ -1,15 +1,14 @@
 ﻿#include "CodeService/FormatElement/TextElement.h"
 #include "Util/format.h"
 
-TextElement::TextElement(std::string_view text, TextDefineType textDefineType, TextRange range)
+TextElement::TextElement(std::string_view text, TextRange range)
 	: FormatElement(range),
-	  _text(text),
-	  _textDefineType(textDefineType)
+	  _text(text)
 {
 }
 
-TextElement::TextElement(std::shared_ptr<LuaAstNode> node, TextDefineType textDefineType)
-	: TextElement(node->GetText(), textDefineType, node->GetTextRange())
+TextElement::TextElement(std::shared_ptr<LuaAstNode> node)
+	: TextElement(node->GetText(), node->GetTextRange())
 {
 }
 
@@ -20,7 +19,7 @@ FormatElementType TextElement::GetType()
 
 void TextElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
-	ctx.Print(*this);
+	ctx.Print(_text, GetTextRange());
 }
 
 void TextElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
@@ -38,9 +37,4 @@ void TextElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatE
 std::string_view TextElement::GetText() const
 {
 	return _text;
-}
-
-void TextElement::SetTextDefineType(TextDefineType textDefineType)
-{
-	_textDefineType = textDefineType;
 }

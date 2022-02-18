@@ -141,6 +141,10 @@ table_append_expression_no_space = true
 if_condition_align_with_each_other = true
 [{long_chain_expression_allow_one_space_after_colon-eq-true.lua}]
 long_chain_expression_allow_one_space_after_colon = true
+[{quote_style-eq-single.lua}]
+quote_style = single
+[{quote_style-eq-double.lua}]
+quote_style = double
 [{minLine-eq-1.lua}]
 keep_line_after_if_statement = minLine:1
 keep_line_after_do_statement = minLine:1

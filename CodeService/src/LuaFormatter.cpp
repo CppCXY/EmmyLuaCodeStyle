@@ -20,6 +20,7 @@
 #include "CodeService/FormatElement/PlaceholderElement.h"
 #include "CodeService/FormatElement/AlignIfLayoutElement.h"
 #include "CodeService/FormatElement/MaxSpaceElement.h"
+#include "CodeService/FormatElement/StringLiteralElement.h"
 #include "Util/StringUtil.h"
 
 bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
@@ -249,10 +250,14 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNode(std::shared_ptr<LuaAstNo
 		{
 			return FormatFunctionBody(node);
 		}
+	case LuaAstNodeType::StringLiteralExpression:
+		{
+			return FormatStringLiteralExpression(node);
+		}
 	case LuaAstNodeType::LiteralExpression:
 	default:
 		{
-			return std::make_shared<TextElement>(node->GetText(), TextDefineType::Normal, node->GetTextRange());
+			return std::make_shared<TextElement>(node->GetText(), node->GetTextRange());
 		}
 	}
 }
@@ -1379,7 +1384,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalFunctionStatement(
 			}
 		case LuaAstNodeType::Identify:
 			{
-				env->Add<TextElement>(child, TextDefineType::FunctionNameDefine);
+				env->Add<TextElement>(child);
 				break;
 			}
 		case LuaAstNodeType::FunctionBody:
@@ -1508,7 +1513,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 			}
 		case LuaAstNodeType::Identify:
 			{
-				env->Add<TextElement>(child, TextDefineType::TableFieldNameDefine);
+				env->Add<TextElement>(child);
 				break;
 			}
 		case LuaAstNodeType::Comment:
@@ -1554,6 +1559,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 		}
 	}
 	return env;
+}
+
+std::shared_ptr<FormatElement> LuaFormatter::FormatStringLiteralExpression(
+	std::shared_ptr<LuaAstNode> stringLiteralExpression)
+{
+	return std::make_shared<StringLiteralElement>(stringLiteralExpression);
 }
 
 void LuaFormatter::DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_ptr<FormatElement> envElement)

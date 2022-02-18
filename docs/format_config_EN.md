@@ -61,6 +61,12 @@ end
 This option is only valid when indent_style is tab
 The effect of this option is usually related to the editor and will not be shown here.
 
+## quote_style
+
+This option indicates whether all string literals expressed in quotation marks are unified into single quotation marks or double or remain the same. This option has three optional values none/single/double
+
+When quote_style = single or double, if there is an unescaped target quote type in the string, it will not be formatted. 
+
 ## continuation_indent_size
 
 This option indicates the number of subsequent indented columns when a long expression or expression list is expressed in a new line. The default value of this option is 4, and 8 is common

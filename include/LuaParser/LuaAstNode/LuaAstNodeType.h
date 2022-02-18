@@ -50,6 +50,8 @@ enum class LuaAstNodeType
 
 	LiteralExpression,
 
+	StringLiteralExpression,
+
 	ClosureExpression,
 
 	UnaryExpression,

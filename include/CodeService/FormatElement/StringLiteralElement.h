@@ -1,14 +1,12 @@
 #pragma once
 
-#include "FormatElement.h"
-// #include "TextDefineType.h"
 
-class TextElement : public FormatElement
+#include "FormatElement.h"
+
+class StringLiteralElement : public FormatElement
 {
 public:
-	explicit TextElement(std::string_view text, TextRange range = TextRange());
-
-	explicit TextElement(std::shared_ptr<LuaAstNode> node);
+	explicit StringLiteralElement(std::shared_ptr<LuaAstNode> node);
 
 	FormatElementType GetType() override;
 
@@ -17,6 +15,7 @@ public:
 
 	std::string_view GetText() const;
 private:
-
+	bool ExistDel(char del);
 	std::string_view _text;
 };
+

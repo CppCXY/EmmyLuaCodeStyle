@@ -47,6 +47,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/MaxSpaceElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignmentElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/ExpressionElement.cpp
+	${CodeService_SOURCE_DIR}/src/FormatElement/StringLiteralElement.cpp
 	${CodeService_SOURCE_DIR}/src/FormatElement/FormatContext.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/SerializeContext.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/AlignmentLayoutElement.cpp	

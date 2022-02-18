@@ -356,7 +356,7 @@ bool NameStyleRuleMatcher::Same(DiagnosisContext& ctx, std::shared_ptr<CheckElem
 			return true;
 		}
 
-		auto firstParamNode = checkElement->ExtraInfoNode->FindFirstOf(LuaAstNodeType::LiteralExpression);
+		auto firstParamNode = checkElement->ExtraInfoNode->FindFirstOf(LuaAstNodeType::StringLiteralExpression);
 
 		if (!firstParamNode)
 		{
@@ -370,7 +370,7 @@ bool NameStyleRuleMatcher::Same(DiagnosisContext& ctx, std::shared_ptr<CheckElem
 			{
 				return true;
 			}
-			firstParamNode = expressionNode->FindFirstOf(LuaAstNodeType::LiteralExpression);
+			firstParamNode = expressionNode->FindFirstOf(LuaAstNodeType::StringLiteralExpression);
 			if (!firstParamNode)
 			{
 				return true;

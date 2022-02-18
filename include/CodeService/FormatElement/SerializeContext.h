@@ -2,14 +2,14 @@
 
 #include "FormatContext.h"
 
-class TextElement;
-
 class SerializeContext : public FormatContext
 {
 public:
 	SerializeContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options);
 
-	virtual void Print(TextElement& textElement);
+	virtual void Print(std::string_view text, TextRange range);
+
+	virtual void Print(char ch, int Offset);
 
 	virtual void PrintLine(int line);
 

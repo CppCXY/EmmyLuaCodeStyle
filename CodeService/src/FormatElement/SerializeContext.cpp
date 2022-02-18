@@ -1,12 +1,11 @@
 #include "CodeService/FormatElement/SerializeContext.h"
-#include "CodeService/FormatElement/TextElement.h"
 
 SerializeContext::SerializeContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options)
 	: FormatContext(parser, options)
 {
 }
 
-void SerializeContext::Print(TextElement& textElement)
+void SerializeContext::Print(std::string_view text, TextRange range)
 {
 	if (!_indentStack.empty())
 	{
@@ -32,8 +31,38 @@ void SerializeContext::Print(TextElement& textElement)
 			}
 		}
 	}
-	_buffer.append(textElement.GetText());
-	_characterCount += textElement.GetText().size();
+	_buffer.append(text);
+	_characterCount += text.size();
+}
+
+void SerializeContext::Print(char ch, int Offset)
+{
+	if (!_indentStack.empty())
+	{
+		auto& indentState = _indentStack.back();
+		if (indentState.Style == IndentStyle::Space)
+		{
+			if (_characterCount < indentState.SpaceIndent)
+			{
+				PrintIndent(indentState.SpaceIndent - _characterCount, indentState.Style);
+			}
+		}
+		else
+		{
+			if (_characterCount == 0)
+			{
+				PrintIndent(indentState.TabIndent, indentState.Style);
+				PrintIndent(indentState.SpaceIndent, IndentStyle::Space);
+			}
+			else if (_characterCount >= indentState.TabIndent && (indentState.SpaceIndent + indentState.TabIndent >
+				_characterCount))
+			{
+				PrintIndent(indentState.SpaceIndent - (_characterCount - indentState.TabIndent), IndentStyle::Space);
+			}
+		}
+	}
+	_buffer.push_back(ch);
+	_characterCount++;
 }
 
 void SerializeContext::PrintLine(int line)

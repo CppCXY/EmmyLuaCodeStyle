@@ -4,15 +4,10 @@
 #include <string_view>
 #include <memory>
 #include <vector>
+#include "LuaCodeStyleEnum.h"
 
 class FormatElement;
 class NameStyleRuleMatcher;
-
-enum class IndentStyle
-{
-	Tab,
-	Space,
-};
 
 std::string GetIndentStyleName(IndentStyle style);
 
@@ -36,12 +31,18 @@ public:
 	 */
 	int tab_width = 4;
 
+	QuoteStyle quote_style = QuoteStyle::None;
+
 	/*
 	 * 延续行缩进
 	 */
 	int continuation_indent_size = 4;
 
 	bool local_assign_continuation_align_to_first_expression = false;
+
+	/*
+	 * no opened
+	 */
 	bool table_field_continuation_align_to_first_sub_expression = false;
 	/*
 	 * 调用参数对齐到第一个参数，经过实际体验这种风格在vscode上会因为垂直对齐线的标注而显得极为难看
@@ -86,6 +87,7 @@ public:
 	 * if语句的条件可以无延续行缩进
 	 */
 	bool if_condition_no_continuation_indent = false;
+
 	/*
 	 * 表内每一个表项对齐到第一个表项
 	 */
@@ -105,6 +107,8 @@ public:
 	bool table_append_expression_no_space = false;
 
 	bool long_chain_expression_allow_one_space_after_colon = false;
+
+	bool call_expression_no_parentheses_when_only_one_string_or_table_arg = false;
 
 	std::string end_of_line = "\r\n";
 
