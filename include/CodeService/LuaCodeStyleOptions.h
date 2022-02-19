@@ -102,8 +102,11 @@ public:
 	bool table_append_expression_no_space = false;
 
 	bool long_chain_expression_allow_one_space_after_colon = false;
-
+#ifndef _WINDOWS
+	std::string end_of_line = "\n";
+#else
 	std::string end_of_line = "\r\n";
+#endif
 
 	bool insert_final_newline = true;
 
