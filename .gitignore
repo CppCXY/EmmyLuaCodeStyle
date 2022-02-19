@@ -30,3 +30,5 @@
 .vs
 out
 3rd/uriparser/src/config.h
+.idea
+.vscode

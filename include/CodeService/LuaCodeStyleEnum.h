@@ -16,7 +16,6 @@ enum class QuoteStyle
 enum class CallArgParentheses
 {
 	Keep,
-	Remove,
-	Always
+	Remove
 };
 

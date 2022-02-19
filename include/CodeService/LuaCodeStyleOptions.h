@@ -52,12 +52,6 @@ public:
 	bool align_call_args = false;
 
 	/*
-	 * 函数调用的括号和参数之间保持一个空格
-	 *
-	 */
-	bool keep_one_space_between_call_args_and_parentheses = false;
-
-	/*
 	 * 函数定义的参数保持对齐到第一个参数
 	 * 函数的定义通常不会太长，这种默认行为是可以接受的
 	 */
