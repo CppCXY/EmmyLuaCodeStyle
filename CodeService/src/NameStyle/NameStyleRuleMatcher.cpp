@@ -16,14 +16,8 @@ NameStyleRuleMatcher::NameStyleRule::NameStyleRule(NameStyleType type, std::vect
 {
 }
 
-std::shared_ptr<NameStyleRuleMatcher> NameStyleRuleMatcher::ParseFrom(std::string_view rule)
-{
-	auto matcher = std::make_shared<NameStyleRuleMatcher>();
-	matcher->ParseRule(rule);
-	return matcher;
-}
-
-NameStyleRuleMatcher::NameStyleRuleMatcher()
+NameStyleRuleMatcher::NameStyleRuleMatcher(std::string_view name)
+	: _name(name)
 {
 }
 
@@ -129,7 +123,7 @@ void NameStyleRuleMatcher::Diagnosis(DiagnosisContext& ctx, std::shared_ptr<Chec
 		}
 	}
 
-	ctx.PushDiagnosis(format(LText("{} not match name rule {}"), checkElement->Node->GetText(), ruleMessage),
+	ctx.PushDiagnosis(format(LText("Name '{}' does not match rule '{}', which require '{}'"), checkElement->Node->GetText(), _name, ruleMessage),
 	                  checkElement->Node->GetTextRange());
 }
 

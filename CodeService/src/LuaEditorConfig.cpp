@@ -395,7 +395,7 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		if (configMap.count(styleOption.first))
 		{
 			std::string value = configMap.at(styleOption.first);
-			styleOption.second = NameStyleRuleMatcher::ParseFrom(value);
+			styleOption.second->ParseRule(value);
 		}
 	}
 

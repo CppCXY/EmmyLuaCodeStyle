@@ -33,6 +33,7 @@ public:
 
 	QuoteStyle quote_style = QuoteStyle::None;
 
+	CallArgParentheses call_arg_parentheses = CallArgParentheses::Keep;
 	/*
 	 * 延续行缩进
 	 */
@@ -107,8 +108,6 @@ public:
 	bool table_append_expression_no_space = false;
 
 	bool long_chain_expression_allow_one_space_after_colon = false;
-
-	bool call_expression_no_parentheses_when_only_one_string_or_table_arg = false;
 
 	std::string end_of_line = "\r\n";
 

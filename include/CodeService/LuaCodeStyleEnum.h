@@ -12,3 +12,11 @@ enum class QuoteStyle
 	Single,
 	Double
 };
+
+enum class CallArgParentheses
+{
+	Keep,
+	Remove,
+	Always
+};
+

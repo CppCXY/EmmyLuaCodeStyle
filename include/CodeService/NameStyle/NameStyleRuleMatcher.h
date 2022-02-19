@@ -29,9 +29,7 @@ public:
 		std::vector<std::string> Param;
 	};
 
-	static std::shared_ptr<NameStyleRuleMatcher> ParseFrom(std::string_view rule);
-
-	NameStyleRuleMatcher();
+	NameStyleRuleMatcher(std::string_view name);
 
 	void Diagnosis(DiagnosisContext& ctx, std::shared_ptr<CheckElement> checkElement);
 
@@ -53,4 +51,5 @@ private:
 	static std::vector<std::string_view> SplitPart(std::string_view source);
 
 	std::vector<NameStyleRule> _rulers;
+	std::string _name;
 };
