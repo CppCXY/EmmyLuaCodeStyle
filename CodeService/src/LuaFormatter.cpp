@@ -22,6 +22,7 @@
 #include "CodeService/FormatElement/MaxSpaceElement.h"
 #include "CodeService/FormatElement/StringLiteralElement.h"
 #include "Util/StringUtil.h"
+#include "CodeService/AstUtil.h"
 
 bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
 {
@@ -1129,17 +1130,29 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<LuaAstNode> callArgList)
 {
 	auto env = std::make_shared<ExpressionElement>();
-	auto& children = callArgList->GetChildren();
-	for (auto child : children)
+	const auto& children = callArgList->GetChildren();
+
+	std::vector<std::shared_ptr<LuaAstNode>> argList;
+	if (ast_util::IsSingleStringOrTableArg(callArgList)
+		&& _options.call_arg_parentheses == CallArgParentheses::Remove)
+	{
+		for (auto child : children)
+		{
+			if (child->GetType() != LuaAstNodeType::GeneralOperator)
+			{
+				argList.push_back(child);
+			}
+		}
+	}
+	else
+	{
+		argList = children;
+	}
+
+	for (auto child : argList)
 	{
 		switch (child->GetType())
 		{
-		case LuaAstNodeType::KeyWord:
-			{
-				env->AddChild(FormatNode(child));
-				env->Add<KeepElement>(0);
-				break;
-			}
 		case LuaAstNodeType::ExpressionList:
 			{
 				std::shared_ptr<FormatElement> layout = nullptr;
@@ -1169,35 +1182,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 				}
 
 				env->AddChild(FormatExpressionList(child, layout));
-
-				if (_options.keep_one_space_between_call_args_and_parentheses)
-				{
-					env->Add<KeepElement>(1);
-				}
-				else
-				{
-					env->Add<KeepElement>(0);
-				}
-
+				env->Add<KeepElement>(0);
 				break;
 			}
 		case LuaAstNodeType::GeneralOperator:
 			{
 				env->Add<TextElement>(child);
-				if (child->GetText() == ",")
-				{
-					env->Add<KeepElement>(1);
-				}
-				else if (child->GetText() == "("
-					&& _options.keep_one_space_between_call_args_and_parentheses
-					&& children.size() > 2)
-				{
-					env->Add<KeepElement>(1);
-				}
-				else
-				{
-					env->Add<KeepElement>(0);
-				}
+				env->Add<KeepElement>(0);
 				break;
 			}
 		default:
@@ -2120,7 +2111,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 				auto next = nextNode(it, children);
 				if (next && next->GetType() == LuaAstNodeType::CallArgList)
 				{
-					if (next->GetChildren().size() == 1)
+					if (!ast_util::WillCallArgHaveParentheses(next, _options.call_arg_parentheses))
 					{
 						env->Add<KeepElement>(1);
 					}
@@ -2139,15 +2130,26 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 		case LuaAstNodeType::CallExpression:
 			{
 				env->AddChild(FormatNode(child));
-				auto callArg = child->FindFirstOf(LuaAstNodeType::CallArgList);
-				if (callArg->GetChildren().size() <= 1)
+
+				auto currentCallArgList = child->FindFirstOf(LuaAstNodeType::CallArgList);
+				auto nextCallArgList = nextNode(it, children);
+				bool needSpace = true;
+				if (currentCallArgList && nextCallArgList)
 				{
-					env->Add<KeepElement>(1);
+					bool currentHas = ast_util::WillCallArgHaveParentheses(currentCallArgList, _options.call_arg_parentheses);
+					bool nextHas = ast_util::WillCallArgHaveParentheses(nextCallArgList, _options.call_arg_parentheses);
+
+					if(currentHas && nextHas)
+					{
+						needSpace = false;
+					}
 				}
 				else
 				{
-					env->Add<KeepElement>(0);
+					needSpace = false;
 				}
+
+				env->Add<KeepElement>(needSpace ? 1 : 0);
 
 				break;
 			}

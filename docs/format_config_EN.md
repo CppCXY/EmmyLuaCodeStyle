@@ -67,6 +67,26 @@ This option indicates whether all string literals expressed in quotation marks a
 
 When quote_style = single or double, if there is an unescaped target quote type in the string, it will not be formatted. 
 
+## call_arg_parentheses
+
+This option means that if the parameter in the call expression has only a single-string literal constant or a table expression, consider keeping or removing the parentheses.
+The optional value of this option is keep/remove and the default value is keep.
+
+```lua
+p("hello world")
+
+```
+
+after formatting
+
+```lua
+--keep
+p("hello")
+
+--remove
+p "hello"
+```
+
 ## continuation_indent_size
 
 This option indicates the number of subsequent indented columns when a long expression or expression list is expressed in a new line. The default value of this option is 4, and 8 is common
@@ -153,32 +173,6 @@ helloWorld(aaa, bbb, ccc,
 ```
 
 The behavior defined by this option has no effect when a cross-line expression appears in the call parameter list 
-
-## keep_one_space_between_call_args_and_parentheses
-
-This option indicates whether there is a space between the parameters of the function call expression and the left and right parentheses. The default value of the option is false
-
-Before formatting: 
-
-```lua
-helloWorld(aaa,bbb,ccc,
-eee,ddd)
-
-print(123,456)
-
-```
-
-after formatting：
-
-```lua
---keep_one_space_between_call_args_and_parentheses = true
-
-helloWorld( aaa, bbb, ccc,
-    eee, ddd )
-
-print( 123, 456 )
-
-```
 
 ## align_function_define_params
 

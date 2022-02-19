@@ -209,6 +209,18 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		}
 	}
 
+	if(configMap.count("call_arg_parentheses"))
+	{
+		if(configMap.at("call_arg_parentheses") == "keep")
+		{
+			options->call_arg_parentheses = CallArgParentheses::Keep;
+		}
+		else if(configMap.at("call_arg_parentheses") == "remove")
+		{
+			options->call_arg_parentheses = CallArgParentheses::Remove;
+		}
+	}
+
 	if (configMap.count("continuation_indent_size")
 		&& isNumber(configMap.at("continuation_indent_size")))
 	{
@@ -230,12 +242,6 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 	if (configMap.count("align_call_args"))
 	{
 		options->align_call_args = configMap.at("align_call_args") == "true";
-	}
-
-	if (configMap.count("keep_one_space_between_call_args_and_parentheses"))
-	{
-		options->keep_one_space_between_call_args_and_parentheses =
-			configMap.at("keep_one_space_between_call_args_and_parentheses") == "true";
 	}
 
 	if (configMap.count("keep_one_space_between_table_and_bracket"))

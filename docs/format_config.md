@@ -67,6 +67,26 @@ end
 
 当quote_style = single 或者double时，如果字符串内存在未转义的目标引号类型，则不予格式化。
 
+## call_arg_parentheses
+
+该选项表示，调用表达式中如果参数仅有单字符串字面值常量或者表表达式，则可以考虑保持或者移除括号。
+该选项可选值是 keep/remove 默认值是keep。
+
+```lua
+p("hello world")
+
+```
+
+格式化后
+
+```lua
+--keep
+p("hello")
+
+--remove
+p "hello"
+```
+
 ## continuation_indent_size
 
 该选项表示长表达式或者表达式列表在换行表达时的后续缩进列数，该选项默认值是4，常见的还有8
@@ -153,32 +173,6 @@ helloWorld(aaa, bbb, ccc,
 ```
 
 当调用参数列表中出现跨行表达式时，该选项定义的行为无效
-
-## keep_one_space_between_call_args_and_parentheses
-
-该选项表示函数调用表达式的参数和左右括号之间是否保持一个空格，选项默认值是false
-
-格式化前：
-
-```lua
-helloWorld(aaa,bbb,ccc,
-eee,ddd)
-
-print(123,456)
-
-```
-
-格式化后：
-
-```lua
---keep_one_space_between_call_args_and_parentheses = true
-
-helloWorld( aaa, bbb, ccc,
-    eee, ddd )
-
-print( 123, 456 )
-
-```
 
 ## align_function_define_params
 

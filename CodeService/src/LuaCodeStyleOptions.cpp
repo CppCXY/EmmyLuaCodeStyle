@@ -32,7 +32,7 @@ LuaCodeStyleOptions::LuaCodeStyleOptions()
 
 	local_name_define_style(std::make_shared<NameStyleRuleMatcher>("Local")),
 	function_param_name_style(std::make_shared<NameStyleRuleMatcher>("Parameters")),
-	function_name_define_style(std::make_shared<NameStyleRuleMatcher>("Class method")),
+	function_name_define_style(std::make_shared<NameStyleRuleMatcher>("Class and module method")),
 	local_function_name_define_style(std::make_shared<NameStyleRuleMatcher>("Local method")),
 	table_field_name_define_style(std::make_shared<NameStyleRuleMatcher>("Table field")),
 	global_variable_name_define_style(std::make_shared<NameStyleRuleMatcher>("Global")),

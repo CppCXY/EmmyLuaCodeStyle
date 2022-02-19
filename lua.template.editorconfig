@@ -10,6 +10,8 @@ indent_size = 4
 tab_width = 4
 # none/single/double
 quote_style = none
+# keep/remove
+call_arg_parentheses = keep
 # only support number
 continuation_indent_size = 4
 # if true, continuation_indent_size for local or assign statement is invalid
@@ -18,8 +20,6 @@ local_assign_continuation_align_to_first_expression = false
 # function call expression's args will align to first arg
 # however, if the args has cross row arg, it will not be aligned to the first arg
 align_call_args = false
-# if true, format like this "print( "123", 456 )"
-keep_one_space_between_call_args_and_parentheses = false
 # if true, all function define params will align to first param
 align_function_define_params = true
 # if true, format like this "local t = { 1, 2, 3 }"

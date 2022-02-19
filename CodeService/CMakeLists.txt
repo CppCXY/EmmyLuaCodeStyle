@@ -66,7 +66,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleChecker.cpp
 	${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleRuleMatcher.cpp
 	${CodeService_SOURCE_DIR}/src/NameStyle/CheckElement.cpp
-
+	${CodeService_SOURCE_DIR}/src/AstUtil.cpp
 )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
