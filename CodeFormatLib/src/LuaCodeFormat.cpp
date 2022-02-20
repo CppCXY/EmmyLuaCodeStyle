@@ -53,6 +53,21 @@ void LuaCodeFormat::RemoveCodeStyle(const std::string& workspaceUri)
 	}
 }
 
+void LuaCodeFormat::SetDefaultCodeStyle(const std::string& configPath)
+{
+	auto editorconfig = LuaEditorConfig::LoadFromFile(configPath);
+	if (editorconfig == nullptr)
+	{
+		return;
+	}
+
+	auto defaultCodeStyle = editorconfig->Generate("");
+	if (defaultCodeStyle)
+	{
+		_defaultOptions = defaultCodeStyle;
+	}
+}
+
 std::string LuaCodeFormat::Reformat(const std::string& uri, std::string&& text)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));

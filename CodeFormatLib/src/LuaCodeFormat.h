@@ -18,6 +18,7 @@ public:
 
 	void UpdateCodeStyle(const std::string& workspaceUri, const std::string& configPath);
 	void RemoveCodeStyle(const std::string& workspaceUri);
+	void SetDefaultCodeStyle(const std::string& configPath);
 
 	std::string Reformat(const std::string& uri, std::string&& text);
 
