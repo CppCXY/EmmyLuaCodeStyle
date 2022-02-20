@@ -235,11 +235,43 @@ int diagnose_file(lua_State* L)
 }
 
 
+int set_default_config(lua_State* L)
+{
+	int top = lua_gettop(L);
+
+	if (top < 1)
+	{
+		return 0;
+	}
+
+	if (lua_isstring(L, 1))
+	{
+		try
+		{
+			std::string configPath = lua_tostring(L, 1);
+			LuaCodeFormat::GetInstance().SetDefaultCodeStyle(configPath);
+			lua_pushboolean(L, true);
+			return 1;
+		}
+		catch (std::exception& e)
+		{
+			std::string err = e.what();
+			lua_settop(L, top);
+			lua_pushboolean(L, false);
+			lua_pushlstring(L, err.c_str(), err.size());
+			return 2;
+		}
+	}
+
+	return 0;
+}
+
 static const luaL_Reg lib[] = {
 	{"format", format},
 	{"range_format", range_format},
 	{"update_config", update_config},
 	{"diagnose_file", diagnose_file},
+	{"set_default_config", set_default_config},
 	{nullptr, nullptr}
 };
 
