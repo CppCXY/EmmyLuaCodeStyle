@@ -234,22 +234,60 @@ int diagnose_file(lua_State* L)
 	return 0;
 }
 
+std::string luaToString(lua_State* L, int idx)
+{
+	if (lua_isstring(L, idx))
+	{
+		return lua_tostring(L, idx);
+	}
+	else if (lua_isinteger(L, idx))
+	{
+		return std::to_string(lua_tointeger(L, idx));
+	}
+	else if (lua_isnumber(L, idx))
+	{
+		return std::to_string(lua_tonumber(L, idx));
+	}
+	else if (lua_isboolean(L, idx))
+	{
+		return std::to_string(static_cast<bool>(lua_toboolean(L, idx)));
+	}
+	else
+	{
+		return "nil";
+	}
+}
 
 int set_default_config(lua_State* L)
 {
 	int top = lua_gettop(L);
 
-	if (top < 1)
+	if (top != 1)
 	{
 		return 0;
 	}
 
-	if (lua_isstring(L, 1))
+	if (lua_istable(L, 1))
 	{
 		try
 		{
-			std::string configPath = lua_tostring(L, 1);
-			LuaCodeFormat::GetInstance().SetDefaultCodeStyle(configPath);
+			std::map<std::string, std::string, std::less<>> configMap;
+
+			lua_pushnil(L);
+			while (lua_next(L, - 2) != 0)
+			{
+				auto key = luaToString(L, -2);
+				auto value = luaToString(L, -1);
+
+				if (key != "nil")
+				{
+					configMap.insert({key, value});
+				}
+
+				lua_pop(L, 1);
+			}
+
+			LuaCodeFormat::GetInstance().SetDefaultCodeStyle(configMap);
 			lua_pushboolean(L, true);
 			return 1;
 		}
