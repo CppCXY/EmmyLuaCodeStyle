@@ -53,7 +53,7 @@ void LuaCodeFormat::RemoveCodeStyle(const std::string& workspaceUri)
 	}
 }
 
-void LuaCodeFormat::SetDefaultCodeStyle(std::map<std::string, std::string, std::less<>>& configMap)
+void LuaCodeFormat::SetDefaultCodeStyle(ConfigMap& configMap)
 {
 	if (!configMap.empty())
 	{
@@ -61,7 +61,7 @@ void LuaCodeFormat::SetDefaultCodeStyle(std::map<std::string, std::string, std::
 	}
 }
 
-std::string LuaCodeFormat::Reformat(const std::string& uri, std::string&& text)
+std::string LuaCodeFormat::Reformat(const std::string& uri, std::string&& text, ConfigMap& configMap)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
 	parser->BuildAstWithComment();
@@ -71,13 +71,34 @@ std::string LuaCodeFormat::Reformat(const std::string& uri, std::string&& text)
 		return "";
 	}
 	auto options = GetOptions(uri);
-	LuaFormatter formatter(parser, *options);
-	formatter.BuildFormattedElement();
+	if (configMap.empty())
+	{
+		LuaFormatter formatter(parser, *options);
+		formatter.BuildFormattedElement();
+		return formatter.GetFormattedText();
+	}
+	else
+	{
+		LuaCodeStyleOptions tempOptions = *options;
+		if (configMap.count("insertSpaces"))
+		{
+			tempOptions.indent_style = configMap.at("insertSpaces") == "true"
+				                           ? IndentStyle::Space
+				                           : IndentStyle::Tab;
+		}
+		if(configMap.count("tabSize"))
+		{
+			tempOptions.tab_width = std::stoi(configMap.at("tabSize"));
+		}
 
-	return formatter.GetFormattedText();
+		LuaFormatter formatter(parser, tempOptions);
+		formatter.BuildFormattedElement();
+		return formatter.GetFormattedText();
+	}
 }
 
-std::string LuaCodeFormat::RangeFormat(const std::string& uri, LuaFormatRange& range, std::string&& text)
+std::string LuaCodeFormat::RangeFormat(const std::string& uri, LuaFormatRange& range, std::string&& text,
+                                       ConfigMap& configMap)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
 	parser->BuildAstWithComment();
@@ -87,10 +108,34 @@ std::string LuaCodeFormat::RangeFormat(const std::string& uri, LuaFormatRange& r
 		return "";
 	}
 	auto options = GetOptions(uri);
-	LuaFormatter formatter(parser, *options);
-	formatter.BuildFormattedElement();
 
-	return formatter.GetRangeFormattedText(range);
+	if (configMap.empty())
+	{
+		LuaFormatter formatter(parser, *options);
+		formatter.BuildFormattedElement();
+
+		return formatter.GetRangeFormattedText(range);
+	}
+	else
+	{
+		LuaCodeStyleOptions tempOptions = *options;
+		if (configMap.count("insertSpaces"))
+		{
+			tempOptions.indent_style = configMap.at("insertSpaces") == "true"
+				? IndentStyle::Space
+				: IndentStyle::Tab;
+		}
+		if (configMap.count("tabSize"))
+		{
+			tempOptions.tab_width = std::stoi(configMap.at("tabSize"));
+		}
+
+		LuaFormatter formatter(parser, tempOptions);
+		formatter.BuildFormattedElement();
+
+		return formatter.GetRangeFormattedText(range);
+	}
+
 }
 
 std::pair<bool, std::vector<LuaDiagnosisInfo>> LuaCodeFormat::Diagnose(const std::string& uri, std::string&& text)

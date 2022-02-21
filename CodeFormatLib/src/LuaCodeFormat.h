@@ -12,17 +12,18 @@
 class LuaCodeFormat
 {
 public:
+	using ConfigMap = std::map<std::string, std::string, std::less<>>;
 	static LuaCodeFormat& GetInstance();
 
 	LuaCodeFormat();
 
 	void UpdateCodeStyle(const std::string& workspaceUri, const std::string& configPath);
 	void RemoveCodeStyle(const std::string& workspaceUri);
-	void SetDefaultCodeStyle(std::map<std::string, std::string, std::less<>>& configMap);
+	void SetDefaultCodeStyle(ConfigMap& configMap);
 
-	std::string Reformat(const std::string& uri, std::string&& text);
+	std::string Reformat(const std::string& uri, std::string&& text,ConfigMap& configMap);
 
-	std::string RangeFormat(const std::string& uri, LuaFormatRange& range, std::string&& text);
+	std::string RangeFormat(const std::string& uri, LuaFormatRange& range, std::string&& text, ConfigMap& configMap);
 
 	std::pair<bool, std::vector<LuaDiagnosisInfo>> Diagnose(const std::string& uri, std::string&& text);
 
