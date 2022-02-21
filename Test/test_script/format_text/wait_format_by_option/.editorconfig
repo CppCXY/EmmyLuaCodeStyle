@@ -18,8 +18,6 @@ local_assign_continuation_align_to_first_expression = false
 # function call expression's args will align to first arg
 # however, if the args has cross row arg, it will not be aligned to the first arg
 align_call_args = false
-# if true, format like this "print( "123", 456 )"
-keep_one_space_between_call_args_and_parentheses = false
 # if true, all function define params will align to first param
 align_function_define_params = true
 # if true, format like this "local t = { 1, 2, 3 }"
@@ -30,9 +28,6 @@ align_table_field_to_first_field = false
 keep_one_space_between_namedef_and_attribute = false
 # continous line distance
 max_continuous_line_distance = 1
-# if true, iff any one of the consecutive rows meets the condition of aligning to the equal sign,
-# the consecutive rows will be aligned to the equal sign
-weak_alignment_rule = false
 # see document for detail
 continuous_assign_statement_align_to_equal_sign = true
 # see document for detail
@@ -45,7 +40,7 @@ do_statement_no_indent = false
 if_condition_no_continuation_indent = false
 
 # optional crlf/lf
-end_of_line = crlf
+end_of_line = auto
 
 # [Row layout]
 # The following configuration supports three expressions

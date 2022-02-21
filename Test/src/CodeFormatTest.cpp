@@ -153,9 +153,6 @@ int main(int argc, char* argv[])
 	if (target == "CheckFormatResult")
 	{
 		auto options = std::make_shared<LuaCodeStyleOptions>();
-#ifndef _WIN32
-		options->end_of_line = "\n";
-#endif
 		std::filesystem::path formattedRoot(commandLine.Get<std::string>("formatted-work-directory"));
 		for (auto& path : luaFiles)
 		{
@@ -190,10 +187,6 @@ int main(int argc, char* argv[])
 		for (auto& path : luaFiles)
 		{
 			auto options = editorConfig->Generate(path);
-#ifndef _WIN32
-			options->end_of_line = "\n";
-#endif
-
 			auto waitFormattingFilePath = workRoot / path;
 			auto waitFormattingText = ReadFile(waitFormattingFilePath.string());
 
@@ -227,9 +220,6 @@ int main(int argc, char* argv[])
 	else if(target == "Performance")
 	{
 		auto options = std::make_shared<LuaCodeStyleOptions>();
-#ifndef _WIN32
-		options->end_of_line = "\n";
-#endif
 		for (auto& path : luaFiles)
 		{
 			auto waitFormattingFilePath = workRoot / path;
