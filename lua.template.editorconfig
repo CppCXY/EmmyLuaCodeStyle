@@ -46,8 +46,8 @@ table_append_expression_no_space = false
 if_condition_align_with_each_other = false
 
 long_chain_expression_allow_one_space_after_colon = false
-# optional crlf/lf
-end_of_line = crlf
+# optional crlf/lf/auto, if it is 'auto', in windows it is crlf other platforms are lf
+end_of_line = auto
 
 # [line layout]
 # The following configuration supports three expressions

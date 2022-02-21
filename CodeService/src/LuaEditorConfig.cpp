@@ -325,6 +325,14 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		{
 			options->end_of_line = "\n";
 		}
+		else if (lineSeparatorSymbol == "auto")
+		{
+#ifndef _WINDOWS
+			options->end_of_line = "\n";
+#else
+			options->end_of_line = "\r\n";
+#endif
+		}
 	}
 
 	if (configMap.count("max_line_length")
