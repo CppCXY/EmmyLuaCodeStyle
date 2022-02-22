@@ -26,7 +26,7 @@ align_function_define_params = true
 keep_one_space_between_table_and_bracket = true
 # if indent_style is tab, this option is invalid
 align_table_field_to_first_field = false
-# if true, ormat like this "local t <const> = 1"
+# if true, format like this "local t <const> = 1"
 keep_one_space_between_namedef_and_attribute = false
 # continous line distance
 max_continuous_line_distance = 1
