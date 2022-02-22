@@ -28,6 +28,8 @@ public:
 	std::pair<bool, std::vector<LuaDiagnosisInfo>> Diagnose(const std::string& uri, std::string&& text);
 
 	std::shared_ptr<LuaCodeStyleOptions> GetOptions(const std::string& uri);
+
+	LuaCodeStyleOptions CalculateOptions(const std::string& uri, ConfigMap& configMap);
 private:
 	std::vector<std::pair<std::string, std::shared_ptr<LuaEditorConfig>>> _editorConfigVector;
 
