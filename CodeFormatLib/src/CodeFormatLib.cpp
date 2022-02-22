@@ -23,7 +23,7 @@ std::string luaToString(lua_State* L, int idx)
 	}
 	else if (lua_isboolean(L, idx))
 	{
-		return std::to_string(static_cast<bool>(lua_toboolean(L, idx)));
+		return lua_toboolean(L, idx) ? "true": "false";
 	}
 	else
 	{
