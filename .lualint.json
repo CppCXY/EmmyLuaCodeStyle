@@ -1,27 +1,27 @@
 {
-    "style": {
-        "max-line-length": 120,
-        "indent-style": "space-4",
-        "quote_style": "double",
-        "align-style": {
-            "local-or-assign": "allow",
-            "if-condition": "suggest",
-            "table-field": "ban"
-        },
-        "white-space": {
-            
-        },
-        "line-space": {},
-        "name-style": {
-            "local-name": "snake_case",
-            "function-param": "snake_case",
-            "table-function": "snake_case",
-            "local-function": "snake_case",
-            "table-field": "snake_case",
-            "global": "snake_case",
-            "module": "snake_case",
-            "require_module": "snake_case",
-            "class": "snake_case"
-        }
-    }
+	"max-line-length": 120,
+	"indent-style": {
+		"style": "space",
+		"indent-size": 4,
+		"tab-width": 4
+	},
+	"quote_style": "double",
+	"align-style": {
+		"local-or-assign": "allow",
+		"if-condition": "suggest",
+		"table-field": "ban"
+	},
+	"white-space": {},
+	"line-space": {},
+	"name-style": {
+		"local-name": "snake_case",
+		"function-param": "snake_case",
+		"table-function": "snake_case",
+		"local-function": "snake_case",
+		"table-field": "snake_case",
+		"global": "snake_case",
+		"module": "snake_case",
+		"require_module": "snake_case",
+		"class": "snake_case"
+	}
 }

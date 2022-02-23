@@ -8,6 +8,7 @@ add_dependencies(CodeService LuaParser Util)
 
 target_include_directories(CodeService PUBLIC
 	${LuaCodeStyle_SOURCE_DIR}/include
+	${LuaCodeStyle_SOURCE_DIR}/3rd/nlohmann_json/include
 	src
 )
 
@@ -68,6 +69,8 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/NameStyle/CheckElement.cpp
 	${CodeService_SOURCE_DIR}/src/AstUtil.cpp
 	${CodeService_SOURCE_DIR}/src/LuaLinterConfig.cpp
+	${CodeService_SOURCE_DIR}/src/LuaLinterType.cpp
+	${CodeService_SOURCE_DIR}/src/LuaLinterOptions.cpp
 )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
