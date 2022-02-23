@@ -129,15 +129,24 @@ LinterLineSpace::LinterLineSpace()
 
 void LinterLineSpace::Deserialize(nlohmann::json json)
 {
-	if(json.is_object())
+	if (json.is_object())
 	{
-
 		Enable = EnableType::Enable;
 	}
 }
 
 LinterNameStyle::LinterNameStyle()
-	: BasicLinterStyle(EnableType::Enable)
+	: BasicLinterStyle(EnableType::Enable),
+	  local_name_define_style(std::make_shared<NameStyleRuleMatcher>("Local")),
+	  function_param_name_style(std::make_shared<NameStyleRuleMatcher>("Parameters")),
+	  function_name_define_style(std::make_shared<NameStyleRuleMatcher>("Class and module method")),
+	  local_function_name_define_style(std::make_shared<NameStyleRuleMatcher>("Local method")),
+	  table_field_name_define_style(std::make_shared<NameStyleRuleMatcher>("Table field")),
+	  global_variable_name_define_style(std::make_shared<NameStyleRuleMatcher>("Global")),
+	  module_name_define_style(std::make_shared<NameStyleRuleMatcher>("Module")),
+	  require_module_name_style(std::make_shared<NameStyleRuleMatcher>("Require module")),
+	  class_name_define_style(std::make_shared<NameStyleRuleMatcher>("Class"))
+
 {
 }
 
@@ -145,26 +154,26 @@ void LinterNameStyle::Deserialize(nlohmann::json json)
 {
 	if (json.is_object())
 	{
-		// std::vector<std::pair<std::string, std::shared_ptr<NameStyleRuleMatcher>&>> styleList = {
-		// {"local_name_define_style", options->local_name_define_style},
-		// {"function_param_name_style", options->function_param_name_style},
-		// {"function_name_define_style", options->function_name_define_style},
-		// {"local_function_name_define_style", options->local_function_name_define_style},
-		// {"table_field_name_define_style", options->table_field_name_define_style},
-		// {"global_variable_name_define_style", options->global_variable_name_define_style},
-		// {"module_name_define_style", options->module_name_define_style},
-		// {"require_module_name_style", options->require_module_name_style},
-		// {"class_name_define_style", options->class_name_define_style},
-		// };
-		//
-		// for (auto& styleOption : styleList)
-		// {
-		// 	if (configMap.count(styleOption.first))
-		// 	{
-		// 		std::string value = configMap.at(styleOption.first);
-		// 		styleOption.second->ParseRule(value);
-		// 	}
-		// }
+		std::vector<std::pair<std::string, std::shared_ptr<NameStyleRuleMatcher>&>> styleList = {
+			{"local_name_define_style", local_name_define_style},
+			{"function_param_name_style", function_param_name_style},
+			{"function_name_define_style", function_name_define_style},
+			{"local_function_name_define_style", local_function_name_define_style},
+			{"table_field_name_define_style", table_field_name_define_style},
+			{"global_variable_name_define_style", global_variable_name_define_style},
+			{"module_name_define_style", module_name_define_style},
+			{"require_module_name_style", require_module_name_style},
+			{"class_name_define_style", class_name_define_style},
+		};
+
+		for (auto& styleOption : styleList)
+		{
+			if (json[styleOption.first].is_string())
+			{
+				std::string value = json[styleOption.first];
+				styleOption.second->ParseRule(value);
+			}
+		}
 		Enable = EnableType::Enable;
 	}
 }

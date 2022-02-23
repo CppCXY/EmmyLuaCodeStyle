@@ -71,6 +71,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/LuaLinterConfig.cpp
 	${CodeService_SOURCE_DIR}/src/LuaLinterType.cpp
 	${CodeService_SOURCE_DIR}/src/LuaLinterOptions.cpp
+	${CodeService_SOURCE_DIR}/src/LuaLinter.cpp
 )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
