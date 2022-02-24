@@ -195,7 +195,7 @@ void NameStyleChecker::VisitParamList(const std::shared_ptr<LuaAstNode>& paramLi
 {
 	for (auto param : paramList->GetChildren())
 	{
-		if (param->GetType() == LuaAstNodeType::Identify)
+		if (param->GetType() == LuaAstNodeType::Param && param->GetText() != "...")
 		{
 			_nameStyleCheckVector.push_back(std::make_shared<CheckElement>(NameDefineType::ParamName, param));
 		}

@@ -46,7 +46,7 @@ void ModuleFinder::VisitParamList(const std::shared_ptr<LuaAstNode>& paramList)
 {
 	for (auto param : paramList->GetChildren())
 	{
-		if (param->GetType() == LuaAstNodeType::Identify)
+		if (param->GetType() == LuaAstNodeType::Param)
 		{
 			RecordLocalVariable(param);
 		}
