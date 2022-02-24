@@ -1180,6 +1180,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 						layout = std::make_shared<AlignToFirstElement>();
 					}
 				}
+				else
+				{
+					layout = std::make_shared<IndentOnLineBreakElement>();
+				}
 
 				env->AddChild(FormatExpressionList(child, layout));
 				env->Add<KeepElement>(0);
