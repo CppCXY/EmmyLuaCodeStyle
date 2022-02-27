@@ -12,8 +12,8 @@ void StatementElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, Fo
 	ctx.PrintLine(1);
 }
 
-void StatementElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void StatementElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
-	FormatElement::Diagnosis(ctx, selfIt, parent);
+	FormatElement::Diagnose(ctx, selfIt, parent);
 	ctx.SetCharacterCount(0);
 }

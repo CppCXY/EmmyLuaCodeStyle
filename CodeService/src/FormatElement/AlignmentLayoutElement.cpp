@@ -16,8 +16,9 @@ std::shared_ptr<FormatElement> FindLastValidChild(FormatElement::ChildIterator i
 	return nullptr;
 }
 
-AlignmentLayoutElement::AlignmentLayoutElement(std::string_view alignSign)
-	: _alignSign(alignSign)
+AlignmentLayoutElement::AlignmentLayoutElement(std::string_view alignSign, AlignStyleLevel level)
+	: _alignSign(alignSign),
+	  _level(level)
 {
 }
 
@@ -41,8 +42,8 @@ void AlignmentLayoutElement::Serialize(SerializeContext& ctx, ChildIterator self
 	}
 }
 
-void AlignmentLayoutElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
-                                       FormatElement& parent)
+void AlignmentLayoutElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt,
+                                      FormatElement& parent)
 {
 	const auto eqPosition = GetAlignPosition(ctx);
 
@@ -52,7 +53,7 @@ void AlignmentLayoutElement::Diagnosis(DiagnosisContext& ctx, ChildIterator self
 	}
 	else
 	{
-		FormatElement::Diagnosis(ctx, selfIt, parent);
+		FormatElement::Diagnose(ctx, selfIt, parent);
 	}
 }
 
@@ -226,5 +227,5 @@ void AlignmentLayoutElement::AlignmentDiagnosis(DiagnosisContext& ctx,
 		}
 	}
 
-	return FormatElement::Diagnosis(ctx, selfIt, parent);
+	return FormatElement::Diagnose(ctx, selfIt, parent);
 }

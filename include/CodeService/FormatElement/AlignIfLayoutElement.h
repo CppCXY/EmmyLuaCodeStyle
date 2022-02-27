@@ -9,7 +9,7 @@ public:
 	FormatElementType GetType() override;
 
 	void Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
-	void Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
+	void Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
 private:
 	bool ElseifFounded();
 	bool OnlyEmptyCharBeforeAnd(FormatContext& ctx, FormatElement& expressionLayout);

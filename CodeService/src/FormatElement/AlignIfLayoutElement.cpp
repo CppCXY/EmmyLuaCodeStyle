@@ -18,11 +18,11 @@ void AlignIfElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, Form
 	FormatElement::Serialize(ctx, selfIt, parent);
 }
 
-void AlignIfElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void AlignIfElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	AlignElement(ctx);
 
-	FormatElement::Diagnosis(ctx, selfIt, parent);
+	FormatElement::Diagnose(ctx, selfIt, parent);
 	// WeakDiagnosis(ctx, selfIt, parent);
 }
 
