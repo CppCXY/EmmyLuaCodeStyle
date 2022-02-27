@@ -4,7 +4,6 @@
 #include "LuaParser/LuaParser.h"
 #include "LuaCodeStyleOptions.h"
 #include "FormatElement/FormatElement.h"
-#include "FormatElement/PlaceholderElement.h"
 #include "LuaDiagnosisInfo.h"
 #include "LuaFormatRange.h"
 
@@ -18,9 +17,9 @@ public:
 
 	std::string GetFormattedText();
 
-	void BuildRangeFormattedElement(LuaFormatRange& validRange);
+	// void BuildRangeFormattedElement(LuaFormatRange& validRange);
 
-	std::string GetRangeFormattedText(LuaFormatRange& validRange);
+	std::string GetRangeFormattedText(LuaFormatRange& validRange); 
 
 	std::vector<LuaDiagnosisInfo> GetDiagnosisInfos();
 
@@ -128,11 +127,10 @@ protected:
 
 	std::shared_ptr<FormatElement> FormatCallExpression(std::shared_ptr<LuaAstNode> callExpression);
 
-	// special rule [#8](https://github.com/CppCXY/EmmyLuaCodeStyle/issues/8)
 	std::shared_ptr<FormatElement> FormatTableAppendExpression(std::shared_ptr<LuaAstNode> expression);
 
 	// special handle range format
-	std::shared_ptr<FormatElement> FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode, LuaFormatRange& validRange);
+	// std::shared_ptr<FormatElement> FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode, LuaFormatRange& validRange);
 private:
 	std::shared_ptr<LuaParser> _parser;
 	LuaCodeStyleOptions& _options;

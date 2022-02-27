@@ -2,7 +2,8 @@
 #include "Util/format.h"
 
 FormatElement::FormatElement(TextRange range)
-	: _textRange(range)
+	: _textRange(range),
+	  _description(LinterDescription::normal)
 {
 }
 
@@ -70,11 +71,11 @@ void FormatElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, Forma
 	}
 }
 
-void FormatElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void FormatElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
-		(*it)->Diagnosis(ctx, it, *this);
+		(*it)->Diagnose(ctx, it, *this);
 	}
 }
 
@@ -87,13 +88,13 @@ void FormatElement::Format(SerializeContext& ctx)
 	Serialize(ctx, it, *root);
 }
 
-void FormatElement::DiagnosisCodeStyle(DiagnosisContext& ctx)
+void FormatElement::DiagnoseCodeStyle(DiagnosisContext& ctx)
 {
 	// workaround
 	auto root = std::make_shared<FormatElement>();
 	root->AddChild(shared_from_this());
 	auto it = root->GetChildren().begin();
-	Diagnosis(ctx, it, *root);
+	Diagnose(ctx, it, *root);
 }
 
 void FormatElement::AddTextRange(TextRange range)
@@ -195,7 +196,7 @@ void FormatElement::GeneralIndentDiagnosis(DiagnosisContext& ctx, ChildIterator 
 		}
 
 	endIndentDiagnose:
-		child->Diagnosis(ctx, it, *this);
+		child->Diagnose(ctx, it, *this);
 	}
 }
 
@@ -203,6 +204,11 @@ void FormatElement::CopyFrom(std::shared_ptr<FormatElement> node)
 {
 	_textRange = node->_textRange;
 	_children = node->_children;
+}
+
+void FormatElement::SetDescription(LinterDescription description)
+{
+	_description = description;
 }
 
 void FormatElement::Reset()

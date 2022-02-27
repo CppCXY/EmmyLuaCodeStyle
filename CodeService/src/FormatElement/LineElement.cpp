@@ -16,7 +16,7 @@ void LineElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatE
 	ctx.PrintLine(1);
 }
 
-void LineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void LineElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	ctx.SetCharacterCount(0);
 }

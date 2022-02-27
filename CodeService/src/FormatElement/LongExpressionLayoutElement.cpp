@@ -21,7 +21,7 @@ void LongExpressionLayoutElement::Serialize(SerializeContext& ctx, ChildIterator
 	}
 }
 
-void LongExpressionLayoutElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void LongExpressionLayoutElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	DiagnosisSubExpression(ctx, *this);
 	if (_hasContinuation)
@@ -68,7 +68,7 @@ void LongExpressionLayoutElement::DiagnosisSubExpression(DiagnosisContext& ctx, 
 		}
 		else
 		{
-			child->Diagnosis(ctx, it, parent);
+			child->Diagnose(ctx, it, parent);
 		}
 		if (child->GetType() == FormatElementType::KeepElement)
 		{

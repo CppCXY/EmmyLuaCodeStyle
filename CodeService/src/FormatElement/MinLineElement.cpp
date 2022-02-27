@@ -38,7 +38,7 @@ void MinLineElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, Form
 	ctx.PrintLine(line);
 }
 
-void MinLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void MinLineElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	if (_line <= 0)
 	{

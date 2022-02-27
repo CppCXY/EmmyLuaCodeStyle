@@ -108,7 +108,3 @@ enum class LuaAstNodeType
 
 	ShebangComment
 };
-
-
-#define LUA_AST(ASTClass)\
-    inline static constexpr LuaAstNodeType ASTIndex = LuaAstNodeType::ASTClass

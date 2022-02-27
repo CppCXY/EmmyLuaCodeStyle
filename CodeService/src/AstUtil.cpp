@@ -68,3 +68,25 @@ bool ast_util::WillCallArgHaveParentheses(std::shared_ptr<LuaAstNode> callArgLis
 
 	return true;
 }
+
+bool ast_util::NextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type,
+                         const LuaAstNode::ChildrenContainer& container)
+{
+	if (it != container.end() && (++it) != container.end())
+	{
+		return (*it)->GetType() == type;
+	}
+
+	return false;
+}
+
+std::shared_ptr<LuaAstNode> ast_util::NextNode(LuaAstNode::ChildIterator it,
+                                               const LuaAstNode::ChildrenContainer& container)
+{
+	if (it != container.end() && (++it) != container.end())
+	{
+		return *it;
+	}
+
+	return nullptr;
+}
