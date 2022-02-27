@@ -36,7 +36,7 @@ void KeepLineElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 	ctx.PrintLine(line);
 }
 
-void KeepLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
+void KeepLineElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt,
                                 FormatElement& parent)
 {
 	ctx.SetCharacterCount(0);

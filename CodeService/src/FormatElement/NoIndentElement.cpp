@@ -20,7 +20,7 @@ void NoIndentElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, For
 	ctx.RecoverIndent();
 }
 
-void NoIndentElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void NoIndentElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	ctx.AddIndent(ctx.GetLastIndent());
 

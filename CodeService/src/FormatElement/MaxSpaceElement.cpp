@@ -37,7 +37,7 @@ void MaxSpaceElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, For
 	ctx.PrintBlank(space);
 }
 
-void MaxSpaceElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void MaxSpaceElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	auto maxSpace = 0;
 	if (_space > 0)

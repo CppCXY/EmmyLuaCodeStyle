@@ -21,7 +21,7 @@ void KeepBlankElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, Fo
 	}
 }
 
-void KeepBlankElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void KeepBlankElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	const int lastOffset = GetLastValidOffset(selfIt, parent);
 	const int nextOffset = GetNextValidOffset(selfIt, parent);

@@ -3,12 +3,17 @@
 #include "LuaCodeStyleEnum.h"
 #include "NameStyle/NameStyleRuleMatcher.h"
 #include <nlohmann/json_fwd.hpp>
+#include "LinterDescription.h"
+#include "FormatElement/FormatElementEnum.h"
+#include "LuaParser/LuaAstNode/LuaAstNode.h"
 
 enum class EnableType
 {
 	None,
 	Enable
 };
+
+class FormatElement;
 
 class BasicLinterStyle
 {
@@ -18,6 +23,28 @@ public:
 	EnableType Enable;
 
 	virtual void Deserialize(nlohmann::json json) = 0;
+
+	virtual operator bool();
+};
+
+class LinterMaxLineLength: public BasicLinterStyle
+{
+public:
+	LinterMaxLineLength();
+	int Value;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+class LinterNoIndentStyle: public BasicLinterStyle
+{
+public:
+	LinterNoIndentStyle();
+	bool DoStatement;
+	bool Label;
+	bool IfCondition;
+
+	void Deserialize(nlohmann::json json) override;
 };
 
 class LinterIndentStyle : public BasicLinterStyle
@@ -28,6 +55,7 @@ public:
 	IndentStyle Style;
 	int IndentSize;
 	int TabWidth;
+	LinterNoIndentStyle NoIndent;
 
 	void Deserialize(nlohmann::json json) override;
 };
@@ -42,20 +70,12 @@ public:
 	void Deserialize(nlohmann::json json) override;
 };
 
-enum class AlignStyleLevel
-{
-	None,
-	Allow,
-	Suggest,
-	Ban
-};
-
-
 class LinterAlignStyle : public BasicLinterStyle
 {
 public:
 	LinterAlignStyle();
 
+	int MaxContinuousLineDistance;
 	AlignStyleLevel LocalOrAssign;
 	AlignStyleLevel IfCondition;
 	AlignStyleLevel TableField;
@@ -68,13 +88,39 @@ class LinterWhiteSpace : public BasicLinterStyle
 public:
 	LinterWhiteSpace();
 
+	TextSpaceType CalculateSpace(std::shared_ptr<LuaAstNode> node);
+
+	std::set<std::string, std::less<>> WrapperSpace;
+	std::set<std::string, std::less<>> NoWrapperSpace;
+	std::set<std::string, std::less<>> AfterSpace;
+
 	void Deserialize(nlohmann::json json) override;
 };
+
+class LinterDetailLineSpace : public BasicLinterStyle
+{
+public:
+	LinterDetailLineSpace(LinterDescription description);
+
+	LinterDescription Description;
+	std::shared_ptr<FormatElement> Element;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
 
 class LinterLineSpace : public BasicLinterStyle
 {
 public:
 	LinterLineSpace();
+
+	LinterDetailLineSpace keep_line_after_if_statement;
+	LinterDetailLineSpace keep_line_after_do_statement;
+	LinterDetailLineSpace keep_line_after_while_statement;
+	LinterDetailLineSpace keep_line_after_repeat_statement;
+	LinterDetailLineSpace keep_line_after_for_statement;
+	LinterDetailLineSpace keep_line_after_local_or_assign_statement;
+	LinterDetailLineSpace keep_line_after_function_define_statement;
 
 	void Deserialize(nlohmann::json json) override;
 };

@@ -28,7 +28,7 @@ void IndentOnLineBreakElement::Serialize(SerializeContext& ctx, ChildIterator se
 	}
 }
 
-void IndentOnLineBreakElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void IndentOnLineBreakElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
@@ -37,7 +37,7 @@ void IndentOnLineBreakElement::Diagnosis(DiagnosisContext& ctx, ChildIterator se
 			_hasLineBreak = true;
 			ctx.AddIndent();
 		}
-		(*it)->Diagnosis(ctx, it, *this);
+		(*it)->Diagnose(ctx, it, *this);
 	}
 	if (_hasLineBreak)
 	{

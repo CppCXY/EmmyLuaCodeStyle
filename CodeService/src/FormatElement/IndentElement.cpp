@@ -43,7 +43,7 @@ void IndentElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, Forma
 	ctx.RecoverIndent();
 }
 
-void IndentElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void IndentElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	if (_defaultIndent)
 	{

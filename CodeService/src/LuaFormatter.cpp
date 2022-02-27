@@ -24,27 +24,6 @@
 #include "Util/StringUtil.h"
 #include "CodeService/AstUtil.h"
 
-bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
-{
-	if (it != container.end() && (++it) != container.end())
-	{
-		return (*it)->GetType() == type;
-	}
-
-	return false;
-}
-
-std::shared_ptr<LuaAstNode> nextNode(LuaAstNode::ChildIterator it, const LuaAstNode::ChildrenContainer& container)
-{
-	if (it != container.end() && (++it) != container.end())
-	{
-		return *it;
-	}
-
-	return nullptr;
-}
-
-
 LuaFormatter::LuaFormatter(std::shared_ptr<LuaParser> luaParser, LuaCodeStyleOptions& options)
 	: _parser(luaParser),
 	  _options(options)
@@ -74,19 +53,19 @@ std::string LuaFormatter::GetFormattedText()
 	return ctx.GetText();
 }
 
-void LuaFormatter::BuildRangeFormattedElement(LuaFormatRange& validRange)
-{
-	auto chunkNode = _parser->GetAst();
-	if (!chunkNode->GetChildren().empty())
-	{
-		auto fileBlock = chunkNode->GetChildren().front();
-		_env = FormatRangeBlock(fileBlock, validRange);
-	}
-	else
-	{
-		_env = std::make_shared<IndentElement>();
-	}
-}
+// void LuaFormatter::BuildRangeFormattedElement(LuaFormatRange& validRange)
+// {
+// 	auto chunkNode = _parser->GetAst();
+// 	if (!chunkNode->GetChildren().empty())
+// 	{
+// 		auto fileBlock = chunkNode->GetChildren().front();
+// 		_env = FormatRangeBlock(fileBlock, validRange);
+// 	}
+// 	else
+// 	{
+// 		_env = std::make_shared<IndentElement>();
+// 	}
+// }
 
 std::string LuaFormatter::GetRangeFormattedText(LuaFormatRange& validRange)
 {
@@ -102,7 +81,7 @@ std::vector<LuaDiagnosisInfo> LuaFormatter::GetDiagnosisInfos()
 {
 	DiagnosisContext ctx(_parser, _options);
 
-	_env->DiagnosisCodeStyle(ctx);
+	_env->DiagnoseCodeStyle(ctx);
 
 	if (_options.enable_name_style_check)
 	{
@@ -277,9 +256,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::AssignStatement:
 		case LuaAstNodeType::LocalStatement:
 			{
-				if (nextMatch(it, LuaAstNodeType::AssignStatement, statements)
-					|| nextMatch(it, LuaAstNodeType::LocalStatement, statements)
-					|| nextMatch(it, LuaAstNodeType::Comment, statements))
+				if (ast_util::NextMatch(it, LuaAstNodeType::AssignStatement, statements)
+					|| ast_util::NextMatch(it, LuaAstNodeType::LocalStatement, statements)
+					|| ast_util::NextMatch(it, LuaAstNodeType::Comment, statements))
 				{
 					indentEnv->AddChild(FormatAlignStatement(it, statements));
 				}
@@ -293,7 +272,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 			}
 		case LuaAstNodeType::RepeatStatement:
 			{
-				auto child = FormatNode(statement);
+				auto child = FormatRepeatStatement(statement);
 				indentEnv->AddChild(child);
 				indentEnv->AddChild(_options.keep_line_after_repeat_statement);
 				break;
@@ -350,9 +329,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::ExpressionStatement:
 			{
 				auto statEnv = FormatNode(statement);
-				if (nextMatch(it, LuaAstNodeType::Comment, statements))
+				if (ast_util::NextMatch(it, LuaAstNodeType::Comment, statements))
 				{
-					auto next = nextNode(it, statements);
+					auto next = ast_util::NextNode(it, statements);
 					int currentLine = _parser->GetLine(statement->GetTextRange().EndOffset);
 					int nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
 
@@ -1314,7 +1293,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 		case LuaAstNodeType::Param:
 			{
 				paramListLayoutEnv->Add<TextElement>(child);
-				if (nextMatch(it, LuaAstNodeType::Comment, children))
+				if (ast_util::NextMatch(it, LuaAstNodeType::Comment, children))
 				{
 					paramListLayoutEnv->Add<KeepElement>(1);
 				}
@@ -1599,7 +1578,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 
 	env->AddChild(FormatNode(*it));
 
-	auto nextChild = nextNode(it, children);
+	auto nextChild = ast_util::NextNode(it, children);
 	if (nextChild == nullptr)
 	{
 		return env->GetChildren().front();
@@ -1658,7 +1637,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 
 		++it;
 
-		nextChild = nextNode(it, children);
+		nextChild = ast_util::NextNode(it, children);
 		if (nextChild == nullptr)
 		{
 			break;
@@ -1687,7 +1666,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 	for (; it != siblings.end(); ++it)
 	{
 		auto current = *it;
-		auto nextSibling = nextNode(it, siblings);
+		auto nextSibling = ast_util::NextNode(it, siblings);
 
 		if (nextSibling == nullptr)
 		{
@@ -1776,9 +1755,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 	auto keyNode = *it;
 	env->AddChild(FormatNode(keyNode));
 
-	if (nextMatch(it, LuaAstNodeType::Comment, children))
+	if (ast_util::NextMatch(it, LuaAstNodeType::Comment, children))
 	{
-		auto comment = nextNode(it, children);
+		auto comment = ast_util::NextNode(it, children);
 		int currentLine = _parser->GetLine(keyNode->GetTextRange().EndOffset);
 		int nextLine = _parser->GetLine(comment->GetTextRange().StartOffset);
 
@@ -1826,9 +1805,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 		env->Add<KeepElement>(1);
 	}
 
-	if (nextMatch(it, LuaAstNodeType::KeyWord, children))
+	if (ast_util::NextMatch(it, LuaAstNodeType::KeyWord, children))
 	{
-		auto next = nextNode(it, children);
+		auto next = ast_util::NextNode(it, children);
 		if (next->GetText() == "end")
 		{
 			env->Add<TextElement>(next);
@@ -1855,13 +1834,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(LuaAstNode::C
 
 	for (; it != children.end(); ++it)
 	{
-		if (nextMatch(it, LuaAstNodeType::Comment, children))
+		if (ast_util::NextMatch(it, LuaAstNodeType::Comment, children))
 		{
-			comments.push_back(nextNode(it, children));
+			comments.push_back(ast_util::NextNode(it, children));
 		}
-		else if (nextMatch(it, LuaAstNodeType::Block, children))
+		else if (ast_util::NextMatch(it, LuaAstNodeType::Block, children))
 		{
-			block = nextNode(it, children);
+			block = ast_util::NextNode(it, children);
 		}
 		else
 		{
@@ -1992,7 +1971,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatUnaryExpression(std::shared_p
 				}
 				else
 				{
-					auto next = nextNode(it, children);
+					auto next = ast_util::NextNode(it, children);
 					if (next && (next->GetType() == LuaAstNodeType::UnaryExpression || next->GetType() ==
 						LuaAstNodeType::Comment))
 					{
@@ -2128,7 +2107,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 			{
 				FormatSubExpressionNode(child, env);
 
-				auto next = nextNode(it, children);
+				auto next = ast_util::NextNode(it, children);
 				if (next && next->GetType() == LuaAstNodeType::CallArgList)
 				{
 					if (!ast_util::WillCallArgHaveParentheses(next, _options.call_arg_parentheses))
@@ -2152,7 +2131,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 				env->AddChild(FormatNode(child));
 
 				auto currentCallArgList = child->FindFirstOf(LuaAstNodeType::CallArgList);
-				auto nextCallArgList = nextNode(it, children);
+				auto nextCallArgList = ast_util::NextNode(it, children);
 				bool needSpace = true;
 				if (currentCallArgList && nextCallArgList)
 				{
@@ -2217,205 +2196,205 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 	return FormatExpression(expression, env);
 }
 
-std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode,
-                                                              LuaFormatRange& validRange)
-{
-	enum class State
-	{
-		UnReach,
-		Contain,
-	} state = State::UnReach;
-
-	auto indentEnv = std::make_shared<IndentElement>();
-
-	auto& statements = blockNode->GetChildren();
-
-	for (auto it = statements.begin(); it != statements.end(); ++it)
-	{
-		const auto statement = *it;
-
-		switch (state)
-		{
-		case State::UnReach:
-			{
-				TextRange textRange = statement->GetTextRange();
-				if (statement->GetType() == LuaAstNodeType::AssignStatement
-					|| statement->GetType() == LuaAstNodeType::LocalStatement
-					|| statement->GetType() == LuaAstNodeType::Comment)
-				{
-					auto lastLine = _parser->GetLine(textRange.EndOffset);
-					auto newIt = it;
-					while (nextMatch(newIt, LuaAstNodeType::AssignStatement, statements)
-						|| nextMatch(newIt, LuaAstNodeType::LocalStatement, statements)
-						|| nextMatch(newIt, LuaAstNodeType::Comment, statements))
-					{
-						auto next = nextNode(newIt, statements);
-						auto nextTextRange = next->GetTextRange();
-
-						auto nextTextLine = _parser->GetLine(nextTextRange.StartOffset);
-
-						if (nextTextLine - lastLine > 2)
-						{
-							break;
-						}
-						textRange.EndOffset = nextTextRange.EndOffset;
-						++newIt;
-					}
-					auto statementEndLine = _parser->GetLine(textRange.EndOffset);
-
-					if (statementEndLine >= validRange.StartLine)
-					{
-						state = State::Contain;
-						break;
-					}
-					else
-					{
-						it = newIt;
-						continue;
-					}
-				}
-				else
-				{
-					auto statementEndLine = _parser->GetLine(textRange.EndOffset);
-
-					if (statementEndLine >= validRange.StartLine)
-					{
-						state = State::Contain;
-						break;
-					}
-					else
-					{
-						continue;
-					}
-				}
-				break;
-			}
-		case State::Contain:
-			{
-				auto statementStartLine = _parser->GetLine(statement->GetTextRange().StartOffset);
-				if (statementStartLine > validRange.EndLine)
-				{
-					goto endLoop;
-				}
-				break;
-			}
-		}
-
-
-		switch (statement->GetType())
-		{
-		case LuaAstNodeType::AssignStatement:
-		case LuaAstNodeType::LocalStatement:
-			{
-				if (nextMatch(it, LuaAstNodeType::AssignStatement, statements)
-					|| nextMatch(it, LuaAstNodeType::LocalStatement, statements)
-					|| nextMatch(it, LuaAstNodeType::Comment, statements))
-				{
-					indentEnv->AddChild(FormatAlignStatement(it, statements));
-				}
-				else
-				{
-					auto childEnv = FormatNode(statement);
-					indentEnv->AddChild(childEnv);
-				}
-				indentEnv->AddChild(_options.keep_line_after_local_or_assign_statement);
-				break;
-			}
-		case LuaAstNodeType::RepeatStatement:
-			{
-				auto child = FormatNode(statement);
-				indentEnv->AddChild(child);
-				indentEnv->AddChild(_options.keep_line_after_repeat_statement);
-				break;
-			}
-		case LuaAstNodeType::DoStatement:
-			{
-				indentEnv->AddChild(FormatNode(statement));
-				indentEnv->AddChild(_options.keep_line_after_do_statement);
-				break;
-			}
-		case LuaAstNodeType::ForStatement:
-			{
-				indentEnv->AddChild(FormatNode(statement));
-				indentEnv->AddChild(_options.keep_line_after_for_statement);
-				break;
-			}
-		case LuaAstNodeType::WhileStatement:
-			{
-				indentEnv->AddChild(FormatNode(statement));
-				indentEnv->AddChild(_options.keep_line_after_while_statement);
-				break;
-			}
-		case LuaAstNodeType::IfStatement:
-			{
-				indentEnv->AddChild(FormatNode(statement));
-				indentEnv->AddChild(_options.keep_line_after_if_statement);
-				break;
-			}
-		case LuaAstNodeType::Comment:
-			{
-				auto comment = FormatComment(statement);
-				auto commentStatement = std::make_shared<StatementElement>();
-				commentStatement->AddChild(comment);
-				indentEnv->AddChild(commentStatement);
-
-				indentEnv->Add<KeepLineElement>();
-				break;
-			}
-		case LuaAstNodeType::BreakStatement:
-		case LuaAstNodeType::ReturnStatement:
-		case LuaAstNodeType::GotoStatement:
-		case LuaAstNodeType::ExpressionStatement:
-			{
-				auto statEnv = FormatNode(statement);
-				if (nextMatch(it, LuaAstNodeType::Comment, statements))
-				{
-					auto next = nextNode(it, statements);
-					int currentLine = _parser->GetLine(statement->GetTextRange().EndOffset);
-					int nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
-
-					if (currentLine == nextLine)
-					{
-						statEnv->Add<KeepBlankElement>(1);
-						statEnv->AddChild(FormatComment(next));
-						++it;
-					}
-				}
-				indentEnv->AddChild(statEnv);
-				indentEnv->Add<KeepLineElement>();
-				break;
-			}
-		case LuaAstNodeType::LocalFunctionStatement:
-		case LuaAstNodeType::FunctionStatement:
-			{
-				indentEnv->AddChild(FormatNode(statement));
-				indentEnv->AddChild(_options.keep_line_after_function_define_statement);
-				break;
-			}
-		case LuaAstNodeType::LabelStatement:
-			{
-				auto childEnv = FormatNode(statement);
-				if (_options.label_no_indent)
-				{
-					auto noIndent = std::make_shared<NoIndentElement>();
-					noIndent->AddChild(childEnv);
-					indentEnv->AddChild(noIndent);
-				}
-				else
-				{
-					indentEnv->AddChild(childEnv);
-				}
-
-				break;
-			}
-		default:
-			{
-				auto childEnv = FormatNode(statement);
-				indentEnv->AddChild(childEnv);
-				indentEnv->Add<KeepLineElement>();
-			}
-		}
-	}
-endLoop:
-	return indentEnv;
-}
+// std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode,
+//                                                               LuaFormatRange& validRange)
+// {
+// 	enum class State
+// 	{
+// 		UnReach,
+// 		Contain,
+// 	} state = State::UnReach;
+//
+// 	auto indentEnv = std::make_shared<IndentElement>();
+//
+// 	auto& statements = blockNode->GetChildren();
+//
+// 	for (auto it = statements.begin(); it != statements.end(); ++it)
+// 	{
+// 		const auto statement = *it;
+//
+// 		switch (state)
+// 		{
+// 		case State::UnReach:
+// 			{
+// 				TextRange textRange = statement->GetTextRange();
+// 				if (statement->GetType() == LuaAstNodeType::AssignStatement
+// 					|| statement->GetType() == LuaAstNodeType::LocalStatement
+// 					|| statement->GetType() == LuaAstNodeType::Comment)
+// 				{
+// 					auto lastLine = _parser->GetLine(textRange.EndOffset);
+// 					auto newIt = it;
+// 					while (ast_util::NextMatch(newIt, LuaAstNodeType::AssignStatement, statements)
+// 						|| ast_util::NextMatch(newIt, LuaAstNodeType::LocalStatement, statements)
+// 						|| ast_util::NextMatch(newIt, LuaAstNodeType::Comment, statements))
+// 					{
+// 						auto next = ast_util::NextNode(newIt, statements);
+// 						auto nextTextRange = next->GetTextRange();
+//
+// 						auto nextTextLine = _parser->GetLine(nextTextRange.StartOffset);
+//
+// 						if (nextTextLine - lastLine > 2)
+// 						{
+// 							break;
+// 						}
+// 						textRange.EndOffset = nextTextRange.EndOffset;
+// 						++newIt;
+// 					}
+// 					auto statementEndLine = _parser->GetLine(textRange.EndOffset);
+//
+// 					if (statementEndLine >= validRange.StartLine)
+// 					{
+// 						state = State::Contain;
+// 						break;
+// 					}
+// 					else
+// 					{
+// 						it = newIt;
+// 						continue;
+// 					}
+// 				}
+// 				else
+// 				{
+// 					auto statementEndLine = _parser->GetLine(textRange.EndOffset);
+//
+// 					if (statementEndLine >= validRange.StartLine)
+// 					{
+// 						state = State::Contain;
+// 						break;
+// 					}
+// 					else
+// 					{
+// 						continue;
+// 					}
+// 				}
+// 				break;
+// 			}
+// 		case State::Contain:
+// 			{
+// 				auto statementStartLine = _parser->GetLine(statement->GetTextRange().StartOffset);
+// 				if (statementStartLine > validRange.EndLine)
+// 				{
+// 					goto endLoop;
+// 				}
+// 				break;
+// 			}
+// 		}
+//
+//
+// 		switch (statement->GetType())
+// 		{
+// 		case LuaAstNodeType::AssignStatement:
+// 		case LuaAstNodeType::LocalStatement:
+// 			{
+// 				if (ast_util::NextMatch(it, LuaAstNodeType::AssignStatement, statements)
+// 					|| ast_util::NextMatch(it, LuaAstNodeType::LocalStatement, statements)
+// 					|| ast_util::NextMatch(it, LuaAstNodeType::Comment, statements))
+// 				{
+// 					indentEnv->AddChild(FormatAlignStatement(it, statements));
+// 				}
+// 				else
+// 				{
+// 					auto childEnv = FormatNode(statement);
+// 					indentEnv->AddChild(childEnv);
+// 				}
+// 				indentEnv->AddChild(_options.keep_line_after_local_or_assign_statement);
+// 				break;
+// 			}
+// 		case LuaAstNodeType::RepeatStatement:
+// 			{
+// 				auto child = FormatNode(statement);
+// 				indentEnv->AddChild(child);
+// 				indentEnv->AddChild(_options.keep_line_after_repeat_statement);
+// 				break;
+// 			}
+// 		case LuaAstNodeType::DoStatement:
+// 			{
+// 				indentEnv->AddChild(FormatNode(statement));
+// 				indentEnv->AddChild(_options.keep_line_after_do_statement);
+// 				break;
+// 			}
+// 		case LuaAstNodeType::ForStatement:
+// 			{
+// 				indentEnv->AddChild(FormatNode(statement));
+// 				indentEnv->AddChild(_options.keep_line_after_for_statement);
+// 				break;
+// 			}
+// 		case LuaAstNodeType::WhileStatement:
+// 			{
+// 				indentEnv->AddChild(FormatNode(statement));
+// 				indentEnv->AddChild(_options.keep_line_after_while_statement);
+// 				break;
+// 			}
+// 		case LuaAstNodeType::IfStatement:
+// 			{
+// 				indentEnv->AddChild(FormatNode(statement));
+// 				indentEnv->AddChild(_options.keep_line_after_if_statement);
+// 				break;
+// 			}
+// 		case LuaAstNodeType::Comment:
+// 			{
+// 				auto comment = FormatNode(statement);
+// 				auto commentStatement = std::make_shared<StatementElement>();
+// 				commentStatement->AddChild(comment);
+// 				indentEnv->AddChild(commentStatement);
+//
+// 				indentEnv->Add<KeepLineElement>();
+// 				break;
+// 			}
+// 		case LuaAstNodeType::BreakStatement:
+// 		case LuaAstNodeType::ReturnStatement:
+// 		case LuaAstNodeType::GotoStatement:
+// 		case LuaAstNodeType::ExpressionStatement:
+// 			{
+// 				auto statEnv = FormatNode(statement);
+// 				if (ast_util::NextMatch(it, LuaAstNodeType::Comment, statements))
+// 				{
+// 					auto next = ast_util::NextNode(it, statements);
+// 					int currentLine = _parser->GetLine(statement->GetTextRange().EndOffset);
+// 					int nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
+//
+// 					if (currentLine == nextLine)
+// 					{
+// 						statEnv->Add<KeepBlankElement>(1);
+// 						statEnv->Add<TextElement>(next);
+// 						++it;
+// 					}
+// 				}
+// 				indentEnv->AddChild(statEnv);
+// 				indentEnv->Add<KeepLineElement>();
+// 				break;
+// 			}
+// 		case LuaAstNodeType::LocalFunctionStatement:
+// 		case LuaAstNodeType::FunctionStatement:
+// 			{
+// 				indentEnv->AddChild(FormatNode(statement));
+// 				indentEnv->AddChild(_options.keep_line_after_function_define_statement);
+// 				break;
+// 			}
+// 		case LuaAstNodeType::LabelStatement:
+// 			{
+// 				auto childEnv = FormatNode(statement);
+// 				if (_options.label_no_indent)
+// 				{
+// 					auto noIndent = std::make_shared<NoIndentElement>();
+// 					noIndent->AddChild(childEnv);
+// 					indentEnv->AddChild(noIndent);
+// 				}
+// 				else
+// 				{
+// 					indentEnv->AddChild(childEnv);
+// 				}
+//
+// 				break;
+// 			}
+// 		default:
+// 			{
+// 				auto childEnv = FormatNode(statement);
+// 				indentEnv->AddChild(childEnv);
+// 				indentEnv->Add<KeepLineElement>();
+// 			}
+// 		}
+// 	}
+// endLoop:
+// 	return indentEnv;
+// }

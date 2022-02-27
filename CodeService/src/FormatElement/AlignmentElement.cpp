@@ -21,7 +21,7 @@ void AlignmentElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, Fo
 	}
 }
 
-void AlignmentElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void AlignmentElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	const int nextOffset = GetNextValidOffset(selfIt, parent);
 	if (nextOffset == -1)

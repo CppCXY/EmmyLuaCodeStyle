@@ -40,7 +40,7 @@ void KeepElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 	}
 }
 
-void KeepElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
+void KeepElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt,
                             FormatElement& parent)
 {
 

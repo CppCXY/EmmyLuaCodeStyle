@@ -12,7 +12,6 @@ class LuaAstVisitor;
 class LuaAstNode: public std::enable_shared_from_this<LuaAstNode>
 {
 public:
-	LUA_AST(LuaAstNode);
 
 	using ChildrenContainer = std::vector<std::shared_ptr<LuaAstNode>>;
 	using ChildIterator = ChildrenContainer::iterator;
@@ -21,7 +20,7 @@ public:
 
 	LuaAstNode(LuaAstNodeType type, LuaToken& token);
 
-	virtual ~LuaAstNode();
+	~LuaAstNode();
 
 	std::shared_ptr<LuaAstNode> Copy();
 
@@ -47,18 +46,7 @@ public:
 
 	const char* GetSource();
 
-	// luaParser 保持在C++17
-	template<class T>
-	bool Is()
-	{
-		return _type == T::TypeIndex;
-	}
-
-	template<class T>
-	std::shared_ptr<T> As()
-	{
-		return std::dynamic_pointer_cast<T>(shared_from_this());
-	}
+	bool Is(LuaAstNodeType type);
 
 protected:
 	void AddChildBefore(ChildIterator it, std::shared_ptr<LuaAstNode> child);

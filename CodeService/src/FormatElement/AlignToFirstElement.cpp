@@ -71,7 +71,7 @@ void AlignToFirstElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 	}
 }
 
-void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
+void AlignToFirstElement::Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
@@ -124,7 +124,7 @@ void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 			ctx.AddIndent(indentState);
 		}
 
-		child->Diagnosis(ctx, it, *this);
+		child->Diagnose(ctx, it, *this);
 	}
 
 	if (!_children.empty())

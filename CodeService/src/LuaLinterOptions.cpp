@@ -7,7 +7,7 @@ void LuaLinterOptions::ParseFromJson(nlohmann::json json)
 	{
 		if(json["max-line-width"].is_number_integer())
 		{
-			max_line_length = json["max-line-width"];
+			max_line_length.Deserialize(json["max-line-width"]);
 		}
 
 		if(!json["indent-style"].is_null())
@@ -23,6 +23,11 @@ void LuaLinterOptions::ParseFromJson(nlohmann::json json)
 		if(!json["white-space"].is_null())
 		{
 			white_space.Deserialize(json["white-space"]);
+		}
+
+		if(!json["align-style"].is_null())
+		{
+			align_style.Deserialize(json["align-style"]);
 		}
 
 		if(!json["line-space"].is_null())

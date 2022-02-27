@@ -38,7 +38,7 @@ void StringLiteralElement::Serialize(SerializeContext& ctx, ChildIterator, Forma
 	return ctx.Print(_text, GetTextRange());
 }
 
-void StringLiteralElement::Diagnosis(DiagnosisContext& ctx, ChildIterator, FormatElement& parent)
+void StringLiteralElement::Diagnose(DiagnosisContext& ctx, ChildIterator, FormatElement& parent)
 {
 	//if necessary , add diagnosis
 }

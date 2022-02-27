@@ -3,7 +3,11 @@
 	"indent-style": {
 		"style": "space",
 		"indent-size": 4,
-		"tab-width": 4
+		"tab-width": 4,
+		"no-indent": [
+			"do_statement",
+			"label"
+		]
 	},
 	"quote_style": "double",
 	"align-style": {
@@ -11,8 +15,40 @@
 		"if-condition": "suggest",
 		"table-field": "ban"
 	},
-	"white-space": {},
-	"line-space": {},
+	"white-space": {
+		"wrapper-space": [
+			"operator:+",
+			"operator:*",
+			"operator:/",
+			"operator:and",
+			"operator:or",
+			"operator://",
+			"operator:>>",
+			"operator:<<",
+			"operator:=",
+			"operator:==",
+			"operator:~="
+		],
+		"after-space": [
+			"line_first_index_operator",
+			"comma",
+			"keywords",
+			"operator:not",
+			"operator:~"
+		],
+		"no-wrapper-space": [
+			"append_expression"
+		]
+	},
+	"line-space": {
+		"keep-line-after-if-statement": "min_line:0",
+		"keep-line-after-do-statement": "min_line:0",
+		"keep-line-after-while-statement": "min_line:0",
+		"keep-line-after-repeat-statement": "min_line:0",
+		"keep-line-after-for-statement": "min_line:0",
+		"keep-line-after-local-or-assign-statement": "keep_line",
+		"keep-line-after-function-define-statement": "keep_line:1"
+	},
 	"name-style": {
 		"local-name": "snake_case",
 		"function-param": "snake_case",
@@ -21,7 +57,7 @@
 		"table-field": "snake_case",
 		"global": "snake_case",
 		"module": "snake_case",
-		"require_module": "snake_case",
+		"require-module": "snake_case",
 		"class": "snake_case"
 	}
 }

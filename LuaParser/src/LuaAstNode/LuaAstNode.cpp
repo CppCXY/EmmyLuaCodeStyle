@@ -164,6 +164,11 @@ const char* LuaAstNode::GetSource()
 	return nullptr;
 }
 
+bool LuaAstNode::Is(LuaAstNodeType type)
+{
+	return _type == type;
+}
+
 void LuaAstNode::AddChildBefore(ChildIterator it, std::shared_ptr<LuaAstNode> child)
 {
 	if (it == _children.begin())

@@ -6,6 +6,7 @@
 #include "DiagnosisContext.h"
 #include "CodeService/LanguageTranslator.h"
 #include "CodeService/LuaFormatRange.h"
+#include "CodeService/LinterDescription.h"
 
 
 class FormatElement : public std::enable_shared_from_this<FormatElement>
@@ -21,11 +22,11 @@ public:
 
 	virtual void Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent);
 
-	virtual void Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent);
+	virtual void Diagnose(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent);
 
 	void Format(SerializeContext& ctx);
 
-	void DiagnosisCodeStyle(DiagnosisContext& ctx);
+	void DiagnoseCodeStyle(DiagnosisContext& ctx);
 
 	TextRange GetTextRange();
 
@@ -45,7 +46,17 @@ public:
 		AddChild(std::make_shared<T>(std::forward<ARGS>(args)...));
 	}
 
+	template <class T, LinterDescription Description ,class ... ARGS>
+	void Add(ARGS ...args)
+	{
+		auto child = std::make_shared<T>(std::forward<ARGS>(args)...);
+		child->SetDescription(Description);
+		AddChild(child);
+	}
+
 	void CopyFrom(std::shared_ptr<FormatElement> node);
+
+	void SetDescription(LinterDescription description);
 
 	void Reset();
 protected:
@@ -59,6 +70,8 @@ protected:
 	void AddTextRange(TextRange range);
 
 	TextRange _textRange;
+
+	LinterDescription _description;
 
 	ChildContainer _children;
 };
