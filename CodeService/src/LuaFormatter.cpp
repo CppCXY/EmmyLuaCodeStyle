@@ -1791,7 +1791,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 		else
 		{
 			singleLineBlock = true;
-			env->Add<KeepBlankElement>(1);
+			env->Add<KeepElement>(1);
 
 			for (auto blockChild : block->GetChildren())
 			{
@@ -1800,7 +1800,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 					auto shortExpression = std::make_shared<ExpressionElement>();
 					shortExpression->AddChildren(blockChild->GetChildren());
 					env->AddChild(shortExpression);
-					env->Add<KeepBlankElement>(1);
+					env->Add<KeepElement>(1);
 				}
 			}
 		}

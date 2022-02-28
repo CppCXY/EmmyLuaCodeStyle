@@ -11,7 +11,6 @@ option(EnableTest "Test project" ON)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_definitions(-DMSVC)
-	# 优化选项
 else()
 	set(CMAKE_C_FLAGS_RELEASE "-O2")
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
