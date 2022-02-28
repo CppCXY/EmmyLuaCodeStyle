@@ -1076,12 +1076,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 				}
 
 				env->AddChild(FormatExpression(child, expression));
-				env->Add<KeepBlankElement>(1);
+				env->Add<KeepElement>(1);
 				break;
 			}
 		default:
 			{
 				DefaultHandle(child, env);
+				env->Add<KeepElement>(1);
 				break;
 			}
 		}
