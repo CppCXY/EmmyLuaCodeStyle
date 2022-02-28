@@ -17,7 +17,8 @@ enum class CallArgParentheses : int
 {
 	Keep,
 	Remove,
-	RemoveStringLiteralOnly,
-	RemoveTableOnly
+	RemoveStringOnly,
+	RemoveTableOnly,
+	UnambiguousRemoveStringOnly
 };
 

@@ -1150,8 +1150,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 			&& _options.call_arg_parentheses == CallArgParentheses::Remove)
 		|| (_options.call_arg_parentheses == CallArgParentheses::RemoveTableOnly
 			&& ast_util::IsSingleTableArg(callArgList))
-		|| (_options.call_arg_parentheses == CallArgParentheses::RemoveStringLiteralOnly
-			&& ast_util::IsSingleStringArg(callArgList)))
+		|| (_options.call_arg_parentheses == CallArgParentheses::RemoveStringOnly
+			&& ast_util::IsSingleStringArg(callArgList))
+		|| (_options.call_arg_parentheses == CallArgParentheses::UnambiguousRemoveStringOnly
+			&& ast_util::IsSingleStringArgUnambiguous(callArgList)))
 	{
 		for (auto child : children)
 		{

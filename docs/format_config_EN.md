@@ -90,6 +90,18 @@ f("wfwefw") { e1231313 } ("1e1231313131")
 f "wfwefw" ({ e1231313 }) "1e1231313131"
 ```
 
+If the value is unambiguous_remove_string_only, the parentheses of the string in the call expression will be removed when there is no ambiguity, for example:
+```lua
+local t = require("aaaa").bbb
+local d = require("cccc")
+```
+will be formatted as:
+```lua
+local t = require("aaaa").bbb
+local d = require "cccc"
+```
+
+
 ## continuation_indent_size
 
 This option indicates the number of subsequent indented columns when a long expression or expression list is expressed in a new line. The default value of this option is 4, and 8 is common

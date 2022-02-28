@@ -84,6 +84,37 @@ bool ast_util::IsSingleStringArg(std::shared_ptr<LuaAstNode> callArgList)
 	return false;
 }
 
+
+bool ast_util::IsSingleStringArgUnambiguous(std::shared_ptr<LuaAstNode> callArgList)
+{
+	bool isSingleStringArg = IsSingleStringArg(callArgList);
+	if (!isSingleStringArg)
+	{
+		return false;
+	}
+
+	auto callExpression = callArgList->GetParent();
+	if (!callExpression)
+	{
+		return false;
+	}
+	if (callExpression->GetType() != LuaAstNodeType::CallExpression)
+	{
+		return false;
+	}
+
+	auto indexExpression = callExpression->GetParent();
+	if (indexExpression && indexExpression->GetType() == LuaAstNodeType::IndexExpression)
+	{
+		if (!indexExpression->GetChildren().empty() && callExpression == indexExpression->GetChildren().front())
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool ast_util::IsSingleTableArg(std::shared_ptr<LuaAstNode> callArgList)
 {
 	if (!callArgList)
@@ -130,29 +161,50 @@ bool ast_util::WillCallArgHaveParentheses(std::shared_ptr<LuaAstNode> callArgLis
 {
 	if (ast_util::IsSingleStringOrTableArg(callArgList))
 	{
-		if (IsSingleStringArg(callArgList) && callArgParentheses == CallArgParentheses::RemoveStringLiteralOnly)
+		switch (callArgParentheses)
 		{
-			return false;
-		}
-		else if (IsSingleTableArg(callArgList) && callArgParentheses == CallArgParentheses::RemoveTableOnly)
-		{
-			return false;
-		}
-		else if (callArgParentheses == CallArgParentheses::Remove)
-		{
-			return false;
-		}
-		else
-		{
-			auto leftParentheses = callArgList->FindFirstOf(LuaAstNodeType::GeneralOperator);
-			if (leftParentheses && leftParentheses->GetText() == "(")
-			{
-				return true;
-			}
-			else
+		case CallArgParentheses::Remove:
 			{
 				return false;
 			}
+		case CallArgParentheses::RemoveStringOnly:
+			{
+				if(IsSingleStringArg(callArgList))
+				{
+					return false;
+				}
+				break;
+			}
+		case CallArgParentheses::RemoveTableOnly:
+			{
+				if(IsSingleTableArg(callArgList))
+				{
+					return false;
+				}
+				break;
+			}
+		case CallArgParentheses::UnambiguousRemoveStringOnly:
+			{
+				if(IsSingleStringArgUnambiguous(callArgList))
+				{
+					return false;
+				}
+				break;
+			}
+		default:
+			{
+				break;
+			}
+		}
+
+		auto leftParentheses = callArgList->FindFirstOf(LuaAstNodeType::GeneralOperator);
+		if (leftParentheses && leftParentheses->GetText() == "(")
+		{
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 

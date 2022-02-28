@@ -211,21 +211,25 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 
 	if(configMap.count("call_arg_parentheses"))
 	{
-		if(configMap.at("call_arg_parentheses") == "keep")
+		if (configMap.at("call_arg_parentheses") == "keep")
 		{
 			options->call_arg_parentheses = CallArgParentheses::Keep;
 		}
-		else if(configMap.at("call_arg_parentheses") == "remove")
+		else if (configMap.at("call_arg_parentheses") == "remove")
 		{
 			options->call_arg_parentheses = CallArgParentheses::Remove;
 		}
-		else if(configMap.at("call_arg_parentheses") == "remove_string_only")
+		else if (configMap.at("call_arg_parentheses") == "remove_string_only")
 		{
-			options->call_arg_parentheses = CallArgParentheses::RemoveStringLiteralOnly;
+			options->call_arg_parentheses = CallArgParentheses::RemoveStringOnly;
 		}
-		else if(configMap.at("call_arg_parentheses") == "remove_table_only")
+		else if (configMap.at("call_arg_parentheses") == "remove_table_only")
 		{
 			options->call_arg_parentheses = CallArgParentheses::RemoveTableOnly;
+		}
+		else if (configMap.at("call_arg_parentheses") == "unambiguous_remove_string_only")
+		{
+			options->call_arg_parentheses = CallArgParentheses::UnambiguousRemoveStringOnly;
 		}
 	}
 

@@ -10,7 +10,7 @@ indent_size = 4
 tab_width = 4
 # none/single/double
 quote_style = none
-# keep/remove/remove_table_only/remove_string_only
+# keep/remove/remove_table_only/remove_string_only/unambiguous_remove_string_only
 call_arg_parentheses = keep
 # only support number
 continuation_indent_size = 4

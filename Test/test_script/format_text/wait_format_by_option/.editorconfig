@@ -153,6 +153,8 @@ call_arg_parentheses = keep
 call_arg_parentheses = remove_table_only
 [{call_arg_parentheses-eq-remove_string_only.lua}]
 call_arg_parentheses = remove_string_only
+[{call_arg_parentheses-eq-unambiguous_remove_string_only.lua}]
+call_arg_parentheses = unambiguous_remove_string_only
 [{minLine-eq-1.lua}]
 keep_line_after_if_statement = minLine:1
 keep_line_after_do_statement = minLine:1

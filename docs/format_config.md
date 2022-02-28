@@ -70,7 +70,7 @@ end
 ## call_arg_parentheses
 
 该选项表示，调用表达式中如果参数仅有单字符串字面值常量或者表表达式，则可以考虑保持或者移除括号。
-该选项可选值是 keep/remove/remove_table_only/remove_string_only 默认值是keep。
+该选项可选值是 keep/remove/remove_table_only/remove_string_only/unambiguous_remove_string_only 默认值是keep。
 
 ```lua
 f("wfwefw")({ e1231313 })("1e1231313131")
@@ -90,6 +90,19 @@ f("wfwefw") { e1231313 } ("1e1231313131")
 --remove_string_only
 f "wfwefw" ({ e1231313 }) "1e1231313131"
 ```
+
+如果值为unambiguous_remove_string_only则不存在歧义的时候会移除调用表达式中字符串的括号,例如:
+```lua
+local t = require("aaaa").bbb
+local d = require("cccc")
+```
+会被格式化为:
+```lua
+local t = require("aaaa").bbb
+local d = require "cccc"
+```
+
+
 
 ## continuation_indent_size
 
