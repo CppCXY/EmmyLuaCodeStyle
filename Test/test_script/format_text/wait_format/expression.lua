@@ -36,3 +36,8 @@ function f()
     dd.e().e().aaa =1231
 end
 
+call(
+	call(aaa,
+		aaaa),
+	call(aaa,bbbb,ccc)
+)

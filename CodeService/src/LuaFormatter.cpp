@@ -1088,12 +1088,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 				}
 
 				env->AddChild(FormatExpression(child, expression));
-				env->Add<KeepBlankElement>(1);
+				env->Add<KeepElement>(1);
 				break;
 			}
 		default:
 			{
 				DefaultHandle(child, env);
+				env->Add<KeepElement>(1);
 				break;
 			}
 		}
@@ -1195,6 +1196,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 					{
 						layout = std::make_shared<AlignToFirstElement>();
 					}
+				}
+				else
+				{
+					layout = std::make_shared<IndentOnLineBreakElement>();
 				}
 
 				env->AddChild(FormatExpressionList(child, layout));
@@ -1803,7 +1808,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 		else
 		{
 			singleLineBlock = true;
-			env->Add<KeepBlankElement>(1);
+			env->Add<KeepElement>(1);
 
 			for (auto blockChild : block->GetChildren())
 			{
@@ -1812,7 +1817,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 					auto shortExpression = std::make_shared<ExpressionElement>();
 					shortExpression->AddChildren(blockChild->GetChildren());
 					env->AddChild(shortExpression);
-					env->Add<KeepBlankElement>(1);
+					env->Add<KeepElement>(1);
 				}
 			}
 		}
