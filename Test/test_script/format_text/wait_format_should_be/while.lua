@@ -10,5 +10,4 @@ while false do
 end
 
 while true do --fff
-end
---ffff
+end --ffff

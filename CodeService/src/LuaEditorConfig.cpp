@@ -219,6 +219,14 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		{
 			options->call_arg_parentheses = CallArgParentheses::Remove;
 		}
+		else if(configMap.at("call_arg_parentheses") == "remove_string_only")
+		{
+			options->call_arg_parentheses = CallArgParentheses::RemoveStringLiteralOnly;
+		}
+		else if(configMap.at("call_arg_parentheses") == "remove_table_only")
+		{
+			options->call_arg_parentheses = CallArgParentheses::RemoveTableOnly;
+		}
 	}
 
 	if (configMap.count("continuation_indent_size")

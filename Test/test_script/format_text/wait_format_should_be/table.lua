@@ -4,7 +4,7 @@ local t = {
 local t2 = { 1, 2, 3, 4, 5 }
 
 local t3 = { 123131,
-             aaa, bbbb, ccc, 1, 2, 3, 4, 5
+    aaa, bbbb, ccc, 1, 2, 3, 4, 5
 }
 
 local t4 = {

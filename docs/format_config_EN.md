@@ -70,21 +70,24 @@ When quote_style = single or double, if there is an unescaped target quote type 
 ## call_arg_parentheses
 
 This option means that if the parameter in the call expression has only a single-string literal constant or a table expression, consider keeping or removing the parentheses.
-The optional value of this option is keep/remove and the default value is keep.
+The optional value of this option is keep/remove/remove_table_only/remove_string_only The default value is keep.
 
 ```lua
-p("hello world")
-
+f("wfwefw")({ e1231313 })("1e1231313131")
 ```
 
 after formatting
 
 ```lua
 --keep
-p("hello")
+f("wfwefw")({ e1231313 })("1e1231313131")
 
 --remove
-p "hello"
+f "wfwefw" { e1231313 } "1e1231313131"
+--remove_table_only
+f("wfwefw") { e1231313 } ("1e1231313131")
+--remove_string_only
+f "wfwefw" ({ e1231313 }) "1e1231313131"
 ```
 
 ## continuation_indent_size
@@ -135,15 +138,17 @@ end
 ## local_assign_continuation_align_to_first_expression
 
 This parameter represents a list of local or right expressions of an assignment statement. If there is more than one line, it will be aligned to the first expression, for example:
-````lua
+
+```lua
 local t = aaa,bbb,ccc,
      ddd,eee,fff
-````
+```
 will be formatted as
-````lua
+
+```lua
 local t = aaa,bbb,ccc,
            ddd,eee,fff
-````
+```
 
 When this option is in effect, the continuation_indent_size option has no effect on local and assignment statements.
 When a cross-line expression appears in the expression list, such as function and table defined across lines, this option is invalid. 
@@ -285,15 +290,15 @@ local t2 = { aaa, bbbb,
 This option indicates that a space should be maintained between the name definition in the name list of the local statement and its attribute.
 
 Before formatting:
-````lua
+```lua
 local t<const> = 1
-````
+```
 
 After formatting:
 
-````lua
+```lua
 local t <const> = 1
-````
+```
 
 ## max_continuous_line_distance
 
@@ -382,7 +387,7 @@ local t = {
 This option means that the labels are not indented.
 
 Before formatting:
-````lua
+```lua
 function fff()
 
     for i=1,2,3 do
@@ -394,9 +399,9 @@ function fff()
     end
 
 end
-````
+```
 After formatting:
-````lua
+```lua
 function fff()
 
     for i=1,2,3 do
@@ -408,7 +413,7 @@ function fff()
     end
 
 end
-````
+```
 ## do_statement_no_indent
 
 This option means no indentation inside the do statement block.

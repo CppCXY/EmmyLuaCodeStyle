@@ -324,12 +324,24 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 			}
 		case LuaAstNodeType::Comment:
 			{
-				auto comment = FormatNode(statement);
-				auto commentStatement = std::make_shared<StatementElement>();
-				commentStatement->AddChild(comment);
-				indentEnv->AddChild(commentStatement);
-
-				indentEnv->Add<KeepLineElement>();
+				auto last = indentEnv->LastValidElement();
+				if (last && _parser->GetLine(last->GetTextRange().EndOffset)
+					== _parser->GetLine(statement->GetTextRange().StartOffset))
+				{
+					if (!last->GetChildren().empty() && last->GetChildren().back()->HasValidTextRange())
+					{
+						last->Add<KeepBlankElement>(1);
+					}
+					last->AddChild(FormatComment(statement));
+				}
+				else
+				{
+					auto comment = FormatComment(statement);
+					auto commentStatement = std::make_shared<StatementElement>();
+					commentStatement->AddChild(comment);
+					indentEnv->AddChild(commentStatement);
+					indentEnv->Add<KeepLineElement>();
+				}
 				break;
 			}
 		case LuaAstNodeType::BreakStatement:
@@ -830,7 +842,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatWhileStatement(std::shared_pt
 				{
 					bool singleLine = false;
 					env->AddChild(FormatNodeAndBlockOrEnd(it, singleLine, children));
-					env->Add<KeepLineElement>();
+					env->Add<KeepElement>(1);
 				}
 				else if (child->GetText() == "while")
 				{
@@ -1133,8 +1145,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 	const auto& children = callArgList->GetChildren();
 
 	std::vector<std::shared_ptr<LuaAstNode>> argList;
-	if (ast_util::IsSingleStringOrTableArg(callArgList)
-		&& _options.call_arg_parentheses == CallArgParentheses::Remove)
+	if ((ast_util::IsSingleStringOrTableArg(callArgList)
+			&& _options.call_arg_parentheses == CallArgParentheses::Remove)
+		|| (_options.call_arg_parentheses == CallArgParentheses::RemoveTableOnly
+			&& ast_util::IsSingleTableArg(callArgList))
+		|| (_options.call_arg_parentheses == CallArgParentheses::RemoveStringLiteralOnly
+			&& ast_util::IsSingleStringArg(callArgList)))
 	{
 		for (auto child : children)
 		{
@@ -2136,10 +2152,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 				bool needSpace = true;
 				if (currentCallArgList && nextCallArgList)
 				{
-					bool currentHas = ast_util::WillCallArgHaveParentheses(currentCallArgList, _options.call_arg_parentheses);
+					bool currentHas = ast_util::WillCallArgHaveParentheses(
+						currentCallArgList, _options.call_arg_parentheses);
 					bool nextHas = ast_util::WillCallArgHaveParentheses(nextCallArgList, _options.call_arg_parentheses);
 
-					if(currentHas && nextHas)
+					if (currentHas && nextHas)
 					{
 						needSpace = false;
 					}

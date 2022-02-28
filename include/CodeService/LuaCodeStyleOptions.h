@@ -86,7 +86,7 @@ public:
 	/*
 	 * 表内每一个表项对齐到第一个表项
 	 */
-	bool align_table_field_to_first_field = true;
+	bool align_table_field_to_first_field = false;
 
 	/*
 	 * 如何认定连续行,相距超过该选项的值则认为不连续

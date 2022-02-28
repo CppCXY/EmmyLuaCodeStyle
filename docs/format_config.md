@@ -70,10 +70,10 @@ end
 ## call_arg_parentheses
 
 该选项表示，调用表达式中如果参数仅有单字符串字面值常量或者表表达式，则可以考虑保持或者移除括号。
-该选项可选值是 keep/remove 默认值是keep。
+该选项可选值是 keep/remove/remove_table_only/remove_string_only 默认值是keep。
 
 ```lua
-p("hello world")
+f("wfwefw")({ e1231313 })("1e1231313131")
 
 ```
 
@@ -81,10 +81,14 @@ p("hello world")
 
 ```lua
 --keep
-p("hello")
+f("wfwefw")({ e1231313 })("1e1231313131")
 
 --remove
-p "hello"
+f "wfwefw" { e1231313 } "1e1231313131"
+--remove_table_only
+f("wfwefw") { e1231313 } ("1e1231313131")
+--remove_string_only
+f "wfwefw" ({ e1231313 }) "1e1231313131"
 ```
 
 ## continuation_indent_size

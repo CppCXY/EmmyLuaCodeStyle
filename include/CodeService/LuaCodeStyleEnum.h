@@ -13,9 +13,11 @@ enum class QuoteStyle
 	Double
 };
 
-enum class CallArgParentheses
+enum class CallArgParentheses : int
 {
 	Keep,
-	Remove
+	Remove,
+	RemoveStringLiteralOnly,
+	RemoveTableOnly
 };
 
