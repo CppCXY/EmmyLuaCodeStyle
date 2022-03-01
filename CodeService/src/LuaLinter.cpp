@@ -173,15 +173,14 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseBlock(std::shared_ptr<LuaAstNo
 			}
 		case LuaAstNodeType::LabelStatement:
 			{
-				auto childEnv = DiagnoseNode(statement);
+				auto childEnv = DiagnoseLabel(statement);
 				childEnv->SetDescription(LinterDescription::no_linter);
 				indentEnv->AddChild(childEnv);
 				break;
 			}
 		default:
 			{
-				auto childEnv = DiagnoseNode(statement);
-				indentEnv->AddChild(childEnv);
+				indentEnv->AddChild(DiagnoseNode(statement));
 			}
 		}
 	}
@@ -446,7 +445,7 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseForBody(std::shared_ptr<LuaAst
 			}
 		case LuaAstNodeType::Block:
 			{
-				env->AddChild(DiagnoseBlockNode(child));
+				env->AddChild(DiagnoseBlock(child));
 				break;
 			}
 		default:
@@ -494,6 +493,158 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseWhileStatement(std::shared_ptr
 		}
 	}
 	return env;
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseBreakStatement(std::shared_ptr<LuaAstNode> breakStatement)
+{
+	auto env = std::make_shared<StatementElement>();
+
+	for (auto& child : breakStatement->GetChildren())
+	{
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::KeyWord:
+		case LuaAstNodeType::GeneralOperator:
+			{
+				env->Add<TextElement>(child, _options.white_space.CalculateSpace(child));
+				break;
+			}
+		default:
+			DefaultHandle(child, env);
+			break;
+		}
+	}
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseReturnStatement(std::shared_ptr<LuaAstNode> returnStatement)
+{
+	auto env = std::make_shared<StatementElement>();
+
+	for (auto& child : returnStatement->GetChildren())
+	{
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::KeyWord:
+		case LuaAstNodeType::GeneralOperator:
+			{
+				env->Add<TextElement>(child, _options.white_space.CalculateSpace(child));
+				break;
+			}
+		case LuaAstNodeType::ExpressionList:
+			{
+				env->AddChild(DiagnoseExpressionList(child));
+				break;
+			}
+		case LuaAstNodeType::Comment:
+			{
+				env->Add<TextElement>(child);
+				break;
+			}
+		default:
+			DefaultHandle(child, env);
+			break;
+		}
+	}
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseGotoStatement(std::shared_ptr<LuaAstNode> gotoStatement)
+{
+	auto env = std::make_shared<StatementElement>();
+
+	for (auto& child : gotoStatement->GetChildren())
+	{
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::KeyWord:
+		case LuaAstNodeType::GeneralOperator:
+			{
+				env->Add<TextElement>(child);
+				break;
+			}
+		case LuaAstNodeType::Identify:
+			{
+				env->Add<TextElement>(child);
+				break;
+			}
+
+		default:
+			DefaultHandle(child, env);
+			break;
+		}
+	}
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseExpressionStatement(std::shared_ptr<LuaAstNode> expressionStatement)
+{
+	auto env = std::make_shared<StatementElement>();
+
+	for (auto& child : expressionStatement->GetChildren())
+	{
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::CallExpression:
+			{
+				env->AddChild(DiagnoseCallExpression(child));
+				break;
+			}
+		case LuaAstNodeType::Expression:
+			{
+				env->AddChild(DiagnoseExpression(child));
+				break;
+			}
+		default:
+			{
+				DefaultHandle(child, env);
+			}
+		}
+	}
+
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseFunctionStatement(std::shared_ptr<LuaAstNode> functionStatement)
+{
+	auto env = std::make_shared<StatementElement>();
+
+	for (auto& child : functionStatement->GetChildren())
+	{
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::KeyWord:
+			{
+				env->Add<TextElement>(child, _options.white_space.CalculateSpace(child));
+				break;
+			}
+		case LuaAstNodeType::NameExpression:
+			{
+				env->AddChild(FormatNameExpression(child));
+				break;
+			}
+		case LuaAstNodeType::FunctionBody:
+			{
+				env->AddChild(FormatFunctionBody(child));
+				break;
+			}
+		default:
+			{
+				DefaultHandle(child, env);
+			}
+		}
+	}
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseExpression(std::shared_ptr<LuaAstNode> expressionStatement,
+                                                             std::shared_ptr<FormatElement> env)
+{
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseExpressionList(std::shared_ptr<LuaAstNode> expressionList,
+                                                                 std::shared_ptr<FormatElement> env)
+{
 }
 
 
