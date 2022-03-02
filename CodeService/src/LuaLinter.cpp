@@ -173,7 +173,7 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseBlock(std::shared_ptr<LuaAstNo
 			}
 		case LuaAstNodeType::LabelStatement:
 			{
-				auto childEnv = DiagnoseLabel(statement);
+				auto childEnv = DiagnoseLabelStatement(statement);
 				childEnv->SetDescription(LinterDescription::no_linter);
 				indentEnv->AddChild(childEnv);
 				break;
@@ -227,6 +227,37 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseLocalStatement(std::shared_ptr
 	return env;
 }
 
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseAssignmentStatement(std::shared_ptr<LuaAstNode> assignStatement)
+{
+	auto env = std::make_shared<StatementElement>();
+	for (auto& child : assignStatement->GetChildren())
+	{
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::GeneralOperator:
+			{
+				env->Add<TextElement>(child);
+				break;
+			}
+		case LuaAstNodeType::ExpressionList:
+			{
+				env->AddChild(DiagnoseExpressionList(child));
+				break;
+			}
+		case LuaAstNodeType::Comment:
+			{
+				env->Add<TextElement>(child);
+				break;
+			}
+		default:
+			DefaultHandle(child, env);
+			break;
+		}
+	}
+
+	return env;
+}
+
 std::shared_ptr<FormatElement> LuaLinter::DiagnoseRepeatStatement(std::shared_ptr<LuaAstNode> repeatStatement)
 {
 	auto env = std::make_shared<StatementElement>();
@@ -240,7 +271,7 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseRepeatStatement(std::shared_pt
 			{
 				if (child->GetText() == "repeat")
 				{
-					env->AddChild(DiagnopseNodeAndBlockOrEnd(it, children));
+					env->AddChild(DiagnoseNodeAndBlockOrEnd(it, children));
 				}
 				else
 				{
@@ -620,12 +651,12 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseFunctionStatement(std::shared_
 			}
 		case LuaAstNodeType::NameExpression:
 			{
-				env->AddChild(FormatNameExpression(child));
+				env->AddChild(DiagnoseNameExpression(child));
 				break;
 			}
 		case LuaAstNodeType::FunctionBody:
 			{
-				env->AddChild(FormatFunctionBody(child));
+				env->AddChild(DiagnoseFunctionBody(child));
 				break;
 			}
 		default:
@@ -637,6 +668,127 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseFunctionStatement(std::shared_
 	return env;
 }
 
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseLocalFunctionStatement(
+	std::shared_ptr<LuaAstNode> localFunctionStatement)
+{
+	auto env = std::make_shared<StatementElement>();
+
+	for (auto& child : localFunctionStatement->GetChildren())
+	{
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::KeyWord:
+			{
+				env->Add<TextElement>(child, _options.white_space.CalculateSpace(child));
+				break;
+			}
+		case LuaAstNodeType::Identify:
+			{
+				env->Add<TextElement>(child);
+				break;
+			}
+		case LuaAstNodeType::FunctionBody:
+			{
+				env->AddChild(DiagnoseFunctionBody(child));
+				break;
+			}
+		default:
+			{
+				DefaultHandle(child, env);
+			}
+		}
+	}
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseFunctionBody(std::shared_ptr<LuaAstNode> functionBody)
+{
+	auto& children = functionBody->GetChildren();
+	auto it = children.begin();
+	return DiagnoseNodeAndBlockOrEnd(it, children);
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseNameExpression(std::shared_ptr<LuaAstNode> nameExpression)
+{
+	auto env = std::make_shared<ExpressionElement>();
+
+	for (auto& child : nameExpression->GetChildren())
+	{
+		DiagnoseSubExpression(child, env);
+	}
+
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseLabelStatement(std::shared_ptr<LuaAstNode> labelStatement)
+{
+	auto env = std::make_shared<StatementElement>();
+
+	for (auto child : labelStatement->GetChildren())
+	{
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::GeneralOperator:
+			{
+				env->Add<TextElement>(child);
+				break;
+			}
+		case LuaAstNodeType::Identify:
+			{
+				env->Add<TextElement>(child);
+				break;
+			}
+
+		default:
+			DefaultHandle(child, env);
+			break;
+		}
+	}
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseParamList(std::shared_ptr<LuaAstNode> paramList)
+{
+	auto env = std::make_shared<ExpressionElement>();
+
+	auto& children = paramList->GetChildren();
+	for (auto it = children.begin(); it != children.end(); ++it)
+	{
+		const auto child = *it;
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::GeneralOperator:
+			{
+				if (child->GetText() == ",")
+				{
+					env->Add<TextElement>(child, _options.white_space.CalculateSpace(child));
+				}
+				else
+				{
+					env->Add<TextElement>(child);
+				}
+				break;
+			}
+		case LuaAstNodeType::Param:
+			{
+				env->Add<TextElement>(child);
+				break;
+			}
+		case LuaAstNodeType::Comment:
+			{
+				env->Add<TextElement>(child);
+				break;
+			}
+		default:
+			{
+				DefaultHandle(child, env);
+			}
+		}
+	}
+	return env;
+}
+
+
 std::shared_ptr<FormatElement> LuaLinter::DiagnoseExpression(std::shared_ptr<LuaAstNode> expressionStatement,
                                                              std::shared_ptr<FormatElement> env)
 {
@@ -644,6 +796,66 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseExpression(std::shared_ptr<Lua
 
 std::shared_ptr<FormatElement> LuaLinter::DiagnoseExpressionList(std::shared_ptr<LuaAstNode> expressionList,
                                                                  std::shared_ptr<FormatElement> env)
+{
+}
+
+void LuaLinter::DiagnoseSubExpression(std::shared_ptr<LuaAstNode> expression, std::shared_ptr<FormatElement> env)
+{
+	switch (expression->GetType())
+	{
+	case LuaAstNodeType::BinaryExpression:
+		{
+			env->AddChild(DiagnoseBinaryExpression(expression));
+			break;
+		}
+	case LuaAstNodeType::UnaryExpression:
+		{
+			env->AddChild(DiagnoseUnaryExpression(expression));
+			break;
+		}
+	case LuaAstNodeType::IndexExpression:
+		{
+			env->AddChild(DiagnoseIndexExpression(expression));
+			break;
+		}
+	case LuaAstNodeType::PrimaryExpression:
+		{
+			env->AddChild(DiagnosePrimaryExpression(expression));
+			break;
+		}
+	case LuaAstNodeType::CallExpression:
+		{
+			env->AddChild(DiagnoseCallExpression(expression));
+			break;
+		}
+	default:
+		{
+			DefaultHandle(expression, env);
+		}
+	}
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseBinaryExpression(std::shared_ptr<LuaAstNode> binaryExpression)
+{
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseUnaryExpression(std::shared_ptr<LuaAstNode> unaryExpression)
+{
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnosePrimaryExpression(std::shared_ptr<LuaAstNode> primaryExpression)
+{
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseIndexExpression(std::shared_ptr<LuaAstNode> indexExpression)
+{
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseCallExpression(std::shared_ptr<LuaAstNode> callExpression)
+{
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseTableAppendExpression(std::shared_ptr<LuaAstNode> expression)
 {
 }
 
@@ -731,4 +943,106 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseAlignStatement(LuaAstNode::Chi
 	}
 
 	return env;
+}
+
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseNodeAndBlockOrEnd(LuaAstNode::ChildIterator& it,
+                                                                    const LuaAstNode::ChildrenContainer& children)
+{
+	auto env = std::make_shared<ExpressionElement>();
+	auto node = *it;
+	env->AddChild(DiagnoseNode(node));
+
+	if (ast_util::NextMatch(it, LuaAstNodeType::Comment, children))
+	{
+		auto comment = ast_util::NextNode(it, children);
+		int currentLine = _parser->GetLine(node->GetTextRange().EndOffset);
+		int nextLine = _parser->GetLine(comment->GetTextRange().StartOffset);
+
+		// 认为是内联注释
+		if (nextLine == currentLine)
+		{
+			env->Add<TextElement>(comment);
+			++it;
+		}
+	}
+
+	auto block = CalculateBlockFromParent(it, children);
+
+	if (!block->GetChildren().empty())
+	{
+		if (_parser->GetLine(node->GetTextRange().StartOffset) != _parser->GetLine(block->GetTextRange().EndOffset))
+		{
+			env->AddChild(block);
+		}
+		else
+		{
+			for (auto blockChild : block->GetChildren())
+			{
+				if (blockChild->HasValidTextRange())
+				{
+					auto shortExpression = std::make_shared<ExpressionElement>();
+					shortExpression->AddChildren(blockChild->GetChildren());
+					env->AddChild(shortExpression);
+				}
+			}
+		}
+	}
+
+	if (ast_util::NextMatch(it, LuaAstNodeType::KeyWord, children))
+	{
+		auto next = ast_util::NextNode(it, children);
+		if (next->GetText() == "end")
+		{
+			env->Add<TextElement>(next, _options.white_space.CalculateSpace(next));
+			++it;
+		}
+	}
+
+	return env;
+}
+
+std::shared_ptr<FormatElement> LuaLinter::CalculateBlockFromParent(LuaAstNode::ChildIterator& it,
+                                                                   const LuaAstNode::ChildrenContainer& children)
+{
+	std::shared_ptr<LuaAstNode> block = nullptr;
+	std::vector<std::shared_ptr<LuaAstNode>> comments;
+
+	for (; it != children.end(); ++it)
+	{
+		if (ast_util::NextMatch(it, LuaAstNodeType::Comment, children))
+		{
+			comments.push_back(ast_util::NextNode(it, children));
+		}
+		else if (ast_util::NextMatch(it, LuaAstNodeType::Block, children))
+		{
+			block = ast_util::NextNode(it, children);
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	if (block)
+	{
+		std::shared_ptr<LuaAstNode> copyBlock = block->Copy();
+
+		for (auto comment : comments)
+		{
+			copyBlock->AddComment(comment);
+		}
+
+		return DiagnoseBlock(copyBlock);
+	}
+	else
+	{
+		auto indentElement = std::make_shared<IndentElement>();
+		for (auto comment : comments)
+		{
+			auto commentStatement = std::make_shared<StatementElement>();
+			commentStatement->Add<TextElement>(comment);
+			indentElement->AddChild(commentStatement);
+		}
+		return indentElement;
+	}
 }
