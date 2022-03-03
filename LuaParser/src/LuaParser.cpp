@@ -127,15 +127,21 @@ void LuaParser::BuildAstWithComment()
 {
 	BuildAst();
 
-	auto chunkChildren = _chunkAstNode->GetChildren();
+	auto& chunkChildren = _chunkAstNode->GetChildren();
+	auto& comments = _tokenParser->GetComments();
 	if (chunkChildren.empty())
 	{
-		return;
+		if (comments.empty()) {
+			return;
+	
+		}
+		auto block = CreateAstNode(LuaAstNodeType::Block);
+		chunkChildren.push_back(block);
 	}
 
 	auto blockNode = chunkChildren.front();
 
-	auto& comments = _tokenParser->GetComments();
+
 	// 将注释注入AST中
 	if (!comments.empty())
 	{
