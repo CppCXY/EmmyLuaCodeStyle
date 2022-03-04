@@ -80,8 +80,14 @@ int main(int argc, char** argv)
 	{
 		options = std::make_shared<LuaCodeStyleOptions>();
 	}
+	options->end_of_line = "\n";
 
 	parser->BuildAstWithComment();
+
+	if(parser->HasError())
+	{
+		return -1;
+	}
 
 	LuaFormatter formatter(parser, *options);
 	formatter.BuildFormattedElement();
