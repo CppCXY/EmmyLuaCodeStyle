@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		std::cerr << "not special input file"<<std::endl;
+		std::cerr << "not special input file" << std::endl;
 		return -1;
 	}
 
@@ -88,9 +88,14 @@ int main(int argc, char** argv)
 	else
 	{
 		options = std::make_shared<LuaCodeStyleOptions>();
+		if (!cmd.GetKeyValueOptions().empty())
+		{
+			LuaEditorConfig::ParseFromSection(options, cmd.GetKeyValueOptions());
+		}
 	}
 
-	if (!cmd.HasOption("outfile")) {
+	if (!cmd.HasOption("outfile"))
+	{
 		options->end_of_line = "\n";
 	}
 
