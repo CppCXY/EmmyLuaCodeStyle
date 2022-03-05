@@ -22,17 +22,20 @@ int main(int argc, char** argv)
 {
 	CommandLine cmd;
 
-	cmd.AddTarget("format");
-	cmd.AddTarget("diagnosis");
+	cmd.AddTarget("format")
+	   .Add<std::string>("file", "f", "Specify the input file")
+	   .Add<int>("stdin", "i", "Read from stdin and specify read size")
+	   .Add<std::string>("config", "c",
+	                     "Specify .editorconfig file, it decides on the effect of formatting")
+	   .Add<std::string>("outfile", "o",
+	                     "Specify output file")
+	   .EnableKeyValueArgs();
+	cmd.AddTarget("check")
+	   .Add<std::string>("file", "f", "Specify the input file")
+	   .Add<std::string>("config", "c",
+	                     "Specify editorconfig file, it decides on the effect of formatting or diagnosis")
+	   .Add<bool>("diagnosis-as-error", "diagnosis-as-error", "if exist error or diagnosis info , return -1");
 
-	cmd.Add<std::string>("file", "f", "Specify the input file");
-	cmd.Add<int>("stdin", "i", "Read from stdin and specify read size");
-	cmd.Add<std::string>("workspace", "w", "Specify a directory for diagnosis(not for format)");
-	cmd.Add<std::string>("config", "c",
-	                     "Specify editorconfig file, it decides on the effect of formatting or diagnosis");
-	cmd.Add<std::string>("outfile", "o",
-	                     "Specify output file");
-	cmd.Add<bool>("diagnosis-as-error", "diagnosis-as-error", "if exist error or diagnosis info , return -1");
 	if (!cmd.Parse(argc, argv))
 	{
 		cmd.PrintUsage();
@@ -41,15 +44,16 @@ int main(int argc, char** argv)
 
 	std::shared_ptr<LuaParser> parser = nullptr;
 
-	if (!cmd.Get<std::string>("file").empty())
+	if (cmd.HasOption("file"))
 	{
 		parser = LuaParser::LoadFromFile(cmd.Get<std::string>("file"));
 		if (!parser)
 		{
 			std::cerr << format("can not find file: {}", cmd.Get<std::string>("file")) << std::endl;
+			return -1;
 		}
 	}
-	else if (cmd.Get<int>("stdin") != 0)
+	else if (cmd.HasOption("stdin"))
 	{
 		SET_BINARY_MODE();
 		std::size_t size = cmd.Get<int>("stdin");
@@ -61,13 +65,18 @@ int main(int argc, char** argv)
 		buffer.resize(realSize);
 		parser = LuaParser::LoadFromBuffer(std::move(buffer));
 	}
+	else
+	{
+		std::cerr << "not special input file"<<std::endl;
+		return -1;
+	}
 
 	std::shared_ptr<LuaCodeStyleOptions> options = nullptr;
 
-	if (!cmd.Get<std::string>("config").empty())
+	if (cmd.HasOption("config"))
 	{
 		auto editorConfig = LuaEditorConfig::LoadFromFile(cmd.Get<std::string>("config"));
-		if (!cmd.Get<std::string>("file").empty())
+		if (cmd.HasOption("file"))
 		{
 			options = editorConfig->Generate(cmd.Get<std::string>("file"));
 		}
@@ -80,11 +89,14 @@ int main(int argc, char** argv)
 	{
 		options = std::make_shared<LuaCodeStyleOptions>();
 	}
-	options->end_of_line = "\n";
+
+	if (!cmd.HasOption("outfile")) {
+		options->end_of_line = "\n";
+	}
 
 	parser->BuildAstWithComment();
 
-	if(parser->HasError())
+	if (parser->HasError())
 	{
 		return -1;
 	}
@@ -95,7 +107,7 @@ int main(int argc, char** argv)
 	if (cmd.GetTarget() == "format")
 	{
 		auto formattedText = formatter.GetFormattedText();
-		if (!cmd.Get<std::string>("outfile").empty())
+		if (cmd.HasOption("outfile"))
 		{
 			std::fstream f(cmd.Get<std::string>("outfile"), std::ios::out | std::ios::binary);
 			f.write(formattedText.data(), formattedText.size());
@@ -106,7 +118,7 @@ int main(int argc, char** argv)
 			std::cout.write(formattedText.data(), formattedText.size());
 		}
 	}
-	else if (cmd.GetTarget() == "diagnosis")
+	else if (cmd.GetTarget() == "check")
 	{
 		auto diagnosis = formatter.GetDiagnosisInfos();
 		for (auto& d : diagnosis)

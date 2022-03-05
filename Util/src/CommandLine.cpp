@@ -2,17 +2,55 @@
 #include <iostream>
 #include "Util/format.h"
 
-void CommandLine::AddTarget(const std::string& name)
+CommandLineTargetOptions::CommandLineTargetOptions()
+	: _enableRestArgs(false)
 {
-	_targets.insert(name);
 }
 
-std::string CommandLine::GetTarget() const noexcept
+CommandLineTargetOptions& CommandLineTargetOptions::EnableKeyValueArgs()
+{
+	_enableRestArgs = true;
+	return *this;
+}
+
+bool CommandLineTargetOptions::HasOption(std::string_view name)
+{
+	auto it = _args.find(name);
+	if (it == _args.end())
+	{
+		return false;
+	}
+
+	return it->second.HasOption;
+}
+
+CommandLine::CommandLine()
+	: _options(nullptr)
+{
+}
+
+bool CommandLine::HasOption(std::string_view name)
+{
+	if (!_options)
+	{
+		return false;
+	}
+
+	return _options->HasOption(name);
+}
+
+CommandLineTargetOptions& CommandLine::AddTarget(std::string_view name)
+{
+	auto it = _targets.insert({std::string(name), CommandLineTargetOptions()});
+	return it.first->second;
+}
+
+std::string_view CommandLine::GetTarget() const noexcept
 {
 	return _currentTarget;
 }
 
-std::string CommandLine::GetArg(int index) const noexcept
+std::string_view CommandLine::GetArg(int index) const noexcept
 {
 	if (static_cast<std::size_t>(index) < _argvs.size())
 	{
@@ -22,6 +60,11 @@ std::string CommandLine::GetArg(int index) const noexcept
 	{
 		return "";
 	}
+}
+
+std::map<std::string, std::string, std::less<>>& CommandLine::GetKeyValueOptions()
+{
+	return _options->_restArgs;
 }
 
 bool CommandLine::Parse(int argc, char** argv)
@@ -37,6 +80,8 @@ bool CommandLine::Parse(int argc, char** argv)
 		return false;
 	}
 
+	_options = &_targets[_currentTarget];
+
 	_argvs.reserve(argc);
 	for (int i = 0; i != argc; i++)
 	{
@@ -47,21 +92,34 @@ bool CommandLine::Parse(int argc, char** argv)
 	// index = 1 的参数时target
 	for (int index = 2; index < argc; index++)
 	{
-		std::string& current = _argvs[index];
+		std::string_view current = _argvs[index];
 		if (current.empty())
 		{
 			continue;
 		}
 
-		std::string option;
+		std::string_view option;
 
-		// 其实应该用start_with
 		if (current.starts_with("--"))
 		{
 			option = current.substr(2);
 			if (option == "help")
 			{
 				return false;
+			}
+
+			auto eqPos = option.find_first_of('=');
+			if (eqPos != std::string_view::npos)
+			{
+				if (!_options->_enableRestArgs)
+				{
+					_errors.emplace_back(format("Unknown option {} ,please enable key=value options", current));
+					return false;
+				}
+				std::string_view value = option.substr(eqPos + 1);
+				option = option.substr(0, eqPos);
+				_options->_restArgs.insert({std::string(option), std::string(value)});
+				continue;
 			}
 		}
 		else if (current.starts_with("-"))
@@ -73,13 +131,12 @@ bool CommandLine::Parse(int argc, char** argv)
 				return false;
 			}
 
-			if (!_shortMap.count(shortOption))
+			if (_options->_shortMap.count(shortOption) == 0)
 			{
 				_errors.emplace_back(format("Unknown Option {}", current));
 				return false;
 			}
-
-			option = _shortMap[shortOption];
+			option = _options->_shortMap.find(shortOption)->second;
 		}
 		else
 		{
@@ -88,7 +145,21 @@ bool CommandLine::Parse(int argc, char** argv)
 
 		if (index < argc - 1)
 		{
-			_args[option].Value = _argvs[++index];
+			auto& commandOption = _options->_args.find(option)->second;
+			if(_argvs[index + 1].starts_with("-"))
+			{
+				if(commandOption.Type == CommandLineValueType::Boolean)
+				{
+					commandOption.Value = "true";
+					commandOption.HasOption = true;
+					continue;
+				}
+				_errors.emplace_back(format("Option {} has not value", current));
+				return false;
+			}
+
+			commandOption.Value = _argvs[++index];
+			commandOption.HasOption = true;
 		}
 	}
 	return true;
@@ -105,18 +176,17 @@ void CommandLine::PrintUsage()
 	std::cerr << "first param must be target:" << std::endl;
 	for (auto& target : _targets)
 	{
-		std::cerr << format("{}", target) << std::endl;
-	}
+		std::cerr << format("{}:", target.first) << std::endl;
+		auto& options = target.second;
+		for (auto& it : options._shortMap)
+		{
+			auto& shortName = it.first;
+			auto& name = it.second;
+			auto& option = options._args[name];
 
-	std::cerr << std::endl;
-
-	for (auto& it : _shortMap)
-	{
-		auto& shortName = it.first;
-		auto& name = it.second;
-		auto& option = _args[name];
-
-		std::cerr << format("-{} --{} {}",
-		                    shortName, name, option.Description) << std::endl;
+			std::cerr << format("    -{} --{} {}",
+				shortName, name, option.Description) << std::endl;
+			std::cerr << std::endl;
+		}
 	}
 }

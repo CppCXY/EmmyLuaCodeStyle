@@ -128,13 +128,18 @@ int main(int argc, char* argv[])
 {
 	CommandLine commandLine;
 
-	commandLine.AddTarget("CheckGrammar");
-	commandLine.AddTarget("CheckFormatResult");
-	commandLine.AddTarget("CheckFormatResultByOption");
-	commandLine.AddTarget("Performance");
+	commandLine.AddTarget("CheckGrammar")
+	           .Add<std::string>("work-directory", "w", "special base work directory");
+	commandLine.AddTarget("CheckFormatResult")
+	           .Add<std::string>("work-directory", "w", "special base work directory")
+	           .Add<std::string>("formatted-work-directory", "f", "special formatted work directory");
+	commandLine.AddTarget("CheckFormatResultByOption")
+	           .Add<std::string>("work-directory", "w", "special base work directory")
+	           .Add<std::string>("formatted-work-directory", "f", "special formatted work directory");
+	commandLine.AddTarget("Performance")
+	           .Add<std::string>("work-directory", "w", "special base work directory")
+	           .Add<std::string>("formatted-work-directory", "f", "special formatted work directory");
 
-	commandLine.Add<std::string>("work-directory", "w", "special base work directory");
-	commandLine.Add<std::string>("formatted-work-directory", "f", "special formatted work directory");
 
 	if (!commandLine.Parse(argc, argv))
 	{
@@ -217,7 +222,7 @@ int main(int argc, char* argv[])
 			std::cout << format("test check grammar {} ... {}", path, passed ? "passed" : "false") << std::endl;
 		}
 	}
-	else if(target == "Performance")
+	else if (target == "Performance")
 	{
 		auto options = std::make_shared<LuaCodeStyleOptions>();
 		for (auto& path : luaFiles)
@@ -226,7 +231,7 @@ int main(int argc, char* argv[])
 			auto waitFormattingText = ReadFile(waitFormattingFilePath.string());
 
 			auto time = TestPerformance(waitFormattingText, options);
-			std::cout << format("test format Performance {} ...it cost {}ms", path, time ) << std::endl;
+			std::cout << format("test format Performance {} ...it cost {}ms", path, time) << std::endl;
 		}
 	}
 
