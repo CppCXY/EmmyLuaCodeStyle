@@ -3,6 +3,7 @@
 #include <string>
 #include <string_view>
 #include <filesystem>
+#include <cstring>
 
 #include "LuaParser/LuaParser.h"
 #include "CodeService/LuaCodeStyleOptions.h"
