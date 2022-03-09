@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstring>
 #include <fstream>
+
+#include "LuaFormat.h"
 #include "CodeService/LuaEditorConfig.h"
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"
@@ -27,6 +29,9 @@ int main(int argc, char** argv)
 	   .Add<int>("stdin", "i", "Read from stdin and specify read size")
 	   .Add<std::string>("config", "c",
 	                     "Specify .editorconfig file, it decides on the effect of formatting")
+	   .Add<std::string>("detect-config-root", "d",
+	                     "Set the root directory for automatic detection of config,\n"
+	                     "    If this option is set, the config option has no effect ")
 	   .Add<std::string>("outfile", "o",
 	                     "Specify output file")
 	   .EnableKeyValueArgs();
@@ -43,13 +48,12 @@ int main(int argc, char** argv)
 	}
 
 	std::shared_ptr<LuaParser> parser = nullptr;
-
+	auto luaFormat = std::make_shared<LuaFormat>();
 	if (cmd.HasOption("file"))
 	{
-		parser = LuaParser::LoadFromFile(cmd.Get<std::string>("file"));
-		if (!parser)
+		if(!luaFormat->SetInputFile(cmd.Get<std::string>("file")))
 		{
-			std::cerr << format("can not find file: {}", cmd.Get<std::string>("file")) << std::endl;
+			std::cerr << format("Can not find file {}", cmd.Get<std::string>("file")) << std::endl;
 			return -1;
 		}
 	}
@@ -57,13 +61,10 @@ int main(int argc, char** argv)
 	{
 		SET_BINARY_MODE();
 		std::size_t size = cmd.Get<int>("stdin");
-
-		std::string buffer;
-		buffer.resize(size);
-		std::cin.get(buffer.data(), size, EOF);
-		auto realSize = strnlen(buffer.data(), size);
-		buffer.resize(realSize);
-		parser = LuaParser::LoadFromBuffer(std::move(buffer));
+		if(!luaFormat->ReadFromStdin(size))
+		{
+			return -1;
+		}
 	}
 	else
 	{
@@ -71,69 +72,35 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	std::shared_ptr<LuaCodeStyleOptions> options = nullptr;
-
-	if (cmd.HasOption("config"))
+	if (cmd.HasOption("output"))
 	{
-		auto editorConfig = LuaEditorConfig::LoadFromFile(cmd.Get<std::string>("config"));
-		if (cmd.HasOption("file"))
-		{
-			options = editorConfig->Generate(cmd.Get<std::string>("file"));
-		}
-		else
-		{
-			options = editorConfig->Generate(cmd.Get<std::string>(""));
-		}
-	}
-	else
-	{
-		options = std::make_shared<LuaCodeStyleOptions>();
-		if (!cmd.GetKeyValueOptions().empty())
-		{
-			LuaEditorConfig::ParseFromSection(options, cmd.GetKeyValueOptions());
-		}
+		luaFormat->SetOutputFile(cmd.Get<std::string>("output"));
 	}
 
-	if (!cmd.HasOption("outfile"))
+	if (cmd.HasOption("detect-config-root"))
 	{
-		options->end_of_line = "\n";
+		luaFormat->AutoDetectConfigRoot(cmd.Get<std::string>("detect-config-root"));
+	}
+	else if(cmd.HasOption("config"))
+	{
+		luaFormat->SetConfigPath(cmd.Get<std::string>("config"));
 	}
 
-	parser->BuildAstWithComment();
-
-	if (parser->HasError())
-	{
-		return -1;
-	}
-
-	LuaFormatter formatter(parser, *options);
-	formatter.BuildFormattedElement();
+	luaFormat->SetDefaultOptions(cmd.GetKeyValueOptions());
 
 	if (cmd.GetTarget() == "format")
 	{
-		auto formattedText = formatter.GetFormattedText();
-		if (cmd.HasOption("outfile"))
+		if(!luaFormat->Reformat())
 		{
-			std::fstream f(cmd.Get<std::string>("outfile"), std::ios::out | std::ios::binary);
-			f.write(formattedText.data(), formattedText.size());
-			f.close();
-		}
-		else
-		{
-			std::cout.write(formattedText.data(), formattedText.size());
+			std::cerr << format("Exist lua syntax error") << std::endl;
+			return -1;
 		}
 	}
 	else if (cmd.GetTarget() == "check")
 	{
-		auto diagnosis = formatter.GetDiagnosisInfos();
-		for (auto& d : diagnosis)
+		if (!luaFormat->Check() && cmd.Get<bool>("diagnosis-as-error"))
 		{
-			std::cout << format("{} from {}:{} to {}:{}", d.Message, d.Range.Start.Line, d.Range.Start.Character,
-			                    d.Range.End.Line, d.Range.End.Character) << std::endl;
-		}
-		if (cmd.Get<bool>("diagnosis-as-error"))
-		{
-			return diagnosis.empty() ? 0 : -1;
+			return -1;
 		}
 	}
 	return 0;

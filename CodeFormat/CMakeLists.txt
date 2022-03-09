@@ -14,6 +14,7 @@ target_include_directories(CodeFormat PUBLIC
 target_sources(CodeFormat
 	PUBLIC
 	${CodeFormat_SOURCE_DIR}/src/CodeFormat.cpp
+	${CodeFormat_SOURCE_DIR}/src/LuaFormat.cpp
 )
 
 target_link_libraries(CodeFormat CodeService Util)
