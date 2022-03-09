@@ -55,11 +55,11 @@ bool StringLiteralElement::ExistDel(char del)
 	for (std::size_t i = 0; i < text.size(); ++i)
 	{
 		ch = text[i];
-		if(ch == del)
+		if (ch == del)
 		{
 			return true;
 		}
-		else if(ch == '\\')
+		else if (ch == '\\')
 		{
 			++i;
 		}

@@ -20,6 +20,7 @@ public:
 	void SetReadySize(std::size_t size);
 protected:
 	void PrintIndent(std::size_t indent, IndentStyle style);
+	void InnerPrintText(std::string_view text, TextRange range);
 	std::string _buffer;
 };
 

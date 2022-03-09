@@ -460,7 +460,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalStatement(std::shared_pt
 			}
 		case LuaAstNodeType::Comment:
 			{
-				env->AddChild(FormatNode(node));
+				env->AddChild(FormatComment(node));
 				env->Add<KeepElement>(1);
 				break;
 			}
@@ -563,7 +563,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameDefList(std::shared_ptr<L
 			}
 		case LuaAstNodeType::Comment:
 			{
-				env->AddChild(FormatNode(node));
+				env->AddChild(FormatComment(node));
 				env->Add<KeepElement>(1);
 				break;
 			}
@@ -662,10 +662,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignLeftExpressionList(std:
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatComment(std::shared_ptr<LuaAstNode> comment)
 {
-	auto env = std::make_shared<ExpressionElement>();
-	env->Add<TextElement>(comment);
-
-	return env;
+	return std::make_shared<TextElement>(comment);
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatBreakStatement(std::shared_ptr<LuaAstNode> breakNode)
@@ -712,7 +709,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatReturnStatement(std::shared_p
 			}
 		case LuaAstNodeType::Comment:
 			{
-				env->AddChild(FormatNode(child));
+				env->AddChild(FormatComment(child));
 				env->Add<KeepElement>(1);
 				break;
 			}
@@ -1330,7 +1327,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 			}
 		case LuaAstNodeType::Comment:
 			{
-				paramListLayoutEnv->Add<TextElement>(child);
+				paramListLayoutEnv->AddChild(FormatComment(child));
 				paramListLayoutEnv->Add<KeepElement>(1);
 				break;
 			}
@@ -1532,7 +1529,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 			}
 		case LuaAstNodeType::Comment:
 			{
-				env->AddChild(FormatNode(child));
+				env->AddChild(FormatComment(child));
 				env->Add<KeepElement>(1);
 				break;
 			}
@@ -1630,7 +1627,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 			if (lastStatementEnv)
 			{
 				lastStatementEnv->Add<KeepBlankElement>(1);
-				lastStatementEnv->Add<TextElement>(nextChild);
+				lastStatementEnv->AddChild(FormatNode(nextChild));
 			}
 			//else 应该不存在这种情况
 		}
@@ -1648,7 +1645,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 
 			if (nextChild->GetType() == LuaAstNodeType::Comment)
 			{
-				auto comment = FormatNode(nextChild);
+				auto comment = FormatComment(nextChild);
 				auto commentStatement = std::make_shared<StatementElement>();
 				commentStatement->AddChild(comment);
 				env->AddChild(commentStatement);
@@ -1789,7 +1786,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 		if (nextLine == currentLine)
 		{
 			env->Add<KeepBlankElement>(1);
-			env->Add<TextElement>(comment);
+			env->AddChild(FormatComment(comment));
 			++it;
 		}
 	}
@@ -1889,7 +1886,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(LuaAstNode::C
 		for (auto comment : comments)
 		{
 			auto commentStatement = std::make_shared<StatementElement>();
-			commentStatement->Add<TextElement>(comment);
+			commentStatement->AddChild(FormatComment(comment));
 			indentElement->AddChild(commentStatement);
 			indentElement->Add<KeepLineElement>();
 		}
@@ -2084,7 +2081,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 			}
 		case LuaAstNodeType::Comment:
 			{
-				env->Add<TextElement>(child);
+				env->AddChild(FormatComment(child));
 				env->Add<KeepElement>(1);
 				break;
 			}
@@ -2357,7 +2354,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<Lu
 			}
 		case LuaAstNodeType::Comment:
 			{
-				auto comment = FormatNode(statement);
+				auto comment = FormatComment(statement);
 				auto commentStatement = std::make_shared<StatementElement>();
 				commentStatement->AddChild(comment);
 				indentEnv->AddChild(commentStatement);
@@ -2380,7 +2377,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<Lu
 					if (currentLine == nextLine)
 					{
 						statEnv->Add<KeepBlankElement>(1);
-						statEnv->Add<TextElement>(next);
+						statEnv->AddChild(FormatComment(next));
 						++it;
 					}
 				}

@@ -48,8 +48,7 @@ void RangeFormatContext::Print(std::string_view text, TextRange range)
 			}
 		}
 	}
-	_buffer.append(text);
-	_characterCount += text.size();
+	InnerPrintText(text, range);
 
 	if (startLine < _formattedRange.StartLine)
 	{

@@ -31,8 +31,7 @@ void SerializeContext::Print(std::string_view text, TextRange range)
 			}
 		}
 	}
-	_buffer.append(text);
-	_characterCount += text.size();
+	InnerPrintText(text, range);
 }
 
 void SerializeContext::Print(char ch, int Offset)
@@ -124,4 +123,42 @@ void SerializeContext::PrintIndent(std::size_t indent, IndentStyle style)
 			break;
 		}
 	}
+}
+
+void SerializeContext::InnerPrintText(std::string_view text, TextRange range)
+{
+	if (GetLine(range.StartOffset) == GetLine(range.EndOffset))
+	{
+		_buffer.append(text);
+		_characterCount += text.size();
+		return;
+	}
+
+	std::size_t lastStartIndex = 0;
+
+	for (std::size_t i = 0; i < text.size(); i++)
+	{
+		char ch = text[i];
+
+		if (ch == '\r' || ch == '\n')
+		{
+			if (i - lastStartIndex != 0)
+			{
+				_buffer.append(text.substr(lastStartIndex, i - lastStartIndex));
+			}
+			_buffer.append(_options.end_of_line);
+			lastStartIndex = i + 1;
+			if (ch == '\r' && lastStartIndex < text.size() && text[lastStartIndex] == '\n')
+			{
+				lastStartIndex++;
+				i++;
+			}
+		}
+	}
+
+	if (lastStartIndex < text.size())
+	{
+		_buffer.append(text.substr(lastStartIndex, text.size() - lastStartIndex));
+	}
+	_characterCount = GetColumn(range.EndOffset);
 }

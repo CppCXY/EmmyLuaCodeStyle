@@ -133,6 +133,7 @@ protected:
 
 	// special handle range format
 	std::shared_ptr<FormatElement> FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode, LuaFormatRange& validRange);
+
 private:
 	std::shared_ptr<LuaParser> _parser;
 	LuaCodeStyleOptions& _options;
