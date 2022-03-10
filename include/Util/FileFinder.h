@@ -15,6 +15,8 @@ public:
 
 	void AddFindExtension(const std::string& extension);
 
+	void AddFindFile(const std::string& fileName);
+
 	std::vector<std::string> FindFiles();
 
 private:
@@ -23,4 +25,5 @@ private:
 	std::filesystem::path _root;
 	std::set<std::string> _ignoreDirectory;
 	std::set<std::string> _findExtension;
+	std::set<std::string> _findFile;
 };

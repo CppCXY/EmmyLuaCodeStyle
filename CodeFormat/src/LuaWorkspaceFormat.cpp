@@ -105,7 +105,7 @@ bool LuaWorkspaceFormat::CheckWorkspace()
 void LuaWorkspaceFormat::CollectEditorconfig()
 {
 	FileFinder finder(_workspace);
-	finder.AddFindExtension(".editorconfig");
+	finder.AddFindFile(".editorconfig");
 	finder.AddIgnoreDirectory(".git");
 	finder.AddIgnoreDirectory(".github");
 	finder.AddIgnoreDirectory(".svn");

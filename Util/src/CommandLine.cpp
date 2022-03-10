@@ -161,6 +161,18 @@ bool CommandLine::Parse(int argc, char** argv)
 			commandOption.Value = _argvs[++index];
 			commandOption.HasOption = true;
 		}
+		else if(index == argc - 1)
+		{
+			auto& commandOption = _options->_args.find(option)->second;
+			if (commandOption.Type == CommandLineValueType::Boolean)
+			{
+				commandOption.Value = "true";
+				commandOption.HasOption = true;
+				continue;
+			}
+			return false;
+		}
+
 	}
 	return true;
 }
