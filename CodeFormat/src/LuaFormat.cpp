@@ -52,20 +52,20 @@ bool IsSubRelative(std::filesystem::path& path, std::filesystem::path base)
 	return !relativeString.starts_with(".");
 }
 
-void LuaFormat::AutoDetectConfigRoot(std::string_view root)
+void LuaFormat::AutoDetectConfig()
 {
 	if (_inputFile.empty())
 	{
 		return;
 	}
-	std::filesystem::path workspace(root);
+	std::filesystem::path workspace(std::filesystem::current_path());
 	std::filesystem::path inputPath(_inputFile);
 	if (!IsSubRelative(inputPath, workspace))
 	{
 		return;
 	}
 
-	auto directory = inputPath.parent_path();
+	auto directory = absolute(inputPath.parent_path());
 	while (IsSubRelative(directory, workspace))
 	{
 		auto editorconfigPath = directory / ".editorconfig";
@@ -89,6 +89,11 @@ void LuaFormat::SetConfigPath(std::string_view config)
 			_options = editorConfig->Generate(_inputFile);
 		}
 	}
+}
+
+void LuaFormat::SetOptions(std::shared_ptr<LuaCodeStyleOptions> options)
+{
+	_options = options;
 }
 
 void LuaFormat::SetDefaultOptions(std::map<std::string, std::string, std::less<>>& keyValues)

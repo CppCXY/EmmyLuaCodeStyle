@@ -20,9 +20,11 @@ public:
 
 	void SetOutputFile(std::string_view path);
 
-	void AutoDetectConfigRoot(std::string_view root);
+	void AutoDetectConfig();
 
 	void SetConfigPath(std::string_view config);
+
+	void SetOptions(std::shared_ptr<LuaCodeStyleOptions> options);
 
 	void SetDefaultOptions(std::map<std::string, std::string, std::less<>>& keyValues);
 
@@ -31,8 +33,6 @@ public:
 	bool Check();
 
 	void DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file);
-	
-
 private:
 	std::string _inputFile;
 	std::string _outFile;
