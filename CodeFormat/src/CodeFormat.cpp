@@ -83,9 +83,9 @@ int main(int argc, char** argv)
 			return -1;
 		}
 
-		if (cmd.HasOption("output"))
+		if (cmd.HasOption("outfile"))
 		{
-			luaFormat->SetOutputFile(cmd.Get<std::string>("output"));
+			luaFormat->SetOutputFile(cmd.Get<std::string>("outfile"));
 		}
 
 		if (cmd.Get<bool>("detect-config"))
