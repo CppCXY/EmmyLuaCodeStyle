@@ -7,6 +7,7 @@
 
 #include "LuaParser/LuaParser.h"
 #include "CodeService/LuaCodeStyleOptions.h"
+#include "CodeService/LuaDiagnosisInfo.h"
 
 class LuaFormat
 {
@@ -23,11 +24,14 @@ public:
 
 	void SetConfigPath(std::string_view config);
 
-	void SetDefaultOptions(std::map<std::string, std::string,std::less<>>& keyValues);
+	void SetDefaultOptions(std::map<std::string, std::string, std::less<>>& keyValues);
 
 	bool Reformat();
 
 	bool Check();
+
+	void DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file);
+	
 
 private:
 	std::string _inputFile;

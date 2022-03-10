@@ -41,11 +41,11 @@ bool IsSubRelative(std::filesystem::path& path, std::filesystem::path base)
 {
 	auto relative = std::filesystem::relative(path, base);
 	auto relativeString = relative.string();
-	if(relativeString.empty())
+	if (relativeString.empty())
 	{
 		return false;
 	}
-	if(relativeString == ".")
+	if (relativeString == ".")
 	{
 		return true;
 	}
@@ -54,22 +54,22 @@ bool IsSubRelative(std::filesystem::path& path, std::filesystem::path base)
 
 void LuaFormat::AutoDetectConfigRoot(std::string_view root)
 {
-	if(_inputFile.empty())
+	if (_inputFile.empty())
 	{
 		return;
 	}
 	std::filesystem::path workspace(root);
 	std::filesystem::path inputPath(_inputFile);
-	if(!IsSubRelative(inputPath, workspace))
+	if (!IsSubRelative(inputPath, workspace))
 	{
 		return;
 	}
 
 	auto directory = inputPath.parent_path();
-	while(IsSubRelative(directory, workspace))
+	while (IsSubRelative(directory, workspace))
 	{
 		auto editorconfigPath = directory / ".editorconfig";
-		if(std::filesystem::exists(editorconfigPath))
+		if (std::filesystem::exists(editorconfigPath))
 		{
 			SetConfigPath(editorconfigPath.string());
 			return;
@@ -77,7 +77,6 @@ void LuaFormat::AutoDetectConfigRoot(std::string_view root)
 
 		directory = directory.parent_path();
 	}
-
 }
 
 void LuaFormat::SetConfigPath(std::string_view config)
@@ -115,7 +114,7 @@ bool LuaFormat::Reformat()
 		}
 	}
 
-	if(_outFile.empty())
+	if (_outFile.empty())
 	{
 		_options->end_of_line = "\n";
 	}
@@ -143,6 +142,16 @@ bool LuaFormat::Check()
 
 	if (_parser->HasError())
 	{
+		auto errors = _parser->GetErrors();
+
+		std::cerr << format("Check {}\t{} error", _inputFile, errors.size()) << std::endl;
+
+		for (auto& error : errors)
+		{
+			auto luaFile = _parser->GetLuaFile();
+			DiagnosisInspection(error.ErrorMessage, error.ErrorRange, luaFile);
+		}
+
 		return false;
 	}
 
@@ -161,12 +170,34 @@ bool LuaFormat::Check()
 	auto diagnosis = formatter.GetDiagnosisInfos();
 	if (!diagnosis.empty())
 	{
+		std::cerr << format("Check {}\t{} warning", _inputFile, diagnosis.size()) << std::endl;
+
 		for (auto& d : diagnosis)
 		{
-			std::cout << format("{} from {}:{} to {}:{}", d.Message, d.Range.Start.Line, d.Range.Start.Character,
-			                    d.Range.End.Line, d.Range.End.Character) << std::endl;
+			auto luaFile = _parser->GetLuaFile();
+
+			DiagnosisInspection(d.Message, TextRange(
+				                    luaFile->GetOffsetFromPosition(d.Range.Start.Line, d.Range.Start.Character),
+				                    luaFile->GetOffsetFromPosition(d.Range.End.Line, d.Range.End.Character)
+			                    ), luaFile);
 		}
+
 		return false;
 	}
+	std::cout << format("Check {} OK", _inputFile) << std::endl;
 	return true;
+}
+
+void LuaFormat::DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file)
+{
+	std::string_view source = file->GetSource();
+	auto startLine = file->GetLine(range.StartOffset);
+	auto startChar = file->GetColumn(range.StartOffset);
+	auto endLine = file->GetLine(range.EndOffset);
+	auto endChar = file->GetColumn(range.EndOffset);
+	std::cerr << format("{}({}:{} to {}:{}): {}", file->GetFilename(), startLine + 1, startChar, endLine + 1, endChar,
+	                    message) << std::endl;
+
+
+
 }
