@@ -24,7 +24,13 @@
 int main(int argc, char** argv)
 {
 	CommandLine cmd;
-
+	cmd.SetUsage(
+		"Usage:\n"
+		"CodeFormat [check/format] [options]\n"
+		"for example:\n"
+		"\tCodeFormat check -w . -d\n"
+		"\tCodeFormat format -f test.lua -d\n"
+		);
 	cmd.AddTarget("format")
 	   .Add<std::string>("file", "f", "Specify the input file")
 	   .Add<std::string>("workspace", "w",
@@ -34,7 +40,7 @@ int main(int argc, char** argv)
 	                     "Specify .editorconfig file, it decides on the effect of formatting")
 	   .Add<bool>("detect-config", "d",
 	              "Configuration will be automatically detected,\n"
-	              "    If this option is set, the config option has no effect ")
+	              "\t\tIf this option is set, the config option has no effect ")
 	   .Add<std::string>("outfile", "o",
 	                     "Specify output file")
 	   .EnableKeyValueArgs();
@@ -46,7 +52,7 @@ int main(int argc, char** argv)
 	                     "Specify editorconfig file, it decides on the effect of formatting or diagnosis")
 	   .Add<bool>("detect-config", "d",
 	              "Configuration will be automatically detected,\n"
-	              "    If this option is set, the config option has no effect")
+	              "\t\tIf this option is set, the config option has no effect")
 	   .Add<bool>("diagnosis-as-error", "DAE", "if exist error or diagnosis info , return -1")
 	   .EnableKeyValueArgs();
 

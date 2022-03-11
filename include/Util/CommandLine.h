@@ -130,6 +130,8 @@ public:
 
 	bool Parse(int argc, char** argv);
 
+	void SetUsage(std::string_view usage);
+
 	void PrintUsage();
 private:
 	std::vector<std::string> _argvs;
@@ -137,4 +139,5 @@ private:
 	CommandLineTargetOptions* _options;
 	std::string _currentTarget;
 	std::vector<std::string> _errors;
+	std::string _usage;
 };

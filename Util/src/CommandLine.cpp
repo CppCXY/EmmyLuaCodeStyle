@@ -177,6 +177,11 @@ bool CommandLine::Parse(int argc, char** argv)
 	return true;
 }
 
+void CommandLine::SetUsage(std::string_view usage)
+{
+	_usage = std::string(usage);
+}
+
 void CommandLine::PrintUsage()
 {
 	for (auto& error : _errors)
@@ -185,7 +190,7 @@ void CommandLine::PrintUsage()
 	}
 	std::cerr << std::endl;
 
-	std::cerr << "first param must be target:" << std::endl;
+	std::cerr << _usage << std::endl;
 	for (auto& target : _targets)
 	{
 		std::cerr << format("{}:", target.first) << std::endl;
@@ -196,7 +201,7 @@ void CommandLine::PrintUsage()
 			auto& name = it.second;
 			auto& option = options._args[name];
 
-			std::cerr << format("    -{} --{} {}",
+			std::cerr << format("\t-{} --{}\n\t\t{}",
 				shortName, name, option.Description) << std::endl;
 			std::cerr << std::endl;
 		}
