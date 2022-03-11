@@ -52,13 +52,12 @@ bool IsSubRelative(std::filesystem::path& path, std::filesystem::path base)
 	return !relativeString.starts_with(".");
 }
 
-void LuaFormat::AutoDetectConfig()
+void LuaFormat::AutoDetectConfig(std::filesystem::path workspace)
 {
 	if (_inputFile.empty())
 	{
 		return;
 	}
-	std::filesystem::path workspace(std::filesystem::current_path());
 	std::filesystem::path inputPath(_inputFile);
 	if (!IsSubRelative(inputPath, workspace))
 	{

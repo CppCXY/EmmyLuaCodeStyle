@@ -20,7 +20,7 @@ public:
 
 	void SetOutputFile(std::string_view path);
 
-	void AutoDetectConfig();
+	void AutoDetectConfig(std::filesystem::path workspace = std::filesystem::current_path());
 
 	void SetConfigPath(std::string_view config);
 

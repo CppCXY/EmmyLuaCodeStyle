@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 	cmd.AddTarget("format")
 	   .Add<std::string>("file", "f", "Specify the input file")
 	   .Add<std::string>("workspace", "w",
-	                     "Specify workspace directory perform batch formatting")
+	                     "Specify workspace directory,if no input file is specified, bulk formatting is performed")
 	   .Add<int>("stdin", "i", "Read from stdin and specify read size")
 	   .Add<std::string>("config", "c",
 	                     "Specify .editorconfig file, it decides on the effect of formatting")
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 	cmd.AddTarget("check")
 	   .Add<std::string>("file", "f", "Specify the input file")
 	   .Add<std::string>("workspace", "w",
-	                     "Specify workspace directory perform batch checking")
+	                     "Specify workspace directory, if no input file is specified, bulk checking is performed")
 	   .Add<std::string>("config", "c",
 	                     "Specify editorconfig file, it decides on the effect of formatting or diagnosis")
 	   .Add<bool>("detect-config", "d",
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	if (!cmd.HasOption("workspace"))
+	if (cmd.HasOption("file"))
 	{
 		auto luaFormat = std::make_shared<LuaFormat>();
 		if (cmd.HasOption("file"))
@@ -90,7 +90,14 @@ int main(int argc, char** argv)
 
 		if (cmd.Get<bool>("detect-config"))
 		{
-			luaFormat->AutoDetectConfig();
+			if (cmd.HasOption("workspace"))
+			{
+				luaFormat->AutoDetectConfig(std::filesystem::path(cmd.Get<std::string>("workspace")));
+			}
+			else
+			{
+				luaFormat->AutoDetectConfig();
+			}
 		}
 		else if (cmd.HasOption("config"))
 		{
@@ -115,28 +122,28 @@ int main(int argc, char** argv)
 			}
 		}
 	}
-	else
+	else if (cmd.HasOption("workspace"))
 	{
 		LuaWorkspaceFormat workspaceFormat(cmd.Get<std::string>("workspace"));
 
-		if(cmd.Get<bool>("detect-config"))
+		if (cmd.Get<bool>("detect-config"))
 		{
 			workspaceFormat.SetAutoDetectConfig(true);
 		}
-		else if(cmd.HasOption("config"))
+		else if (cmd.HasOption("config"))
 		{
 			workspaceFormat.SetConfigPath(cmd.Get<std::string>("config"));
 		}
 
 		workspaceFormat.SetKeyValues(cmd.GetKeyValueOptions());
 
-		if(cmd.GetTarget() == "format")
+		if (cmd.GetTarget() == "format")
 		{
 			workspaceFormat.ReformatWorkspace();
 		}
-		else if(cmd.GetTarget() == "check")
+		else if (cmd.GetTarget() == "check")
 		{
-			if(!workspaceFormat.CheckWorkspace() && cmd.Get<bool>("diagnosis-as-error"))
+			if (!workspaceFormat.CheckWorkspace() && cmd.Get<bool>("diagnosis-as-error"))
 			{
 				return -1;
 			}
