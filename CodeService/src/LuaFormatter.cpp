@@ -1239,7 +1239,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameExpression(std::shared_pt
 
 	for (auto& child : nameExpression->GetChildren())
 	{
-		FormatSubExpressionNode(child, env);
+		FormatSubExpression(child, env);
 	}
 
 	return env;
@@ -1345,7 +1345,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatClosureExpression(std::shared
 			}
 		case LuaAstNodeType::FunctionBody:
 			{
-				env->AddChild(FormatNode(child));
+				env->AddChild(FormatFunctionBody(child));
 				break;
 			}
 		default:
@@ -1379,7 +1379,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalFunctionStatement(
 			}
 		case LuaAstNodeType::FunctionBody:
 			{
-				env->AddChild(FormatNode(child));
+				env->AddChild(FormatForBody(child));
 				break;
 			}
 		default:
@@ -1875,7 +1875,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(LuaAstNode::C
 }
 
 
-void LuaFormatter::FormatSubExpressionNode(std::shared_ptr<LuaAstNode> expression,
+void LuaFormatter::FormatSubExpression(std::shared_ptr<LuaAstNode> expression,
                                            std::shared_ptr<FormatElement> env)
 {
 	switch (expression->GetType())
@@ -1931,7 +1931,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<Lu
 	{
 		const auto current = *it;
 
-		FormatSubExpressionNode(current, env);
+		FormatSubExpression(current, env);
 		env->Add<KeepElement>(0);
 	}
 
@@ -1946,7 +1946,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBinaryExpression(std::shared_
 	{
 		const auto current = *it;
 
-		FormatSubExpressionNode(current, env);
+		FormatSubExpression(current, env);
 		env->Add<KeepElement>(1);
 	}
 
@@ -1984,7 +1984,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatUnaryExpression(std::shared_p
 			}
 		default:
 			{
-				FormatSubExpressionNode(child, env);
+				FormatSubExpression(child, env);
 				env->Add<KeepElement>(1);
 			}
 		}
@@ -2077,13 +2077,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 					}
 				}
 
-				FormatSubExpressionNode(child, env);
+				FormatSubExpression(child, env);
 				env->Add<KeepElement>(0);
 				break;
 			}
 		default:
 			{
-				FormatSubExpressionNode(child, env);
+				FormatSubExpression(child, env);
 				env->Add<KeepElement>(0);
 			}
 		}
@@ -2105,7 +2105,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 		case LuaAstNodeType::IndexExpression:
 		case LuaAstNodeType::PrimaryExpression:
 			{
-				FormatSubExpressionNode(child, env);
+				FormatSubExpression(child, env);
 
 				auto next = ast_util::NextNode(it, children);
 				if (next && next->GetType() == LuaAstNodeType::CallArgList)
@@ -2155,7 +2155,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 			}
 		case LuaAstNodeType::CallArgList:
 			{
-				env->AddChild(FormatNode(child));
+				env->AddChild(FormatCallArgList(child));
 				break;
 			}
 		default:
@@ -2183,7 +2183,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 					&& binaryExpressionChildren[1]->GetText() == "+")
 				&& binaryExpressionChildren[2]->GetText() == "1")
 			{
-				FormatSubExpressionNode(binaryExpressionChildren[0], env);
+				FormatSubExpression(binaryExpressionChildren[0], env);
 				env->Add<KeepElement>(0);
 				env->Add<TextElement>(binaryExpressionChildren[1]);
 				env->Add<KeepElement>(0);

@@ -112,7 +112,7 @@ protected:
 	                                                     const LuaAstNode::ChildrenContainer& children);
 
 	// 以下是表达式相关，表达式会联合布局
-	void FormatSubExpressionNode(std::shared_ptr<LuaAstNode> expression, std::shared_ptr<FormatElement> env);
+	void FormatSubExpression(std::shared_ptr<LuaAstNode> expression, std::shared_ptr<FormatElement> env);
 
 	std::shared_ptr<FormatElement> FormatExpression(std::shared_ptr<LuaAstNode> expression,
 	                                                std::shared_ptr<FormatElement> env = nullptr);

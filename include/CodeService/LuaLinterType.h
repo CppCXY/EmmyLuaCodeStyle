@@ -56,6 +56,7 @@ public:
 	int IndentSize;
 	int TabWidth;
 	LinterNoIndentStyle NoIndent;
+	int ContinuationIndent;
 
 	void Deserialize(nlohmann::json json) override;
 };

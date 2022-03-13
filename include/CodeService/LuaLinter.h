@@ -52,7 +52,6 @@ protected:
 	std::shared_ptr<FormatElement> DiagnoseTableAppendExpression(std::shared_ptr<LuaAstNode> expression);
 
 
-
 	std::shared_ptr<FormatElement> DiagnoseAlignStatement(LuaAstNode::ChildIterator& it,
 	                                                      const LuaAstNode::ChildrenContainer& children);
 	std::shared_ptr<FormatElement> DiagnoseNodeAndBlockOrEnd(LuaAstNode::ChildIterator& it,

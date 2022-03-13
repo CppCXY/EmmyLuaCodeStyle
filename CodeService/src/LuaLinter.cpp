@@ -9,6 +9,7 @@
 #include "CodeService/FormatElement/LongExpressionLayoutElement.h"
 #include "CodeService/FormatElement/NoIndentElement.h"
 #include "CodeService/FormatElement/StatementElement.h"
+#include "CodeService/FormatElement/SubExpressionElement.h"
 #include "CodeService/FormatElement/TextElement.h"
 #include "CodeService/NameStyle/NameStyleChecker.h"
 
@@ -198,7 +199,6 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseLocalStatement(std::shared_ptr
 		case LuaAstNodeType::KeyWord:
 		case LuaAstNodeType::GeneralOperator:
 			{
-				// ���������Ŀ��� ����local ���û�еȺ�����nameDefList�Ŀո�������
 				env->Add<TextElement>(node, _options.white_space.CalculateSpace(node));
 
 				break;
@@ -210,7 +210,10 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseLocalStatement(std::shared_ptr
 			}
 		case LuaAstNodeType::ExpressionList:
 			{
-				env->AddChild(DiagnoseExpressionList(node));
+				env->AddChild(DiagnoseExpressionList(
+					node,
+					std::make_shared<LongExpressionLayoutElement>(
+						_options.indent_style.ContinuationIndent)));
 				break;
 			}
 		case LuaAstNodeType::Comment:
@@ -241,7 +244,10 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseAssignmentStatement(std::share
 			}
 		case LuaAstNodeType::ExpressionList:
 			{
-				env->AddChild(DiagnoseExpressionList(child));
+				env->AddChild(DiagnoseExpressionList(
+					child,
+					std::make_shared<LongExpressionLayoutElement>(
+						_options.indent_style.ContinuationIndent)));
 				break;
 			}
 		case LuaAstNodeType::Comment:
@@ -336,7 +342,7 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseIfStatement(std::shared_ptr<Lu
 				{
 					env->Add<TextElement>(child, _options.white_space.CalculateSpace(child));
 				}
-				else // Ȼ��end���� FormatNodeAndBlockOrEnd ����ɵ�
+				else
 				{
 					env->Add<TextElement>(child);
 				}
@@ -564,7 +570,10 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseReturnStatement(std::shared_pt
 			}
 		case LuaAstNodeType::ExpressionList:
 			{
-				env->AddChild(DiagnoseExpressionList(child));
+				env->AddChild(DiagnoseExpressionList(
+					child,
+					std::make_shared<LongExpressionLayoutElement>(
+						_options.indent_style.ContinuationIndent)));
 				break;
 			}
 		case LuaAstNodeType::Comment:
@@ -789,14 +798,52 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseParamList(std::shared_ptr<LuaA
 }
 
 
-std::shared_ptr<FormatElement> LuaLinter::DiagnoseExpression(std::shared_ptr<LuaAstNode> expressionStatement,
+std::shared_ptr<FormatElement> LuaLinter::DiagnoseExpression(std::shared_ptr<LuaAstNode> expression,
                                                              std::shared_ptr<FormatElement> env)
 {
+	if (env == nullptr)
+	{
+		env = std::make_shared<LongExpressionLayoutElement>(_options.indent_style.ContinuationIndent);
+	}
+
+	auto& children = expression->GetChildren();
+	for (auto it = children.begin(); it != children.end(); ++it)
+	{
+		const auto current = *it;
+
+		DiagnoseSubExpression(current, env);
+	}
+
+	return env;
 }
 
 std::shared_ptr<FormatElement> LuaLinter::DiagnoseExpressionList(std::shared_ptr<LuaAstNode> expressionList,
                                                                  std::shared_ptr<FormatElement> env)
 {
+	if (env == nullptr)
+	{
+		env = std::make_shared<LongExpressionLayoutElement>(_options.indent_style.ContinuationIndent);
+	}
+
+	for (auto& node : expressionList->GetChildren())
+	{
+		switch (node->GetType())
+		{
+		case LuaAstNodeType::Expression:
+			{
+				auto subEnv = std::make_shared<SubExpressionElement>();
+				env->AddChild(DiagnoseExpression(node, subEnv));
+				break;
+			}
+		case LuaAstNodeType::GeneralOperator:
+			{
+				env->Add<TextElement>(node, _options.white_space.CalculateSpace(node));
+				break;
+			}
+		default:
+			DefaultHandle(node, env);
+		}
+	}
 }
 
 void LuaLinter::DiagnoseSubExpression(std::shared_ptr<LuaAstNode> expression, std::shared_ptr<FormatElement> env)
@@ -888,13 +935,11 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseAlignStatement(LuaAstNode::Chi
 		auto currentChild = *it;
 		int currentLine = _parser->GetLine(currentChild->GetTextRange().EndOffset);
 		int nextLine = _parser->GetLine(nextChild->GetTextRange().StartOffset);
-		// �����������һ�������ĸ�ֵ/local/ע������������һ����ֵ/local/ע����� ���2�����ϣ�����Ϊ������
 		if (nextLine - currentLine > _options.align_style.MaxContinuousLineDistance)
 		{
 			break;
 		}
 
-		// ����Ƿ��������ע�� ���� local t = 123 -- inline comment
 		if ((currentChild->GetType() == LuaAstNodeType::LocalStatement
 				|| currentChild->GetType() == LuaAstNodeType::AssignStatement)
 			&& nextChild->GetType() == LuaAstNodeType::Comment && nextLine == currentLine)
@@ -904,7 +949,6 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseAlignStatement(LuaAstNode::Chi
 			{
 				lastStatementEnv->Add<TextElement>(nextChild);
 			}
-			//else Ӧ�ò������������
 		}
 		else
 		{
@@ -936,7 +980,6 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseAlignStatement(LuaAstNode::Chi
 			break;
 		}
 	}
-	// ������Ǻ���������������򷵻ر���
 	if (env->GetChildren().size() == 1)
 	{
 		return env->GetChildren()[0];
@@ -958,7 +1001,6 @@ std::shared_ptr<FormatElement> LuaLinter::DiagnoseNodeAndBlockOrEnd(LuaAstNode::
 		int currentLine = _parser->GetLine(node->GetTextRange().EndOffset);
 		int nextLine = _parser->GetLine(comment->GetTextRange().StartOffset);
 
-		// ��Ϊ������ע��
 		if (nextLine == currentLine)
 		{
 			env->Add<TextElement>(comment);
@@ -1045,4 +1087,9 @@ std::shared_ptr<FormatElement> LuaLinter::CalculateBlockFromParent(LuaAstNode::C
 		}
 		return indentElement;
 	}
+}
+
+void LuaLinter::DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_ptr<FormatElement> env)
+{
+	env->AddChild(DiagnoseNode(node));
 }
