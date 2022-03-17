@@ -40,6 +40,8 @@ label_no_indent = false
 do_statement_no_indent = false
 # if true, the conditional expression of the if statement will not be a continuation line indent
 if_condition_no_continuation_indent = false
+# 
+if_branch_comments_after_block_no_indent = false
 # if true, t[#t+1] will not space wrapper '+'
 table_append_expression_no_space = false
 # if statement will align like switch case 

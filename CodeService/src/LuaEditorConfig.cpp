@@ -319,6 +319,12 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("if_condition_align_with_each_other") == "true";
 	}
 
+	if(configMap.count("if_branch_comments_after_block_no_indent"))
+	{
+		options->if_branch_comments_after_block_no_indent =
+			configMap.at("if_branch_comments_after_block_no_indent") == "true";
+	}
+
 	if(configMap.count("long_chain_expression_allow_one_space_after_colon"))
 	{
 		options->long_chain_expression_allow_one_space_after_colon =

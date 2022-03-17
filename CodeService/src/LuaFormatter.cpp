@@ -1852,12 +1852,23 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(LuaAstNode::C
 {
 	std::shared_ptr<LuaAstNode> block = nullptr;
 	std::vector<std::shared_ptr<LuaAstNode>> comments;
-
+	std::vector<std::shared_ptr<LuaAstNode>> afterBlockComments;
 	for (; it != children.end(); ++it)
 	{
 		if (nextMatch(it, LuaAstNodeType::Comment, children))
 		{
-			comments.push_back(nextNode(it, children));
+			auto next = nextNode(it, children);
+			if (block)
+			{
+				if (_parser->GetLine(block->GetTextRange().EndOffset) != _parser->GetLine(
+					next->GetTextRange().StartOffset))
+				{
+					afterBlockComments.push_back(next);
+					continue;
+				}
+			}
+
+			comments.push_back(next);
 		}
 		else if (nextMatch(it, LuaAstNodeType::Block, children))
 		{
@@ -1878,7 +1889,32 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(LuaAstNode::C
 			copyBlock->AddComment(comment);
 		}
 
-		return FormatBlock(copyBlock);
+		auto nextKey = nextNode(it, children);
+		if (_options.if_branch_comments_after_block_no_indent
+			&& nextKey && nextKey->GetType() == LuaAstNodeType::KeyWord
+			&& (nextKey->GetText() == "elseif" || nextKey->GetText() == "else"))
+		{
+			auto blockEnv = FormatBlock(copyBlock);
+			auto noIndentEnv = std::make_shared<NoIndentElement>();
+			for (auto comment : afterBlockComments)
+			{
+				auto commentStatement = std::make_shared<StatementElement>();
+				commentStatement->AddChild(FormatComment(comment));
+				noIndentEnv->AddChild(commentStatement);
+				noIndentEnv->Add<KeepLineElement>();
+			}
+			blockEnv->AddChild(noIndentEnv);
+
+			return blockEnv;
+		}
+		else
+		{
+			for (auto comment : afterBlockComments)
+			{
+				copyBlock->AddComment(comment);
+			}
+			return FormatBlock(copyBlock);
+		}
 	}
 	else
 	{

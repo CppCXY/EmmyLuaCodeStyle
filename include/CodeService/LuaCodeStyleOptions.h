@@ -84,6 +84,7 @@ public:
 	 */
 	bool if_condition_no_continuation_indent = false;
 
+	bool if_branch_comments_after_block_no_indent = false;
 	/*
 	 * 表内每一个表项对齐到第一个表项
 	 */
@@ -103,6 +104,7 @@ public:
 	bool table_append_expression_no_space = false;
 
 	bool long_chain_expression_allow_one_space_after_colon = false;
+
 #ifndef _WINDOWS
 	std::string end_of_line = "\n";
 #else
