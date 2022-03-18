@@ -662,7 +662,24 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignLeftExpressionList(std:
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatComment(std::shared_ptr<LuaAstNode> comment)
 {
-	return std::make_shared<TextElement>(comment);
+	auto text = comment->GetText();
+	if(!text.empty() && text.back() > 0 && ::isspace(text.back()) == 0)
+	{
+		return std::make_shared<TextElement>(comment);
+	}
+	int i = static_cast<int>(text.size()) - 1;
+	for (; i >= 0; i--)
+	{
+		char ch = text[i];
+		if(ch <= 0 || ::isspace(ch) == 0)
+		{
+			break;
+		}
+	}
+
+	text = text.substr(0, i + 1);
+
+	return std::make_shared<TextElement>(text, comment->GetTextRange());
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatBreakStatement(std::shared_ptr<LuaAstNode> breakNode)

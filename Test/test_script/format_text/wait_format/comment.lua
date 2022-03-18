@@ -23,3 +23,11 @@ end
 
 return --fff
 aaa+ccc,bbb
+
+--wjgiowjiojg        
+--[[     ]]          
+local t = -- [[[[[[]]]]]]    
+wgwjgjwiog --[[
+
+  
+]]   
