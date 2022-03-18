@@ -1,6 +1,9 @@
 
-[*]
+[*.yaml]
+indent_style = space
+indent_size = 2
 
+[*.cpp]
 # ReSharper properties
 resharper_namespace_indentation=none
 indent_style=tab
