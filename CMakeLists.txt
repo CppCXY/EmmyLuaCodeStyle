@@ -4,10 +4,19 @@ project(LuaCodeStyle)
 
 set(CMAKE_CXX_STANDARD 20)
 
+option(BuildARM "CROSS COMPILER" OFF)
 option(BuildAsLuaLib "Build for lua dll" OFF)
 option(BuildCodeFormat "Build CodeFormat" ON)
 option(BuildCodeFormatServer "Build CodeFormatServer" ON)
 option(EnableTest "Test project" ON)
+
+if(BuildARM)
+	SET(CMAKE_C_COMPILER "arm-linux-gcc")
+	SET(CMAKE_CXX_COMPILER "arm-linux-g++")
+	SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+	SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+	SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_definitions(-DMSVC)
