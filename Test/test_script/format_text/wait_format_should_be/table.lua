@@ -32,7 +32,7 @@ local t6 = {
 }
 
 local t7 = {
-    --hhhh 
+    --hhhh
     aaa = 1231,
     bbbbb --sgjowjogg
 }
