@@ -11,8 +11,6 @@ option(BuildCodeFormatServer "Build CodeFormatServer" ON)
 option(EnableTest "Test project" ON)
 
 if(BuildARM)
-	SET(CMAKE_C_COMPILER "arm-linux-gcc")
-	SET(CMAKE_CXX_COMPILER "arm-linux-g++")
 	SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 	SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 	SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)

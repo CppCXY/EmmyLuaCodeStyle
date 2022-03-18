@@ -18,7 +18,8 @@ jobs:
     - name: install gcc 10
       run: |
         sudo apt-get install -y gcc-10-arm-linux-gnueabi g++-10-arm-linux-gnueabi
-
+        echo "CC=arm-linux-gnueabi-gcc-10" >> $GITHUB_ENV
+        echo "CXX=arm-linux-gnueabi-g++-10" >> $GITHUB_ENV
     - name: Build
       run: | 
         mkdir build
