@@ -155,6 +155,8 @@ call_arg_parentheses = remove_string_only
 call_arg_parentheses = unambiguous_remove_string_only
 [{if_branch_comments_after_block_no_indent-eq-true.lua}]
 if_branch_comments_after_block_no_indent = true
+[{align_chained_expression_statement-eq-true.lua}]
+align_chained_expression_statement = true
 [{minLine-eq-1.lua}]
 keep_line_after_if_statement = minLine:1
 keep_line_after_do_statement = minLine:1

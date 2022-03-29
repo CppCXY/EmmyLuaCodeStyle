@@ -22,6 +22,8 @@ local_assign_continuation_align_to_first_expression = false
 align_call_args = false
 # if true, all function define params will align to first param
 align_function_define_params = true
+# 
+align_chained_expression_statement = false
 # if true, format like this "local t = { 1, 2, 3 }"
 keep_one_space_between_table_and_bracket = true
 # if indent_style is tab, this option is invalid

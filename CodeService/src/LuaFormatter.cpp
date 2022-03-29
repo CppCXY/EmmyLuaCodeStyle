@@ -663,7 +663,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignLeftExpressionList(std:
 std::shared_ptr<FormatElement> LuaFormatter::FormatComment(std::shared_ptr<LuaAstNode> comment)
 {
 	auto text = comment->GetText();
-	if(!text.empty() && text.back() > 0 && ::isspace(text.back()) == 0)
+	if (!text.empty() && text.back() > 0 && ::isspace(text.back()) == 0)
 	{
 		return std::make_shared<TextElement>(comment);
 	}
@@ -671,7 +671,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatComment(std::shared_ptr<LuaAs
 	for (; i >= 0; i--)
 	{
 		char ch = text[i];
-		if(ch <= 0 || ::isspace(ch) == 0)
+		if (ch <= 0 || ::isspace(ch) == 0)
 		{
 			break;
 		}
@@ -1138,11 +1138,26 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 				env->AddChild(FormatNode(child));
 				break;
 			}
-			// case LuaAstNodeType::Expression:
-			// 	{
-			// 		FormatExpression(child, env);
-			// 		break;
-			// 	}
+		case LuaAstNodeType::Expression:
+			{
+				std::shared_ptr<FormatElement> expressionEnv = nullptr;
+				if (_options.align_chained_expression_statement)
+				{
+					auto indexExpression = ast_util::FindLeftIndexExpression(child);
+					if (indexExpression)
+					{
+						auto indexOp = indexExpression->FindFirstOf(LuaAstNodeType::IndexOperator);
+						if (indexOp->GetText() == "." || indexOp->GetText() == ":")
+						{
+							auto continuationIndent = _parser->GetColumn(indexOp->GetTextRange().StartOffset)
+								- _parser->GetColumn(child->GetTextRange().StartOffset);
+							expressionEnv = std::make_shared<LongExpressionLayoutElement>(continuationIndent);
+						}
+					}
+				}
+				env->AddChild(FormatExpression(child, expressionEnv));
+				break;
+			}
 			// default 一般只有一个分号
 		default:
 			{

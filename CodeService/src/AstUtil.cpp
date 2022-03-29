@@ -169,7 +169,7 @@ bool ast_util::WillCallArgHaveParentheses(std::shared_ptr<LuaAstNode> callArgLis
 			}
 		case CallArgParentheses::RemoveStringOnly:
 			{
-				if(IsSingleStringArg(callArgList))
+				if (IsSingleStringArg(callArgList))
 				{
 					return false;
 				}
@@ -177,7 +177,7 @@ bool ast_util::WillCallArgHaveParentheses(std::shared_ptr<LuaAstNode> callArgLis
 			}
 		case CallArgParentheses::RemoveTableOnly:
 			{
-				if(IsSingleTableArg(callArgList))
+				if (IsSingleTableArg(callArgList))
 				{
 					return false;
 				}
@@ -185,7 +185,7 @@ bool ast_util::WillCallArgHaveParentheses(std::shared_ptr<LuaAstNode> callArgLis
 			}
 		case CallArgParentheses::UnambiguousRemoveStringOnly:
 			{
-				if(IsSingleStringArgUnambiguous(callArgList))
+				if (IsSingleStringArgUnambiguous(callArgList))
 				{
 					return false;
 				}
@@ -209,4 +209,57 @@ bool ast_util::WillCallArgHaveParentheses(std::shared_ptr<LuaAstNode> callArgLis
 	}
 
 	return true;
+}
+
+std::shared_ptr<LuaAstNode> ast_util::FindLeftIndexExpression(std::shared_ptr<LuaAstNode> expression)
+{
+	if (expression->GetChildren().empty())
+	{
+		return nullptr;
+	}
+
+	std::shared_ptr<LuaAstNode> leftIndex = nullptr;
+	auto subExpression = expression->GetChildren().front();
+	while (subExpression)
+	{
+		switch (subExpression->GetType())
+		{
+		case LuaAstNodeType::CallExpression:
+			{
+				if (subExpression->GetChildren().empty())
+				{
+					subExpression = nullptr;
+				}
+				else
+				{
+					subExpression = subExpression->GetChildren().front();
+				}
+				break;
+			}
+		case LuaAstNodeType::IndexExpression:
+			{
+				leftIndex = subExpression;
+				if (subExpression->GetChildren().empty())
+				{
+					subExpression = nullptr;
+				}
+				else
+				{
+					subExpression = subExpression->GetChildren().front();
+				}
+				break;
+			}
+		case LuaAstNodeType::PrimaryExpression:
+			{
+				subExpression = nullptr;
+				break;
+			}
+		default:
+			{
+				return nullptr;
+			}
+		}
+	}
+
+	return leftIndex;
 }

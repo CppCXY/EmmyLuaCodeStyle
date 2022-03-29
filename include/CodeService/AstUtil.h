@@ -14,4 +14,6 @@ namespace ast_util
 	bool IsSingleTableArg(std::shared_ptr<LuaAstNode> callArgList);
 
 	bool WillCallArgHaveParentheses(std::shared_ptr<LuaAstNode> callArgList, CallArgParentheses callArgParentheses);
+
+	std::shared_ptr<LuaAstNode> FindLeftIndexExpression(std::shared_ptr<LuaAstNode> expression);
 }

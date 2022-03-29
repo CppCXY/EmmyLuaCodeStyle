@@ -58,6 +58,7 @@ public:
 	 */
 	bool align_function_define_params = true;
 
+	bool align_chained_expression_statement = false;
 	/*
 	 * 表的大括号和表项之间保持一个空格
 	 * 经过实际体验这种方式比较美观

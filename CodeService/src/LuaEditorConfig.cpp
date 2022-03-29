@@ -256,6 +256,11 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		options->align_call_args = configMap.at("align_call_args") == "true";
 	}
 
+	if(configMap.count("align_chained_expression_statement"))
+	{
+		options->align_chained_expression_statement = configMap.at("align_chained_expression_statement") == "true";
+	}
+
 	if (configMap.count("keep_one_space_between_table_and_bracket"))
 	{
 		options->keep_one_space_between_table_and_bracket =
