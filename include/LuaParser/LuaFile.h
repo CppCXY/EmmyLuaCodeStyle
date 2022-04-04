@@ -3,6 +3,7 @@
 #include <string_view>
 #include <string>
 #include <vector>
+#include "EndOfLineType.h"
 
 class LuaFile
 {
@@ -34,10 +35,15 @@ public:
 	void UpdateLineInfo(int startLine = 0);
 
 	void Reset();
+
+	void SetEndOfLineState(EndOfLine endOfLine);
+
+	EndOfLine GetEndOfLine() const;
 protected:
 	std::string _source;
 	std::string _filename;
 
 	int _linenumber;
 	std::vector<int> _lineOffsetVec;
+	EndOfLine _lineState;
 };

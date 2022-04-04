@@ -5,7 +5,8 @@
 LuaFile::LuaFile(std::string_view filename, std::string&& fileText)
 	: _source(fileText),
 	  _filename(filename),
-	  _linenumber(0)
+	  _linenumber(0),
+	  _lineState(EndOfLine::UNKNOWN)
 {
 	_lineOffsetVec.push_back(0);
 }
@@ -181,7 +182,7 @@ void LuaFile::UpdateLineInfo(int startLine)
 
 	for (; startOffset < _source.size(); startOffset ++)
 	{
-		if(_source[startOffset] == '\n')
+		if (_source[startOffset] == '\n')
 		{
 			_lineOffsetVec.push_back(startOffset + 1);
 		}
@@ -193,4 +194,36 @@ void LuaFile::Reset()
 	_lineOffsetVec.resize(0);
 	_lineOffsetVec.push_back(0);
 	_linenumber = 0;
+	_lineState = EndOfLine::UNKNOWN;
+}
+
+void LuaFile::SetEndOfLineState(EndOfLine endOfLine)
+{
+	switch (_lineState)
+	{
+	case EndOfLine::UNKNOWN:
+		{
+			_lineState = endOfLine;
+			break;
+		}
+	case EndOfLine::CR:
+	case EndOfLine::LF:
+	case EndOfLine::CRLF:
+		{
+			if (_lineState != endOfLine)
+			{
+				_lineState = EndOfLine::MIX;
+			}
+			break;
+		}
+	default:
+		{
+			break;
+		}
+	}
+}
+
+EndOfLine LuaFile::GetEndOfLine() const
+{
+	return _lineState;
 }

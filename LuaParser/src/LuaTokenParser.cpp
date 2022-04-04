@@ -52,10 +52,9 @@ LuaTokenParser::LuaTokenParser(std::shared_ptr<LuaFile> file)
 	_currentParseIndex(0),
 	_currentIndex(0),
 	_source(file->GetSource()),
-	_eosToken(LuaToken{ TK_EOS, "", TextRange(0, 0) }),
+	_eosToken(LuaToken{TK_EOS, "", TextRange(0, 0)}),
 	_file(file)
 {
-	
 }
 
 bool LuaTokenParser::Parse()
@@ -527,7 +526,7 @@ LuaTokenType LuaTokenParser::ReadNumeral()
 			break;
 		}
 	}
-	
+
 	// fix bug:这里不能使用lislalpha,否则会错误的解析下一个unicode字符
 	if (std::isalpha(GetCurrentChar())) /* is numeral touching a letter? */
 	{
@@ -691,7 +690,17 @@ void LuaTokenParser::IncLinenumber()
 	if (CurrentIsNewLine() && GetCurrentChar() != old)
 	{
 		NextChar(); /* skip '\n\r' or '\r\n' */
+		_file->SetEndOfLineState(EndOfLine::CRLF);
 	}
+	else if (old == '\n')
+	{
+		_file->SetEndOfLineState(EndOfLine::LF);
+	}
+	else
+	{
+		_file->SetEndOfLineState(EndOfLine::CR);
+	}
+
 
 	if (++_linenumber >= std::numeric_limits<int>::max())
 	{

@@ -120,7 +120,7 @@ bool LuaFormat::Reformat()
 
 	if (_outFile.empty())
 	{
-		_options->end_of_line = "\n";
+		_options->end_of_line = EndOfLine::LF;
 	}
 
 	LuaFormatter formatter(_parser, *_options);

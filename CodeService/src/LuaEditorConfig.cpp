@@ -342,20 +342,25 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		auto lineSeparatorSymbol = configMap.at("end_of_line");
 		if (lineSeparatorSymbol == "crlf")
 		{
-			options->end_of_line = "\r\n";
+			options->end_of_line = EndOfLine::CRLF;
 		}
 		else if (lineSeparatorSymbol == "lf")
 		{
-			options->end_of_line = "\n";
+			options->end_of_line = EndOfLine::LF;
 		}
 		else if (lineSeparatorSymbol == "auto")
 		{
 #ifndef _WINDOWS
-			options->end_of_line = "\n";
+			options->end_of_line = EndOfLine::LF;
 #else
-			options->end_of_line = "\r\n";
+			options->end_of_line = EndOfLine::CRLF;
 #endif
 		}
+	}
+
+	if(configMap.count("detect_end_of_line"))
+	{
+		options->detect_end_of_line = configMap.at("detect_end_of_line") == "true";
 	}
 
 	if (configMap.count("max_line_length")

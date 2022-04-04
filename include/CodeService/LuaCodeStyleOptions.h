@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include "LuaCodeStyleEnum.h"
+#include "LuaParser/EndOfLineType.h"
 
 class FormatElement;
 class NameStyleRuleMatcher;
@@ -107,10 +108,11 @@ public:
 	bool long_chain_expression_allow_one_space_after_colon = false;
 
 #ifndef _WINDOWS
-	std::string end_of_line = "\n";
+	EndOfLine end_of_line = EndOfLine::LF;
 #else
-	std::string end_of_line = "\r\n";
+	EndOfLine end_of_line = EndOfLine::CRLF;
 #endif
+	bool detect_end_of_line = false;
 
 	bool insert_final_newline = true;
 

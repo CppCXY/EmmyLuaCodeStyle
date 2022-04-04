@@ -16,11 +16,14 @@ public:
 	virtual void PrintBlank(int blank);
 
 	virtual std::string GetText();
-
 	void SetReadySize(std::size_t size);
 protected:
+	static void InnerPrintEndOfLine(std::string& buffer, EndOfLine endOfLine);
+
 	void PrintIndent(std::size_t indent, IndentStyle style);
 	void InnerPrintText(std::string_view text, TextRange range);
-	std::string _buffer;
-};
+	void PrintEndOfLine();
 
+	std::string _buffer;
+	std::shared_ptr<LuaFile> _luaFile;
+};

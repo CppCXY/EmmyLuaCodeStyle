@@ -135,7 +135,7 @@ void RangeFormatContext::PrintLine(int line)
 	{
 		for (int i = 0; i < line; i++)
 		{
-			_buffer.append(_options.end_of_line);
+			PrintEndOfLine();
 		}
 	}
 }
@@ -150,7 +150,28 @@ std::string RangeFormatContext::GetText()
 
 		if (ch != '\n' && ch != '\r')
 		{
-			formattedText = formattedText.substr(0, i + 1).append(_options.end_of_line);
+			bool needNext = false;
+			if (i < formattedText.size() - 1)
+			{
+				if (formattedText[i + 1] == '\r')
+				{
+					needNext = true;
+				}
+				i++;
+			}
+
+			if (needNext && (i < formattedText.size() - 1))
+			{
+				if (formattedText[i + 1] == '\n')
+				{
+					i++;
+				}
+			}
+
+			if (i + 1 < formattedText.size())
+			{
+				formattedText = formattedText.substr(0, i + 1);
+			}
 			break;
 		}
 	}

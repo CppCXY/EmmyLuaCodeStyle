@@ -1,7 +1,8 @@
 #include "CodeService/FormatElement/SerializeContext.h"
 
 SerializeContext::SerializeContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options)
-	: FormatContext(parser, options)
+	: FormatContext(parser, options),
+	  _luaFile(parser->GetLuaFile())
 {
 }
 
@@ -72,8 +73,8 @@ void SerializeContext::PrintLine(int line)
 	}
 	for (int i = 0; i < line; i++)
 	{
-		_buffer.append(_options.end_of_line);
 		_characterCount = 0;
+		PrintEndOfLine();
 	}
 }
 
@@ -146,7 +147,7 @@ void SerializeContext::InnerPrintText(std::string_view text, TextRange range)
 			{
 				_buffer.append(text.substr(lastStartIndex, i - lastStartIndex));
 			}
-			_buffer.append(_options.end_of_line);
+			PrintEndOfLine();
 			lastStartIndex = i + 1;
 			if (ch == '\r' && lastStartIndex < text.size() && text[lastStartIndex] == '\n')
 			{
@@ -161,4 +162,55 @@ void SerializeContext::InnerPrintText(std::string_view text, TextRange range)
 		_buffer.append(text.substr(lastStartIndex, text.size() - lastStartIndex));
 	}
 	_characterCount = GetColumn(range.EndOffset);
+}
+
+void SerializeContext::PrintEndOfLine()
+{
+	if (_options.detect_end_of_line)
+	{
+		auto endOfLine = _luaFile->GetEndOfLine();
+		switch (endOfLine)
+		{
+		case EndOfLine::CRLF:
+		case EndOfLine::LF:
+		case EndOfLine::CR:
+			{
+				InnerPrintEndOfLine(_buffer, endOfLine);
+				return;
+			}
+		default:
+			{
+				break;
+			}
+		}
+	}
+
+	InnerPrintEndOfLine(_buffer, _options.end_of_line);
+}
+
+void SerializeContext::InnerPrintEndOfLine(std::string& buffer, EndOfLine endOfLine)
+{
+	switch (endOfLine)
+	{
+	case EndOfLine::LF:
+		{
+			buffer.push_back('\n');
+			break;;
+		}
+	case EndOfLine::CRLF:
+		{
+			buffer.push_back('\r');
+			buffer.push_back('\n');
+			break;
+		}
+	case EndOfLine::CR:
+		{
+			buffer.push_back('\r');
+			break;
+		}
+	default:
+		{
+			break;
+		}
+	}
 }
