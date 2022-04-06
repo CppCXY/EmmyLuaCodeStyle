@@ -28,11 +28,11 @@ jobs:
         sudo apt-get install -y gcc-11 g++-11
         echo "CC=gcc-11" >> $GITHUB_ENV
         echo "CXX=g++-11" >> $GITHUB_ENV
-    - name: Build
+    - name: Build-Release
       run: | 
             mkdir build
             cd build
-            cmake ..
+            cmake .. -DCMAKE_USER_MAKE_RULES_OVERRIDE=../cmake/flags_override.cmake
             cmake --build . --config Release
             ctest -V -C Release
             cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
