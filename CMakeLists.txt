@@ -9,11 +9,19 @@ option(BuildCodeFormat "Build CodeFormat" ON)
 option(BuildCodeFormatServer "Build CodeFormatServer" ON)
 option(EnableTest "Test project" ON)
 
+
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_definitions(-DMSVC)
-else()
-	set(CMAKE_C_FLAGS_RELEASE "-O2")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+elseif(APPLE)
+	include(CheckCCompilerFlag)
+
+	set(CMAKE_REQUIRED_LINK_OPTIONS "-arch;x86_64")
+	check_c_compiler_flag("-arch x86_64" x86_64Supported)
+	message("x86_64Supported=${x86_64Supported}")
+
+	set(CMAKE_REQUIRED_LINK_OPTIONS "-arch;arm64")
+	check_c_compiler_flag("-arch arm64" arm64Supported)
+	message("arm64Supported=${arm64Supported}")
 endif ()
 
 add_subdirectory(LuaParser)
