@@ -1,7 +1,6 @@
 ﻿#include "LuaParser/LuaParser.h"
 #include <fstream>
 #include <sstream>
-#include <filesystem>
 #include "LuaDefine.h"
 #include "LuaParser/LuaTokenTypeDetail.h"
 #include "LuaParser/LuaOperatorType.h"
@@ -9,7 +8,10 @@
 #include "LuaParser/LuaParseException.h"
 #include "LuaParser/LuaFile.h"
 
+#ifndef NOT_SUPPORT_FILE_SYSTEM
+#include <filesystem>
 using namespace std::filesystem;
+#endif
 
 std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 {
@@ -105,7 +107,7 @@ bool LuaParser::IsEmptyLine(int line)
 
 void LuaParser::SetFilename(std::string_view filename)
 {
-#ifdef NOT_SURPPORT_FILE_SYSTEM
+#ifdef NOT_SUPPORT_FILE_SYSTEM
 	_file->SetFilename(filename);
 #else
 	std::filesystem::path path(filename);

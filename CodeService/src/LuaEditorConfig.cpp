@@ -3,7 +3,9 @@
 #include <fstream>
 #include <vector>
 #include <regex>
+#ifndef NOT_SUPPORT_FILE_SYSTEM
 #include <filesystem>
+#endif
 #include "Util/StringUtil.h"
 #include "CodeService/FormatElement/KeepElement.h"
 #include "CodeService/FormatElement/MinLineElement.h"
@@ -112,7 +114,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 				}
 			}
 		}
-#ifndef NOT_SURPPORT_FILE_SYSTEM
+#ifndef NOT_SUPPORT_FILE_SYSTEM
 		// [lib/**.lua]
 		else if (StringUtil::EndWith(sectionPattern, "**.lua"))
 		{

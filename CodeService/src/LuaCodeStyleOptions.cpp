@@ -1,5 +1,4 @@
 #include "CodeService/LuaCodeStyleOptions.h"
-#include <filesystem>
 #include "CodeService/FormatElement/MinLineElement.h"
 #include "CodeService/FormatElement/KeepLineElement.h"
 #include "CodeService/NameStyle/NameStyleRuleMatcher.h"
