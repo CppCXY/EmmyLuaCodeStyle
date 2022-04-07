@@ -29,6 +29,7 @@ jobs:
         echo "CC=gcc-11" >> $GITHUB_ENV
         echo "CXX=g++-11" >> $GITHUB_ENV
     - name: Build-Release
+      shell: bash
       run: | 
         mkdir build
         cd build
