@@ -54,11 +54,14 @@ void MinLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, Form
 	}
 
 	const int lastElementLine = ctx.GetLine(lastOffset);
-	const int nextElementLine = nextOffset == -1 ? -1 : ctx.GetLine(nextOffset);
+	const int nextElementLine = ctx.GetLine(nextOffset);
 
 	if (_line > (nextElementLine - lastElementLine - 1))
 	{
-		ctx.PushDiagnosis(format(LText("here need at least {} line"), _line), TextRange(lastOffset, nextOffset));
+		auto character = ctx.GetColumn(nextOffset);
+		ctx.PushDiagnosis(format(LText("here need at least {} empty line"), _line),
+		                  LuaDiagnosisPosition(nextElementLine, character),
+		                  LuaDiagnosisPosition(nextElementLine + 1, 0));
 	}
 	ctx.SetCharacterCount(0);
 }

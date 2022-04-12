@@ -56,8 +56,11 @@ void KeepLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 
 		if (_line != (nextElementLine - lastElementLine - 1))
 		{
-			ctx.PushDiagnosis(format(LText("here need keep {} line"), _line),
-			                  TextRange(lastElementOffset, nextElementOffset));
+			auto character = ctx.GetColumn(nextElementOffset);
+
+			ctx.PushDiagnosis(format(LText("here need keep {} empty line"), _line),
+			                  LuaDiagnosisPosition(nextElementLine, character),
+			                  LuaDiagnosisPosition(nextElementLine + 1, 0));
 		}
 	}
 }

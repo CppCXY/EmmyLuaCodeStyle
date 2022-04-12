@@ -240,6 +240,16 @@ public:
 
 class ConfigSource;
 
+class VscodeSettings : public Serializable
+{
+public:
+	bool lintCodeStyle = true;
+	bool lintModule = true;
+	bool autoImport = true;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
 class InitializationOptions : public Serializable
 {
 public:
@@ -248,6 +258,7 @@ public:
 	std::vector<ConfigSource> moduleConfigFiles;
 	std::string localeRoot;
 	std::string extensionChars;
+	VscodeSettings vscodeConfig;
 	void Deserialize(nlohmann::json json) override;
 };
 

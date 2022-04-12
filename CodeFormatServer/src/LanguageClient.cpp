@@ -153,11 +153,15 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 		return;
 	}
 
-	auto formatDiagnostic = GetService<CodeFormatService>()->Diagnose(filename, parser, options);
-	auto moduleDiagnosis = GetService<ModuleService>()->Diagnose(filename, parser);
+	if (_vscodeSettings.lintCodeStyle) {
+		auto formatDiagnostic = GetService<CodeFormatService>()->Diagnose(filename, parser, options);
+		std::copy(formatDiagnostic.begin(), formatDiagnostic.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
+	}
 
-	std::copy(formatDiagnostic.begin(), formatDiagnostic.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
-	std::copy(moduleDiagnosis.begin(), moduleDiagnosis.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
+	if (_vscodeSettings.lintModule) {
+		auto moduleDiagnosis = GetService<ModuleService>()->Diagnose(filename, parser);
+		std::copy(moduleDiagnosis.begin(), moduleDiagnosis.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
+	}
 
 	SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
 }
@@ -309,6 +313,16 @@ void LanguageClient::SetRoot(std::string_view root)
 asio::io_context& LanguageClient::GetIOContext()
 {
 	return _ioc;
+}
+
+vscode::VscodeSettings LanguageClient::GetSettings() const
+{
+	return _vscodeSettings;
+}
+
+void LanguageClient::SetVscodeSettings(vscode::VscodeSettings& settings)
+{
+	_vscodeSettings = settings;
 }
 
 uint64_t LanguageClient::GetRequestId()

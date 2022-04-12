@@ -1,4 +1,16 @@
 # Change Log
+
+## 0.10.0
+
+`NEW` vscode插件端实现配置EmmyluaCodeStyle开关`模块诊断`,`代码风格诊断`, `模块补全`.
+
+`NEW` 行距诊断换一种表现方式
+
+`NEW` 支持通过设置`align_chained_expression_statement=true`使链式表达式对齐到第一个'.'或者':' 
+
+`NEW` 支持通过设置`if_branch_comments_after_block_no_indent`允许else或者elseif之上的注释对齐到关键词上
+
+
 ## 0.9.7
 
 `IMPL` [#31](https://github.com/CppCXY/EmmyLuaCodeStyle/issues/31)

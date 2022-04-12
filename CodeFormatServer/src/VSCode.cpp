@@ -201,6 +201,11 @@ void vscode::InitializationOptions::Deserialize(nlohmann::json json)
 	{
 		extensionChars = json["extensionChars"];
 	}
+
+	if(json["vscodeConfig"].is_object())
+	{
+		vscodeConfig.Deserialize(json["vscodeConfig"]);
+	}
 }
 
 void vscode::InitializeParams::Deserialize(nlohmann::json json)
@@ -305,6 +310,13 @@ void vscode::ConfigSource::Deserialize(nlohmann::json json)
 	uri = json["uri"];
 	path = json["path"];
 	workspace = json["workspace"];
+}
+
+void vscode::VscodeSettings::Deserialize(nlohmann::json json)
+{
+	lintCodeStyle = json["lint.codeStyle"];
+	lintModule = json["lint.moduleCheck"];
+	autoImport = json["autoImport"];
 }
 
 void vscode::ConfigUpdateParams::Deserialize(nlohmann::json json)

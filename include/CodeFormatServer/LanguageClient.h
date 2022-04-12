@@ -69,6 +69,9 @@ public:
 	template <ServiceClass Service>
 	std::shared_ptr<Service> GetService();
 
+	vscode::VscodeSettings GetSettings() const;
+
+	void SetVscodeSettings(vscode::VscodeSettings& settings);
 private:
 	uint64_t GetRequestId();
 
@@ -91,6 +94,8 @@ private:
 	asio::io_context _ioc;
 
 	std::array<std::shared_ptr<Service>, static_cast<std::size_t>(ServiceType::ServiceCount)> _services;
+
+	vscode::VscodeSettings _vscodeSettings;
 };
 
 template <ServiceClass Service>

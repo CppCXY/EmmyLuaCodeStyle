@@ -73,6 +73,8 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 	result->capabilities.textDocumentSync.change = vscode::TextDocumentSyncKind::Incremental;
 	result->capabilities.textDocumentSync.openClose = true;
 
+	LanguageClient::GetInstance().SetVscodeSettings(param->initializationOptions.vscodeConfig);
+
 	result->capabilities.codeActionProvider = true;
 	result->capabilities.executeCommandProvider.commands = {
 		"emmylua.reformat.me",
@@ -341,6 +343,11 @@ std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::sha
 	auto filePath = url::UrlToFilePath(uri);
 	auto codeActionResult = std::make_shared<vscode::CodeActionResult>();
 
+	if(!LanguageClient::GetInstance().GetSettings().autoImport)
+	{
+		return codeActionResult;
+	}
+
 	if (LanguageClient::GetInstance().GetService<CodeFormatService>()->IsDiagnosticRange(filePath, range))
 	{
 		auto& action = codeActionResult->actions.emplace_back();
@@ -493,13 +500,19 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChangeWatchedFiles(
 
 std::shared_ptr<vscode::CompletionList> LanguageService::OnCompletion(std::shared_ptr<vscode::CompletionParams> param)
 {
+	auto list = std::make_shared<vscode::CompletionList>();
+
+	if(!LanguageClient::GetInstance().GetSettings().autoImport)
+	{
+		return list;
+	}
+
 	auto uri = param->textDocument.uri;
 
 	auto parser = LanguageClient::GetInstance().GetFileParser(uri);
 
 	auto options = LanguageClient::GetInstance().GetOptions(uri);
 
-	auto list = std::make_shared<vscode::CompletionList>();
 	list->isIncomplete = true;
 	list->items = LanguageClient::GetInstance().GetService<CompletionService>()->GetCompletions(
 		param->textDocument.uri, param->position, parser, options);
