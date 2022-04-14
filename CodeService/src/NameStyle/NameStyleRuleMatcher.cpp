@@ -228,7 +228,6 @@ bool NameStyleRuleMatcher::SnakeCase(std::shared_ptr<CheckElement> checkElement)
 bool NameStyleRuleMatcher::UpperSnakeCase(std::shared_ptr<CheckElement> checkElement)
 {
 	auto source = checkElement->Node->GetText();
-	bool lowerCase = false;
 	for (std::size_t index = 0; index != source.size(); index++)
 	{
 		char ch = source[index];

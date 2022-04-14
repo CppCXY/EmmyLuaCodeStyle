@@ -151,7 +151,8 @@ std::string RangeFormatContext::GetText()
 		if (ch != '\n' && ch != '\r')
 		{
 			bool needNext = false;
-			if (i < formattedText.size() - 1)
+			int size = static_cast<int>(formattedText.size());
+			if (i < size - 1)
 			{
 				if (formattedText[i + 1] == '\r')
 				{
@@ -160,7 +161,7 @@ std::string RangeFormatContext::GetText()
 				i++;
 			}
 
-			if (needNext && (i < formattedText.size() - 1))
+			if (needNext && (i < size - 1))
 			{
 				if (formattedText[i + 1] == '\n')
 				{
@@ -168,7 +169,7 @@ std::string RangeFormatContext::GetText()
 				}
 			}
 
-			if (i + 1 < formattedText.size())
+			if (i < (formattedText.size() - 1))
 			{
 				formattedText = formattedText.substr(0, i + 1);
 			}

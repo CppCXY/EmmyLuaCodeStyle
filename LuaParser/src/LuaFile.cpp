@@ -66,14 +66,21 @@ int LuaFile::GetColumn(int offset)
 
 int LuaFile::GetOffsetFromPosition(int line, int character)
 {
-	if (line >= _lineOffsetVec.size() || line < 0)
+	if (line < 0)
+	{
+		return _source.size() + 1;
+	}
+
+	std::size_t sizeLine = line;
+
+	if (sizeLine >= _lineOffsetVec.size())
 	{
 		return _source.size() + 1;
 	}
 
 	int lineStartOffset = _lineOffsetVec[line];
 	std::size_t nextOffset = 0;
-	if (static_cast<std::size_t>(line) + 1 >= _lineOffsetVec.size())
+	if (sizeLine + 1 >= _lineOffsetVec.size())
 	{
 		nextOffset = _source.size();
 	}
@@ -93,10 +100,11 @@ int LuaFile::GetTotalLine()
 
 bool LuaFile::IsEmptyLine(int line)
 {
-	if (line < 0 || line >= _lineOffsetVec.size())
+	if (line < 0 || line >= static_cast<int>(_lineOffsetVec.size()))
 	{
 		return true;
 	}
+
 	int lineStartOffset = _lineOffsetVec[line];
 	int nextLineStartOffset = 0;
 
@@ -168,7 +176,7 @@ std::string_view LuaFile::GetFilename() const
 void LuaFile::UpdateLineInfo(int startLine)
 {
 	int totalLine = _lineOffsetVec.size() - 1;
-	int startOffset = 0;
+	std::size_t startOffset = 0;
 	if (totalLine < startLine)
 	{
 		startLine = 0;
