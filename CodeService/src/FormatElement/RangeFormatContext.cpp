@@ -169,7 +169,7 @@ std::string RangeFormatContext::GetText()
 				}
 			}
 
-			if (i < (formattedText.size() - 1))
+			if (i < static_cast<int>(formattedText.size() - 1))
 			{
 				formattedText = formattedText.substr(0, i + 1);
 			}

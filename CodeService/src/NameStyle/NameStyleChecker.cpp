@@ -234,8 +234,8 @@ void NameStyleChecker::VisitFunctionStatement(const std::shared_ptr<LuaAstNode>&
 				}
 			}
 
-			if (lastElement && lastElement->GetType() == LuaAstNodeType::Identify
-				|| lastElement->GetType() == LuaAstNodeType::PrimaryExpression)
+			if (lastElement && (lastElement->GetType() == LuaAstNodeType::Identify)
+				|| (lastElement->GetType() == LuaAstNodeType::PrimaryExpression))
 			{
 				_nameStyleCheckVector.push_back(
 					std::make_shared<CheckElement>(NameDefineType::FunctionDefineName, lastElement));
