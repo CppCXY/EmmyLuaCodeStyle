@@ -1,7 +1,7 @@
 local a = 123
 local c, d = 123
-local c<const> = 123
-local d<close> = {}
+local c <const> = 123
+local d <close> = {}
 ccc = 123
 ddd = a + b + c + d
 eee = b, 1321, 353

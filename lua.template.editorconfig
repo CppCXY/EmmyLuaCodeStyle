@@ -29,7 +29,7 @@ keep_one_space_between_table_and_bracket = true
 # if indent_style is tab, this option is invalid
 align_table_field_to_first_field = false
 # if true, ormat like this "local t <const> = 1"
-keep_one_space_between_namedef_and_attribute = false
+keep_one_space_between_namedef_and_attribute = true
 # continous line distance
 max_continuous_line_distance = 1
 # see document for detail
@@ -50,7 +50,7 @@ table_append_expression_no_space = false
 if_condition_align_with_each_other = false
 
 long_chain_expression_allow_one_space_after_colon = false
-# optional crlf/lf/auto, if it is 'auto', in windows it is crlf other platforms are lf
+# optional crlf/lf/cr/auto, if it is 'auto', in windows it is crlf other platforms are lf
 end_of_line = auto
 #
 detect_end_of_line = false

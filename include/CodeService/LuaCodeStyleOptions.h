@@ -69,7 +69,7 @@ public:
 	/*
 	 * 设定namedef 和 他的attribute之间是否间距一个空格
 	 */
-	bool keep_one_space_between_namedef_and_attribute = false;
+	bool keep_one_space_between_namedef_and_attribute = true;
 
 	/*
 	 * 标签无缩进
