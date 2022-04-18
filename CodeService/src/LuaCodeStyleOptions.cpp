@@ -28,6 +28,7 @@ LuaCodeStyleOptions::LuaCodeStyleOptions()
 	keep_line_after_for_statement(std::make_shared<MinLineElement>(0)),
 	keep_line_after_local_or_assign_statement(std::make_shared<KeepLineElement>()),
 	keep_line_after_function_define_statement(std::make_shared<KeepLineElement>(1)),
+	keep_line_after_expression_statement(std::make_shared<KeepLineElement>()),
 
 	local_name_define_style(std::make_shared<NameStyleRuleMatcher>("Local")),
 	function_param_name_style(std::make_shared<NameStyleRuleMatcher>("Parameters")),

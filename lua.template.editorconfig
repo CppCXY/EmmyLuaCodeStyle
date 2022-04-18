@@ -56,10 +56,11 @@ end_of_line = auto
 detect_end_of_line = false
 
 # [line layout]
-# The following configuration supports three expressions
+# The following configuration supports four expressions
 # minLine:${n}   
 # keepLine   
-# KeepLine:${n}
+# keepLine:${n}
+# maxLine:${n}
 
 keep_line_after_if_statement = minLine:0
 keep_line_after_do_statement = minLine:0
@@ -68,6 +69,7 @@ keep_line_after_repeat_statement = minLine:0
 keep_line_after_for_statement = minLine:0
 keep_line_after_local_or_assign_statement = keepLine
 keep_line_after_function_define_statement = keepLine:1
+keep_line_after_expression_statement = keepLine
 
 # [diagnostic]
 # the following is code diagnostic options

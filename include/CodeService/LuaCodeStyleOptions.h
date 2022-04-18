@@ -123,6 +123,7 @@ public:
 	std::shared_ptr<FormatElement> keep_line_after_for_statement;
 	std::shared_ptr<FormatElement> keep_line_after_local_or_assign_statement;
 	std::shared_ptr<FormatElement> keep_line_after_function_define_statement;
+	std::shared_ptr<FormatElement> keep_line_after_expression_statement;
 
 
 	// 以下是代码诊断选项，诊断选项不一定会作为格式化内容

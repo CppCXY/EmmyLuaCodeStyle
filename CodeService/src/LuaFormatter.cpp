@@ -364,7 +364,15 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 					}
 				}
 				indentEnv->AddChild(statEnv);
-				indentEnv->Add<KeepLineElement>();
+				if(statement->GetType() == LuaAstNodeType::ExpressionStatement)
+				{
+					indentEnv->AddChild(_options.keep_line_after_expression_statement);
+				}
+				else
+				{
+					indentEnv->Add<KeepLineElement>();
+				}
+				
 				break;
 			}
 		case LuaAstNodeType::LocalFunctionStatement:

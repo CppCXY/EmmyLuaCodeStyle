@@ -527,6 +527,7 @@ keep_line_after_repeat_statement = minLine:1
 keep_line_after_for_statement = minLine:1
 keep_line_after_local_or_assign_statement = keepLine
 keep_line_after_function_define_statement = keepLine:1
+keep_line_after_expression_statement = keepLine
 ```
 
 All options support three value expressions:
@@ -539,3 +540,6 @@ All options support three value expressions:
 - keepLine:${n}
 
     Means to maintain n line spacing with the next line 
+- maxLine:${n}
+
+	Indicates and the next line at most n lines

@@ -9,6 +9,7 @@
 #include "Util/StringUtil.h"
 #include "CodeService/FormatElement/KeepElement.h"
 #include "CodeService/FormatElement/MinLineElement.h"
+#include "CodeService/FormatElement/MaxLineElement.h"
 #include "CodeService/NameStyle/NameStyleRuleMatcher.h"
 
 bool isNumber(std::string_view source)
@@ -99,7 +100,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 			patternKey.append("#").append(sectionPattern);
 			luaSections.push_back(section);
 		}
-		// [{test.lua,lib.lua}]
+			// [{test.lua,lib.lua}]
 		else if (StringUtil::StartWith(sectionPattern, "{") && StringUtil::EndWith(sectionPattern, "}"))
 		{
 			auto fileListText = sectionPattern.substr(1, sectionPattern.size() - 2);
@@ -115,7 +116,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 			}
 		}
 #ifndef NOT_SUPPORT_FILE_SYSTEM
-		// [lib/**.lua]
+			// [lib/**.lua]
 		else if (StringUtil::EndWith(sectionPattern, "**.lua"))
 		{
 			std::string prefix = sectionPattern.substr(0, sectionPattern.size() - 6);
@@ -131,7 +132,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 				luaSections.push_back(section);
 			}
 		}
-		//[aaa/bbb.lua]
+			//[aaa/bbb.lua]
 		else
 		{
 			std::filesystem::path workspace(_workspace);
@@ -202,16 +203,17 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 
 	if (configMap.count("quote_style"))
 	{
-		if (configMap.at("quote_style") == "single") {
+		if (configMap.at("quote_style") == "single")
+		{
 			options->quote_style = QuoteStyle::Single;
 		}
-		else if(configMap.at("quote_style") == "double")
+		else if (configMap.at("quote_style") == "double")
 		{
 			options->quote_style = QuoteStyle::Double;
 		}
 	}
 
-	if(configMap.count("call_arg_parentheses"))
+	if (configMap.count("call_arg_parentheses"))
 	{
 		if (configMap.at("call_arg_parentheses") == "keep")
 		{
@@ -258,7 +260,7 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		options->align_call_args = configMap.at("align_call_args") == "true";
 	}
 
-	if(configMap.count("align_chained_expression_statement"))
+	if (configMap.count("align_chained_expression_statement"))
 	{
 		options->align_chained_expression_statement = configMap.at("align_chained_expression_statement") == "true";
 	}
@@ -326,13 +328,13 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("if_condition_align_with_each_other") == "true";
 	}
 
-	if(configMap.count("if_branch_comments_after_block_no_indent"))
+	if (configMap.count("if_branch_comments_after_block_no_indent"))
 	{
 		options->if_branch_comments_after_block_no_indent =
 			configMap.at("if_branch_comments_after_block_no_indent") == "true";
 	}
 
-	if(configMap.count("long_chain_expression_allow_one_space_after_colon"))
+	if (configMap.count("long_chain_expression_allow_one_space_after_colon"))
 	{
 		options->long_chain_expression_allow_one_space_after_colon =
 			configMap.at("long_chain_expression_allow_one_space_after_colon") == "true";
@@ -360,7 +362,7 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		}
 	}
 
-	if(configMap.count("detect_end_of_line"))
+	if (configMap.count("detect_end_of_line"))
 	{
 		options->detect_end_of_line = configMap.at("detect_end_of_line") == "true";
 	}
@@ -383,10 +385,12 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		{"keep_line_after_repeat_statement", options->keep_line_after_repeat_statement},
 		{"keep_line_after_for_statement", options->keep_line_after_for_statement},
 		{"keep_line_after_local_or_assign_statement", options->keep_line_after_local_or_assign_statement},
-		{"keep_line_after_function_define_statement", options->keep_line_after_function_define_statement}
+		{"keep_line_after_function_define_statement", options->keep_line_after_function_define_statement},
+		{"keep_line_after_expression_statement", options->keep_line_after_expression_statement},
 	};
 	std::regex minLineRegex = std::regex(R"(minLine:\s*(\d+))");
 	std::regex keepLineRegex = std::regex(R"(keepLine:\s*(\d+))");
+	std::regex maxLineRegex = std::regex(R"(maxLine:\s*(\d+))");
 	for (auto& keepLineOption : fieldList)
 	{
 		if (configMap.count(keepLineOption.first))
@@ -408,6 +412,11 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			if (std::regex_search(value, m, keepLineRegex))
 			{
 				keepLineOption.second = std::make_shared<KeepLineElement>(std::stoi(m.str(1)));
+			}
+
+			if (std::regex_search(value, m, maxLineRegex))
+			{
+				keepLineOption.second = std::make_shared<MaxLineElement>(std::stoi(m.str(1)));
 			}
 		}
 	}

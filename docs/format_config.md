@@ -525,6 +525,7 @@ keep_line_after_repeat_statement = minLine:0
 keep_line_after_for_statement = minLine:0
 keep_line_after_local_or_assign_statement = keepLine
 keep_line_after_function_define_statement = keepLine:0
+keep_line_after_expression_statement = keepLine
 ```
 
 所有选项支持三种值表达：
@@ -537,3 +538,6 @@ keep_line_after_function_define_statement = keepLine:0
 - keepLine:${n}
 
     表示和下一行保持n行间距
+- maxLine:${n}
+	
+	表示和下一行最多n行行距

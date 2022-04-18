@@ -21,6 +21,7 @@ enum class FormatElementType
 	ControlStart,
 	KeepLineElement,
 	MinLineElement,
+	MaxLineElement,
 	KeepBlankElement,
 	LineElement,
 	AlignmentElement,

@@ -9,9 +9,13 @@
 该项目主要追求的是合理的格式化，多样的代码风格诊断
 
 该项目除了提供语言服务实例，也提供独立的命令行工具CodeFormat，他能用于批量的代码格式化和代码风格检查。
+## RoadMap
+* new linter
+* code quality check
+* plugin
 
 ## 文档
-
+* [使用方式](docs/usage.md)
 * [格式化行为介绍](docs/format_action.md)
 * [如何配置格式化](docs/format_config.md)
 * [代码诊断配置](docs/diagnosis_config.md)
