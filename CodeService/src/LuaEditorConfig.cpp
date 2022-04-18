@@ -367,10 +367,14 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		options->detect_end_of_line = configMap.at("detect_end_of_line") == "true";
 	}
 
-	if (configMap.count("max_line_length")
-		&& isNumber(configMap.at("max_line_length")))
+	if (configMap.count("max_line_length"))
 	{
-		options->max_line_length = std::stoi(configMap.at("max_line_length"));
+		if (isNumber(configMap.at("max_line_length"))) {
+			options->max_line_length = std::stoi(configMap.at("max_line_length"));
+		}
+		else if(configMap.at("max_line_length") == "unset"){
+			options->max_line_length = std::numeric_limits<int>::max();
+		}
 	}
 
 	if (configMap.count("enable_check_codestyle"))

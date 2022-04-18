@@ -74,7 +74,7 @@ keep_line_after_expression_statement = keepLine
 # [diagnostic]
 # the following is code diagnostic options
 enable_check_codestyle = true
-# this mean utf8 length
+# this mean utf8 length , if this is 'unset' then the line width is no longer checked
 max_line_length = 120
 # this will check text end with new line(format always end with new line)
 insert_final_newline = true
