@@ -9,9 +9,12 @@ This project is an example of Lua code analysis\formatting\code diagnosis algori
 The main pursuit of this project is reasonable formatting and diagnosis of various code styles
 
 In addition to providing language service examples, the project also provides an independent command line tool CodeFormat, which can be used for batch code formatting and code style checking. 
-
+## RoadMap
+* new linter[0%]
+* code quality check[0%]
+* plugin[0%]
 ## Document
-
+* [Usage](docs/usage_EN.md)
 * [Introduction to formatting behavior](docs/format_action_EN.md)
 * [How to configure formatting](docs/format_config_EN.md)
 * [Code diagnosis configuration](docs/diagnosis_config_EN.md)

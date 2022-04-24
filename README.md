@@ -10,9 +10,9 @@
 
 该项目除了提供语言服务实例，也提供独立的命令行工具CodeFormat，他能用于批量的代码格式化和代码风格检查。
 ## RoadMap
-* new linter
-* code quality check
-* plugin
+* new linter[进度...新建文件夹]
+* code quality check[%0]
+* plugin[0%]
 
 ## 文档
 * [使用方式](docs/usage.md)
