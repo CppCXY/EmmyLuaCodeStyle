@@ -78,6 +78,11 @@ void FormatElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, Forma
 	}
 }
 
+bool FormatElement::Is(FormatElementType type)
+{
+	return type == GetType();
+}
+
 void FormatElement::Format(SerializeContext& ctx)
 {
 	// workaround

@@ -17,6 +17,7 @@ enum class FormatElementType
 	PlaceholderElement,
 	AlignIfLayoutElement,
 	StringLiteralElement,
+	CallArgsListLayoutElement,
 
 	ControlStart,
 	KeepLineElement,

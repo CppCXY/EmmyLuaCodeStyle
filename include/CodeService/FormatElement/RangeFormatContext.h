@@ -12,6 +12,8 @@ public:
 
 	void Print(char ch, int Offset) override;
 
+	void PrintIndentOnly(int line) override;
+
 	void PrintBlank(int blank) override;
 
 	void PrintLine(int line) override;

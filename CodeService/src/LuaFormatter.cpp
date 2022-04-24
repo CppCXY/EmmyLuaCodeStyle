@@ -21,6 +21,7 @@
 #include "CodeService/FormatElement/AlignIfLayoutElement.h"
 #include "CodeService/FormatElement/MaxSpaceElement.h"
 #include "CodeService/FormatElement/StringLiteralElement.h"
+#include "CodeService/FormatElement/CallArgsListLayoutElement.h"
 #include "Util/StringUtil.h"
 #include "CodeService/AstUtil.h"
 
@@ -364,7 +365,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 					}
 				}
 				indentEnv->AddChild(statEnv);
-				if(statement->GetType() == LuaAstNodeType::ExpressionStatement)
+				if (statement->GetType() == LuaAstNodeType::ExpressionStatement)
 				{
 					indentEnv->AddChild(_options.keep_line_after_expression_statement);
 				}
@@ -372,7 +373,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				{
 					indentEnv->Add<KeepLineElement>();
 				}
-				
+
 				break;
 			}
 		case LuaAstNodeType::LocalFunctionStatement:
@@ -1238,7 +1239,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 				}
 				else
 				{
-					layout = std::make_shared<IndentOnLineBreakElement>();
+					layout = std::make_shared<CallArgsListLayoutElement>();
 				}
 
 				env->AddChild(FormatExpressionList(child, layout));
@@ -1248,6 +1249,15 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 		case LuaAstNodeType::GeneralOperator:
 			{
 				env->Add<TextElement>(child);
+				env->Add<KeepElement>(0);
+				break;
+			}
+		case LuaAstNodeType::StringLiteralExpression:
+		case LuaAstNodeType::TableExpression:
+			{
+				auto layout = std::make_shared<CallArgsListLayoutElement>();
+				layout->AddChild(FormatNode(child));
+				env->AddChild(layout);
 				env->Add<KeepElement>(0);
 				break;
 			}
@@ -2252,7 +2262,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 			}
 		case LuaAstNodeType::CallArgList:
 			{
-				env->AddChild(FormatNode(child));
+				env->AddChild(FormatCallArgList(child));
 				break;
 			}
 		default:

@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include "FormatElement.h"
 
 class IndentOnLineBreakElement : public FormatElement

@@ -37,7 +37,7 @@ void LongExpressionLayoutElement::SerializeSubExpression(SerializeContext& ctx, 
 	{
 		auto child = *it;
 
-		if (child->GetType() == FormatElementType::SubExpressionElement)
+		if (child->Is(FormatElementType::SubExpressionElement))
 		{
 			SerializeSubExpression(ctx, *child);
 		}
@@ -45,7 +45,7 @@ void LongExpressionLayoutElement::SerializeSubExpression(SerializeContext& ctx, 
 		{
 			child->Serialize(ctx, it, parent);
 		}
-		if (child->GetType() == FormatElementType::KeepElement)
+		if (child->Is(FormatElementType::KeepElement))
 		{
 			if (ctx.GetCharacterCount() == 0 && !_hasContinuation)
 			{

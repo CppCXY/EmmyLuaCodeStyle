@@ -113,6 +113,40 @@ void RangeFormatContext::Print(char ch, int offset)
 	}
 }
 
+void RangeFormatContext::PrintIndentOnly(int line)
+{
+	if (line > _validRange.EndLine || line < _validRange.StartLine)
+	{
+		_inValidRange = false;
+		return;
+	}
+
+	if (!_indentStack.empty())
+	{
+		auto& indentState = _indentStack.back();
+		if (indentState.Style == IndentStyle::Space)
+		{
+			if (_characterCount < indentState.SpaceIndent)
+			{
+				PrintIndent(indentState.SpaceIndent - _characterCount, indentState.Style);
+			}
+		}
+		else
+		{
+			if (_characterCount == 0)
+			{
+				PrintIndent(indentState.TabIndent, indentState.Style);
+				PrintIndent(indentState.SpaceIndent, IndentStyle::Space);
+			}
+			else if (_characterCount >= indentState.TabIndent && (indentState.SpaceIndent + indentState.TabIndent >
+				_characterCount))
+			{
+				PrintIndent(indentState.SpaceIndent - (_characterCount - indentState.TabIndent), IndentStyle::Space);
+			}
+		}
+	}
+}
+
 void RangeFormatContext::PrintBlank(int blank)
 {
 	for (int i = 0; i < blank; i++)

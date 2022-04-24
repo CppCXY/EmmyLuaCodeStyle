@@ -23,6 +23,8 @@ public:
 
 	virtual void Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent);
 
+	bool Is(FormatElementType type);
+
 	void Format(SerializeContext& ctx);
 
 	void DiagnosisCodeStyle(DiagnosisContext& ctx);

@@ -16,6 +16,9 @@ public:
 	virtual void PrintBlank(int blank);
 
 	virtual std::string GetText();
+
+	virtual void PrintIndentOnly(int line  = -1);
+
 	void SetReadySize(std::size_t size);
 protected:
 	static void InnerPrintEndOfLine(std::string& buffer, EndOfLine endOfLine);

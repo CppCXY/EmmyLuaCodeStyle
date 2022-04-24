@@ -59,6 +59,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/PlaceholderElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/SubExpressionElement.cpp
 	${CodeService_SOURCE_DIR}/src/FormatElement/MaxLineElement.cpp
+	${CodeService_SOURCE_DIR}/src/FormatElement/CallArgsListLayoutElement.cpp
 	${CodeService_SOURCE_DIR}/src/FormatElement/DiagnosisContext.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/RangeFormatContext.cpp	
 	${CodeService_SOURCE_DIR}/src/LuaCodeStyleOptions.cpp
