@@ -47,7 +47,8 @@ void LongExpressionLayoutElement::SerializeSubExpression(SerializeContext& ctx, 
 		}
 		if (child->Is(FormatElementType::KeepElement))
 		{
-			if (ctx.GetCharacterCount() == 0 && !_hasContinuation)
+			auto keepElement = std::dynamic_pointer_cast<KeepElement>(child);
+			if (keepElement->AllowContinueIndent() && ctx.GetCharacterCount() == 0 && !_hasContinuation)
 			{
 				IndentSubExpression(ctx);
 			}

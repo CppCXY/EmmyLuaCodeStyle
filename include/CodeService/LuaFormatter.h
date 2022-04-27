@@ -4,7 +4,6 @@
 #include "LuaParser/LuaParser.h"
 #include "LuaCodeStyleOptions.h"
 #include "FormatElement/FormatElement.h"
-#include "FormatElement/PlaceholderElement.h"
 #include "LuaDiagnosisInfo.h"
 #include "LuaFormatRange.h"
 

@@ -1,9 +1,10 @@
 ﻿#include "CodeService/FormatElement/KeepElement.h"
 #include "Util/format.h"
 
-KeepElement::KeepElement(int keepBlank, bool hasLinebreak)
+KeepElement::KeepElement(int keepBlank, bool hasLinebreak, bool allowContinueIndent)
 	: _keepBlank(keepBlank),
-	  _hasLinebreak(hasLinebreak)
+	  _hasLinebreak(hasLinebreak),
+	  _allowContinueIndent(allowContinueIndent)
 {
 }
 
@@ -15,7 +16,6 @@ FormatElementType KeepElement::GetType()
 void KeepElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
                             FormatElement& parent)
 {
-
 	const int lastElementLine = GetLastValidLine(ctx, selfIt, parent);
 	const int nextElementLine = GetNextValidLine(ctx, selfIt, parent);
 
@@ -43,8 +43,7 @@ void KeepElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 void KeepElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
                             FormatElement& parent)
 {
-
-	if(selfIt == parent.GetChildren().begin())
+	if (selfIt == parent.GetChildren().begin())
 	{
 		return;
 	}

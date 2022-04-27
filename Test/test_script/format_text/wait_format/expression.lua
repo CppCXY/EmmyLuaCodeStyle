@@ -41,3 +41,17 @@ call(
 		aaaa),
 	call(aaa,bbbb,ccc)
 )
+TEST
+[[
+
+]]
+[[
+
+]]
+local t = TEST 
+[[
+
+]]
+[[
+
+]]

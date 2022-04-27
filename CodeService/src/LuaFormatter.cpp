@@ -2219,16 +2219,17 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 				{
 					if (!ast_util::WillCallArgHaveParentheses(next, _options.call_arg_parentheses))
 					{
-						env->Add<KeepElement>(1);
+						//TODO workaround
+						env->Add<KeepElement>(1, false, false);
 					}
 					else
 					{
-						env->Add<KeepElement>(0);
+						env->Add<KeepElement>(0, false, false);
 					}
 				}
 				else
 				{
-					env->Add<KeepElement>(1);
+					env->Add<KeepElement>(1, false, false);
 				}
 
 				break;
@@ -2256,7 +2257,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 					needSpace = false;
 				}
 
-				env->Add<KeepElement>(needSpace ? 1 : 0);
+				env->Add<KeepElement>(needSpace ? 1 : 0, false, !nextCallArgList);
 
 				break;
 			}

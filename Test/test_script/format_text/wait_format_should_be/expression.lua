@@ -31,7 +31,7 @@ function f()
     local c = { aaa, 13131, 2424242 }
     local ddd = call { aaaa, bbb, ccc }
     local eee = calll
-        { 12313, 35353, fff }
+    { 12313, 35353, fff }
     local fff = function() end
     dd.e().e().aaa = 1231
 end
@@ -41,3 +41,17 @@ call(
         aaaa),
     call(aaa, bbbb, ccc)
 )
+TEST
+[[
+
+]]
+[[
+
+]]
+local t = TEST
+[[
+
+]]
+[[
+
+]]
