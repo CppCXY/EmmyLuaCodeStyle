@@ -100,7 +100,7 @@ void CallArgsListLayoutElement::SerializeSubExpression(SerializeContext& ctx, st
 	auto& children = parent->GetChildren();
 	auto it = children.begin();
 
-	if (topLevelSubexpression && _hasLineBreak && IsLastArg(parent))
+	if (topLevelSubexpression && _hasLineBreak && IsLastArg(parent) && ctx.GetCharacterCount() != 0)
 	{
 		auto expression = *it;
 		if (expression->Is(FormatElementType::ExpressionElement))
@@ -155,7 +155,7 @@ void CallArgsListLayoutElement::DiagnoseSubExpression(DiagnosisContext& ctx, std
 	}
 	auto it = children.begin();
 
-	if (topLevelSubexpression && _hasLineBreak && IsLastArg(parent))
+	if (topLevelSubexpression && _hasLineBreak && IsLastArg(parent) && ctx.GetCharacterCount() != 0)
 	{
 		auto expression = *it;
 		if (expression->Is(FormatElementType::ExpressionElement))

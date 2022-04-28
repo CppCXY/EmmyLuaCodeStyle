@@ -55,3 +55,39 @@ local t = TEST
 [[
 
 ]]
+
+p
+{
+    a = 1321
+}
+{
+    afajogfj = 131
+}
+
+P2(AA, BBB, function ()
+	
+end)
+
+P3(aa .. 
+	bbb , function()
+		
+end)
+
+P4(eee 
+	.. eee + cccc, {
+	aa = 123
+})
+
+p5(hhhh
+	+ joijfoiji,
+	{
+		ok = main
+	})
+
+p6(haode
+	+ jjjjj,
+	function ()
+		
+	end)
+
+	
