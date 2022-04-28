@@ -243,6 +243,12 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		options->continuation_indent_size = std::stoi(configMap.at("continuation_indent_size"));
 	}
 
+	if(configMap.count("statement_inline_comment_space")
+		&& isNumber(configMap.at("statement_inline_comment_space")))
+	{
+		options->statement_inline_comment_space = std::stoi(configMap.at("statement_inline_comment_space"));
+	}
+
 	if (configMap.count("local_assign_continuation_align_to_first_expression"))
 	{
 		options->local_assign_continuation_align_to_first_expression =

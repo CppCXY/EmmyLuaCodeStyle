@@ -40,6 +40,7 @@ public:
 	 */
 	int continuation_indent_size = 4;
 
+	int statement_inline_comment_space = 1;
 
 	bool local_assign_continuation_align_to_first_expression = false;
 

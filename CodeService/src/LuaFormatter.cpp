@@ -331,7 +331,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				{
 					if (!last->GetChildren().empty() && last->GetChildren().back()->HasValidTextRange())
 					{
-						last->Add<KeepBlankElement>(1);
+						last->Add<KeepBlankElement>(_options.statement_inline_comment_space);
 					}
 					last->AddChild(FormatComment(statement));
 				}
@@ -359,7 +359,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 
 					if (currentLine == nextLine)
 					{
-						statEnv->Add<KeepBlankElement>(1);
+						statEnv->Add<KeepBlankElement>(_options.statement_inline_comment_space);
 						statEnv->Add<TextElement>(next);
 						++it;
 					}
@@ -1676,7 +1676,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 			auto lastStatementEnv = env->LastValidElement();
 			if (lastStatementEnv)
 			{
-				lastStatementEnv->Add<KeepBlankElement>(1);
+				lastStatementEnv->Add<KeepBlankElement>(_options.statement_inline_comment_space);
 				lastStatementEnv->AddChild(FormatNode(nextChild));
 			}
 			//else 应该不存在这种情况
