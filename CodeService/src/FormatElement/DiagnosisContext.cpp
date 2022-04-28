@@ -8,16 +8,16 @@ DiagnosisContext::DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaCodeSty
 }
 
 
-void DiagnosisContext::PushDiagnosis(std::string_view message, TextRange range)
+void DiagnosisContext::PushDiagnosis(std::string_view message, TextRange range, DiagnosisType type)
 {
 	LuaDiagnosisPosition start(GetLine(range.StartOffset), GetColumn(range.StartOffset));
 	LuaDiagnosisPosition end(GetLine(range.EndOffset), GetColumn(range.EndOffset) + 1);
-	PushDiagnosis(message, start, end);
+	PushDiagnosis(message, start, end, type);
 }
 
-void DiagnosisContext::PushDiagnosis(std::string_view message, LuaDiagnosisPosition start, LuaDiagnosisPosition end)
+void DiagnosisContext::PushDiagnosis(std::string_view message, LuaDiagnosisPosition start, LuaDiagnosisPosition end, DiagnosisType type)
 {
-	_diagnosisInfos.push_back(LuaDiagnosisInfo{std::string(message), LuaDiagnosisRange(start, end)});
+	_diagnosisInfos.push_back(LuaDiagnosisInfo{std::string(message), LuaDiagnosisRange(start, end), type});
 }
 
 void DiagnosisContext::SetCharacterCount(int character)
@@ -38,7 +38,7 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 		{
 			LuaDiagnosisPosition start(line, _options.max_line_length);
 			LuaDiagnosisPosition end(line, character);
-			PushDiagnosis(format(LText("The line width should not exceed {}"), _options.max_line_length), start, end);
+			PushDiagnosis(format(LText("The line width should not exceed {}"), _options.max_line_length), start, end, DiagnosisType::MaxLineWidth);
 		}
 		_lineMaxLengthMap.clear();
 	}
@@ -48,7 +48,7 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 		LuaDiagnosisPosition start(_parser->GetTotalLine(), _parser->GetColumn(
 			                           static_cast<int>(_parser->GetSource().size())));
 		LuaDiagnosisPosition end(_parser->GetTotalLine() + 1, 0);
-		PushDiagnosis(LText("The code must end with a new line"), start, end);
+		PushDiagnosis(LText("The code must end with a new line"), start, end, DiagnosisType::EndWithNewLine);
 	}
 	return _diagnosisInfos;
 }

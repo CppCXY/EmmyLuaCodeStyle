@@ -167,7 +167,8 @@ void FormatElement::GeneralIndentDiagnosis(DiagnosisContext& ctx, ChildIterator 
 					       GetIndentStyleName(indentState.Style)
 					),
 					LuaDiagnosisPosition(line, 0),
-					LuaDiagnosisPosition(line, character)
+					LuaDiagnosisPosition(line, character),
+					DiagnosisType::Indent
 				);
 				goto endIndentDiagnose;
 			}
@@ -180,7 +181,8 @@ void FormatElement::GeneralIndentDiagnosis(DiagnosisContext& ctx, ChildIterator 
 						format(LText("incorrect indentation {}, here need {} space indentation"),
 						       indentState.SpaceIndent, state.SpaceIndent),
 						LuaDiagnosisPosition(line, 0),
-						LuaDiagnosisPosition(line, character)
+						LuaDiagnosisPosition(line, character),
+						DiagnosisType::Indent
 					);
 				}
 				goto endIndentDiagnose;
@@ -193,7 +195,8 @@ void FormatElement::GeneralIndentDiagnosis(DiagnosisContext& ctx, ChildIterator 
 						format(LText("incorrect indentation, here need {} tab and {} space indentation"),
 						       state.TabIndent, state.SpaceIndent),
 						LuaDiagnosisPosition(line, 0),
-						LuaDiagnosisPosition(line, character)
+						LuaDiagnosisPosition(line, character),
+						DiagnosisType::Indent
 					);
 				}
 			}

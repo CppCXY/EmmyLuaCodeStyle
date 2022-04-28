@@ -23,7 +23,7 @@ std::string luaToString(lua_State* L, int idx)
 	}
 	else if (lua_isboolean(L, idx))
 	{
-		return lua_toboolean(L, idx) ? "true": "false";
+		return lua_toboolean(L, idx) ? "true" : "false";
 	}
 	else
 	{
@@ -31,6 +31,20 @@ std::string luaToString(lua_State* L, int idx)
 	}
 }
 
+std::string GetDiagnosisString(DiagnosisType type)
+{
+	switch (type)
+	{
+	case DiagnosisType::MaxLineWidth: return "MaxLineWidth";
+	case DiagnosisType::Indent: return "Indent";
+	case DiagnosisType::Align: return "Align";
+	case DiagnosisType::Blank: return "Blank";
+	case DiagnosisType::EndWithNewLine: return "EndWithNewLine";
+	case DiagnosisType::NameStyle: return "NameStyle";
+	case DiagnosisType::StatementLineSpace: return "StatementLineSpace";
+	}
+	return "";
+}
 
 int format(lua_State* L)
 {
@@ -49,7 +63,7 @@ int format(lua_State* L)
 			std::string text = lua_tostring(L, 2);
 			LuaCodeFormat::ConfigMap configMap;
 
-			if(top == 3 && lua_istable(L, 3))
+			if (top == 3 && lua_istable(L, 3))
 			{
 				lua_pushnil(L);
 				while (lua_next(L, -2) != 0)
@@ -59,7 +73,7 @@ int format(lua_State* L)
 
 					if (key != "nil")
 					{
-						configMap.insert({ key, value });
+						configMap.insert({key, value});
 					}
 
 					lua_pop(L, 1);
@@ -124,7 +138,7 @@ int range_format(lua_State* L)
 
 					if (key != "nil")
 					{
-						configMap.insert({ key, value });
+						configMap.insert({key, value});
 					}
 
 					lua_pop(L, 1);
@@ -239,6 +253,10 @@ int diagnose_file(lua_State* L)
 				{
 					lua_pushstring(L, "message");
 					lua_pushlstring(L, diagnosticInfo.Message.c_str(), diagnosticInfo.Message.size());
+					lua_rawset(L, -3);
+
+					lua_pushstring(L, "type");
+					lua_pushstring(L, GetDiagnosisString(diagnosticInfo.type).c_str());
 					lua_rawset(L, -3);
 				}
 

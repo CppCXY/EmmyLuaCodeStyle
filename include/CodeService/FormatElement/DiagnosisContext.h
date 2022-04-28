@@ -11,9 +11,9 @@ class DiagnosisContext: public FormatContext
 public:
 	DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options);
 
-	void PushDiagnosis(std::string_view message, TextRange range);
+	void PushDiagnosis(std::string_view message, TextRange range, DiagnosisType type);
 
-	void PushDiagnosis(std::string_view message, LuaDiagnosisPosition start, LuaDiagnosisPosition end);
+	void PushDiagnosis(std::string_view message, LuaDiagnosisPosition start, LuaDiagnosisPosition end, DiagnosisType type);
 
 	void SetCharacterCount(int character);
 

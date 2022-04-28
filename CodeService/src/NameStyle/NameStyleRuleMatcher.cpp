@@ -123,8 +123,11 @@ void NameStyleRuleMatcher::Diagnosis(DiagnosisContext& ctx, std::shared_ptr<Chec
 		}
 	}
 
-	ctx.PushDiagnosis(format(LText("Name '{}' does not match rule '{}', which require '{}'"), checkElement->Node->GetText(), _name, ruleMessage),
-	                  checkElement->Node->GetTextRange());
+	ctx.PushDiagnosis(
+		format(
+			LText("Name '{}' does not match rule '{}', which require '{}'"),
+			checkElement->Node->GetText(), _name, ruleMessage),
+		checkElement->Node->GetTextRange(), DiagnosisType::NameStyle);
 }
 
 void NameStyleRuleMatcher::ParseRule(std::string_view rule)

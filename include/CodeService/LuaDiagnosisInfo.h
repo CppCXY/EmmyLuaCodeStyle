@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "DiagnosisType.h"
 
 class LuaDiagnosisPosition
 {
@@ -33,4 +34,5 @@ class LuaDiagnosisInfo
 public:
 	std::string Message;
 	LuaDiagnosisRange Range;
+	DiagnosisType type;
 };

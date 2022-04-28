@@ -60,7 +60,7 @@ void KeepLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 
 			ctx.PushDiagnosis(format(LText("here need keep {} empty line"), _line),
 			                  LuaDiagnosisPosition(nextElementLine, character),
-			                  LuaDiagnosisPosition(nextElementLine + 1, 0));
+			                  LuaDiagnosisPosition(nextElementLine + 1, 0), DiagnosisType::StatementLineSpace);
 		}
 	}
 }

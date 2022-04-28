@@ -60,7 +60,7 @@ void MaxLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, Form
 		auto character = ctx.GetColumn(nextOffset);
 		ctx.PushDiagnosis(format(LText("The maximum empty line here is {}"), _line),
 			LuaDiagnosisPosition(nextElementLine, character),
-			LuaDiagnosisPosition(nextElementLine + 1, 0));
+			LuaDiagnosisPosition(nextElementLine + 1, 0), DiagnosisType::StatementLineSpace);
 	}
 	ctx.SetCharacterCount(0);
 }
