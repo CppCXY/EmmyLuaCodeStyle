@@ -1,4 +1,6 @@
 #include "Util/FileFinder.h"
+#include "wildcards/match.hpp"
+#include "Util/StringUtil.h"
 
 FileFinder::FileFinder(std::filesystem::path root)
 	: _root(root)
@@ -20,13 +22,45 @@ void FileFinder::AddFindFile(const std::string& fileName)
 	_findFile.insert(fileName);
 }
 
+void FileFinder::AddignorePatterns(const std::string& pattern)
+{
+	_ignorePatterns.push_back(pattern);
+}
+
 std::vector<std::string> FileFinder::FindFiles()
 {
 	std::vector<std::string> files;
 
 	CollectFile(_root, files);
 
-	return files;
+	if(_ignorePatterns.empty())
+	{
+		return files;
+	}
+
+	std::vector<std::string> resultFiles;
+	auto rootPath = _root.string();
+	for(auto& originFile: files)
+	{
+		if (StringUtil::StartWith(originFile, rootPath))
+		{
+			auto matchFilePath = originFile.substr(rootPath.size());
+
+			for (auto& pattern : _ignorePatterns) {
+				auto f = wildcards::match(matchFilePath, pattern);
+
+				if(f.res)
+				{
+					goto nextFile;
+				}
+			}
+
+		}
+		resultFiles.push_back(originFile);
+nextFile:
+		void();//ignore
+	}
+	return resultFiles;
 }
 
 void FileFinder::CollectFile(std::filesystem::path directoryPath, std::vector<std::string>& paths)

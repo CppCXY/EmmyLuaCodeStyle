@@ -17,6 +17,8 @@ public:
 
 	void AddFindFile(const std::string& fileName);
 
+	void AddignorePatterns(const std::string& pattern);
+
 	std::vector<std::string> FindFiles();
 
 private:
@@ -26,4 +28,5 @@ private:
 	std::set<std::string> _ignoreDirectory;
 	std::set<std::string> _findExtension;
 	std::set<std::string> _findFile;
+	std::vector<std::string> _ignorePatterns;
 };

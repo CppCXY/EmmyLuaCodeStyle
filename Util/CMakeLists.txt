@@ -11,6 +11,7 @@ target_include_directories(Util PUBLIC
 	PRIVATE
 	src
 	${LuaCodeStyle_SOURCE_DIR}/3rd/uriparser/include
+	${LuaCodeStyle_SOURCE_DIR}/3rd/wildcards/include
 )
 
 target_sources(Util
