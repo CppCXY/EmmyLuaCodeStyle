@@ -30,9 +30,9 @@ public:
 
 	bool Reformat();
 
-	bool Check();
+	bool Check(std::string_view workspace = "");
 
-	void DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file);
+	void DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file, std::string_view path);
 private:
 	std::string _inputFile;
 	std::string _outFile;

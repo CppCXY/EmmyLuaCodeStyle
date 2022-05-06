@@ -7,6 +7,7 @@
 
 #include "CodeService/LuaEditorConfig.h"
 #include "CodeService/LuaFormatter.h"
+#include "Util/StringUtil.h"
 
 LuaFormat::LuaFormat()
 	: _options(nullptr),
@@ -140,20 +141,25 @@ bool LuaFormat::Reformat()
 	return true;
 }
 
-bool LuaFormat::Check()
+bool LuaFormat::Check(std::string_view workspace)
 {
 	_parser->BuildAstWithComment();
 
+	std::string_view inputFile = _inputFile;
+	if(!workspace.empty())
+	{
+		inputFile = StringUtil::GetFileRelativePath(workspace, inputFile);
+	}
 	if (_parser->HasError())
 	{
 		auto errors = _parser->GetErrors();
 
-		std::cerr << format("Check {}\t{} error", _inputFile, errors.size()) << std::endl;
+		std::cerr << format("Check {}\t{} error", inputFile, errors.size()) << std::endl;
 
 		for (auto& error : errors)
 		{
 			auto luaFile = _parser->GetLuaFile();
-			DiagnosisInspection(error.ErrorMessage, error.ErrorRange, luaFile);
+			DiagnosisInspection(error.ErrorMessage, error.ErrorRange, luaFile, inputFile);
 		}
 
 		return false;
@@ -174,7 +180,7 @@ bool LuaFormat::Check()
 	auto diagnosis = formatter.GetDiagnosisInfos();
 	if (!diagnosis.empty())
 	{
-		std::cerr << format("Check {}\t{} warning", _inputFile, diagnosis.size()) << std::endl;
+		std::cerr << format("Check {}\t{} warning", inputFile, diagnosis.size()) << std::endl;
 
 		for (auto& d : diagnosis)
 		{
@@ -183,23 +189,23 @@ bool LuaFormat::Check()
 			DiagnosisInspection(d.Message, TextRange(
 				                    luaFile->GetOffsetFromPosition(d.Range.Start.Line, d.Range.Start.Character),
 				                    luaFile->GetOffsetFromPosition(d.Range.End.Line, d.Range.End.Character)
-			                    ), luaFile);
+			                    ), luaFile, inputFile);
 		}
 
 		return false;
 	}
-	std::cout << format("Check {} OK", _inputFile) << std::endl;
+	std::cout << format("Check {} OK", inputFile) << std::endl;
 	return true;
 }
 
-void LuaFormat::DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file)
+void LuaFormat::DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file, std::string_view path)
 {
 	std::string_view source = file->GetSource();
 	auto startLine = file->GetLine(range.StartOffset);
 	auto startChar = file->GetColumn(range.StartOffset);
 	auto endLine = file->GetLine(range.EndOffset);
 	auto endChar = file->GetColumn(range.EndOffset);
-	std::cerr << format("{}({}:{} to {}:{}): {}", file->GetFilename(), startLine + 1, startChar, endLine + 1, endChar,
+	std::cerr << format("{}({}:{} to {}:{}): {}", path, startLine + 1, startChar, endLine + 1, endChar,
 	                    message) << std::endl;
 
 
