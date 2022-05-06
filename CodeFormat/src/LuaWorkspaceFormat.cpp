@@ -29,14 +29,15 @@ bool LuaWorkspaceFormat::SetConfigPath(std::string_view config)
 
 void LuaWorkspaceFormat::AddIgnoresByFile(std::string_view gitIgnoreFile)
 {
-	std::fstream fin(gitIgnoreFile, std::ios::in);
+	std::fstream fin(std::string(gitIgnoreFile), std::ios::in);
 	if (fin.is_open())
 	{
 		std::string line;
-		while (!fin.eof()) {
+		while (!fin.eof())
+		{
 			std::getline(fin, line);
 			auto newLine = StringUtil::TrimSpace(line);
-			if(!StringUtil::StartWith(newLine, "#"))
+			if (!StringUtil::StartWith(newLine, "#"))
 			{
 				_ignorePattern.push_back(std::string(newLine));
 			}
@@ -78,7 +79,7 @@ void LuaWorkspaceFormat::ReformatWorkspace()
 	finder.AddIgnoreDirectory(".idea");
 	finder.AddIgnoreDirectory(".vs");
 	finder.AddIgnoreDirectory(".vscode");
-	for(auto pattern: _ignorePattern)
+	for (auto pattern : _ignorePattern)
 	{
 		finder.AddignorePatterns(pattern);
 	}
