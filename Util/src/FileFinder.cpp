@@ -1,5 +1,4 @@
 #include "Util/FileFinder.h"
-#include "wildcards/match.hpp"
 #include "Util/StringUtil.h"
 
 FileFinder::FileFinder(std::filesystem::path root)
@@ -24,6 +23,17 @@ void FileFinder::AddFindFile(const std::string& fileName)
 
 void FileFinder::AddignorePatterns(const std::string& pattern)
 {
+	if(pattern.empty())
+	{
+		return;
+	}
+
+	auto firstChar = pattern.front();
+	if(firstChar == '\\' || firstChar == '/')
+	{
+		_ignorePatterns.push_back(pattern.substr(1));
+	}
+
 	_ignorePatterns.push_back(pattern);
 }
 
@@ -33,32 +43,28 @@ std::vector<std::string> FileFinder::FindFiles()
 
 	CollectFile(_root, files);
 
-	if(_ignorePatterns.empty())
+	if (_ignorePatterns.empty())
 	{
 		return files;
 	}
 
 	std::vector<std::string> resultFiles;
 	auto rootPath = _root.string();
-	for(auto& originFile: files)
+	for (auto& originFile : files)
 	{
-		if (StringUtil::StartWith(originFile, rootPath))
+		auto matchFilePath = StringUtil::GetFileRelativePath(rootPath, originFile);
+		if (!matchFilePath.empty())
 		{
-			auto matchFilePath = originFile.substr(rootPath.size());
-
-			for (auto& pattern : _ignorePatterns) {
-				auto f = wildcards::match(matchFilePath, pattern);
-
-				if(f.res)
+			for (auto& pattern : _ignorePatterns)
+			{
+				if (StringUtil::FileWildcardMatch(matchFilePath, pattern))
 				{
 					goto nextFile;
 				}
 			}
-
 		}
 		resultFiles.push_back(originFile);
-nextFile:
-		void();//ignore
+	nextFile:; //ignore
 	}
 	return resultFiles;
 }

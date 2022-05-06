@@ -1,7 +1,10 @@
 #include "LuaWorkspaceFormat.h"
 #include <iostream>
+#include <regex>
+#include <fstream>
 #include "Util/format.h"
 #include "Util/FileFinder.h"
+#include "Util/StringUtil.h"
 
 LuaWorkspaceFormat::LuaWorkspaceFormat(std::string_view workspace)
 	: _workspace(absolute(std::filesystem::path(workspace))),
@@ -22,6 +25,28 @@ bool LuaWorkspaceFormat::SetConfigPath(std::string_view config)
 	});
 	_editorConfigVector.back().second->SetWorkspace(_workspace.string());
 	return true;
+}
+
+void LuaWorkspaceFormat::AddIgnoresByFile(std::string_view gitIgnoreFile)
+{
+	std::fstream fin(gitIgnoreFile, std::ios::in);
+	if (fin.is_open())
+	{
+		std::string line;
+		while (!fin.eof()) {
+			std::getline(fin, line);
+			auto newLine = StringUtil::TrimSpace(line);
+			if(!StringUtil::StartWith(newLine, "#"))
+			{
+				_ignorePattern.push_back(std::string(newLine));
+			}
+		}
+	}
+}
+
+void LuaWorkspaceFormat::AddIgnores(std::string_view pattern)
+{
+	_ignorePattern.push_back(std::string(pattern));
 }
 
 void LuaWorkspaceFormat::SetAutoDetectConfig(bool detect)
@@ -53,6 +78,10 @@ void LuaWorkspaceFormat::ReformatWorkspace()
 	finder.AddIgnoreDirectory(".idea");
 	finder.AddIgnoreDirectory(".vs");
 	finder.AddIgnoreDirectory(".vscode");
+	for(auto pattern: _ignorePattern)
+	{
+		finder.AddignorePatterns(pattern);
+	}
 
 	auto files = finder.FindFiles();
 	for (auto& file : files)
@@ -88,6 +117,10 @@ bool LuaWorkspaceFormat::CheckWorkspace()
 	finder.AddIgnoreDirectory(".idea");
 	finder.AddIgnoreDirectory(".vs");
 	finder.AddIgnoreDirectory(".vscode");
+	for (auto pattern : _ignorePattern)
+	{
+		finder.AddignorePatterns(pattern);
+	}
 
 	auto files = finder.FindFiles();
 	bool ret = true;

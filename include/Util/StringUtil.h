@@ -18,4 +18,8 @@ namespace StringUtil
 	bool EndWith(std::string_view source, std::string_view str);
 
 	bool IsStringEqualIgnoreCase(std::string_view lhs, std::string_view rhs);
+
+	std::string_view GetFileRelativePath(std::string_view workspace, std::string_view filePath);
+
+	bool FileWildcardMatch(std::string_view sourceFile, std::string_view pattern);
 }

@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "wildcards/match.hpp"
+
 std::vector<std::string_view> StringUtil::Split(std::string_view source, std::string_view separator)
 {
 	if (source.empty() || separator.empty())
@@ -124,3 +126,52 @@ bool StringUtil::IsStringEqualIgnoreCase(std::string_view lhs, std::string_view 
 	}
 	return true;
 }
+
+std::string_view StringUtil::GetFileRelativePath(std::string_view workspace, std::string_view filePath)
+{
+	if (workspace.size() >= filePath.size())
+	{
+		return "";
+	}
+
+	std::size_t i = 0;
+	std::size_t size = workspace.size();
+	for (; i != size; i++)
+	{
+		char wch = workspace[i];
+		char fch = filePath[i];
+		if (wch != fch)
+		{
+			if ((wch == '\\' || wch == '/') && (fch == '\\' || fch == '/'))
+			{
+				continue;
+			}
+			return "";
+		}
+	}
+
+	if (i < filePath.size() && filePath[i] == '\\' || filePath[i] == '/')
+	{
+		i++;
+	}
+
+	return std::string_view(filePath.data() + i, filePath.size() - i);
+}
+
+struct equal_to
+{
+	constexpr auto operator()(const char& lhs, const char& rhs) const -> decltype(lhs == rhs)
+	{
+		if (lhs == rhs)
+		{
+			return true;
+		}
+		return (lhs == '\\' || lhs == '/') && (rhs == '\\' || rhs == '/');
+	}
+};
+
+bool StringUtil::FileWildcardMatch(std::string_view sourceFile, std::string_view pattern)
+{
+	return wildcards::match(sourceFile, pattern, equal_to()).res;
+}
+

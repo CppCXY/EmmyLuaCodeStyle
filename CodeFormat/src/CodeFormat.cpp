@@ -9,6 +9,7 @@
 #include "CodeService/LuaFormatter.h"
 #include "Util/CommandLine.h"
 #include "LuaWorkspaceFormat.h"
+#include "Util/StringUtil.h"
 
 // https://stackoverflow.com/questions/1598985/c-read-binary-stdin
 #ifdef _WIN32
@@ -30,7 +31,9 @@ int main(int argc, char** argv)
 		"for example:\n"
 		"\tCodeFormat check -w . -d\n"
 		"\tCodeFormat format -f test.lua -d\n"
-		);
+		"\tCodeFormat check -w . -d --ignores \"Test/*.lua;src/**.lua\"\n"
+		"\tCodeFormat check -w . -d --ignores-file \".gitignore\"\n"
+	);
 	cmd.AddTarget("format")
 	   .Add<std::string>("file", "f", "Specify the input file")
 	   .Add<std::string>("workspace", "w",
@@ -43,6 +46,13 @@ int main(int argc, char** argv)
 	              "\t\tIf this option is set, the config option has no effect ")
 	   .Add<std::string>("outfile", "o",
 	                     "Specify output file")
+	   .Add<std::string>("ignores-file", "igf",
+	                     "Specify which files to ignore through configuration file,for example \".gitignore\""
+	   )
+	   .Add<std::string>("ignores", "ig",
+	                     "Use file wildcards to specify how to ignore files\n"
+	                     "\t\tseparated by ';'"
+	   )
 	   .EnableKeyValueArgs();
 	cmd.AddTarget("check")
 	   .Add<std::string>("file", "f", "Specify the input file")
@@ -54,6 +64,13 @@ int main(int argc, char** argv)
 	              "Configuration will be automatically detected,\n"
 	              "\t\tIf this option is set, the config option has no effect")
 	   .Add<bool>("diagnosis-as-error", "DAE", "if exist error or diagnosis info , return -1")
+	   .Add<std::string>("ignores-file", "igf",
+	                     "Specify which files to ignore through configuration file,for example \".gitignore\""
+	   )
+	   .Add<std::string>("ignores", "ig",
+	                     "Use file wildcards to specify how to ignore files\n"
+	                     "\t\tseparated by ';'"
+	   )
 	   .EnableKeyValueArgs();
 
 
@@ -139,6 +156,25 @@ int main(int argc, char** argv)
 		else if (cmd.HasOption("config"))
 		{
 			workspaceFormat.SetConfigPath(cmd.Get<std::string>("config"));
+		}
+
+		if (cmd.HasOption("ignores"))
+		{
+			auto ignores = cmd.Get<std::string>("ignores");
+			auto patterns = StringUtil::Split(ignores, ";");
+			for (auto pattern : patterns)
+			{
+				auto patternNoSpace = StringUtil::TrimSpace(pattern);
+				if (!patternNoSpace.empty())
+				{
+					workspaceFormat.AddIgnores(patternNoSpace);
+				}
+			}
+		}
+
+		if (cmd.HasOption("ignores-file"))
+		{
+			workspaceFormat.AddIgnoresByFile(cmd.Get<std::string>("ignores-file"));
 		}
 
 		workspaceFormat.SetKeyValues(cmd.GetKeyValueOptions());

@@ -14,6 +14,10 @@ public:
 
 	bool SetConfigPath(std::string_view config);
 
+	void AddIgnoresByFile(std::string_view gitIgnoreFile);
+
+	void AddIgnores(std::string_view pattern);
+
 	void SetAutoDetectConfig(bool detect);
 
 	void SetKeyValues(std::map<std::string, std::string, std::less<>>& keyValues);
@@ -30,4 +34,5 @@ private:
 	bool _autoDetectConfig;
 	std::vector<std::pair<std::string, std::shared_ptr<LuaEditorConfig>>> _editorConfigVector;
 	std::shared_ptr<LuaCodeStyleOptions> _defaultOptions;
+	std::vector<std::string> _ignorePattern;
 };
