@@ -1,7 +1,7 @@
 #include "Util/StringUtil.h"
 #include <cstdlib>
 #include <cstring>
-
+#include <algorithm>
 #include "wildcards/match.hpp"
 
 std::vector<std::string_view> StringUtil::Split(std::string_view source, std::string_view separator)
@@ -162,16 +162,30 @@ struct equal_to
 {
 	constexpr auto operator()(const char& lhs, const char& rhs) const -> decltype(lhs == rhs)
 	{
-		if (lhs == rhs)
-		{
-			return true;
-		}
-		return (lhs == '\\' || lhs == '/') && (rhs == '\\' || rhs == '/');
+		return lhs == rhs
+			|| ((lhs == '\\' || lhs == '/') && (rhs == '\\' || rhs == '/'))
+			|| (::tolower(lhs) == ::tolower(rhs));
 	}
 };
 
 bool StringUtil::FileWildcardMatch(std::string_view sourceFile, std::string_view pattern)
 {
-	return wildcards::match(sourceFile, pattern, equal_to()).res;
-}
+	equal_to eq;
 
+	auto minSize = std::min(sourceFile.size(), pattern.size());
+	bool match = true;
+	for (std::size_t i = 0; i != minSize; i++)
+	{
+		if(!eq(sourceFile[i], pattern[i]))
+		{
+			match = false;
+			break;
+		}
+	}
+
+	if(!match)
+	{
+		match = wildcards::match(sourceFile, pattern, equal_to()).res;
+	}
+	return match;
+}
