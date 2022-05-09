@@ -150,7 +150,7 @@ std::string_view StringUtil::GetFileRelativePath(std::string_view workspace, std
 		}
 	}
 
-	if (i < filePath.size() && filePath[i] == '\\' || filePath[i] == '/')
+	if (i < filePath.size() && (filePath[i] == '\\' || filePath[i] == '/'))
 	{
 		i++;
 	}
