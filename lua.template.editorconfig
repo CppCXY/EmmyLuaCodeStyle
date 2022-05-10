@@ -50,6 +50,10 @@ table_append_expression_no_space = false
 if_condition_align_with_each_other = false
 
 long_chain_expression_allow_one_space_after_colon = false
+
+remove_empty_header_and_footer_lines_in_function = true
+
+remove_expression_list_finish_comma = true
 # optional crlf/lf/cr/auto, if it is 'auto', in windows it is crlf other platforms are lf
 end_of_line = auto
 #

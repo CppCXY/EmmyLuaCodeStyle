@@ -21,11 +21,13 @@ function f3()
 end
 
 local dd = function()
+
     local t = 13
+
 end
 
 --extend syntax
-local function f2(aaa, bbb, ccc)
+local function f2(aaa, bbb, ccc,)
 end
 
-f2(1, 2, 3)
+f2(1, 2, 3,)

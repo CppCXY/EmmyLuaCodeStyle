@@ -159,6 +159,10 @@ call_arg_parentheses = unambiguous_remove_string_only
 if_branch_comments_after_block_no_indent = true
 [{align_chained_expression_statement-eq-true.lua}]
 align_chained_expression_statement = true
+[{remove_empty_header_and_footer_lines_in_function-eq-true.lua}]
+remove_empty_header_and_footer_lines_in_function = true
+[{remove_expression_list_finish_comma-eq-true.lua}]
+remove_expression_list_finish_comma = true
 [{minLine-eq-1.lua}]
 keep_line_after_if_statement = minLine:1
 keep_line_after_do_statement = minLine:1
