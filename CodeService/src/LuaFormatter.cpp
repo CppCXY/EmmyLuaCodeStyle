@@ -25,7 +25,7 @@
 #include "Util/StringUtil.h"
 #include "CodeService/AstUtil.h"
 
-bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
+bool NextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
 {
 	if (it != container.end() && (++it) != container.end())
 	{
@@ -35,7 +35,7 @@ bool nextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNo
 	return false;
 }
 
-std::shared_ptr<LuaAstNode> nextNode(LuaAstNode::ChildIterator it, const LuaAstNode::ChildrenContainer& container)
+std::shared_ptr<LuaAstNode> NextNode(LuaAstNode::ChildIterator it, const LuaAstNode::ChildrenContainer& container)
 {
 	if (it != container.end() && (++it) != container.end())
 	{
@@ -278,9 +278,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::AssignStatement:
 		case LuaAstNodeType::LocalStatement:
 			{
-				if (nextMatch(it, LuaAstNodeType::AssignStatement, statements)
-					|| nextMatch(it, LuaAstNodeType::LocalStatement, statements)
-					|| nextMatch(it, LuaAstNodeType::Comment, statements))
+				if (NextMatch(it, LuaAstNodeType::AssignStatement, statements)
+					|| NextMatch(it, LuaAstNodeType::LocalStatement, statements)
+					|| NextMatch(it, LuaAstNodeType::Comment, statements))
 				{
 					indentEnv->AddChild(FormatAlignStatement(it, statements));
 				}
@@ -351,9 +351,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::ExpressionStatement:
 			{
 				auto statEnv = FormatNode(statement);
-				if (nextMatch(it, LuaAstNodeType::Comment, statements))
+				if (NextMatch(it, LuaAstNodeType::Comment, statements))
 				{
-					auto next = nextNode(it, statements);
+					auto next = NextNode(it, statements);
 					int currentLine = _parser->GetLine(statement->GetTextRange().EndOffset);
 					int nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
 
@@ -1310,7 +1310,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNameExpression(std::shared_pt
 
 	for (auto& child : nameExpression->GetChildren())
 	{
-		FormatSubExpressionNode(child, env);
+		FormatSubExpression(child, env);
 	}
 
 	return env;
@@ -1364,7 +1364,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 		case LuaAstNodeType::Param:
 			{
 				paramListLayoutEnv->Add<TextElement>(child);
-				if (nextMatch(it, LuaAstNodeType::Comment, children))
+				if (NextMatch(it, LuaAstNodeType::Comment, children))
 				{
 					paramListLayoutEnv->Add<KeepElement>(1);
 				}
@@ -1649,7 +1649,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 
 	env->AddChild(FormatNode(*it));
 
-	auto nextChild = nextNode(it, children);
+	auto nextChild = NextNode(it, children);
 	if (nextChild == nullptr)
 	{
 		return env->GetChildren().front();
@@ -1708,7 +1708,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 
 		++it;
 
-		nextChild = nextNode(it, children);
+		nextChild = NextNode(it, children);
 		if (nextChild == nullptr)
 		{
 			break;
@@ -1737,7 +1737,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 	for (; it != siblings.end(); ++it)
 	{
 		auto current = *it;
-		auto nextSibling = nextNode(it, siblings);
+		auto nextSibling = NextNode(it, siblings);
 
 		if (nextSibling == nullptr)
 		{
@@ -1824,11 +1824,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 {
 	auto env = std::make_shared<ExpressionElement>();
 	auto keyNode = *it;
+	auto parentNode = keyNode->GetParent();
 	env->AddChild(FormatNode(keyNode));
 
-	if (nextMatch(it, LuaAstNodeType::Comment, children))
+	if (NextMatch(it, LuaAstNodeType::Comment, children))
 	{
-		auto comment = nextNode(it, children);
+		auto comment = NextNode(it, children);
 		int currentLine = _parser->GetLine(keyNode->GetTextRange().EndOffset);
 		int nextLine = _parser->GetLine(comment->GetTextRange().StartOffset);
 
@@ -1849,10 +1850,18 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 		blockExist = true;
 		if (_parser->GetLine(keyNode->GetTextRange().StartOffset) != _parser->GetLine(block->GetTextRange().EndOffset))
 		{
-			env->Add<KeepElement>(1);
-
-			env->AddChild(block);
-			env->Add<KeepElement>(1, true);
+			if (_options.remove_empty_header_and_footer_lines_in_function
+				&& parentNode && parentNode->GetType() == LuaAstNodeType::FunctionBody)
+			{
+				env->Add<LineElement>();
+				env->AddChild(block);
+			}
+			else
+			{
+				env->Add<KeepElement>(1);
+				env->AddChild(block);
+				env->Add<KeepElement>(1, true);
+			}
 		}
 		else
 		{
@@ -1876,9 +1885,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 		env->Add<KeepElement>(1);
 	}
 
-	if (nextMatch(it, LuaAstNodeType::KeyWord, children))
+	if (NextMatch(it, LuaAstNodeType::KeyWord, children))
 	{
-		auto next = nextNode(it, children);
+		auto next = NextNode(it, children);
 		if (next->GetText() == "end")
 		{
 			env->Add<TextElement>(next);
@@ -1898,16 +1907,16 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(LuaAstNode::ChildIterator& it,
-                                                                   const LuaAstNode::ChildrenContainer& children)
+                                                                   const LuaAstNode::ChildrenContainer& siblings)
 {
 	std::shared_ptr<LuaAstNode> block = nullptr;
 	std::vector<std::shared_ptr<LuaAstNode>> comments;
 	std::vector<std::shared_ptr<LuaAstNode>> afterBlockComments;
-	for (; it != children.end(); ++it)
+	for (; it != siblings.end(); ++it)
 	{
-		if (nextMatch(it, LuaAstNodeType::Comment, children))
+		if (NextMatch(it, LuaAstNodeType::Comment, siblings))
 		{
-			auto next = nextNode(it, children);
+			auto next = NextNode(it, siblings);
 			if (block)
 			{
 				if (_parser->GetLine(block->GetTextRange().EndOffset) != _parser->GetLine(
@@ -1920,9 +1929,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(LuaAstNode::C
 
 			comments.push_back(next);
 		}
-		else if (nextMatch(it, LuaAstNodeType::Block, children))
+		else if (NextMatch(it, LuaAstNodeType::Block, siblings))
 		{
-			block = nextNode(it, children);
+			block = NextNode(it, siblings);
 		}
 		else
 		{
@@ -1939,7 +1948,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(LuaAstNode::C
 			copyBlock->AddComment(comment);
 		}
 
-		auto nextKey = nextNode(it, children);
+		auto nextKey = NextNode(it, siblings);
 		if (_options.if_branch_comments_after_block_no_indent
 			&& nextKey && nextKey->GetType() == LuaAstNodeType::KeyWord
 			&& (nextKey->GetText() == "elseif" || nextKey->GetText() == "else"))
@@ -1982,8 +1991,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(LuaAstNode::C
 }
 
 
-void LuaFormatter::FormatSubExpressionNode(std::shared_ptr<LuaAstNode> expression,
-                                           std::shared_ptr<FormatElement> env)
+void LuaFormatter::FormatSubExpression(std::shared_ptr<LuaAstNode> expression,
+                                       std::shared_ptr<FormatElement> env)
 {
 	switch (expression->GetType())
 	{
@@ -2038,7 +2047,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpression(std::shared_ptr<Lu
 	{
 		const auto current = *it;
 
-		FormatSubExpressionNode(current, env);
+		FormatSubExpression(current, env);
 		env->Add<KeepElement>(0);
 	}
 
@@ -2053,7 +2062,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBinaryExpression(std::shared_
 	{
 		const auto current = *it;
 
-		FormatSubExpressionNode(current, env);
+		FormatSubExpression(current, env);
 		env->Add<KeepElement>(1);
 	}
 
@@ -2078,7 +2087,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatUnaryExpression(std::shared_p
 				}
 				else
 				{
-					auto next = nextNode(it, children);
+					auto next = NextNode(it, children);
 					if (next && (next->GetType() == LuaAstNodeType::UnaryExpression || next->GetType() ==
 						LuaAstNodeType::Comment))
 					{
@@ -2091,7 +2100,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatUnaryExpression(std::shared_p
 			}
 		default:
 			{
-				FormatSubExpressionNode(child, env);
+				FormatSubExpression(child, env);
 				env->Add<KeepElement>(1);
 			}
 		}
@@ -2184,13 +2193,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 					}
 				}
 
-				FormatSubExpressionNode(child, env);
+				FormatSubExpression(child, env);
 				env->Add<KeepElement>(0);
 				break;
 			}
 		default:
 			{
-				FormatSubExpressionNode(child, env);
+				FormatSubExpression(child, env);
 				env->Add<KeepElement>(0);
 			}
 		}
@@ -2212,9 +2221,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 		case LuaAstNodeType::IndexExpression:
 		case LuaAstNodeType::PrimaryExpression:
 			{
-				FormatSubExpressionNode(child, env);
+				FormatSubExpression(child, env);
 
-				auto next = nextNode(it, children);
+				auto next = NextNode(it, children);
 				if (next && next->GetType() == LuaAstNodeType::CallArgList)
 				{
 					if (!ast_util::WillCallArgHaveParentheses(next, _options.call_arg_parentheses))
@@ -2239,7 +2248,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 				env->AddChild(FormatNode(child));
 
 				auto currentCallArgList = child->FindFirstOf(LuaAstNodeType::CallArgList);
-				auto nextCallArgList = nextNode(it, children);
+				auto nextCallArgList = NextNode(it, children);
 				bool needSpace = true;
 				if (currentCallArgList && nextCallArgList)
 				{
@@ -2291,7 +2300,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 					&& binaryExpressionChildren[1]->GetText() == "+")
 				&& binaryExpressionChildren[2]->GetText() == "1")
 			{
-				FormatSubExpressionNode(binaryExpressionChildren[0], env);
+				FormatSubExpression(binaryExpressionChildren[0], env);
 				env->Add<KeepElement>(0);
 				env->Add<TextElement>(binaryExpressionChildren[1]);
 				env->Add<KeepElement>(0);
@@ -2332,11 +2341,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<Lu
 				{
 					auto lastLine = _parser->GetLine(textRange.EndOffset);
 					auto newIt = it;
-					while (nextMatch(newIt, LuaAstNodeType::AssignStatement, statements)
-						|| nextMatch(newIt, LuaAstNodeType::LocalStatement, statements)
-						|| nextMatch(newIt, LuaAstNodeType::Comment, statements))
+					while (NextMatch(newIt, LuaAstNodeType::AssignStatement, statements)
+						|| NextMatch(newIt, LuaAstNodeType::LocalStatement, statements)
+						|| NextMatch(newIt, LuaAstNodeType::Comment, statements))
 					{
-						auto next = nextNode(newIt, statements);
+						auto next = NextNode(newIt, statements);
 						auto nextTextRange = next->GetTextRange();
 
 						auto nextTextLine = _parser->GetLine(nextTextRange.StartOffset);
@@ -2394,9 +2403,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<Lu
 		case LuaAstNodeType::AssignStatement:
 		case LuaAstNodeType::LocalStatement:
 			{
-				if (nextMatch(it, LuaAstNodeType::AssignStatement, statements)
-					|| nextMatch(it, LuaAstNodeType::LocalStatement, statements)
-					|| nextMatch(it, LuaAstNodeType::Comment, statements))
+				if (NextMatch(it, LuaAstNodeType::AssignStatement, statements)
+					|| NextMatch(it, LuaAstNodeType::LocalStatement, statements)
+					|| NextMatch(it, LuaAstNodeType::Comment, statements))
 				{
 					indentEnv->AddChild(FormatAlignStatement(it, statements));
 				}
@@ -2455,9 +2464,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<Lu
 		case LuaAstNodeType::ExpressionStatement:
 			{
 				auto statEnv = FormatNode(statement);
-				if (nextMatch(it, LuaAstNodeType::Comment, statements))
+				if (NextMatch(it, LuaAstNodeType::Comment, statements))
 				{
-					auto next = nextNode(it, statements);
+					auto next = NextNode(it, statements);
 					int currentLine = _parser->GetLine(statement->GetTextRange().EndOffset);
 					int nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
 

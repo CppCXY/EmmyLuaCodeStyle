@@ -92,7 +92,7 @@ private:
 	void CheckMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent,
 	                LuaAstNodeType addType = LuaAstNodeType::KeyWord);
 
-	void ExpressionList(std::shared_ptr<LuaAstNode> parent);
+	void ExpressionList(std::shared_ptr<LuaAstNode> parent, LuaTokenType stopToken = 0);
 
 	void Expression(std::shared_ptr<LuaAstNode> parent);
 

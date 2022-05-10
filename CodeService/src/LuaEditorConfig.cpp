@@ -12,7 +12,7 @@
 #include "CodeService/FormatElement/MaxLineElement.h"
 #include "CodeService/NameStyle/NameStyleRuleMatcher.h"
 
-bool isNumber(std::string_view source)
+bool IsNumber(std::string_view source)
 {
 	for (auto c : source)
 	{
@@ -189,14 +189,14 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 	}
 
 	if (configMap.count("indent_size")
-		&& isNumber(configMap.at("indent_size"))
+		&& IsNumber(configMap.at("indent_size"))
 	)
 	{
 		options->indent_size = std::stoi(configMap.at("indent_size"));
 	}
 
 	if (configMap.count("tab_width")
-		&& isNumber(configMap.at("tab_width")))
+		&& IsNumber(configMap.at("tab_width")))
 	{
 		options->tab_width = std::stoi(configMap.at("tab_width"));
 	}
@@ -238,13 +238,13 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 	}
 
 	if (configMap.count("continuation_indent_size")
-		&& isNumber(configMap.at("continuation_indent_size")))
+		&& IsNumber(configMap.at("continuation_indent_size")))
 	{
 		options->continuation_indent_size = std::stoi(configMap.at("continuation_indent_size"));
 	}
 
 	if(configMap.count("statement_inline_comment_space")
-		&& isNumber(configMap.at("statement_inline_comment_space")))
+		&& IsNumber(configMap.at("statement_inline_comment_space")))
 	{
 		options->statement_inline_comment_space = std::stoi(configMap.at("statement_inline_comment_space"));
 	}
@@ -304,7 +304,7 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 	}
 
 	if (configMap.count("max_continuous_line_distance")
-		&& isNumber(configMap.at("max_continuous_line_distance")))
+		&& IsNumber(configMap.at("max_continuous_line_distance")))
 	{
 		options->max_continuous_line_distance =
 			std::stoi(configMap.at("max_continuous_line_distance"));
@@ -346,6 +346,11 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("long_chain_expression_allow_one_space_after_colon") == "true";
 	}
 
+	if(configMap.count("remove_empty_header_and_footer_lines_in_function"))
+	{
+		options->remove_empty_header_and_footer_lines_in_function =
+			configMap.at("remove_empty_header_and_footer_lines_in_function") == "true";
+	}
 
 	if (configMap.count("end_of_line"))
 	{
@@ -375,7 +380,7 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 
 	if (configMap.count("max_line_length"))
 	{
-		if (isNumber(configMap.at("max_line_length"))) {
+		if (IsNumber(configMap.at("max_line_length"))) {
 			options->max_line_length = std::stoi(configMap.at("max_line_length"));
 		}
 		else if(configMap.at("max_line_length") == "unset"){

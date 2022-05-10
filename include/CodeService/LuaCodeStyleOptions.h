@@ -48,9 +48,9 @@ public:
 	 * no opened
 	 */
 	bool table_field_continuation_align_to_first_sub_expression = false;
+
 	/*
-	 * 调用参数对齐到第一个参数，经过实际体验这种风格在vscode上会因为垂直对齐线的标注而显得极为难看
-	 * 
+	 * 调用参数对齐到第一个参数
 	 */
 	bool align_call_args = false;
 
@@ -108,6 +108,9 @@ public:
 
 	bool long_chain_expression_allow_one_space_after_colon = false;
 
+	bool remove_expression_list_finish_comma = false;
+
+	bool remove_empty_header_and_footer_lines_in_function = false;
 #ifndef _WINDOWS
 	EndOfLine end_of_line = EndOfLine::LF;
 #else

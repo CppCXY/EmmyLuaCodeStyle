@@ -133,9 +133,9 @@ void LuaParser::BuildAstWithComment()
 	auto& comments = _tokenParser->GetComments();
 	if (chunkChildren.empty())
 	{
-		if (comments.empty()) {
+		if (comments.empty())
+		{
 			return;
-	
 		}
 		auto block = CreateAstNode(LuaAstNodeType::Block);
 		chunkChildren.push_back(block);
@@ -589,12 +589,17 @@ void LuaParser::CheckMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<
 }
 
 /* explist -> expr { ',' expr } */
-void LuaParser::ExpressionList(std::shared_ptr<LuaAstNode> parent)
+void LuaParser::ExpressionList(std::shared_ptr<LuaAstNode> parent, LuaTokenType stopToken)
 {
 	auto expressionListNode = CreateAstNode(LuaAstNodeType::ExpressionList);
 	Expression(expressionListNode);
 	while (TestNext(',', expressionListNode, LuaAstNodeType::GeneralOperator))
 	{
+		if (_tokenParser->Current().TokenType == stopToken)
+		{
+			break;
+		}
+
 		Expression(expressionListNode);
 	}
 
@@ -852,6 +857,10 @@ void LuaParser::ParamList(std::shared_ptr<LuaAstNode> functionBodyNode)
 					_tokenParser->Next();
 					break;
 				}
+			case ')':
+				{
+					break;
+				}
 			default:
 				{
 					ThrowLuaError("<name> or '...' expected", paramList);
@@ -933,7 +942,8 @@ void LuaParser::FunctionCallArgs(std::shared_ptr<LuaAstNode>& expressionNode)
 			_tokenParser->Next();
 			if (_tokenParser->Current().TokenType != ')')
 			{
-				ExpressionList(callArgsNode);
+				// extend grammar, allow pcall(1,2,)
+				ExpressionList(callArgsNode, ')');
 			}
 
 			CheckMatch(')', '(', callArgsNode, LuaAstNodeType::GeneralOperator);
