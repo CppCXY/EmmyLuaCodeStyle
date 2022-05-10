@@ -243,7 +243,7 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		options->continuation_indent_size = std::stoi(configMap.at("continuation_indent_size"));
 	}
 
-	if(configMap.count("statement_inline_comment_space")
+	if (configMap.count("statement_inline_comment_space")
 		&& IsNumber(configMap.at("statement_inline_comment_space")))
 	{
 		options->statement_inline_comment_space = std::stoi(configMap.at("statement_inline_comment_space"));
@@ -346,10 +346,16 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("long_chain_expression_allow_one_space_after_colon") == "true";
 	}
 
-	if(configMap.count("remove_empty_header_and_footer_lines_in_function"))
+	if (configMap.count("remove_empty_header_and_footer_lines_in_function"))
 	{
 		options->remove_empty_header_and_footer_lines_in_function =
 			configMap.at("remove_empty_header_and_footer_lines_in_function") == "true";
+	}
+
+	if (configMap.count("remove_expression_list_finish_comma"))
+	{
+		options->remove_expression_list_finish_comma =
+			configMap.at("remove_expression_list_finish_comma") == "true";
 	}
 
 	if (configMap.count("end_of_line"))
@@ -380,10 +386,12 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 
 	if (configMap.count("max_line_length"))
 	{
-		if (IsNumber(configMap.at("max_line_length"))) {
+		if (IsNumber(configMap.at("max_line_length")))
+		{
 			options->max_line_length = std::stoi(configMap.at("max_line_length"));
 		}
-		else if(configMap.at("max_line_length") == "unset"){
+		else if (configMap.at("max_line_length") == "unset")
+		{
 			options->max_line_length = std::numeric_limits<int>::max();
 		}
 	}

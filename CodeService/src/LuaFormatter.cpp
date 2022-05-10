@@ -639,6 +639,40 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_pt
 	return env;
 }
 
+std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgsExpressionList(std::shared_ptr<LuaAstNode> expressionList,
+                                                                          std::shared_ptr<FormatElement> env)
+{
+	auto& children = expressionList->GetChildren();
+	for (auto& node : children)
+	{
+		switch (node->GetType())
+		{
+		case LuaAstNodeType::Expression:
+			{
+				auto subEnv = std::make_shared<SubExpressionElement>();
+				env->AddChild(FormatExpression(node, subEnv));
+				env->Add<KeepElement>(0);
+				break;
+			}
+		case LuaAstNodeType::GeneralOperator:
+			{
+				if (_options.remove_expression_list_finish_comma && node == children.back())
+				{
+					break;
+				}
+				env->Add<TextElement>(node);
+				env->Add<KeepElement>(1);
+				break;
+			}
+		default:
+			DefaultHandle(node, env);
+			env->Add<KeepElement>(1);
+		}
+	}
+
+	return env;
+}
+
 std::shared_ptr<FormatElement> LuaFormatter::FormatAssignLeftExpressionList(std::shared_ptr<LuaAstNode> expressionList)
 {
 	auto env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent_size);
@@ -1242,7 +1276,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 					layout = std::make_shared<CallArgsListLayoutElement>();
 				}
 
-				env->AddChild(FormatExpressionList(child, layout));
+				env->AddChild(FormatCallArgsExpressionList(child, layout));
 				env->Add<KeepElement>(0);
 				break;
 			}
@@ -1341,6 +1375,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 			{
 				if (child->GetText() == ",")
 				{
+					if(_options.remove_expression_list_finish_comma
+						&& NextMatch(it, LuaAstNodeType::GeneralOperator, children))
+					{
+						break;
+					}
 					paramListLayoutEnv->Add<TextElement>(child);
 					paramListLayoutEnv->Add<KeepElement>(1);
 				}
