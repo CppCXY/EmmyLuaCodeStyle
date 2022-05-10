@@ -150,7 +150,8 @@ std::string_view StringUtil::GetFileRelativePath(std::string_view workspace, std
 		}
 	}
 
-	if (i < filePath.size() && filePath[i] == '\\' || filePath[i] == '/')
+	if (i < filePath.size() 
+		&& (filePath[i] == '\\' || filePath[i] == '/'))
 	{
 		i++;
 	}
@@ -185,7 +186,7 @@ bool StringUtil::FileWildcardMatch(std::string_view sourceFile, std::string_view
 
 	if(!match)
 	{
-		match = wildcards::match(sourceFile, pattern, equal_to()).res;
+		match = wildcards::match(sourceFile, pattern, eq).res;
 	}
 	return match;
 }
