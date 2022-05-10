@@ -642,6 +642,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionList(std::shared_pt
 std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgsExpressionList(std::shared_ptr<LuaAstNode> expressionList,
                                                                           std::shared_ptr<FormatElement> env)
 {
+	if (env == nullptr)
+	{
+		env = std::make_shared<LongExpressionLayoutElement>(_options.continuation_indent_size);
+	}
+
 	auto& children = expressionList->GetChildren();
 	for (auto& node : children)
 	{
