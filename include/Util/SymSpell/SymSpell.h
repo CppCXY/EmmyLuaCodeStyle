@@ -1,0 +1,68 @@
+﻿#pragma once
+
+// Copyright (C) 2019 Wolf Garbe
+// Version: 6.5
+// Author: Wolf Garbe wolf.garbe@faroo.com
+// Maintainer: Wolf Garbe wolf.garbe@faroo.com
+// URL: https://github.com/wolfgarbe/symspell
+// Description: https://medium.com/@wolfgarbe/1000x-faster-spelling-correction-algorithm-2012-8701fcd87a5f
+//
+// MIT License
+// Copyright (c) 2019 Wolf Garbe
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
+// documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+// the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, 
+// and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+// https://opensource.org/licenses/MIT
+
+// algorithm come from https://github.com/AtheS21/SymspellCPP
+// MODIFY: I re-implemented the whole algorithm
+// @CppCXY: 我修改了整个算法的实现，精简了不需要的部分，修改了不够简练的部分
+
+#include <map>
+#include <vector>
+#include <string>
+#include <string_view>
+#include <unordered_set>
+#include "SuggestItem.h"
+#include "EditDistance.h"
+
+class SymSpell
+{
+public:
+	SymSpell();
+
+	~SymSpell();
+
+	bool LoadWordDictionary(std::string path);
+
+	bool LoadBuildInDictionary();
+
+	bool CreateDictionaryEntry(std::string_view key, int64_t count);
+
+	std::vector<SuggestItem> LookUp(std::string_view input);
+private:
+	std::unordered_set<std::string> EditsPrefix(std::string_view key);
+
+	void Edits(std::string_view word, std::unordered_set<std::string>& deleteWord);
+
+	int GetStringHash(std::string_view source);
+
+	bool DeleteInSuggestionPrefix(std::string_view deleteSugg, std::size_t deleteLen, std::string_view suggestion, std::size_t suggestionLen);
+
+	std::size_t _prefixLength; //prefix length  5..7
+	uint32_t _compactMask;
+	// DistanceAlgorithm distanceAlgorithm = DistanceAlgorithm::DamerauOSADistance;
+	std::size_t _maxDictionaryWordLength; //maximum dictionary term length
+	// Dictionary that contains a mapping of lists of suggested correction words to the hashCodes
+	// of the original words and the deletes derived from them. Collisions of hashCodes is tolerated,
+	// because suggestions are ultimately verified via an edit distance function.
+	// A list of suggestions might have a single suggestion, or multiple suggestions. 
+	std::map<int, std::vector<std::string>> _deletes;
+	// Dictionary of unique correct spelling words, and the frequency count for each word.
+	std::map<std::string, int64_t, std::less<>> _words;
+
+	EditDistance _editDistance;
+};

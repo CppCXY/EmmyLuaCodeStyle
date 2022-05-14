@@ -5,6 +5,7 @@
 #include "Util/format.h"
 #include "Util/FileFinder.h"
 #include "Util/StringUtil.h"
+// #include "Util/SymSpell/SymSpell.h"
 
 LuaWorkspaceFormat::LuaWorkspaceFormat(std::string_view workspace)
 	: _workspace(absolute(std::filesystem::path(workspace))),
@@ -104,6 +105,9 @@ void LuaWorkspaceFormat::ReformatWorkspace()
 
 bool LuaWorkspaceFormat::CheckWorkspace()
 {
+	// SymSpell spell;
+	// spell.LoadWordDictionary(R"(C:\Users\zc\Desktop\jamSpell\SymspellCPP\data\frequency_dictionary_en_82_765.txt)");
+
 	if (_autoDetectConfig)
 	{
 		CollectEditorconfig();
