@@ -147,6 +147,11 @@ bool SymSpell::CreateDictionaryEntry(std::string key, int count)
 	return true;
 }
 
+bool SymSpell::IsCorrectWord(const std::string& word) const
+{
+	return (word.size() <= static_cast<std::size_t>(_maxDictionaryEditDistance)) || (_words.count(word) == 1);
+}
+
 std::vector<SuggestItem> SymSpell::LookUp(const std::string& input)
 {
 	return LookUp(input, _maxDictionaryEditDistance);

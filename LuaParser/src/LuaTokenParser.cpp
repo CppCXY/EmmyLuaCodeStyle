@@ -175,6 +175,11 @@ bool LuaTokenParser::ConsumeAllTokens()
 	return Current().TokenType == _eosToken.TokenType;
 }
 
+std::vector<LuaToken>& LuaTokenParser::GetTokens()
+{
+	return _tokens;
+}
+
 LuaTokenType LuaTokenParser::Lex()
 {
 	ResetBuffer();

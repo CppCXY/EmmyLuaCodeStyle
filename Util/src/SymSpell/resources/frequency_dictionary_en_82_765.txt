@@ -787,6 +787,7 @@ adult 97583096
 tickets 97561755
 thing 97451660
 centre 97258243
+center 97258243
 requirements 97233632
 via 97167128
 cheap 97049762
@@ -1497,7 +1498,7 @@ fish 52756224
 membership 52738089
 mission 52716319
 eye 52688696
-my_string 52681344
+string 52681344
 sense 52629633
 modified 52557860
 pack 52556205
@@ -2588,6 +2589,7 @@ exclusive 29069478
 seat 29066336
 concerns 29065609
 colour 29049269
+color 29049269
 vendor 29029083
 originally 29016923
 intel 28995654
@@ -4465,6 +4467,7 @@ athletic 14193383
 thermal 14186960
 essays 14183871
 behaviour 14175567
+behavior 14175567
 vital 14166642
 telling 14160780
 fairly 14154477
@@ -4654,6 +4657,7 @@ sight 13360499
 laid 13359320
 clay 13357683
 defence 13356231
+defense 13356231
 patches 13354086
 weak 13347842
 refund 13340961
@@ -4978,7 +4982,7 @@ interfaces 12224161
 advertisers 12223306
 moments 12221536
 atlas 12221120
-my_strings 12221039
+strings 12221039
 dawn 12219521
 representing 12219202
 observation 12217876
@@ -8970,6 +8974,7 @@ wagon 5198530
 barbie 5198277
 dat 5197825
 favour 5196953
+favor 5196953
 knock 5196013
 urge 5195810
 generates 5193442
@@ -9046,6 +9051,7 @@ johnston 5136263
 terminology 5134603
 gentleman 5134582
 fibre 5134463
+fiber 5134463
 reproduce 5134246
 convicted 5133903
 shades 5133522
@@ -12821,6 +12827,7 @@ haul 2825285
 acupuncture 2825171
 workload 2824856
 acknowledgement 2823891
+acknowledgment 2823891
 highlighting 2823564
 duly 2823211
 roasted 2822882
@@ -14738,6 +14745,7 @@ admire 2196307
 westerns 2196151
 dodgers 2195501
 litre 2195204
+liter 2195204
 poured 2195144
 usefulness 2194801
 unsolicited 2194503
@@ -15209,6 +15217,7 @@ nguyen 2070173
 meteorological 2070017
 spit 2069895
 labelled 2069889
+labeled 2069889
 darker 2069829
 horsepower 2068922
 globes 2068693
@@ -15411,7 +15420,7 @@ pipelines 2015779
 conforming 2015526
 causal 2015266
 rudy 2014882
-my_stringent 2014881
+stringent 2014881
 rowan 2014844
 tia 2014530
 assigning 2014457
@@ -16554,6 +16563,7 @@ articulate 1767860
 ecstasy 1767792
 sweetheart 1767766
 fulfil 1767616
+fulfill 1767616
 calcutta 1767575
 thursdays 1767458
 tenerife 1767294
@@ -16798,6 +16808,7 @@ weymouth 1721736
 spherical 1721397
 intracellular 1721340
 favourable 1721108
+favorable 1721108
 informs 1720738
 dramas 1720511
 cher 1720213
@@ -17216,6 +17227,7 @@ sanction 1645521
 dyer 1645507
 effected 1645475
 signalling 1645433
+signaling 1645433
 daycare 1645407
 tubular 1645135
 merriam 1644972
@@ -21970,6 +21982,7 @@ guilds 1013989
 blatant 1013927
 floss 1013783
 favoured 1013666
+favored 1013666
 sarge 1013607
 endnote 1013592
 ridges 1013404
@@ -23528,6 +23541,7 @@ simulating 878491
 coughing 878491
 hiatus 878386
 enrol 878274
+enroll 878274
 upholstered 878180
 evangelist 878138
 louvre 878086
@@ -25700,7 +25714,7 @@ serialized 728699
 hangzhou 728685
 bjork 728665
 uncanny 728621
-my_stringer 728602
+stringer 728602
 nanjing 728504
 milligrams 728399
 jab 728373
@@ -26011,7 +26025,7 @@ jagger 710230
 forgery 710220
 setups 710211
 schindler 710088
-drawmy_string 709804
+drawstring 709804
 infrequent 709747
 mull 709728
 ort 709723
@@ -33302,7 +33316,7 @@ sparkles 404075
 collared 404023
 segfault 404007
 costner 403985
-my_stringed 403966
+stringed 403966
 barnabas 403919
 weeding 403855
 evasive 403806
@@ -34655,7 +34669,7 @@ elastomer 366082
 wahoo 366081
 anagram 366073
 fogdog 366028
-my_stringing 366014
+stringing 366014
 finnegan 365995
 bazar 365968
 newsworthy 365954
@@ -35039,7 +35053,7 @@ draperies 356525
 postdoc 356523
 biceps 356518
 hydrant 356496
-hammy_string 356480
+hamstring 356480
 darrow 356480
 tinderbox 356466
 streetwise 356432
@@ -36019,7 +36033,7 @@ toothpick 333066
 exhale 333048
 forwarders 333024
 likable 333004
-shoemy_string 332956
+shoestring 332956
 brads 332940
 whirling 332914
 doghouse 332874
@@ -37237,6 +37251,7 @@ betas 306327
 brothels 306278
 intraocular 306273
 skilful 306269
+skillful 306269
 sprockets 306229
 futurist 306200
 invocations 306188
@@ -38311,6 +38326,7 @@ timbuktu 284407
 nonnegative 284402
 awakens 284351
 amoeba 284346
+ameba 284346
 sonoran 284327
 accentuate 284301
 duvets 284281
@@ -45410,7 +45426,7 @@ minnelli 175665
 hunched 175656
 buzzed 175653
 pickets 175642
-amy_stringent 175631
+astringent 175631
 doldrums 175618
 rectifying 175611
 soothed 175609
@@ -47287,7 +47303,7 @@ bulwark 154812
 beefed 154769
 speculates 154755
 clipboards 154745
-my_stringy 154732
+stringy 154732
 misusing 154729
 befriends 154682
 sonorous 154672
@@ -48048,7 +48064,7 @@ akiva 147117
 interlocked 147106
 lanolin 147085
 immunocompromised 147052
-my_stringers 147040
+stringers 147040
 premonition 147035
 quadriceps 147017
 turnarounds 147003
@@ -51511,7 +51527,7 @@ yearns 117196
 tarawa 117189
 unaccustomed 117188
 platoons 117179
-hammy_strings 117173
+hamstrings 117173
 unbelieving 117162
 luminary 117156
 congressionally 117152
@@ -52540,7 +52556,7 @@ avers 109324
 groks 109301
 amblyopia 109277
 shipowners 109268
-my_stringency 109267
+stringency 109267
 livability 109251
 quale 109246
 frater 109238
@@ -53204,7 +53220,7 @@ weeded 104681
 granados 104681
 disobeying 104676
 psychophysics 104669
-heartmy_strings 104668
+heartstrings 104668
 arum 104652
 sidon 104648
 honeypots 104639
@@ -62096,7 +62112,7 @@ pourer 58543
 sfax 58539
 patroclus 58536
 nonmetal 58534
-my_stringently 58529
+stringently 58529
 demigods 58525
 sipper 58521
 federals 58517
@@ -62813,7 +62829,7 @@ ganger 55890
 thermogenesis 55889
 improbably 55885
 expressionless 55876
-bowmy_string 55874
+bowstring 55874
 collimators 55871
 abraded 55869
 denar 55863
@@ -65250,7 +65266,7 @@ moraines 47562
 unflagging 47561
 adiposity 47553
 dogwoods 47542
-amy_stringents 47540
+astringents 47540
 tobacconists 47536
 collectivization 47535
 harrows 47529
@@ -74199,7 +74215,7 @@ couching 25681
 yesenia 25680
 promethium 25679
 cackles 25677
-drawmy_strings 25676
+drawstrings 25676
 scoters 25675
 lipetsk 25672
 rechecking 25669
@@ -76146,7 +76162,7 @@ postnatally 22203
 enticingly 22201
 manichean 22200
 equestrianism 22199
-amy_stringency 22196
+astringency 22196
 wrings 22195
 malnourishment 22192
 glacially 22191
@@ -77938,7 +77954,7 @@ montgolfier 19290
 shamelessness 19285
 resiliently 19283
 felicitated 19280
-shoemy_strings 19279
+shoestrings 19279
 birls 19278
 stupefaction 19275
 lexicographers 19271
@@ -79388,7 +79404,7 @@ brakpan 17069
 accelerant 17069
 battened 17068
 raillery 17067
-remy_stringing 17066
+restringing 17066
 haymakers 17065
 accordant 17065
 swigging 17064
@@ -82763,3 +82779,56 @@ he'll 300000
 they'll 300000
 i'll 300000
 i'm 300000
+aren't 300000
+could've 300000
+didn't 300000
+doesn't 300000
+hadn't 300000
+hasn't 300000
+haven't 300000
+he'd 300000
+he's 300000
+here's 300000
+how'd 300000
+how'll 300000
+how're 300000
+i'd 300000
+i've 300000
+isn't 300000
+it'd 300000
+it'll 300000
+it's 300000
+let's 300000
+might've 300000
+o'clock 300000
+she'd 300000
+she's 300000
+should've 300000
+somebody's 300000
+someone's 300000
+something's 300000
+that's 300000
+there's 300000
+they'd 300000
+they're 300000
+they've 300000
+wasn't 300000
+we'd 300000
+we're 300000
+we've 300000
+weren't 300000
+what's 300000
+where's 300000
+who'd 300000
+who'll 300000
+who're 300000
+who's 300000
+why'd 300000
+why're 300000
+why's 300000
+you'd 300000
+you'll 300000
+you're 300000
+you'v 300000
+covid 300000
+hi 300000

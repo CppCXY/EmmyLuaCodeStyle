@@ -125,6 +125,11 @@ std::shared_ptr<LuaFile> LuaParser::GetLuaFile()
 	return _file;
 }
 
+std::shared_ptr<LuaTokenParser> LuaParser::GetTokenParser()
+{
+	return _tokenParser;
+}
+
 void LuaParser::BuildAstWithComment()
 {
 	BuildAst();

@@ -142,7 +142,7 @@ bool LuaFormat::Reformat()
 	return true;
 }
 
-bool LuaFormat::Check(std::string_view workspace)
+bool LuaFormat::Check(std::string_view workspace, std::shared_ptr<CodeSpellChecker> spellChecker)
 {
 	_parser->BuildAstWithComment();
 
@@ -186,6 +186,8 @@ bool LuaFormat::Check(std::string_view workspace)
 		NameStyleChecker styleChecker(ctx);
 		styleChecker.Analysis();
 	}
+
+	spellChecker->Analysis(ctx);
 
 	auto diagnosis = ctx.GetDiagnosisInfos();
 	if (!diagnosis.empty())

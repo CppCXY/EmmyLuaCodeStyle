@@ -68,6 +68,8 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleChecker.cpp
 	${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleRuleMatcher.cpp
 	${CodeService_SOURCE_DIR}/src/NameStyle/CheckElement.cpp
+	${CodeService_SOURCE_DIR}/src/Spell/CodeSpellChecker.cpp
+	${CodeService_SOURCE_DIR}/src/Spell/IdentifyParser.cpp
 	${CodeService_SOURCE_DIR}/src/AstUtil.cpp
 )
 

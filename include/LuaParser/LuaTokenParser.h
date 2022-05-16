@@ -41,7 +41,9 @@ public:
 
 	std::shared_ptr<LuaFile> GetFile();
 
-	bool ConsumeAllTokens(); 
+	bool ConsumeAllTokens();
+
+	std::vector<LuaToken>& GetTokens();
 private:
 	static std::map<std::string, LuaTokenType, std::less<>> LuaReserved;
 

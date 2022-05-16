@@ -44,6 +44,8 @@ public:
 
 	bool CreateDictionaryEntry(std::string key, int count);
 
+	bool IsCorrectWord(const std::string& word) const;
+
 	std::vector<SuggestItem> LookUp(const std::string& input);
 
 	std::vector<SuggestItem> LookUp(const std::string& input, int maxEditDistance);

@@ -42,6 +42,8 @@ public:
 	std::string_view GetFilename();
 
 	std::shared_ptr<LuaFile> GetLuaFile();
+
+	std::shared_ptr<LuaTokenParser> GetTokenParser();
 private:
 	bool BlockFollow(bool withUntil = false);
 
