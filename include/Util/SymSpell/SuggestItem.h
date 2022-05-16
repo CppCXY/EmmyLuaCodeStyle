@@ -5,21 +5,16 @@
 class SuggestItem
 {
 public:
-	SuggestItem()
-	{
-	}
+	static bool Comapare(const SuggestItem& lhs, const SuggestItem& rhs);
 
-	SuggestItem(std::string term, int distance, int64_t count)
-		: Term(term),
-		  Distance(distance),
-		  Count(count)
-	{
-	}
+	SuggestItem();
 
-	// The suggested correctly spelled word.</summary>
+	SuggestItem(std::string term, int distance, int count);
+
+	// The suggested correctly spelled word.
 	std::string Term;
-	// Edit distance between searched for word and suggestion.</summary>
+	// Edit distance between searched for word and suggestion.
 	int Distance = 0;
-	// Frequency of suggestion in the dictionary (a measure of how common the word is).</summary>
-	int64_t Count = 0;
+	// Frequency of suggestion in the dictionary (a measure of how common the word is).
+	int Count = 0;
 };

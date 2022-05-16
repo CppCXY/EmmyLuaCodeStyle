@@ -26,13 +26,15 @@
 #include <string>
 #include <string_view>
 #include <unordered_set>
+#include <unordered_map>
 #include "SuggestItem.h"
 #include "EditDistance.h"
 
 class SymSpell
 {
 public:
-	SymSpell();
+	SymSpell(int maxDictionaryEditDistance = 2,
+	         int prefixLength = 3);
 
 	~SymSpell();
 
@@ -40,29 +42,34 @@ public:
 
 	bool LoadBuildInDictionary();
 
-	bool CreateDictionaryEntry(std::string_view key, int64_t count);
+	bool CreateDictionaryEntry(std::string key, int count);
 
-	std::vector<SuggestItem> LookUp(std::string_view input);
+	std::vector<SuggestItem> LookUp(const std::string& input);
+
+	std::vector<SuggestItem> LookUp(const std::string& input, int maxEditDistance);
 private:
 	std::unordered_set<std::string> EditsPrefix(std::string_view key);
 
-	void Edits(std::string_view word, std::unordered_set<std::string>& deleteWord);
+	void Edits(std::string_view word, int editDistance, std::unordered_set<std::string>& deleteWord);
 
 	int GetStringHash(std::string_view source);
 
-	bool DeleteInSuggestionPrefix(std::string_view deleteSugg, std::size_t deleteLen, std::string_view suggestion, std::size_t suggestionLen);
+	bool DeleteInSuggestionPrefix(std::string_view deleteSuggest, std::size_t deleteLen, std::string_view suggestion,
+	                              std::size_t suggestionLen);
 
 	std::size_t _prefixLength; //prefix length  5..7
 	uint32_t _compactMask;
 	// DistanceAlgorithm distanceAlgorithm = DistanceAlgorithm::DamerauOSADistance;
 	std::size_t _maxDictionaryWordLength; //maximum dictionary term length
+
+	int _maxDictionaryEditDistance;
 	// Dictionary that contains a mapping of lists of suggested correction words to the hashCodes
 	// of the original words and the deletes derived from them. Collisions of hashCodes is tolerated,
 	// because suggestions are ultimately verified via an edit distance function.
 	// A list of suggestions might have a single suggestion, or multiple suggestions. 
 	std::map<int, std::vector<std::string>> _deletes;
 	// Dictionary of unique correct spelling words, and the frequency count for each word.
-	std::map<std::string, int64_t, std::less<>> _words;
+	std::unordered_map<std::string, int> _words;
 
 	EditDistance _editDistance;
 };

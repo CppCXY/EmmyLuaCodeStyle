@@ -4,14 +4,18 @@
 #include <sstream>
 #include <limits>
 #include <cmath>
+#include <algorithm>
 #include "Util/StringUtil.h"
 
-extern std::vector<std::pair<std::string, int64_t>> BuildInWords;
+// extern const char *BuildInWords;
 
-SymSpell::SymSpell()
-	: _prefixLength(5),
+SymSpell::SymSpell(int maxDictionaryEditDistance,
+                   int prefixLength)
+	: _prefixLength(prefixLength),
+	  _compactMask((std::numeric_limits<uint32_t>::max() >> 8) << 2),
 	  _maxDictionaryWordLength(0),
-	  _compactMask((std::numeric_limits<uint32_t>::max() >> 8) << 2)
+	  _maxDictionaryEditDistance(maxDictionaryEditDistance),
+	  _words(82765)
 {
 }
 
@@ -43,8 +47,11 @@ bool SymSpell::LoadWordDictionary(std::string path)
 			}
 
 			int64_t count = std::stoll(std::string(tokens[1]));
-
-			CreateDictionaryEntry(tokens[0], count);
+			if (count > std::numeric_limits<int>::max())
+			{
+				count = std::numeric_limits<int>::max();
+			}
+			CreateDictionaryEntry(std::string(tokens[0]), static_cast<int>(count));
 		}
 	}
 	catch (std::exception& e)
@@ -58,10 +65,37 @@ bool SymSpell::LoadWordDictionary(std::string path)
 
 bool SymSpell::LoadBuildInDictionary()
 {
+	// std::string_view dictionarySource = BuildInWords;
+	//
+	// auto lines = StringUtil::Split(dictionarySource, "\n");
+	// try
+	// {
+	// 	for (auto& line : lines)
+	// 	{
+	// 		auto tokens = StringUtil::Split(line, " ");
+	// 		if (tokens.size() < 2)
+	// 		{
+	// 			continue;
+	// 		}
+	//
+	// 		int64_t count = std::stoll(std::string(tokens[1]));
+	// 		if (count > std::numeric_limits<int>::max())
+	// 		{
+	// 			count = std::numeric_limits<int>::max();
+	// 		}
+	// 		CreateDictionaryEntry(tokens[0], static_cast<int>(count));
+	// 	}
+	// }
+	// catch (std::exception& e)
+	// {
+	// 	std::cerr << e.what() << std::endl;
+	// 	return false;
+	// }
+
 	return true;
 }
 
-bool SymSpell::CreateDictionaryEntry(std::string_view key, int64_t count)
+bool SymSpell::CreateDictionaryEntry(std::string key, int count)
 {
 	if (count <= 0)
 	{
@@ -72,24 +106,24 @@ bool SymSpell::CreateDictionaryEntry(std::string_view key, int64_t count)
 	auto wordsFounded = _words.find(key);
 	if (wordsFounded != _words.end())
 	{
-		int64_t countPrevious = wordsFounded->second;
-		count = (std::numeric_limits<int64_t>::max() - countPrevious > count)
+		int countPrevious = wordsFounded->second;
+		count = (std::numeric_limits<int>::max() - countPrevious > count)
 			        ? (countPrevious + count)
-			        : std::numeric_limits<int64_t>::max();
+			        : std::numeric_limits<int>::max();
 		wordsFounded->second = count;
 		return false;
 	}
 	else
 	{
-		_words.insert({std::string(key), count});
+		_words.insert({key, count});
 	}
 
 	//edits/suggestions are created only once, no matter how often word occurs
 	//edits/suggestions are created only as soon as the word occurs in the corpus, 
 	//even if the same term existed before in the dictionary as an edit from another word
-	if (key.size() > this->_maxDictionaryWordLength)
+	if (key.size() > _maxDictionaryWordLength)
 	{
-		this->_maxDictionaryWordLength = key.size();
+		_maxDictionaryWordLength = key.size();
 	}
 	//create deletes
 	auto edits = EditsPrefix(key);
@@ -101,7 +135,7 @@ bool SymSpell::CreateDictionaryEntry(std::string_view key, int64_t count)
 		if (deletesFounded != _deletes.end())
 		{
 			auto& suggestions = deletesFounded->second;
-			suggestions.push_back(std::string(key));
+			suggestions.emplace_back(key);
 		}
 		else
 		{
@@ -113,22 +147,35 @@ bool SymSpell::CreateDictionaryEntry(std::string_view key, int64_t count)
 	return true;
 }
 
-std::vector<SuggestItem> SymSpell::LookUp(std::string_view input)
+std::vector<SuggestItem> SymSpell::LookUp(const std::string& input)
+{
+	return LookUp(input, _maxDictionaryEditDistance);
+}
+
+std::vector<SuggestItem> SymSpell::LookUp(const std::string& input, int maxEditDistance)
 {
 	std::vector<SuggestItem> suggestions;
+
+	if (maxEditDistance > _maxDictionaryEditDistance)
+	{
+		return suggestions;
+	}
+
 	// early exit - word is too big to possibly match any words
 	if (input.size() - 1 > _maxDictionaryWordLength)
 	{
 		return suggestions;
 	}
 
-	int64_t suggestionCount = 0;
+	int suggestionCount = 0;
 	auto founded = _words.find(input);
 
 	if (founded != _words.end())
 	{
-		suggestionCount = founded->second;
-		suggestions.emplace_back(std::string(input), 0, suggestionCount);
+		// suggestionCount = founded->second;
+		// suggestions.emplace_back(std::string(input), 0, suggestionCount);
+		// Modify: 如果是已经存在的单词则不给出建议
+		return suggestions;
 	}
 
 	// deletes we've considered already
@@ -138,11 +185,12 @@ std::vector<SuggestItem> SymSpell::LookUp(std::string_view input)
 
 	hashset2.insert(std::string(input));
 
-	int maxEditDistance2 = 1;
+	int maxEditDistance2 = maxEditDistance;
 
 	std::vector<std::string> candidates;
 
 	auto inputPrefixLen = input.size();
+	auto inputLen = inputPrefixLen;
 	if (inputPrefixLen > _prefixLength)
 	{
 		inputPrefixLen = _prefixLength;
@@ -156,9 +204,10 @@ std::vector<SuggestItem> SymSpell::LookUp(std::string_view input)
 	std::size_t candidateIndex = 0;
 	while (candidateIndex < candidates.size())
 	{
-		auto& candidate = candidates[candidateIndex++];
+		// do not &
+		auto candidate = candidates[candidateIndex++];
 		auto candidateLen = candidate.size();
-		int lengthDiff = inputPrefixLen - candidateLen;
+		int lengthDiff = static_cast<int>(inputPrefixLen - candidateLen);
 		if (lengthDiff > maxEditDistance2)
 		{
 			break;
@@ -177,15 +226,21 @@ std::vector<SuggestItem> SymSpell::LookUp(std::string_view input)
 				}
 
 				if ((::abs(static_cast<int>(suggestionLen - input.size())) > maxEditDistance2)
+					// input and sugg lengths diff > allowed/current best distance
 					|| (suggestionLen < candidateLen)
+					// sugg must be for a different delete string, in same bin only because of hash collision
 					|| (suggestionLen == candidateLen && suggestion != candidate))
+					// if sugg len = delete len, then it either equals delete or is in same bin only because of hash collision
 				{
 					continue;
 				}
 
-				auto suggPrefixLen = std::min(suggestionLen, _prefixLength);
-				if (suggPrefixLen > inputPrefixLen && (suggPrefixLen - candidateLen) > maxEditDistance2) continue;
-
+				auto suggestPrefixLen = std::min(suggestionLen, _prefixLength);
+				if ((suggestPrefixLen > inputPrefixLen)
+					&& (static_cast<int>(suggestPrefixLen - candidateLen) > maxEditDistance2))
+				{
+					continue;
+				}
 				//True Damerau-Levenshtein Edit Distance: adjust distance, if both distances>0
 				//We allow simultaneous edits (deletes) of maxEditDistance on on both the dictionary and the input term. 
 				//For replaces and adjacent transposes the resulting edit distance stays <= maxEditDistance.
@@ -195,58 +250,78 @@ std::vector<SuggestItem> SymSpell::LookUp(std::string_view input)
 				//Two deletes on each side of a pair makes them all equal, but the first two pairs have edit distance=1, the others edit distance=2.
 				int distance = 0;
 				int minLen = 0;
-				auto inputLen = input.size();
 				if (candidateLen == 0)
 				{
 					//suggestions which have no common chars with input (inputLen<=maxEditDistance && suggestionLen<=maxEditDistance)
-					distance = std::max(input.size(), suggestionLen);
+					distance = static_cast<int>(std::max(inputLen, suggestionLen));
 					auto flag = hashset2.insert(suggestion);
-					if (distance > maxEditDistance2 || !flag.second) continue;
+					if (distance > maxEditDistance2 || !flag.second)
+					{
+						continue;
+					}
 				}
 				else if (suggestionLen == 1)
 				{
 					// not entirely sure what happens here yet
-					if (input.find(suggestion[0]) == input.npos)
-						distance = input.size();
+					if (input.find(suggestion[0]) == std::string_view::npos)
+					{
+						distance = static_cast<int>(inputLen);
+					}
 					else
-						distance = input.size() - 1;
-
+					{
+						distance = static_cast<int>(inputLen) - 1;
+					}
 					auto flag = hashset2.insert(suggestion);
-					if (distance > maxEditDistance2 || !flag.second) continue;
-				}
-				else
-
-					//number of edits in prefix ==maxediddistance  AND no identic suffix
-					//, then editdistance>maxEditDistance and no need for Levenshtein calculation  
-					//      (inputLen >= prefixLength) && (suggestionLen >= prefixLength) 
-					if ((_prefixLength - 1 == candidateLen)
-						&& (((minLen = std::min(inputLen, suggestionLen) - _prefixLength) > 1)
-							&& (input.substr(inputLen + 1 - minLen) != suggestion.substr(suggestionLen + 1 - minLen)))
-						|| ((minLen > 0) && (input[inputLen - minLen] != suggestion[suggestionLen - minLen])
-							&& ((input[inputLen - minLen - 1] != suggestion[suggestionLen - minLen])
-								|| (input[inputLen - minLen] != suggestion[suggestionLen - minLen - 1]))))
+					if (distance > maxEditDistance2 || !flag.second)
 					{
 						continue;
 					}
-					else
+				}
+				else
+				{
+					// number of edits in prefix == maxediddistance  AND no identic suffix
+					// then editdistance>maxEditDistance and no need for Levenshtein calculation  
+					if (_prefixLength - 1 == candidateLen)
 					{
-						// DeleteInSuggestionPrefix is somewhat expensive, and only pays off when verbosity is Top or Closest.
-						if ((!DeleteInSuggestionPrefix(candidate, candidateLen, suggestion, suggestionLen))
-							|| !hashset2.insert(suggestion).second)
+						minLen = static_cast<int>(std::min(inputLen, suggestionLen) - _prefixLength);
+						if (minLen > 1 && input.substr(inputLen + 1 - minLen) != suggestion.substr(
+							suggestionLen + 1 - minLen))
+						{
 							continue;
-						distance = _editDistance.Compare(input, suggestion, maxEditDistance2);
-						if (distance < 0) continue;
+						}
+
+						if (minLen > 0
+							&& (input[inputLen - minLen] != suggestion[suggestionLen - minLen])
+							&& ((input[inputLen - minLen - 1] != suggestion[suggestionLen - minLen])
+								|| (input[inputLen - minLen] != suggestion[suggestionLen - minLen - 1])))
+						{
+							continue;
+						}
 					}
+
+					// DeleteInSuggestionPrefix is somewhat expensive, and only pays off when verbosity is Top or Closest.
+					if ((!DeleteInSuggestionPrefix(candidate, candidateLen, suggestion, suggestionLen))
+						|| !hashset2.insert(suggestion).second)
+					{
+						continue;
+					}
+					distance = _editDistance.Compare(input, suggestion, maxEditDistance2);
+					if (distance < 0)
+					{
+						continue;
+					}
+				}
 
 				//save some time
 				//do not process higher distances than those already found, if verbosity<All (note: maxEditDistance2 will always equal maxEditDistance when Verbosity.All)
 				if (distance <= maxEditDistance2)
 				{
 					suggestionCount = _words[suggestion];
-					SuggestItem si = SuggestItem(suggestion, distance, suggestionCount);
-					if (suggestions.size() > 0)
+					SuggestItem si(suggestion, distance, suggestionCount);
+
+					if (!suggestions.empty() && distance < maxEditDistance2)
 					{
-						if (distance < maxEditDistance2) suggestions.clear();
+						suggestions.clear();
 					}
 
 					maxEditDistance2 = distance;
@@ -254,14 +329,40 @@ std::vector<SuggestItem> SymSpell::LookUp(std::string_view input)
 				}
 			}
 		}
+
+		//add edits 
+		//derive edits (deletes) from candidate (input) and add them to candidates list
+		//this is a recursive process until the maximum edit distance has been reached
+		if ((lengthDiff < maxEditDistance) && (candidateLen <= _prefixLength))
+		{
+			//save some time
+			//do not create edits with edit distance smaller than suggestions already found
+			if (lengthDiff >= maxEditDistance2)
+			{
+				continue;
+			}
+			for (std::size_t i = 0; i < candidateLen; i++)
+			{
+				std::string temp(candidate);
+				std::string del = temp.erase(i, 1);
+
+				if (hashset1.insert(del).second)
+				{
+					candidates.push_back(del);
+				}
+			}
+		}
 	}
+
+	std::sort(suggestions.begin(), suggestions.end(), SuggestItem::Comapare);
+
 	return suggestions;
 }
 
 std::unordered_set<std::string> SymSpell::EditsPrefix(std::string_view key)
 {
 	std::unordered_set<std::string> hashSet;
-	if (key.size() <= _maxDictionaryWordLength)
+	if (key.size() <= static_cast<int>(_maxDictionaryEditDistance))
 	{
 		hashSet.insert("");
 	}
@@ -270,21 +371,27 @@ std::unordered_set<std::string> SymSpell::EditsPrefix(std::string_view key)
 		key = key.substr(0, _prefixLength);
 	}
 	hashSet.insert(std::string(key));
-	Edits(key, hashSet);
+	Edits(key, 0, hashSet);
 
 	return hashSet;
 }
 
-void SymSpell::Edits(std::string_view word, std::unordered_set<std::string>& deleteWord)
+void SymSpell::Edits(std::string_view word, int editDistance, std::unordered_set<std::string>& deleteWord)
 {
+	editDistance++;
 	if (word.size() > 1)
 	{
 		for (std::size_t i = 0; i < word.size(); i++)
 		{
 			std::string tmp(word);
 			auto del = tmp.erase(i, 1);
-			// 定死为1的编辑距离
-			deleteWord.insert(del);
+			if (deleteWord.insert(del).second)
+			{
+				if (editDistance < _maxDictionaryEditDistance)
+				{
+					Edits(del, editDistance, deleteWord);
+				}
+			}
 		}
 	}
 }
@@ -309,7 +416,8 @@ int SymSpell::GetStringHash(std::string_view source)
 	return static_cast<int>(hash);
 }
 
-bool SymSpell::DeleteInSuggestionPrefix(std::string_view deleteSugg, std::size_t deleteLen, std::string_view suggestion,
+bool SymSpell::DeleteInSuggestionPrefix(std::string_view deleteSuggest, std::size_t deleteLen,
+                                        std::string_view suggestion,
                                         std::size_t suggestionLen)
 {
 	if (deleteLen == 0)
@@ -324,7 +432,7 @@ bool SymSpell::DeleteInSuggestionPrefix(std::string_view deleteSugg, std::size_t
 	std::size_t j = 0;
 	for (std::size_t i = 0; i < deleteLen; i++)
 	{
-		char delChar = deleteSugg[i];
+		char delChar = deleteSuggest[i];
 		while (j < suggestionLen && delChar != suggestion[j]) { j++; }
 		if (j == suggestionLen)
 		{
@@ -333,7 +441,3 @@ bool SymSpell::DeleteInSuggestionPrefix(std::string_view deleteSugg, std::size_t
 	}
 	return true;
 }
-
-#ifdef USE_BUILDIN_DICTIONARY
-#include "resources/dictionary.hpp"
-#endif

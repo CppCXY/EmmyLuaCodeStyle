@@ -117,7 +117,7 @@ public:
 		PrefixSuffixPrep(string1, string2, len1, len2, start);
 		if (len1 == 0)
 		{
-			return (len2 < maxEditDistance) ? len2 : -1;
+			return (len2 <= maxEditDistance) ? len2 : -1;
 		}
 		if (len2 > _baseChar1Costs.size())
 		{
@@ -246,12 +246,15 @@ public:
 		// suffix common to both strings can be ignored
 		while (len1 != 0 && string1[len1 - 1] == string2[len2 - 1])
 		{
-			len1 = len1 - 1;
-			len2 = len2 - 1;
+			len1--;
+			len2--;
 		}
 		// prefix common to both strings can be ignored
 		start = 0;
-		while (start != len1 && string1[start] == string2[start]) start++;
+		while (start != len1 && string1[start] == string2[start])
+		{
+			start++;
+		}
 		if (start != 0)
 		{
 			len2 -= start; // length of the part excluding common prefix and suffix

@@ -35,3 +35,7 @@ target_sources(Util
 
 
 target_link_libraries(Util PUBLIC uriparser)
+
+if(BuildInWordsDictionary)
+	target_compile_definitions(Util PRIVATE -DUSE_BUILDIN_DICTIONARY)
+endif()
