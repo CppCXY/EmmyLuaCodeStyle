@@ -2,7 +2,7 @@
 #include <memory>
 #include <stack>
 #include "FormatContext.h"
-#include "CodeService/LuaDiagnosisInfo.h"
+#include "CodeService/Diagnosis/LuaDiagnosisInfo.h"
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "LuaParser/LuaParser.h"
 

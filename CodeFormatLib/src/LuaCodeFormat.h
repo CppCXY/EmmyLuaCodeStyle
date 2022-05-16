@@ -5,7 +5,7 @@
 #include <string_view>
 
 #include "CodeService/LuaCodeStyleOptions.h"
-#include "CodeService/LuaDiagnosisInfo.h"
+#include "CodeService/Diagnosis/LuaDiagnosisInfo.h"
 #include "CodeService/LuaEditorConfig.h"
 #include "CodeService/LuaFormatRange.h"
 

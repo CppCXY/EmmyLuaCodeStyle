@@ -2,6 +2,7 @@
 
 #include "CodeService/LuaEditorConfig.h"
 #include "CodeService/LuaFormatter.h"
+#include "CodeService/NameStyle/NameStyleChecker.h"
 #include "LuaParser/LuaParser.h"
 #include "Util/StringUtil.h"
 
@@ -109,7 +110,16 @@ std::pair<bool, std::vector<LuaDiagnosisInfo>> LuaCodeFormat::Diagnose(const std
 	LuaFormatter formatter(parser, *options);
 	formatter.BuildFormattedElement();
 
-	return std::make_pair(true, formatter.GetDiagnosisInfos());
+	DiagnosisContext ctx(parser, *options);
+	formatter.CalculateDiagnosisInfos(ctx);
+
+	if (options->enable_check_codestyle)
+	{
+		NameStyleChecker styleChecker(ctx);
+		styleChecker.Analysis();
+	}
+
+	return std::make_pair(true, ctx.GetDiagnosisInfos());
 }
 
 std::shared_ptr<LuaCodeStyleOptions> LuaCodeFormat::GetOptions(const std::string& uri)

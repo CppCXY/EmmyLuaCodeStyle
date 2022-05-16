@@ -7,7 +7,7 @@
 
 #include "LuaParser/LuaParser.h"
 #include "CodeService/LuaCodeStyleOptions.h"
-#include "CodeService/LuaDiagnosisInfo.h"
+#include "CodeService/Diagnosis/LuaDiagnosisInfo.h"
 
 class LuaFormat
 {

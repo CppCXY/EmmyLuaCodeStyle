@@ -4,7 +4,6 @@
 #include "LuaParser/LuaParser.h"
 #include "LuaCodeStyleOptions.h"
 #include "FormatElement/FormatElement.h"
-#include "LuaDiagnosisInfo.h"
 #include "LuaFormatRange.h"
 
 class LuaFormatter
@@ -21,7 +20,7 @@ public:
 
 	std::string GetRangeFormattedText(LuaFormatRange& validRange);
 
-	std::vector<LuaDiagnosisInfo> GetDiagnosisInfos();
+	void CalculateDiagnosisInfos(DiagnosisContext& ctx);
 
 protected:
 	std::shared_ptr<FormatElement> FormatNode(std::shared_ptr<LuaAstNode> node);

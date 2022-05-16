@@ -7,6 +7,7 @@
 
 #include "CodeService/LuaEditorConfig.h"
 #include "CodeService/LuaFormatter.h"
+#include "CodeService/NameStyle/NameStyleChecker.h"
 #include "Util/StringUtil.h"
 
 LuaFormat::LuaFormat()
@@ -177,7 +178,16 @@ bool LuaFormat::Check(std::string_view workspace)
 	LuaFormatter formatter(_parser, *_options);
 	formatter.BuildFormattedElement();
 
-	auto diagnosis = formatter.GetDiagnosisInfos();
+	DiagnosisContext ctx(_parser, *_options);
+	formatter.CalculateDiagnosisInfos(ctx);
+
+	if (_options->enable_check_codestyle)
+	{
+		NameStyleChecker styleChecker(ctx);
+		styleChecker.Analysis();
+	}
+
+	auto diagnosis = ctx.GetDiagnosisInfos();
 	if (!diagnosis.empty())
 	{
 		std::cerr << format("Check {}\t{} warning", inputFile, diagnosis.size()) << std::endl;
@@ -207,7 +217,4 @@ void LuaFormat::DiagnosisInspection(std::string_view message, TextRange range, s
 	auto endChar = file->GetColumn(range.EndOffset);
 	std::cerr << format("{}({}:{} to {}:{}): {}", path, startLine + 1, startChar, endLine + 1, endChar,
 	                    message) << std::endl;
-
-
-
 }

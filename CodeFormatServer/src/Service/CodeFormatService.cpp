@@ -1,6 +1,7 @@
 #include "CodeFormatServer/Service/CodeFormatService.h"
-
 #include "CodeService/LuaFormatter.h"
+#include "CodeService/FormatElement/DiagnosisContext.h"
+#include "CodeService/NameStyle/NameStyleChecker.h"
 
 CodeFormatService::CodeFormatService(std::shared_ptr<LanguageClient> owner)
 	: Service(owner)
@@ -14,8 +15,18 @@ std::vector<vscode::Diagnostic> CodeFormatService::Diagnose(std::string_view fil
 	LuaFormatter formatter(parser, *options);
 	formatter.BuildFormattedElement();
 
-	auto diagnosisInfos = formatter.GetDiagnosisInfos();
+	DiagnosisContext ctx(parser, *options);
+	formatter.CalculateDiagnosisInfos(ctx);
+
+	if(options->enable_check_codestyle)
+	{
+		NameStyleChecker styleChecker(ctx);
+		styleChecker.Analysis();
+	}
+
+	auto diagnosisInfos = ctx.GetDiagnosisInfos(); ;
 	std::vector<vscode::Diagnostic> diagnostics;
+
 	for (auto diagnosisInfo : diagnosisInfos)
 	{
 		auto& diagnosis = diagnostics.emplace_back();
