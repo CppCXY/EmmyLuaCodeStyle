@@ -117,15 +117,15 @@ public:
 		PrefixSuffixPrep(string1, string2, len1, len2, start);
 		if (len1 == 0)
 		{
-			return (len2 <= maxEditDistance) ? len2 : -1;
+			return (len2 <= static_cast<int>(maxEditDistance)) ? len2 : -1;
 		}
-		if (len2 > _baseChar1Costs.size())
+		if (len2 > static_cast<int>(_baseChar1Costs.size()))
 		{
 			_baseChar1Costs.resize(len2, 0);
 			_basePrevChar1Costs.resize(len2, 0);
 		}
 
-		if (maxEditDistance < len2)
+		if (static_cast<int>(maxEditDistance) < len2)
 		{
 			return Distance(string1, string2, len1, len2, start, static_cast<int>(maxEditDistance), _baseChar1Costs, _basePrevChar1Costs);
 		}
