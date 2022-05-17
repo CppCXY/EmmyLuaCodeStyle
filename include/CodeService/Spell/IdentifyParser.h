@@ -21,6 +21,12 @@ public:
 	{
 		std::size_t Start;
 		std::size_t Count;
+
+		WordRange(std::size_t start, std::size_t count)
+			: Start(start),
+			  Count(count)
+		{
+		}
 	};
 
 	struct Word
