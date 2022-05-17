@@ -83,7 +83,7 @@ IdentifyParser::IdentifyType IdentifyParser::Lex()
 			return IdentifyType::Ignore;
 		}
 
-		if (ch > std::numeric_limits<char>::max())
+		if (ch > CHAR_MAX)
 		{
 			return IdentifyType::Unicode;
 		}
