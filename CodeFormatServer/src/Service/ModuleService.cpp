@@ -259,7 +259,7 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 		{
 			auto& luaModule = pair.second.front();
 			completion.detail = Util::format("({})", name);
-			completion.documentation = format("import from {}", luaModule->FilePath);
+			completion.documentation = Util::format("import from {}", luaModule->FilePath);
 			auto object = nlohmann::json::object();
 			object["moduleName"] = luaModule->ModuleName;
 			object["path"] = luaModule->FilePath;
