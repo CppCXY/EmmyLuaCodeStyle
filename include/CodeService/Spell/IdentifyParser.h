@@ -33,6 +33,12 @@ public:
 	{
 		WordRange Range;
 		std::string Item;
+
+		Word(const WordRange& range, const std::string& item)
+			: Range(range),
+			  Item(item)
+		{
+		}
 	};
 
 	IdentifyParser(std::string_view source);
