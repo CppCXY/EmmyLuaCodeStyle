@@ -8,6 +8,7 @@ enum class DiagnosisType : int
 	Align,
 	Blank,
 	EndWithNewLine,
-	NameStyle
+	NameStyle,
+	Spell
 };
 

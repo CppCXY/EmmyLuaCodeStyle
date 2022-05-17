@@ -2,7 +2,7 @@
 #include <memory>
 #include <stack>
 #include "FormatContext.h"
-#include "CodeService/LuaDiagnosisInfo.h"
+#include "CodeService/Diagnosis/LuaDiagnosisInfo.h"
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "LuaParser/LuaParser.h"
 
@@ -11,9 +11,9 @@ class DiagnosisContext: public FormatContext
 public:
 	DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options);
 
-	void PushDiagnosis(std::string_view message, TextRange range, DiagnosisType type);
+	void PushDiagnosis(std::string_view message, TextRange range, DiagnosisType type, std::string data = "");
 
-	void PushDiagnosis(std::string_view message, LuaDiagnosisPosition start, LuaDiagnosisPosition end, DiagnosisType type);
+	void PushDiagnosis(std::string_view message, LuaDiagnosisPosition start, LuaDiagnosisPosition end, DiagnosisType type, std::string data = "");
 
 	void SetCharacterCount(int character);
 

@@ -35,4 +35,5 @@ public:
 	std::string Message;
 	LuaDiagnosisRange Range;
 	DiagnosisType type;
+	std::string Data;
 };

@@ -5,6 +5,7 @@
 #include "Util/format.h"
 #include "Util/FileFinder.h"
 #include "Util/StringUtil.h"
+#include "Util/SymSpell/SymSpell.h"
 
 LuaWorkspaceFormat::LuaWorkspaceFormat(std::string_view workspace)
 	: _workspace(absolute(std::filesystem::path(workspace))),
@@ -126,12 +127,13 @@ bool LuaWorkspaceFormat::CheckWorkspace()
 	auto files = finder.FindFiles();
 	bool ret = true;
 	auto workspaceString = _workspace.string();
+
 	for (auto& file : files)
 	{
 		LuaFormat luaFormat;
 		luaFormat.SetInputFile(file);
 		luaFormat.SetOptions(GetOptions(file));
-		ret &= luaFormat.Check(workspaceString);
+		ret &= luaFormat.Check(workspaceString, nullptr);
 	}
 
 	return ret;

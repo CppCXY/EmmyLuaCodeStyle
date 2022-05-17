@@ -9,6 +9,7 @@
 #include "CodeFormatServer/VSCode.h"
 #include "Service.h"
 #include "CodeService/LuaFormatRange.h"
+#include "CodeService/Spell/CodeSpellChecker.h"
 
 class CodeFormatService : public Service
 {
@@ -25,7 +26,13 @@ public:
 	std::string RangeFormat(LuaFormatRange& range, std::shared_ptr<LuaParser> parser,
 	                        std::shared_ptr<LuaCodeStyleOptions> options);
 
-	bool IsDiagnosticRange(std::string_view filePath ,vscode::Range& range);
+	void MakeSpellActions(std::shared_ptr<vscode::CodeActionResult> result, vscode::Diagnostic& diagnostic, std::string_view uri);
+
+	void LoadDictionary(std::string_view path);
+
+	bool IsCodeFormatDiagnostic(vscode::Diagnostic& diagnostic);
+	bool IsSpellDiagnostic(vscode::Diagnostic& diagnostic);
 private:
-	std::map<std::string, std::set<vscode::Range>, std::less<>> _diagnosticCaches;
+
+	std::shared_ptr<CodeSpellChecker> _spellChecker;
 };

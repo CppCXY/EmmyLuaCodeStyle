@@ -7,7 +7,8 @@
 
 #include "LuaParser/LuaParser.h"
 #include "CodeService/LuaCodeStyleOptions.h"
-#include "CodeService/LuaDiagnosisInfo.h"
+#include "CodeService/Diagnosis/LuaDiagnosisInfo.h"
+#include "CodeService/Spell/CodeSpellChecker.h"
 
 class LuaFormat
 {
@@ -30,7 +31,7 @@ public:
 
 	bool Reformat();
 
-	bool Check(std::string_view workspace = "");
+	bool Check(std::string_view workspace = "", std::shared_ptr<CodeSpellChecker> checker = nullptr);
 
 	void DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file, std::string_view path);
 private:

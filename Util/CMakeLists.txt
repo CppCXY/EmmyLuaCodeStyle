@@ -20,6 +20,7 @@ target_sources(Util
 	${LuaCodeStyle_SOURCE_DIR}/include/Util/StringUtil.h
 	${LuaCodeStyle_SOURCE_DIR}/include/Util/Utf8.h
 	${LuaCodeStyle_SOURCE_DIR}/include/Util/Url.h
+	${LuaCodeStyle_SOURCE_DIR}/include/Util/SymSpell/SymSpell.h
 
 	PRIVATE
 	${Util_SOURCE_DIR}/src/CommandLine.cpp
@@ -27,7 +28,14 @@ target_sources(Util
 	${Util_SOURCE_DIR}/src/Utf8.cpp
 	${Util_SOURCE_DIR}/src/Url.cpp
 	${Util_SOURCE_DIR}/src/FileFinder.cpp
+	${Util_SOURCE_DIR}/src/SymSpell/SymSpell.cpp
+	${Util_SOURCE_DIR}/src/SymSpell/SuggestItem.cpp
+	${Util_SOURCE_DIR}/src/SymSpell/EditDistance.cpp
 )
 
 
 target_link_libraries(Util PUBLIC uriparser)
+
+if(BuildInWordsDictionary)
+	target_compile_definitions(Util PRIVATE -DUSE_BUILDIN_DICTIONARY)
+endif()

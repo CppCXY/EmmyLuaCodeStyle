@@ -7,6 +7,7 @@
 
 #include "CodeService/LuaEditorConfig.h"
 #include "CodeService/LuaFormatter.h"
+#include "CodeService/NameStyle/NameStyleChecker.h"
 #include "Util/StringUtil.h"
 
 LuaFormat::LuaFormat()
@@ -141,12 +142,12 @@ bool LuaFormat::Reformat()
 	return true;
 }
 
-bool LuaFormat::Check(std::string_view workspace)
+bool LuaFormat::Check(std::string_view workspace, std::shared_ptr<CodeSpellChecker> spellChecker)
 {
 	_parser->BuildAstWithComment();
 
 	std::string_view inputFile = _inputFile;
-	if(!workspace.empty())
+	if (!workspace.empty())
 	{
 		inputFile = StringUtil::GetFileRelativePath(workspace, inputFile);
 	}
@@ -177,7 +178,20 @@ bool LuaFormat::Check(std::string_view workspace)
 	LuaFormatter formatter(_parser, *_options);
 	formatter.BuildFormattedElement();
 
-	auto diagnosis = formatter.GetDiagnosisInfos();
+	DiagnosisContext ctx(_parser, *_options);
+	formatter.CalculateDiagnosisInfos(ctx);
+
+	if (_options->enable_check_codestyle)
+	{
+		NameStyleChecker styleChecker(ctx);
+		styleChecker.Analysis();
+	}
+	if (spellChecker)
+	{
+		spellChecker->Analysis(ctx);
+	}
+
+	auto diagnosis = ctx.GetDiagnosisInfos();
 	if (!diagnosis.empty())
 	{
 		std::cerr << format("Check {}\t{} warning", inputFile, diagnosis.size()) << std::endl;
@@ -198,7 +212,8 @@ bool LuaFormat::Check(std::string_view workspace)
 	return true;
 }
 
-void LuaFormat::DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file, std::string_view path)
+void LuaFormat::DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file,
+                                    std::string_view path)
 {
 	std::string_view source = file->GetSource();
 	auto startLine = file->GetLine(range.StartOffset);
@@ -207,7 +222,4 @@ void LuaFormat::DiagnosisInspection(std::string_view message, TextRange range, s
 	auto endChar = file->GetColumn(range.EndOffset);
 	std::cerr << format("{}({}:{} to {}:{}): {}", path, startLine + 1, startChar, endLine + 1, endChar,
 	                    message) << std::endl;
-
-
-
 }

@@ -99,21 +99,9 @@ std::string LuaFormatter::GetRangeFormattedText(LuaFormatRange& validRange)
 	return ctx.GetText();
 }
 
-std::vector<LuaDiagnosisInfo> LuaFormatter::GetDiagnosisInfos()
+void LuaFormatter::CalculateDiagnosisInfos(DiagnosisContext& ctx)
 {
-	DiagnosisContext ctx(_parser, _options);
-
 	_env->DiagnosisCodeStyle(ctx);
-
-	if (_options.enable_name_style_check)
-	{
-		NameStyleChecker checker(ctx);
-		auto chunkAst = _parser->GetAst();
-		chunkAst->AcceptChildren(checker);
-		checker.Analysis();
-	}
-
-	return ctx.GetDiagnosisInfos();
 }
 
 std::shared_ptr<FormatElement> LuaFormatter::FormatNode(std::shared_ptr<LuaAstNode> node)

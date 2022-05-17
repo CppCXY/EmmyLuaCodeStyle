@@ -42,6 +42,7 @@ std::string GetDiagnosisString(DiagnosisType type)
 	case DiagnosisType::EndWithNewLine: return "EndWithNewLine";
 	case DiagnosisType::NameStyle: return "NameStyle";
 	case DiagnosisType::StatementLineSpace: return "StatementLineSpace";
+	case DiagnosisType::Spell: return "Spell";
 	}
 	return "";
 }
@@ -360,12 +361,233 @@ int set_default_config(lua_State* L)
 	return 0;
 }
 
+int spell_load_dictionary_from_path(lua_State* L)
+{
+	int top = lua_gettop(L);
+
+	if (top != 1)
+	{
+		return 0;
+	}
+
+	if (lua_isstring(L, 1))
+	{
+		try
+		{
+			auto path = lua_tostring(L, 1);
+			LuaCodeFormat::GetInstance().LoadSpellDictionary(path);
+
+			lua_pushboolean(L, true);
+			return 1;
+		}
+		catch (std::exception& e)
+		{
+			std::string err = e.what();
+			lua_settop(L, top);
+			lua_pushboolean(L, false);
+			lua_pushlstring(L, err.c_str(), err.size());
+			return 2;
+		}
+	}
+
+	return 0;
+}
+
+
+int spell_load_dictionary_from_buffer(lua_State* L)
+{
+	int top = lua_gettop(L);
+
+	if (top != 1)
+	{
+		return 0;
+	}
+
+	if (lua_isstring(L, 1))
+	{
+		try
+		{
+			auto dictionary = lua_tostring(L, 1);
+			LuaCodeFormat::GetInstance().LoadSpellDictionaryFromBuffer(dictionary);
+
+			lua_pushboolean(L, true);
+			return 1;
+		}
+		catch (std::exception& e)
+		{
+			std::string err = e.what();
+			lua_settop(L, top);
+			lua_pushboolean(L, false);
+			lua_pushlstring(L, err.c_str(), err.size());
+			return 2;
+		}
+	}
+
+	return 0;
+}
+
+int spell_analysis(lua_State* L)
+{
+	int top = lua_gettop(L);
+
+	if (top < 2)
+	{
+		return 0;
+	}
+
+	if (lua_isstring(L, 1) && lua_isstring(L, 2))
+	{
+		try
+		{
+			std::string filename = lua_tostring(L, 1);
+			std::string text = lua_tostring(L, 2);
+			auto diagnosticInfos = LuaCodeFormat::GetInstance().SpellCheck(filename, std::move(text));
+
+			lua_pushboolean(L, true);
+			int count = 1;
+			lua_newtable(L);
+			for (auto& diagnosticInfo : diagnosticInfos)
+			{
+				// 诊断信息表
+				lua_newtable(L);
+
+				//message
+				{
+					lua_pushstring(L, "message");
+					lua_pushlstring(L, diagnosticInfo.Message.c_str(), diagnosticInfo.Message.size());
+					lua_rawset(L, -3);
+
+					lua_pushstring(L, "type");
+					lua_pushstring(L, GetDiagnosisString(diagnosticInfo.type).c_str());
+					lua_rawset(L, -3);
+
+					lua_pushstring(L, "data");
+					lua_pushstring(L, diagnosticInfo.Data.c_str());
+					lua_rawset(L, -3);
+				}
+
+				// range
+				{
+					lua_pushstring(L, "range");
+					//range table
+					lua_newtable(L);
+
+					lua_pushstring(L, "start");
+					// start table
+					lua_newtable(L);
+					lua_pushstring(L, "line");
+					lua_pushinteger(L, diagnosticInfo.Range.Start.Line);
+					lua_rawset(L, -3);
+
+					lua_pushstring(L, "character");
+					lua_pushinteger(L, diagnosticInfo.Range.Start.Character);
+					lua_rawset(L, -3);
+
+					lua_rawset(L, -3); // set start = {}
+
+					lua_pushstring(L, "end");
+					// end table
+					lua_newtable(L);
+					lua_pushstring(L, "line");
+					lua_pushinteger(L, diagnosticInfo.Range.End.Line);
+					lua_rawset(L, -3);
+
+					lua_pushstring(L, "character");
+					lua_pushinteger(L, diagnosticInfo.Range.End.Character);
+					lua_rawset(L, -3);
+
+					lua_rawset(L, -3); // set end = {}
+
+					lua_rawset(L, -3); // set range = {}
+				}
+
+				// 不确认lua会不会把他改成宏，所以不要在这里用++count
+				lua_rawseti(L, -2, count);
+				count++;
+			}
+
+			return 2;
+		}
+		catch (std::exception& e)
+		{
+			std::string err = e.what();
+			lua_settop(L, top);
+			lua_pushboolean(L, false);
+			lua_pushlstring(L, err.c_str(), err.size());
+			return 2;
+		}
+	}
+	return 0;
+}
+
+int spell_suggest(lua_State* L)
+{
+	int top = lua_gettop(L);
+
+	if (top != 1)
+	{
+		return 0;
+	}
+
+	if (lua_isstring(L, 1))
+	{
+		try
+		{
+			std::string word = lua_tostring(L, 1);
+
+			std::string letterWord = word;
+			for (auto& c : letterWord)
+			{
+				c = ::tolower(c);
+			}
+			bool upperFirst = false;
+			if (std::isupper(word.front()))
+			{
+				upperFirst = true;
+			}
+			lua_pushboolean(L, true);
+
+			auto suggests = LuaCodeFormat::GetInstance().SpellCorrect(word);
+			int count = 1;
+			lua_newtable(L);
+			for (auto& suggest : suggests)
+			{
+				if (!suggest.Term.empty())
+				{
+					if (upperFirst)
+					{
+						suggest.Term[0] = ::toupper(suggest.Term[0]);
+					}
+					lua_pushstring(L, suggest.Term.c_str());
+					lua_rawseti(L, -2, count);
+					count++;
+				}
+			}
+
+			return 2;
+		}
+		catch (std::exception& e)
+		{
+			std::string err = e.what();
+			lua_settop(L, top);
+			lua_pushboolean(L, false);
+			lua_pushlstring(L, err.c_str(), err.size());
+			return 2;
+		}
+	}
+	return 0;
+}
+
 static const luaL_Reg lib[] = {
 	{"format", format},
 	{"range_format", range_format},
 	{"update_config", update_config},
 	{"diagnose_file", diagnose_file},
 	{"set_default_config", set_default_config},
+	{"spell_load_dictionary_from_path", spell_load_dictionary_from_path},
+	{"spell_load_dictionary_from_buffer", spell_load_dictionary_from_buffer},
+	{"spell_analysis", spell_analysis},
+	{"spell_suggest", spell_suggest},
 	{nullptr, nullptr}
 };
 

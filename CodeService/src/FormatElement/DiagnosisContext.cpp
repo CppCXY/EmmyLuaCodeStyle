@@ -8,16 +8,17 @@ DiagnosisContext::DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaCodeSty
 }
 
 
-void DiagnosisContext::PushDiagnosis(std::string_view message, TextRange range, DiagnosisType type)
+void DiagnosisContext::PushDiagnosis(std::string_view message, TextRange range, DiagnosisType type, std::string data)
 {
 	LuaDiagnosisPosition start(GetLine(range.StartOffset), GetColumn(range.StartOffset));
 	LuaDiagnosisPosition end(GetLine(range.EndOffset), GetColumn(range.EndOffset) + 1);
-	PushDiagnosis(message, start, end, type);
+	PushDiagnosis(message, start, end, type, data);
 }
 
-void DiagnosisContext::PushDiagnosis(std::string_view message, LuaDiagnosisPosition start, LuaDiagnosisPosition end, DiagnosisType type)
+void DiagnosisContext::PushDiagnosis(std::string_view message, LuaDiagnosisPosition start, LuaDiagnosisPosition end,
+                                     DiagnosisType type, std::string data)
 {
-	_diagnosisInfos.push_back(LuaDiagnosisInfo{std::string(message), LuaDiagnosisRange(start, end), type});
+	_diagnosisInfos.push_back(LuaDiagnosisInfo{std::string(message), LuaDiagnosisRange(start, end), type, data});
 }
 
 void DiagnosisContext::SetCharacterCount(int character)
@@ -38,7 +39,8 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 		{
 			LuaDiagnosisPosition start(line, _options.max_line_length);
 			LuaDiagnosisPosition end(line, character);
-			PushDiagnosis(format(LText("The line width should not exceed {}"), _options.max_line_length), start, end, DiagnosisType::MaxLineWidth);
+			PushDiagnosis(format(LText("The line width should not exceed {}"), _options.max_line_length), start, end,
+			              DiagnosisType::MaxLineWidth);
 		}
 		_lineMaxLengthMap.clear();
 	}
