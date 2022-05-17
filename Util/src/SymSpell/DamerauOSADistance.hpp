@@ -127,7 +127,7 @@ public:
 
 		if (maxEditDistance < len2)
 		{
-			return Distance(string1, string2, len1, len2, start, maxEditDistance, _baseChar1Costs, _basePrevChar1Costs);
+			return Distance(string1, string2, len1, len2, start, static_cast<int>(maxEditDistance), _baseChar1Costs, _basePrevChar1Costs);
 		}
 
 		return Distance(string1, string2, len1, len2, start, _baseChar1Costs, _basePrevChar1Costs);
@@ -265,8 +265,8 @@ public:
 	static int NullDistanceResults(std::string_view string1, std::string_view string2, std::size_t maxEditDistance)
 	{
 		if (string1.empty())
-			return (string2.empty()) ? 0 : (string2.size() <= maxEditDistance) ? string2.size() : -1;
-		return (string1.size() <= maxEditDistance) ? string1.size() : -1;
+			return (string2.empty()) ? 0 : (string2.size() <= maxEditDistance) ? static_cast<int>(string2.size()) : -1;
+		return (string1.size() <= maxEditDistance) ? static_cast<int>(string1.size()) : -1;
 	}
 
 private:

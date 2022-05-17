@@ -68,14 +68,14 @@ int LuaFile::GetOffsetFromPosition(int line, int character)
 {
 	if (line < 0)
 	{
-		return _source.size() + 1;
+		return static_cast<int>(_source.size()) + 1;
 	}
 
 	std::size_t sizeLine = line;
 
 	if (sizeLine >= _lineOffsetVec.size())
 	{
-		return _source.size() + 1;
+		return static_cast<int>(_source.size()) + 1;
 	}
 
 	int lineStartOffset = _lineOffsetVec[line];
@@ -175,7 +175,7 @@ std::string_view LuaFile::GetFilename() const
 
 void LuaFile::UpdateLineInfo(int startLine)
 {
-	int totalLine = _lineOffsetVec.size() - 1;
+	int totalLine = static_cast<int>(_lineOffsetVec.size()) - 1;
 	std::size_t startOffset = 0;
 	if (totalLine < startLine)
 	{
@@ -192,7 +192,7 @@ void LuaFile::UpdateLineInfo(int startLine)
 	{
 		if (_source[startOffset] == '\n')
 		{
-			_lineOffsetVec.push_back(startOffset + 1);
+			_lineOffsetVec.push_back(static_cast<int>(startOffset) + 1);
 		}
 	}
 }
