@@ -50,7 +50,7 @@ bool TestGrammar(std::string input)
 	if (!result)
 	{
 		for (auto& error : parser->GetErrors())
-			std::cout << format("error: {}, from [{},{}] to [{},{}]", error.ErrorMessage,
+			std::cout << Util::format("error: {}, from [{},{}] to [{},{}]", error.ErrorMessage,
 			                    parser->GetLine(error.ErrorRange.StartOffset),
 			                    parser->GetColumn(error.ErrorRange.StartOffset),
 			                    parser->GetLine(error.ErrorRange.EndOffset),
@@ -74,7 +74,7 @@ bool TestGrammar(std::string input)
 	if (!result)
 	{
 		for (auto& error : formattedParser->GetErrors())
-			std::cout << format("error after formatted: {}, from [{},{}] to [{},{}]", error.ErrorMessage,
+			std::cout << Util::format("error after formatted: {}, from [{},{}] to [{},{}]", error.ErrorMessage,
 			                    formattedParser->GetLine(error.ErrorRange.StartOffset),
 			                    formattedParser->GetColumn(error.ErrorRange.StartOffset),
 			                    formattedParser->GetLine(error.ErrorRange.EndOffset),
@@ -171,11 +171,11 @@ int main(int argc, char* argv[])
 			bool passed = TestFormatted(waitFormattingText, formattedText, options);
 
 			success &= passed;
-			std::cout << format("test format {} ... {}", path, passed ? "passed" : "false") << std::endl;
+			std::cout << Util::format("test format {} ... {}", path, passed ? "passed" : "false") << std::endl;
 
 			passed = TestFormatted(formattedText, formattedText, options);
 			success &= passed;
-			std::cout << format("test format stability {} ... {}", path, passed ? "passed" : "false") << std::endl;
+			std::cout << Util::format("test format stability {} ... {}", path, passed ? "passed" : "false") << std::endl;
 		}
 	}
 	else if (target == "CheckFormatResultByOption")
@@ -202,11 +202,11 @@ int main(int argc, char* argv[])
 			bool passed = TestFormatted(waitFormattingText, formattedText, options);
 
 			success &= passed;
-			std::cout << format("test format {} ... {}", path, passed ? "passed" : "false") << std::endl;
+			std::cout << Util::format("test format {} ... {}", path, passed ? "passed" : "false") << std::endl;
 
 			passed = TestFormatted(formattedText, formattedText, options);
 			success &= passed;
-			std::cout << format("test format stability {} ... {}", path, passed ? "passed" : "false") << std::endl;
+			std::cout << Util::format("test format stability {} ... {}", path, passed ? "passed" : "false") << std::endl;
 		}
 	}
 	else if (target == "CheckGrammar")
@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
 			bool passed = TestGrammar(text);
 
 			success &= passed;
-			std::cout << format("test check grammar {} ... {}", path, passed ? "passed" : "false") << std::endl;
+			std::cout << Util::format("test check grammar {} ... {}", path, passed ? "passed" : "false") << std::endl;
 		}
 	}
 	else if (target == "Performance")
@@ -231,7 +231,7 @@ int main(int argc, char* argv[])
 			auto waitFormattingText = ReadFile(waitFormattingFilePath.string());
 
 			auto time = TestPerformance(waitFormattingText, options);
-			std::cout << format("test format Performance {} ...it cost {}ms", path, time) << std::endl;
+			std::cout << Util::format("test format Performance {} ...it cost {}ms", path, time) << std::endl;
 		}
 	}
 

@@ -104,11 +104,11 @@ void NameStyleRuleMatcher::Diagnosis(DiagnosisContext& ctx, std::shared_ptr<Chec
 			{
 				if (rule.Param.size() == 1)
 				{
-					ruleMessage.append(format("same({})", rule.Param[0]));
+					ruleMessage.append(Util::format("same({})", rule.Param[0]));
 				}
 				else if (rule.Param.size() == 2)
 				{
-					ruleMessage.append(format("same({},{})", rule.Param[0], rule.Param[1]));
+					ruleMessage.append(Util::format("same({},{})", rule.Param[0], rule.Param[1]));
 				}
 				break;
 			}
@@ -124,7 +124,7 @@ void NameStyleRuleMatcher::Diagnosis(DiagnosisContext& ctx, std::shared_ptr<Chec
 	}
 
 	ctx.PushDiagnosis(
-		format(
+		Util::format(
 			LText("Name '{}' does not match rule '{}', which require '{}'"),
 			checkElement->Node->GetText(), _name, ruleMessage),
 		checkElement->Node->GetTextRange(), DiagnosisType::NameStyle);

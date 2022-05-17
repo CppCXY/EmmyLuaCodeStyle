@@ -459,7 +459,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 
 		std::string moduleDefineName = param->arguments[3];
 
-		std::string requireString = format("local {} = {}(\"{}\")\n", moduleDefineName, config->import_function,
+		std::string requireString = Util::format("local {} = {}(\"{}\")\n", moduleDefineName, config->import_function,
 		                                   moduleName);
 		auto parser = LanguageClient::GetInstance().GetFileParser(uri);
 		auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();

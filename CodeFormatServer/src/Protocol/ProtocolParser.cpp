@@ -55,7 +55,7 @@ std::string ProtocolParser::SerializeProtocol(std::shared_ptr<vscode::Serializab
 	json["result"] = result->Serialize();
 	json["jsonrpc"] = "2.0";
 	auto dumpResult = json.dump(-1,' ', true, nlohmann::detail::error_handler_t::ignore);
-	std::string message = format("Content-Length:{}\r\n\r\n", dumpResult.size());
+	std::string message = Util::format("Content-Length:{}\r\n\r\n", dumpResult.size());
 
 	message.append(dumpResult);
 	return std::move(message);

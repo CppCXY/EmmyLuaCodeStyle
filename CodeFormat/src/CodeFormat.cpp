@@ -87,7 +87,7 @@ int main(int argc, char** argv)
 		{
 			if (!luaFormat->SetInputFile(cmd.Get<std::string>("file")))
 			{
-				std::cerr << format("Can not find file {}", cmd.Get<std::string>("file")) << std::endl;
+				std::cerr << Util::format("Can not find file {}", cmd.Get<std::string>("file")) << std::endl;
 				return -1;
 			}
 		}
@@ -133,7 +133,7 @@ int main(int argc, char** argv)
 		{
 			if (!luaFormat->Reformat())
 			{
-				std::cerr << format("Exist lua syntax error") << std::endl;
+				std::cerr << Util::format("Exist lua syntax error") << std::endl;
 				return -1;
 			}
 		}

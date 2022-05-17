@@ -588,7 +588,7 @@ void LuaParser::CheckMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<
 	if (!TestNext(what, parent, addType))
 	{
 		auto range = parent->GetTextRange();
-		ThrowMatchError(format("token {} expected ,(to close {} at", what, who),
+		ThrowMatchError(Util::format("token {} expected ,(to close {} at", what, who),
 		                TextRange(range.EndOffset, range.EndOffset));
 	}
 }
@@ -1058,7 +1058,7 @@ LuaAttribute LuaParser::GetLocalAttribute(std::shared_ptr<LuaAstNode> nameDefLis
 			return LuaAttribute::Close;
 		}
 
-		ThrowMatchError(format("unknown attribute {}", attributeName), attribute->GetTextRange());
+		ThrowMatchError(Util::format("unknown attribute {}", attributeName), attribute->GetTextRange());
 	}
 
 	return LuaAttribute::NoAttribute;
@@ -1068,7 +1068,7 @@ void LuaParser::Check(LuaTokenType c)
 {
 	if (_tokenParser->Current().TokenType != c)
 	{
-		ThrowMatchError(format("{} expected", c), _tokenParser->Current().Range);
+		ThrowMatchError(Util::format("{} expected", c), _tokenParser->Current().Range);
 	}
 }
 
@@ -1161,7 +1161,7 @@ void LuaParser::CheckAndNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent,
 {
 	if (_tokenParser->Current().TokenType != c)
 	{
-		ThrowLuaError(format("token type {} expected", c), parent);
+		ThrowLuaError(Util::format("token type {} expected", c), parent);
 		return;
 	}
 

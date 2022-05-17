@@ -39,7 +39,7 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 		{
 			LuaDiagnosisPosition start(line, _options.max_line_length);
 			LuaDiagnosisPosition end(line, character);
-			PushDiagnosis(format(LText("The line width should not exceed {}"), _options.max_line_length), start, end,
+			PushDiagnosis(Util::format(LText("The line width should not exceed {}"), _options.max_line_length), start, end,
 			              DiagnosisType::MaxLineWidth);
 		}
 		_lineMaxLengthMap.clear();

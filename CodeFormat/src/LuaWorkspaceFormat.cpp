@@ -94,11 +94,11 @@ void LuaWorkspaceFormat::ReformatWorkspace()
 		luaFormat.SetOutputFile(file);
 		if (luaFormat.Reformat())
 		{
-			std::cerr << format("reformat {} succeed.", file) << std::endl;
+			std::cerr << Util::format("reformat {} succeed.", file) << std::endl;
 		}
 		else
 		{
-			std::cerr << format("reformat {} fail.", file) << std::endl;
+			std::cerr << Util::format("reformat {} fail.", file) << std::endl;
 		}
 	}
 }

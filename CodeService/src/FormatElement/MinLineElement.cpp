@@ -59,7 +59,7 @@ void MinLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, Form
 	if (_line > (nextElementLine - lastElementLine - 1))
 	{
 		auto character = ctx.GetColumn(nextOffset);
-		ctx.PushDiagnosis(format(LText("here need at least {} empty line"), _line),
+		ctx.PushDiagnosis(Util::format(LText("here need at least {} empty line"), _line),
 		                  LuaDiagnosisPosition(nextElementLine, character),
 		                  LuaDiagnosisPosition(nextElementLine + 1, 0), DiagnosisType::StatementLineSpace);
 	}

@@ -113,7 +113,7 @@ bool CommandLine::Parse(int argc, char** argv)
 			{
 				if (!_options->_enableRestArgs)
 				{
-					_errors.emplace_back(format("Unknown option {} ,please enable key=value options", current));
+					_errors.emplace_back(Util::format("Unknown option {} ,please enable key=value options", current));
 					return false;
 				}
 				std::string_view value = option.substr(eqPos + 1);
@@ -133,7 +133,7 @@ bool CommandLine::Parse(int argc, char** argv)
 
 			if (_options->_shortMap.count(shortOption) == 0)
 			{
-				_errors.emplace_back(format("Unknown Option {}", current));
+				_errors.emplace_back(Util::format("Unknown Option {}", current));
 				return false;
 			}
 			option = _options->_shortMap.find(shortOption)->second;
@@ -154,7 +154,7 @@ bool CommandLine::Parse(int argc, char** argv)
 					commandOption.HasOption = true;
 					continue;
 				}
-				_errors.emplace_back(format("Option {} has not value", current));
+				_errors.emplace_back(Util::format("Option {} has not value", current));
 				return false;
 			}
 
@@ -193,7 +193,7 @@ void CommandLine::PrintUsage()
 	std::cerr << _usage << std::endl;
 	for (auto& target : _targets)
 	{
-		std::cerr << format("{}:", target.first) << std::endl;
+		std::cerr << Util::format("{}:", target.first) << std::endl;
 		auto& options = target.second;
 		for (auto& it : options._shortMap)
 		{
@@ -201,7 +201,7 @@ void CommandLine::PrintUsage()
 			auto& name = it.second;
 			auto& option = options._args[name];
 
-			std::cerr << format("\t-{} --{}\n\t\t{}",
+			std::cerr << Util::format("\t-{} --{}\n\t\t{}",
 				shortName, name, option.Description) << std::endl;
 			std::cerr << std::endl;
 		}

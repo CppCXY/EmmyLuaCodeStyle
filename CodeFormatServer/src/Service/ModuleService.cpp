@@ -258,15 +258,15 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 		if (pair.second.size() == 1)
 		{
 			auto& luaModule = pair.second.front();
-			completion.detail = format("({})", name);
+			completion.detail = Util::format("({})", name);
 			completion.documentation = format("import from {}", luaModule->FilePath);
 			auto object = nlohmann::json::object();
 			object["moduleName"] = luaModule->ModuleName;
 			object["path"] = luaModule->FilePath;
 			object["name"] = name;
 			command.arguments.push_back(object);
-			labelDetails.detail = format("[{}]", luaModule->ModuleName);
-			labelDetails.description = format("[{}]", luaModule->ModuleName);
+			labelDetails.detail = Util::format("[{}]", luaModule->ModuleName);
+			labelDetails.description = Util::format("[{}]", luaModule->ModuleName);
 		}
 		else
 		{
@@ -279,8 +279,8 @@ std::vector<vscode::CompletionItem> ModuleService::GetModuleCompletions(std::sha
 				object["name"] = name;
 				command.arguments.push_back(object);
 			}
-			labelDetails.detail = format("[{}]", completion.detail);
-			labelDetails.description = format("[{}]", completion.detail);
+			labelDetails.detail = Util::format("[{}]", completion.detail);
+			labelDetails.description = Util::format("[{}]", completion.detail);
 		}
 		completion.command = command;
 		completion.labelDetails = labelDetails;

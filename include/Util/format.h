@@ -1,11 +1,12 @@
 ﻿#pragma once
 
-
 #include <string>
 #include <string_view>
 #include <vector>
 #include <sstream>
 #include <type_traits>
+
+namespace Util {
 
 class FormatReplaceExpress
 {
@@ -36,7 +37,7 @@ std::string toFormatString(T t)
 	{
 		return t;
 	}
-	else if constexpr (std::is_same_v<T, const char *>)
+	else if constexpr (std::is_same_v<T, const char*>)
 	{
 		return std::string(t);
 	}
@@ -214,4 +215,5 @@ std::string format(std::string_view fmt, ARGS ... args)
 		}
 	}
 	return message.str();
+}
 }

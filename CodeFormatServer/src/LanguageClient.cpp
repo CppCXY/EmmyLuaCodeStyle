@@ -62,7 +62,7 @@ void LanguageClient::SendNotification(std::string_view method, std::shared_ptr<v
 	if (_session)
 	{
 		auto dumpResult = json.dump();
-		std::string message = format("Content-Length:{}\r\n\r\n", dumpResult.size());
+		std::string message = Util::format("Content-Length:{}\r\n\r\n", dumpResult.size());
 
 		message.append(dumpResult);
 		_session->Send(std::move(message));
@@ -80,7 +80,7 @@ void LanguageClient::SendRequest(std::string_view method, std::shared_ptr<vscode
 	if (_session)
 	{
 		auto dumpResult = json.dump();
-		std::string message = format("Content-Length:{}\r\n\r\n", dumpResult.size());
+		std::string message = Util::format("Content-Length:{}\r\n\r\n", dumpResult.size());
 
 		message.append(dumpResult);
 		_session->Send(std::move(message));
