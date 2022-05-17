@@ -1,4 +1,5 @@
 #include "CodeService/Spell/IdentifyParser.h"
+#include <climits>
 
 const int EOZ = -1;
 
