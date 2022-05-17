@@ -10,9 +10,7 @@ option(BuildCodeFormatServer "Build CodeFormatServer" ON)
 option(EnableTest "Test project" ON)
 option(BuildInWordsDictionary "Use BuildInWordsDictionary" ON)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	#add_definitions(-DMSVC)
-elseif(APPLE)
+if(APPLE)
 	include(CheckCCompilerFlag)
 
 	set(CMAKE_REQUIRED_LINK_OPTIONS "-arch;x86_64")

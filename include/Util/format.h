@@ -1,12 +1,6 @@
 ﻿#pragma once
 
 
-#if defined(MSVC) && _MSVC_LANG > 202002L
-#include <format>
-
-using std::format;
-
-#else // gcc 怎么还没实现format啊
 #include <string>
 #include <string_view>
 #include <vector>
@@ -221,4 +215,3 @@ std::string format(std::string_view fmt, ARGS ... args)
 	}
 	return message.str();
 }
-#endif
