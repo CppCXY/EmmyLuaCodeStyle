@@ -72,7 +72,7 @@ nlohmann::json vscode::Diagnostic::Serialize()
 	object["message"] = message;
 	object["range"] = range.Serialize();
 	object["severity"] = static_cast<int>(severity);
-
+	object["data"] = data;
 	return object;
 }
 
@@ -81,6 +81,10 @@ void vscode::Diagnostic::Deserialize(nlohmann::json json)
 	message = json["message"];
 	range.Deserialize(json["range"]);
 	severity = static_cast<DiagnosticSeverity>(json["severity"].get<int>());
+	if(json["data"].is_string())
+	{
+		data = json["data"];
+	}
 }
 
 nlohmann::json vscode::TextDocument::Serialize()
@@ -205,6 +209,11 @@ void vscode::InitializationOptions::Deserialize(nlohmann::json json)
 	if(json["vscodeConfig"].is_object())
 	{
 		vscodeConfig.Deserialize(json["vscodeConfig"]);
+	}
+
+	if(json["dictionaryPath"].is_string())
+	{
+		dictionaryPath = json["dictionaryPath"];
 	}
 }
 

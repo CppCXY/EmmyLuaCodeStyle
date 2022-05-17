@@ -9,13 +9,15 @@
 
 // extern const char *BuildInWords;
 
-SymSpell::SymSpell(int maxDictionaryEditDistance,
+SymSpell::SymSpell(Strategy strategy,
+                   int maxDictionaryEditDistance,
                    int prefixLength)
 	: _prefixLength(prefixLength),
 	  _compactMask((std::numeric_limits<uint32_t>::max() >> 8) << 2),
 	  _maxDictionaryWordLength(0),
 	  _maxDictionaryEditDistance(maxDictionaryEditDistance),
-	  _words(82765)
+	  _words(),
+	  _strategy(strategy)
 {
 }
 
@@ -33,25 +35,35 @@ bool SymSpell::LoadWordDictionary(std::string path)
 
 	std::stringstream s;
 	s << fin.rdbuf();
-	auto dictionarySource = s.str();
 
-	auto lines = StringUtil::Split(dictionarySource, "\n");
+	return LoadWordDictionaryFromBuffer(s.str());
+}
+
+bool SymSpell::LoadWordDictionaryFromBuffer(std::string_view buffer)
+{
+	auto lines = StringUtil::Split(buffer, "\n");
 	try
 	{
 		for (auto& line : lines)
 		{
 			auto tokens = StringUtil::Split(line, " ");
-			if (tokens.size() < 2)
+			if (tokens.empty())
 			{
 				continue;
 			}
-
-			int64_t count = std::stoll(std::string(tokens[1]));
-			if (count > std::numeric_limits<int>::max())
+			if(tokens.size() == 2)
 			{
-				count = std::numeric_limits<int>::max();
+				int64_t count = std::stoll(std::string(tokens[1]));
+				if (count > std::numeric_limits<int>::max())
+				{
+					count = std::numeric_limits<int>::max();
+				}
+				CreateDictionaryEntry(std::string(tokens[0]), static_cast<int>(count));
 			}
-			CreateDictionaryEntry(std::string(tokens[0]), static_cast<int>(count));
+			else
+			{
+				CreateDictionaryEntry(std::string(tokens[0]), 1);
+			}
 		}
 	}
 	catch (std::exception& e)
@@ -95,7 +107,7 @@ bool SymSpell::LoadBuildInDictionary()
 	return true;
 }
 
-bool SymSpell::CreateDictionaryEntry(std::string key, int count)
+bool SymSpell::CreateDictionaryEntry(const std::string& key, int count)
 {
 	if (count <= 0)
 	{
@@ -118,33 +130,12 @@ bool SymSpell::CreateDictionaryEntry(std::string key, int count)
 		_words.insert({key, count});
 	}
 
-	//edits/suggestions are created only once, no matter how often word occurs
-	//edits/suggestions are created only as soon as the word occurs in the corpus, 
-	//even if the same term existed before in the dictionary as an edit from another word
-	if (key.size() > _maxDictionaryWordLength)
+	if(_strategy == Strategy::LazyLoaded)
 	{
-		_maxDictionaryWordLength = key.size();
+		return true;
 	}
-	//create deletes
-	auto edits = EditsPrefix(key);
-	// 砍掉无意义的写法
-	for (auto it = edits.begin(); it != edits.end(); ++it)
-	{
-		int deleteHash = GetStringHash(*it);
-		auto deletesFounded = _deletes.find(deleteHash);
-		if (deletesFounded != _deletes.end())
-		{
-			auto& suggestions = deletesFounded->second;
-			suggestions.emplace_back(key);
-		}
-		else
-		{
-			std::vector<std::string> suggestions = {std::string(key)};
 
-			_deletes.insert({deleteHash, suggestions});
-		}
-	}
-	return true;
+	return BuildDeletesWords(key);
 }
 
 bool SymSpell::IsCorrectWord(const std::string& word) const
@@ -159,6 +150,12 @@ std::vector<SuggestItem> SymSpell::LookUp(const std::string& input)
 
 std::vector<SuggestItem> SymSpell::LookUp(const std::string& input, int maxEditDistance)
 {
+	if(_strategy == Strategy::LazyLoaded)
+	{
+		BuildAllDeletesWords();
+		_strategy = Strategy::Normal;
+	}
+
 	std::vector<SuggestItem> suggestions;
 
 	if (maxEditDistance > _maxDictionaryEditDistance)
@@ -364,10 +361,51 @@ std::vector<SuggestItem> SymSpell::LookUp(const std::string& input, int maxEditD
 	return suggestions;
 }
 
+bool SymSpell::BuildDeletesWords(const std::string& key)
+{
+	//edits/suggestions are created only once, no matter how often word occurs
+	//edits/suggestions are created only as soon as the word occurs in the corpus, 
+	//even if the same term existed before in the dictionary as an edit from another word
+	if (key.size() > _maxDictionaryWordLength)
+	{
+		_maxDictionaryWordLength = key.size();
+	}
+	//create deletes
+	auto edits = EditsPrefix(key);
+	// 砍掉无意义的写法
+	for (auto it = edits.begin(); it != edits.end(); ++it)
+	{
+		int deleteHash = GetStringHash(*it);
+		auto deletesFounded = _deletes.find(deleteHash);
+		if (deletesFounded != _deletes.end())
+		{
+			auto& suggestions = deletesFounded->second;
+			suggestions.emplace_back(key);
+		}
+		else
+		{
+			std::vector<std::string> suggestions = {key};
+
+			_deletes.insert({deleteHash, suggestions});
+		}
+	}
+	return true;
+}
+
+bool SymSpell::BuildAllDeletesWords()
+{
+	bool ret = true;
+	for(auto& pair: _words)
+	{
+		ret &= BuildDeletesWords(pair.first);
+	}
+	return ret;
+}
+
 std::unordered_set<std::string> SymSpell::EditsPrefix(std::string_view key)
 {
 	std::unordered_set<std::string> hashSet;
-	if (key.size() <= static_cast<int>(_maxDictionaryEditDistance))
+	if (key.size() <= static_cast<std::size_t>(_maxDictionaryEditDistance))
 	{
 		hashSet.insert("");
 	}

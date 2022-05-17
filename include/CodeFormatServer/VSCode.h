@@ -137,6 +137,7 @@ public:
 	Range range;
 	DiagnosticSeverity severity;
 	std::string message;
+	std::string data;
 
 	nlohmann::json Serialize() override;
 	void Deserialize(nlohmann::json json) override;
@@ -247,6 +248,7 @@ public:
 	bool lintModule = true;
 	bool autoImport = true;
 
+
 	void Deserialize(nlohmann::json json) override;
 };
 
@@ -258,6 +260,7 @@ public:
 	std::vector<ConfigSource> moduleConfigFiles;
 	std::string localeRoot;
 	std::string extensionChars;
+	std::string dictionaryPath;
 	VscodeSettings vscodeConfig;
 	void Deserialize(nlohmann::json json) override;
 };

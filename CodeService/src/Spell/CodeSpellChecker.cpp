@@ -1,14 +1,12 @@
 ﻿#include "CodeService/Spell/CodeSpellChecker.h"
 #include "LuaParser/LuaTokenTypeDetail.h"
-#include "CodeService/Spell/IdentifyParser.h"
 #include "Util/format.h"
 #include "LuaDict.hpp"
 
 CodeSpellChecker::CodeSpellChecker()
-	: _symSpell(std::make_shared<SymSpell>()),
-	  _dictionaryLoaded(false)
+	: _symSpell(std::make_shared<SymSpell>(SymSpell::Strategy::LazyLoaded))
 {
-	for(auto& word: LuaBuildInWords)
+	for (auto& word : LuaBuildInWords)
 	{
 		_symSpell->CreateDictionaryEntry(word, 1);
 	}
@@ -16,7 +14,12 @@ CodeSpellChecker::CodeSpellChecker()
 
 void CodeSpellChecker::LoadDictionary(std::string_view path)
 {
-	_dictionaryLoaded = _symSpell->LoadWordDictionary(std::string(path));
+	_symSpell->LoadWordDictionary(std::string(path));
+}
+
+void CodeSpellChecker::LoadDictionaryFromBuffer(std::string_view buffer)
+{
+	 _symSpell->LoadWordDictionaryFromBuffer(buffer);
 }
 
 void CodeSpellChecker::Analysis(DiagnosisContext& ctx)
@@ -33,14 +36,28 @@ void CodeSpellChecker::Analysis(DiagnosisContext& ctx)
 	}
 }
 
+std::vector<SuggestItem> CodeSpellChecker::GetSuggests(const std::string& word)
+{
+	return _symSpell->LookUp(word);
+}
+
 void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token)
 {
-	// 代码标识符分词
-	// 全大写的标识符不作检查
-	// 
-	IdentifyParser parser(token.Text);
-	parser.Parse();
-	auto& words = parser.GetWords();
+	std::shared_ptr<IdentifyParser> parser = nullptr;
+	std::string text(token.Text);
+	auto it = _caches.find(text);
+	if (it != _caches.end())
+	{
+		parser = it->second;
+	}
+	else
+	{
+		parser = std::make_shared<IdentifyParser>(token.Text);
+		parser->Parse();
+		_caches.insert({ text, parser });
+	}
+
+	auto& words = parser->GetWords();
 	if (words.empty())
 	{
 		return;
@@ -48,12 +65,13 @@ void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token)
 
 	for (auto& word : words)
 	{
-		if (!_symSpell->IsCorrectWord(word.Item))
+		if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item))
 		{
 			auto range = TextRange(token.Range.StartOffset + word.Range.Start,
-			                       token.Range.StartOffset + word.Range.Count - 1
+			                       token.Range.StartOffset + word.Range.Start + word.Range.Count - 1
 			);
-			ctx.PushDiagnosis(format("Typo '{}'", word.Item), range, DiagnosisType::Spell);
+			std::string originText(token.Text.substr(word.Range.Start, word.Range.Count));
+			ctx.PushDiagnosis(format("Typo: in word '{}'", originText), range, DiagnosisType::Spell, originText);
 		}
 	}
 }

@@ -33,16 +33,26 @@
 class SymSpell
 {
 public:
-	SymSpell(int maxDictionaryEditDistance = 2,
+	enum class Strategy
+	{
+		Normal,
+		LazyLoaded
+	};
+
+
+	SymSpell(Strategy strategy,
+	         int maxDictionaryEditDistance = 2,
 	         int prefixLength = 3);
 
 	~SymSpell();
 
 	bool LoadWordDictionary(std::string path);
 
+	bool LoadWordDictionaryFromBuffer(std::string_view buffer);
+
 	bool LoadBuildInDictionary();
 
-	bool CreateDictionaryEntry(std::string key, int count);
+	bool CreateDictionaryEntry(const std::string& key, int count);
 
 	bool IsCorrectWord(const std::string& word) const;
 
@@ -50,6 +60,10 @@ public:
 
 	std::vector<SuggestItem> LookUp(const std::string& input, int maxEditDistance);
 private:
+	bool BuildDeletesWords(const std::string& key);
+
+	bool BuildAllDeletesWords();
+
 	std::unordered_set<std::string> EditsPrefix(std::string_view key);
 
 	void Edits(std::string_view word, int editDistance, std::unordered_set<std::string>& deleteWord);
@@ -74,4 +88,6 @@ private:
 	std::unordered_map<std::string, int> _words;
 
 	EditDistance _editDistance;
+
+	Strategy _strategy;
 };

@@ -8,6 +8,7 @@
 #include "CodeService/Diagnosis/LuaDiagnosisInfo.h"
 #include "CodeService/LuaEditorConfig.h"
 #include "CodeService/LuaFormatRange.h"
+#include "CodeService/Spell/CodeSpellChecker.h"
 
 class LuaCodeFormat
 {
@@ -21,11 +22,19 @@ public:
 	void RemoveCodeStyle(const std::string& workspaceUri);
 	void SetDefaultCodeStyle(ConfigMap& configMap);
 
+	void LoadSpellDictionary(const std::string& path);
+
+	void LoadSpellDictionaryFromBuffer(const std::string& buffer);
+
 	std::string Reformat(const std::string& uri, std::string&& text,ConfigMap& configMap);
 
 	std::string RangeFormat(const std::string& uri, LuaFormatRange& range, std::string&& text, ConfigMap& configMap);
 
 	std::pair<bool, std::vector<LuaDiagnosisInfo>> Diagnose(const std::string& uri, std::string&& text);
+
+	std::vector<LuaDiagnosisInfo> SpellCheck(const std::string& uri, std::string&& text);
+
+	std::vector<SuggestItem> SpellCorrect(const std::string& word);
 
 	std::shared_ptr<LuaCodeStyleOptions> GetOptions(const std::string& uri);
 
@@ -34,4 +43,6 @@ private:
 	std::vector<std::pair<std::string, std::shared_ptr<LuaEditorConfig>>> _editorConfigVector;
 
 	std::shared_ptr<LuaCodeStyleOptions> _defaultOptions;
+
+	std::shared_ptr<CodeSpellChecker> _codeSpellChecker;
 };

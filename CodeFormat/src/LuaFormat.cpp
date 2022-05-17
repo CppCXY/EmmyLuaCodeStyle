@@ -147,7 +147,7 @@ bool LuaFormat::Check(std::string_view workspace, std::shared_ptr<CodeSpellCheck
 	_parser->BuildAstWithComment();
 
 	std::string_view inputFile = _inputFile;
-	if(!workspace.empty())
+	if (!workspace.empty())
 	{
 		inputFile = StringUtil::GetFileRelativePath(workspace, inputFile);
 	}
@@ -186,8 +186,10 @@ bool LuaFormat::Check(std::string_view workspace, std::shared_ptr<CodeSpellCheck
 		NameStyleChecker styleChecker(ctx);
 		styleChecker.Analysis();
 	}
-
-	spellChecker->Analysis(ctx);
+	if (spellChecker)
+	{
+		spellChecker->Analysis(ctx);
+	}
 
 	auto diagnosis = ctx.GetDiagnosisInfos();
 	if (!diagnosis.empty())
@@ -210,7 +212,8 @@ bool LuaFormat::Check(std::string_view workspace, std::shared_ptr<CodeSpellCheck
 	return true;
 }
 
-void LuaFormat::DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file, std::string_view path)
+void LuaFormat::DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file,
+                                    std::string_view path)
 {
 	std::string_view source = file->GetSource();
 	auto startLine = file->GetLine(range.StartOffset);
