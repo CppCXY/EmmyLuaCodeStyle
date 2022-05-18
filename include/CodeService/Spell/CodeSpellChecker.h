@@ -16,12 +16,12 @@ public:
 
 	void LoadDictionaryFromBuffer(std::string_view buffer);
 
-	void Analysis(DiagnosisContext& ctx);
+	void Analysis(DiagnosisContext& ctx, const std::set<std::string>& tempDict = std::set<std::string>());
 
 	// copy once
 	std::vector<SuggestItem> GetSuggests(std::string word);
 private:
-	void IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token);
+	void IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, const std::set<std::string>& tempDict);
 
 	std::shared_ptr<SymSpell> _symSpell;
 	std::unordered_map<std::string, std::shared_ptr<IdentifyParser>> _caches;

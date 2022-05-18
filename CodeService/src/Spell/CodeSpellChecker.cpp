@@ -22,7 +22,7 @@ void CodeSpellChecker::LoadDictionaryFromBuffer(std::string_view buffer)
 	_symSpell->LoadWordDictionaryFromBuffer(buffer);
 }
 
-void CodeSpellChecker::Analysis(DiagnosisContext& ctx)
+void CodeSpellChecker::Analysis(DiagnosisContext& ctx, const std::set<std::string>& tempDict)
 {
 	auto parser = ctx.GetParser();
 	auto tokenParser = parser->GetTokenParser();
@@ -31,7 +31,7 @@ void CodeSpellChecker::Analysis(DiagnosisContext& ctx)
 	{
 		if (token.TokenType == TK_NAME)
 		{
-			IdentifyAnalysis(ctx, token);
+			IdentifyAnalysis(ctx, token, tempDict);
 		}
 	}
 }
@@ -150,7 +150,7 @@ std::vector<SuggestItem> CodeSpellChecker::GetSuggests(std::string word)
 	return suggests;
 }
 
-void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token)
+void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, const std::set<std::string>& tempDict)
 {
 	std::shared_ptr<IdentifyParser> parser = nullptr;
 	std::string text(token.Text);
@@ -174,7 +174,7 @@ void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token)
 
 	for (auto& word : words)
 	{
-		if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item))
+		if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item) && tempDict.count(word.Item) == 0)
 		{
 			auto range = TextRange(token.Range.StartOffset + word.Range.Start,
 			                       token.Range.StartOffset + word.Range.Start + word.Range.Count - 1

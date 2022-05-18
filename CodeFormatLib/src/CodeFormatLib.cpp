@@ -441,7 +441,21 @@ int spell_analysis(lua_State* L)
 		{
 			std::string filename = lua_tostring(L, 1);
 			std::string text = lua_tostring(L, 2);
-			auto diagnosticInfos = LuaCodeFormat::GetInstance().SpellCheck(filename, std::move(text));
+
+			std::set<std::string> tempDict;
+
+			if (top == 3 && lua_istable(L, 3))
+			{
+				lua_pushnil(L);
+				while (lua_next(L, -2) != 0)
+				{
+					auto value = luaToString(L, -1);
+					tempDict.insert(value);
+					lua_pop(L, 1);
+				}
+			}
+
+			auto diagnosticInfos = LuaCodeFormat::GetInstance().SpellCheck(filename, std::move(text), tempDict);
 
 			lua_pushboolean(L, true);
 			int count = 1;

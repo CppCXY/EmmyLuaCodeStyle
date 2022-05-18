@@ -32,7 +32,7 @@ public:
 
 	std::pair<bool, std::vector<LuaDiagnosisInfo>> Diagnose(const std::string& uri, std::string&& text);
 
-	std::vector<LuaDiagnosisInfo> SpellCheck(const std::string& uri, std::string&& text);
+	std::vector<LuaDiagnosisInfo> SpellCheck(const std::string& uri, std::string&& text, std::set<std::string>& tempDict);
 
 	std::vector<SuggestItem> SpellCorrect(const std::string& word);
 
