@@ -534,19 +534,6 @@ int spell_suggest(lua_State* L)
 		try
 		{
 			std::string word = lua_tostring(L, 1);
-
-			std::string letterWord = word;
-			for (auto& c : letterWord)
-			{
-				c = ::tolower(c);
-			}
-			bool upperFirst = false;
-			if (std::isupper(word.front()))
-			{
-				upperFirst = true;
-			}
-			lua_pushboolean(L, true);
-
 			auto suggests = LuaCodeFormat::GetInstance().SpellCorrect(word);
 			int count = 1;
 			lua_newtable(L);
@@ -554,10 +541,6 @@ int spell_suggest(lua_State* L)
 			{
 				if (!suggest.Term.empty())
 				{
-					if (upperFirst)
-					{
-						suggest.Term[0] = ::toupper(suggest.Term[0]);
-					}
 					lua_pushstring(L, suggest.Term.c_str());
 					lua_rawseti(L, -2, count);
 					count++;

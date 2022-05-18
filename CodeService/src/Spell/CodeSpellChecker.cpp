@@ -19,7 +19,7 @@ void CodeSpellChecker::LoadDictionary(std::string_view path)
 
 void CodeSpellChecker::LoadDictionaryFromBuffer(std::string_view buffer)
 {
-	 _symSpell->LoadWordDictionaryFromBuffer(buffer);
+	_symSpell->LoadWordDictionaryFromBuffer(buffer);
 }
 
 void CodeSpellChecker::Analysis(DiagnosisContext& ctx)
@@ -36,9 +36,118 @@ void CodeSpellChecker::Analysis(DiagnosisContext& ctx)
 	}
 }
 
-std::vector<SuggestItem> CodeSpellChecker::GetSuggests(const std::string& word)
+std::vector<SuggestItem> CodeSpellChecker::GetSuggests(std::string word)
 {
-	return _symSpell->LookUp(word);
+	enum class ParseState
+	{
+		Unknown,
+		FirstUpper,
+		AllUpper,
+		Lower,
+	} state = ParseState::Unknown;
+
+	std::vector<SuggestItem> suggests;
+
+	for (std::size_t i = 0; i != word.size(); i++)
+	{
+		char& c = word[i];
+		if (c < 0 || !std::isalpha(c))
+		{
+			return suggests;
+		}
+
+		switch (state)
+		{
+		case ParseState::Unknown:
+			{
+				if (std::isupper(c))
+				{
+					state = ParseState::AllUpper;
+					c = static_cast<char>(std::tolower(c));
+				}
+				else // lower
+				{
+					state = ParseState::Lower;
+				}
+
+				break;
+			}
+		case ParseState::AllUpper:
+			{
+				if (std::islower(c))
+				{
+					if (i == 1)
+					{
+						state = ParseState::FirstUpper;
+					}
+					else
+					{
+						return suggests;
+					}
+				}
+				c = static_cast<char>(std::tolower(c));
+				break;
+			}
+		case ParseState::FirstUpper:
+			{
+				if (!std::islower(c))
+				{
+					return suggests;
+				}
+				break;
+			}
+		case ParseState::Lower:
+			{
+				if (std::isupper(c))
+				{
+					return suggests;
+				}
+				break;
+			}
+		}
+	}
+
+	if (state == ParseState::Unknown)
+	{
+		return suggests;
+	}
+
+	suggests = _symSpell->LookUp(word);
+
+	switch (state)
+	{
+	case ParseState::FirstUpper:
+		{
+			for (auto& suggest : suggests)
+			{
+				if (!suggest.Term.empty())
+				{
+					suggest.Term[0] = std::toupper(suggest.Term[0]);
+				}
+			}
+			break;
+		}
+	case ParseState::AllUpper:
+		{
+			for (auto& suggest : suggests)
+			{
+				if (!suggest.Term.empty())
+				{
+					for (auto& ch : suggest.Term)
+					{
+						ch = std::toupper(ch);
+					}
+				}
+			}
+			break;
+		}
+	default:
+		{
+			break;
+		}
+	}
+
+	return suggests;
 }
 
 void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token)
@@ -54,7 +163,7 @@ void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token)
 	{
 		parser = std::make_shared<IdentifyParser>(token.Text);
 		parser->Parse();
-		_caches.insert({ text, parser });
+		_caches.insert({text, parser});
 	}
 
 	auto& words = parser->GetWords();

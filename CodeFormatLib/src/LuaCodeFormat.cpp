@@ -148,7 +148,30 @@ std::vector<LuaDiagnosisInfo> LuaCodeFormat::SpellCheck(const std::string& uri, 
 
 std::vector<SuggestItem> LuaCodeFormat::SpellCorrect(const std::string& word)
 {
-	return _codeSpellChecker->GetSuggests(word);
+	std::string letterWord = word;
+	for (auto& c : letterWord)
+	{
+		c = std::tolower(c);
+	}
+	bool upperFirst = false;
+	if (std::isupper(word.front()))
+	{
+		upperFirst = true;
+	}
+
+	auto suggests = _codeSpellChecker->GetSuggests(letterWord);
+
+	for (auto& suggest : suggests)
+	{
+		if (!suggest.Term.empty())
+		{
+			if (upperFirst)
+			{
+				suggest.Term[0] = std::toupper(suggest.Term[0]);
+			}
+		}
+	}
+	return suggests;
 }
 
 std::shared_ptr<LuaCodeStyleOptions> LuaCodeFormat::GetOptions(const std::string& uri)

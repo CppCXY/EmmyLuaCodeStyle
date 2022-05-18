@@ -29,7 +29,7 @@ void IdentifyParser::Parse()
 				start = _currentIndex;
 				break;
 			}
-		case IdentifyType::LowerEnd:
+		case IdentifyType::AsciiEnd:
 			{
 				WordRange range(start, _source.size() - start);
 				PushWords(range);
@@ -72,9 +72,9 @@ IdentifyParser::IdentifyType IdentifyParser::Lex()
 
 		if (ch == EOZ)
 		{
-			if(state == ParseState::LowerCase)
+			if(state == ParseState::LowerCase || state == ParseState::UpperCase)
 			{
-				return IdentifyType::LowerEnd;
+				return IdentifyType::AsciiEnd;
 			}
 			return IdentifyType::End;
 		}
@@ -145,7 +145,7 @@ IdentifyParser::IdentifyType IdentifyParser::Lex()
 					--_currentIndex;
 				}
 
-				return IdentifyType::Ignore;
+				return IdentifyType::Ascii;
 			}
 		}
 		++_currentIndex;

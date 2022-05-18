@@ -18,7 +18,8 @@ public:
 
 	void Analysis(DiagnosisContext& ctx);
 
-	std::vector<SuggestItem> GetSuggests(const std::string& word);
+	// copy once
+	std::vector<SuggestItem> GetSuggests(std::string word);
 private:
 	void IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token);
 

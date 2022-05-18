@@ -100,27 +100,12 @@ void CodeFormatService::MakeSpellActions(std::shared_ptr<vscode::CodeActionResul
 		return;
 	}
 
-	auto letterWord = originText;
-	for (auto& c : letterWord)
-	{
-		c = ::tolower(c);
-	}
-	bool upperFirst = false;
-	if(std::isupper(originText.front()))
-	{
-		upperFirst = true;
-	}
-
-	auto suggests = _spellChecker->GetSuggests(letterWord);
+	auto suggests = _spellChecker->GetSuggests(originText);
 	for (auto& suggest : suggests)
 	{
 		if (!suggest.Term.empty()) {
 			auto& action = result->actions.emplace_back();
-			auto term = suggest.Term;
-			if(upperFirst)
-			{
-				term[0] = std::toupper(term[0]);
-			}
+			auto& term = suggest.Term;
 
 			action.title = term;
 			action.command.title = term;

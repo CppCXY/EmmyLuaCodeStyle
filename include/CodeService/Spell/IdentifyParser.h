@@ -13,7 +13,7 @@ public:
 		Ascii,
 		Unicode,
 		Ignore,
-		LowerEnd,
+		AsciiEnd,
 		End,
 	};
 
