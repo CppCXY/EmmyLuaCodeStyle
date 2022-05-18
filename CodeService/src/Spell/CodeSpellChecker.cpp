@@ -154,6 +154,12 @@ void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, 
 {
 	std::shared_ptr<IdentifyParser> parser = nullptr;
 	std::string text(token.Text);
+
+	if (tempDict.count(text) != 0)
+	{
+		return;
+	}
+
 	auto it = _caches.find(text);
 	if (it != _caches.end())
 	{
