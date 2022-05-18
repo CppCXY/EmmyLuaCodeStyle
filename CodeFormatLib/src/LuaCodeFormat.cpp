@@ -141,7 +141,7 @@ std::vector<LuaDiagnosisInfo> LuaCodeFormat::SpellCheck(const std::string& uri, 
 
 	DiagnosisContext ctx(parser, *options);
 
-	_codeSpellChecker->Analysis(ctx);
+	_codeSpellChecker->Analysis(ctx, tempDict);
 	
 	return ctx.GetDiagnosisInfos();
 }

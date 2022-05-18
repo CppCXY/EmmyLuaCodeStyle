@@ -559,6 +559,11 @@ int spell_suggest(lua_State* L)
 					lua_rawseti(L, -2, count);
 					count++;
 				}
+				// 15个已经可以了
+				if (count == 15)
+				{
+					break;
+				}
 			}
 
 			return 2;
