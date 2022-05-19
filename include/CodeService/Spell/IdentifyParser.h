@@ -3,6 +3,9 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include "BasicSpellParserType.h"
+
+namespace spell {
 
 class IdentifyParser
 {
@@ -17,30 +20,6 @@ public:
 		End,
 	};
 
-	struct WordRange
-	{
-		std::size_t Start;
-		std::size_t Count;
-
-		WordRange(std::size_t start, std::size_t count)
-			: Start(start),
-			  Count(count)
-		{
-		}
-	};
-
-	struct Word
-	{
-		WordRange Range;
-		std::string Item;
-
-		Word(const WordRange& range, const std::string& item)
-			: Range(range),
-			  Item(item)
-		{
-		}
-	};
-
 	IdentifyParser(std::string_view source);
 
 	void Parse();
@@ -51,9 +30,11 @@ private:
 
 	int GetCurrentChar();
 
-	void PushWords(WordRange range);
+	void PushWords(spell::WordRange range);
 
 	std::string_view _source;
 	std::size_t _currentIndex;
 	std::vector<Word> _words;
 };
+
+}

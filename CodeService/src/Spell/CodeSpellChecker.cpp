@@ -1,15 +1,10 @@
 ﻿#include "CodeService/Spell/CodeSpellChecker.h"
 #include "LuaParser/LuaTokenTypeDetail.h"
 #include "Util/format.h"
-#include "LuaDict.hpp"
 
 CodeSpellChecker::CodeSpellChecker()
 	: _symSpell(std::make_shared<SymSpell>(SymSpell::Strategy::LazyLoaded))
 {
-	for (auto& word : LuaBuildInWords)
-	{
-		_symSpell->CreateDictionaryEntry(word, 1);
-	}
 }
 
 void CodeSpellChecker::LoadDictionary(std::string_view path)
@@ -22,16 +17,17 @@ void CodeSpellChecker::LoadDictionaryFromBuffer(std::string_view buffer)
 	_symSpell->LoadWordDictionaryFromBuffer(buffer);
 }
 
-void CodeSpellChecker::Analysis(DiagnosisContext& ctx, const std::set<std::string>& tempDict)
+void CodeSpellChecker::Analysis(DiagnosisContext& ctx, const CustomDictionary& customDict)
 {
 	auto parser = ctx.GetParser();
 	auto tokenParser = parser->GetTokenParser();
 	auto& tokens = tokenParser->GetTokens();
+
 	for (auto& token : tokens)
 	{
 		if (token.TokenType == TK_NAME)
 		{
-			IdentifyAnalysis(ctx, token, tempDict);
+			IdentifyAnalysis(ctx, token, customDict);
 		}
 	}
 }
@@ -150,12 +146,12 @@ std::vector<SuggestItem> CodeSpellChecker::GetSuggests(std::string word)
 	return suggests;
 }
 
-void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, const std::set<std::string>& tempDict)
+void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, const CustomDictionary& cutomDict)
 {
-	std::shared_ptr<IdentifyParser> parser = nullptr;
+	std::shared_ptr<spell::IdentifyParser> parser = nullptr;
 	std::string text(token.Text);
 
-	if (tempDict.count(text) != 0)
+	if (cutomDict.count(text) != 0)
 	{
 		return;
 	}
@@ -167,7 +163,7 @@ void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, 
 	}
 	else
 	{
-		parser = std::make_shared<IdentifyParser>(token.Text);
+		parser = std::make_shared<spell::IdentifyParser>(token.Text);
 		parser->Parse();
 		_caches.insert({text, parser});
 	}
@@ -180,7 +176,7 @@ void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, 
 
 	for (auto& word : words)
 	{
-		if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item) && tempDict.count(word.Item) == 0)
+		if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item) && cutomDict.count(word.Item) == 0)
 		{
 			auto range = TextRange(token.Range.StartOffset + word.Range.Start,
 			                       token.Range.StartOffset + word.Range.Start + word.Range.Count - 1

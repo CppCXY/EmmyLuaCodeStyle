@@ -133,7 +133,8 @@ std::pair<bool, std::vector<LuaDiagnosisInfo>> LuaCodeFormat::Diagnose(const std
 	return std::make_pair(true, ctx.GetDiagnosisInfos());
 }
 
-std::vector<LuaDiagnosisInfo> LuaCodeFormat::SpellCheck(const std::string& uri, std::string&& text, std::set<std::string>& tempDict)
+std::vector<LuaDiagnosisInfo> LuaCodeFormat::SpellCheck(const std::string& uri, std::string&& text,
+                                                        const CodeSpellChecker::CustomDictionary& tempDict)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
 
@@ -142,7 +143,7 @@ std::vector<LuaDiagnosisInfo> LuaCodeFormat::SpellCheck(const std::string& uri, 
 	DiagnosisContext ctx(parser, *options);
 
 	_codeSpellChecker->Analysis(ctx, tempDict);
-	
+
 	return ctx.GetDiagnosisInfos();
 }
 

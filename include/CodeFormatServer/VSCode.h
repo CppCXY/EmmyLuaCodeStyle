@@ -137,6 +137,7 @@ public:
 	Range range;
 	DiagnosticSeverity severity;
 	std::string message;
+	std::string code;
 	std::string data;
 
 	nlohmann::json Serialize() override;
@@ -218,6 +219,7 @@ public:
 class CompletionOptions : public Serializable
 {
 public:
+	bool supportCompletion = false;
 	std::vector<std::string> triggerCharacters;
 	bool resolveProvider;
 	CompletionItemOptions completionItem;

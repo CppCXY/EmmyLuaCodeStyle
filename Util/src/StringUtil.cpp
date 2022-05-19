@@ -190,3 +190,37 @@ bool StringUtil::FileWildcardMatch(std::string_view sourceFile, std::string_view
 	}
 	return match;
 }
+
+// glibc º¯Êý
+int __strncasecmp(const char* s1, const char* s2, int n)
+{
+	if (n && s1 != s2)
+	{
+		do
+		{
+			int d = ::tolower(*s1) - ::tolower(*s2);
+			if (d || *s1 == '\0' || *s2 == '\0') return d;
+			s1++;
+			s2++;
+		} while (--n);
+	}
+	return 0;
+}
+
+bool StringUtil::CaseInsensitiveLess::operator()(std::string_view lhs, std::string_view rhs) const
+{
+	std::size_t llen = lhs.size();
+	std::size_t rlen = rhs.size();
+
+	int ret = __strncasecmp(lhs.data(), rhs.data(), static_cast<int>((std::min)(llen, rlen)));
+
+	if (ret < 0)
+	{
+		return true;
+	}
+	if (ret == 0 && llen < rlen)
+	{
+		return true;
+	}
+	return false;
+}

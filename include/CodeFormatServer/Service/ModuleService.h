@@ -10,7 +10,6 @@
 #include "Service.h"
 #include "Indexs/ModuleIndex.h"
 
-
 class ModuleService : public Service
 {
 public:
@@ -28,7 +27,7 @@ public:
 
 	std::vector<vscode::Diagnostic> Diagnose(std::string_view filePath, std::shared_ptr<LuaParser> parser);
 
-	bool IsDiagnosticRange(std::string_view filePath, vscode::Range range);
+	bool IsModuleDiagnostic(vscode::Diagnostic& diagnostic);
 
 	std::vector<LuaModule> GetImportModules(std::string_view filePath, vscode::Range range);
 

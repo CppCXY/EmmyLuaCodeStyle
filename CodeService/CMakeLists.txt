@@ -70,6 +70,7 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/NameStyle/CheckElement.cpp
 	${CodeService_SOURCE_DIR}/src/Spell/CodeSpellChecker.cpp
 	${CodeService_SOURCE_DIR}/src/Spell/IdentifyParser.cpp
+	${CodeService_SOURCE_DIR}/src/Spell/TextParser.cpp
 	${CodeService_SOURCE_DIR}/src/AstUtil.cpp
 )
 

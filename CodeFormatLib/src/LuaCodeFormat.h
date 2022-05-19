@@ -26,13 +26,14 @@ public:
 
 	void LoadSpellDictionaryFromBuffer(const std::string& buffer);
 
-	std::string Reformat(const std::string& uri, std::string&& text,ConfigMap& configMap);
+	std::string Reformat(const std::string& uri, std::string&& text, ConfigMap& configMap);
 
 	std::string RangeFormat(const std::string& uri, LuaFormatRange& range, std::string&& text, ConfigMap& configMap);
 
 	std::pair<bool, std::vector<LuaDiagnosisInfo>> Diagnose(const std::string& uri, std::string&& text);
 
-	std::vector<LuaDiagnosisInfo> SpellCheck(const std::string& uri, std::string&& text, std::set<std::string>& tempDict);
+	std::vector<LuaDiagnosisInfo> SpellCheck(const std::string& uri, std::string&& text,
+	                                         const CodeSpellChecker::CustomDictionary& tempDict);
 
 	std::vector<SuggestItem> SpellCorrect(const std::string& word);
 

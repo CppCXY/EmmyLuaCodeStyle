@@ -31,6 +31,7 @@ public:
 	void LoadDictionary(std::string_view path);
 
 	bool IsCodeFormatDiagnostic(vscode::Diagnostic& diagnostic);
+
 	bool IsSpellDiagnostic(vscode::Diagnostic& diagnostic);
 private:
 

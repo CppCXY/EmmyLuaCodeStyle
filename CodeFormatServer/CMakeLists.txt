@@ -57,6 +57,7 @@ target_sources(CodeFormatServer
 	${CodeFormatServer_SOURCE_DIR}/src/Service/ModuleService.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Service/CodeFormatService.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Service/CompletionService.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/Service/CommandService.cpp
 
 	# mimalloc
 	${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.3/src/static.c

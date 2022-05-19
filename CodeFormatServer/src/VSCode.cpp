@@ -73,6 +73,7 @@ nlohmann::json vscode::Diagnostic::Serialize()
 	object["range"] = range.Serialize();
 	object["severity"] = static_cast<int>(severity);
 	object["data"] = data;
+	object["code"] = code;
 	return object;
 }
 
@@ -81,9 +82,13 @@ void vscode::Diagnostic::Deserialize(nlohmann::json json)
 	message = json["message"];
 	range.Deserialize(json["range"]);
 	severity = static_cast<DiagnosticSeverity>(json["severity"].get<int>());
-	if(json["data"].is_string())
+	if (json["data"].is_string())
 	{
 		data = json["data"];
+	}
+	if (json["code"].is_string())
+	{
+		code = json["code"];
 	}
 }
 
@@ -159,8 +164,10 @@ nlohmann::json vscode::ServerCapabilities::Serialize()
 	object["documentOnTypeFormattingProvider"] = documentOnTypeFormattingProvider.Serialize();
 	object["codeActionProvider"] = codeActionProvider;
 	object["executeCommandProvider"] = executeCommandProvider.Serialize();
-	object["completionProvider"] = completionProvider.Serialize();
-
+	if (completionProvider.supportCompletion)
+	{
+		object["completionProvider"] = completionProvider.Serialize();
+	}
 	return object;
 }
 
@@ -201,17 +208,17 @@ void vscode::InitializationOptions::Deserialize(nlohmann::json json)
 		localeRoot = json["localeRoot"];
 	}
 
-	if(json["extensionChars"].is_string())
+	if (json["extensionChars"].is_string())
 	{
 		extensionChars = json["extensionChars"];
 	}
 
-	if(json["vscodeConfig"].is_object())
+	if (json["vscodeConfig"].is_object())
 	{
 		vscodeConfig.Deserialize(json["vscodeConfig"]);
 	}
 
-	if(json["dictionaryPath"].is_string())
+	if (json["dictionaryPath"].is_string())
 	{
 		dictionaryPath = json["dictionaryPath"];
 	}
@@ -575,7 +582,7 @@ nlohmann::json vscode::CompletionItem::Serialize()
 	object["documentation"] = documentation;
 	object["insertText"] = insertText;
 
-	if(sortText.has_value())
+	if (sortText.has_value())
 	{
 		object["sortText"] = sortText.value();
 	}
@@ -589,7 +596,7 @@ nlohmann::json vscode::CompletionItem::Serialize()
 		object["command"] = command->Serialize();
 	}
 
-	if(labelDetails.has_value())
+	if (labelDetails.has_value())
 	{
 		object["labelDetails"] = labelDetails->Serialize();
 	}

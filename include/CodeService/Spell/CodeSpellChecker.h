@@ -6,23 +6,26 @@
 #include "Util/SymSpell/SymSpell.h"
 #include "CodeService/FormatElement/DiagnosisContext.h"
 #include "IdentifyParser.h"
+#include "Util/StringUtil.h"
 
 class CodeSpellChecker
 {
 public:
+	using CustomDictionary = std::set<std::string, StringUtil::CaseInsensitiveLess>;
+
 	CodeSpellChecker();
 
 	void LoadDictionary(std::string_view path);
 
 	void LoadDictionaryFromBuffer(std::string_view buffer);
 
-	void Analysis(DiagnosisContext& ctx, const std::set<std::string>& tempDict = std::set<std::string>());
+	void Analysis(DiagnosisContext& ctx, const CustomDictionary& customDict = CustomDictionary());
 
 	// copy once
 	std::vector<SuggestItem> GetSuggests(std::string word);
 private:
-	void IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, const std::set<std::string>& tempDict);
+	void IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, const CustomDictionary& customDict);
 
 	std::shared_ptr<SymSpell> _symSpell;
-	std::unordered_map<std::string, std::shared_ptr<IdentifyParser>> _caches;
+	std::unordered_map<std::string, std::shared_ptr<spell::IdentifyParser>> _caches;
 };

@@ -10,7 +10,7 @@
 #include "CodeFormatServer/Service/ModuleService.h"
 #include "CodeFormatServer/Service/CodeFormatService.h"
 #include "CodeFormatServer/Service/CompletionService.h"
-
+#include "CodeFormatServer/Service/CommandService.h"
 
 LanguageClient& LanguageClient::GetInstance()
 {
@@ -30,6 +30,7 @@ void LanguageClient::InitializeService()
 	AddService<CodeFormatService>();
 	AddService<ModuleService>();
 	AddService<CompletionService>();
+	AddService<CommandService>();
 
 	for (auto service : _services)
 	{

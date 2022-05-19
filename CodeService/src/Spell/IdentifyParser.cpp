@@ -1,6 +1,7 @@
 #include "CodeService/Spell/IdentifyParser.h"
 #include <climits>
 
+using namespace spell;
 const int EOZ = -1;
 
 IdentifyParser::IdentifyParser(std::string_view source)
@@ -49,7 +50,7 @@ void IdentifyParser::Parse()
 	}
 }
 
-std::vector<IdentifyParser::Word>& IdentifyParser::GetWords()
+std::vector<Word>& IdentifyParser::GetWords()
 {
 	return _words;
 }

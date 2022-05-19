@@ -1,4 +1,4 @@
-#include "CodeFormatServer/LanguageService.h"
+﻿#include "CodeFormatServer/LanguageService.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -9,6 +9,7 @@
 #include "CodeService/LuaFormatter.h"
 #include "CodeFormatServer/LanguageClient.h"
 #include "CodeFormatServer/Service/CodeFormatService.h"
+#include "CodeFormatServer/Service/CommandService.h"
 #include "CodeFormatServer/Service/ModuleService.h"
 #include "CodeFormatServer/Service/CompletionService.h"
 #include "Util/Url.h"
@@ -76,15 +77,14 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 	LanguageClient::GetInstance().SetVscodeSettings(param->initializationOptions.vscodeConfig);
 
 	result->capabilities.codeActionProvider = true;
-	result->capabilities.executeCommandProvider.commands = {
-		"emmylua.reformat.me",
-		"emmylua.import.me",
-		"emmylua.spell.correct"
-	};
+	result->capabilities.executeCommandProvider.commands =
+		LanguageClient::GetInstance().GetService<CommandService>()->GetCommands();
 
-	result->capabilities.completionProvider.resolveProvider = false;
-	result->capabilities.completionProvider.triggerCharacters = {};
-	result->capabilities.completionProvider.completionItem.labelDetailsSupport = true;
+	// result->capabilities.completionProvider.resolveProvider = false;
+	// result->capabilities.completionProvider.triggerCharacters = {};
+	// result->capabilities.completionProvider.completionItem.labelDetailsSupport = true;
+	// 砍掉代码补全
+	result->capabilities.completionProvider.supportCompletion = false;
 
 	auto& editorConfigFiles = param->initializationOptions.editorConfigFiles;
 	for (auto& configFile : editorConfigFiles)
@@ -344,6 +344,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 
 std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::shared_ptr<vscode::CodeActionParams> param)
 {
+	// TODO refactor move to CodeActionService
 	auto range = param->range;
 	auto uri = param->textDocument.uri;
 	auto filePath = url::UrlToFilePath(uri);
@@ -354,10 +355,11 @@ std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::sha
 		if (LanguageClient::GetInstance().GetService<CodeFormatService>()->IsCodeFormatDiagnostic(diagnostic))
 		{
 			auto& action = codeActionResult->actions.emplace_back();
-			std::string title = "reformat";
+			std::string title = "reformat current line";
 			action.title = title;
 			action.command.title = title;
-			action.command.command = "emmylua.reformat.me";
+			action.command.command = LanguageClient::GetInstance().
+			                         GetService<CommandService>()->GetCommand(CommandService::Command::Reformat);
 			action.command.arguments.push_back(param->textDocument.uri);
 			action.command.arguments.push_back(param->range.Serialize());
 
@@ -365,16 +367,22 @@ std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::sha
 		}
 		else if (LanguageClient::GetInstance().GetService<CodeFormatService>()->IsSpellDiagnostic(diagnostic))
 		{
-			LanguageClient::GetInstance().GetService<CodeFormatService>()->MakeSpellActions(codeActionResult, diagnostic, param->textDocument.uri);
+			LanguageClient::GetInstance().GetService<CodeFormatService>()->MakeSpellActions(
+				codeActionResult, diagnostic, param->textDocument.uri);
 		}
-		else if (LanguageClient::GetInstance().GetService<ModuleService>()->IsDiagnosticRange(filePath, range))
+		else if (LanguageClient::GetInstance().GetService<ModuleService>()->IsModuleDiagnostic(diagnostic))
 		{
 			auto modules = LanguageClient::GetInstance().GetService<ModuleService>()->GetImportModules(filePath, range);
 			auto& action = codeActionResult->actions.emplace_back();
-			std::string title = "import me";
+			std::string title = "import multi choice";
+			if (modules.size() == 1)
+			{
+				title = Util::format("import '{}'", modules.front().ModuleName);
+			}
 			action.title = title;
 			action.command.title = title;
-			action.command.command = "emmylua.import.me";
+			action.command.command = LanguageClient::GetInstance().
+			                         GetService<CommandService>()->GetCommand(CommandService::Command::Import);
 			action.command.arguments.push_back(param->textDocument.uri);
 			action.command.arguments.push_back(param->range.Serialize());
 			for (auto& module : modules)
@@ -395,108 +403,8 @@ std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::sha
 std::shared_ptr<vscode::Serializable> LanguageService::OnExecuteCommand(
 	std::shared_ptr<vscode::ExecuteCommandParams> param)
 {
-	auto result = std::make_shared<vscode::Serializable>();
-	if (param->command == "emmylua.reformat.me")
-	{
-		if (param->arguments.size() < 2)
-		{
-			return result;
-		}
-
-		std::string uri = param->arguments[0];
-		vscode::Range range;
-
-		range.Deserialize(param->arguments[1]);
-
-		auto parser = LanguageClient::GetInstance().GetFileParser(uri);
-
-		auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();
-
-		auto options = LanguageClient::GetInstance().GetOptions(uri);
-
-		if (parser->HasError())
-		{
-			return result;
-		}
-
-		auto it = applyParams->edit.changes.emplace(uri, std::vector<vscode::TextEdit>());
-		auto& change = it.first->second;
-
-		auto& edit = change.emplace_back();
-		LuaFormatRange formattedRange(static_cast<int>(range.start.line), static_cast<int>(range.end.line));
-
-		auto formatResult = LanguageClient::GetInstance().GetService<CodeFormatService>()->RangeFormat(
-			formattedRange, parser, options);
-
-		edit.newText = std::move(formatResult);
-
-		edit.range = vscode::Range(
-			vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
-			vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
-		);
-
-		LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
-	}
-	else if (param->command == "emmylua.import.me")
-	{
-		if (param->arguments.size() < 4)
-		{
-			return result;
-		}
-
-		std::string uri = param->arguments[0];
-		std::string filePath = url::UrlToFilePath(uri);
-		auto config = LanguageClient::GetInstance().GetService<ModuleService>()->GetIndex().GetConfig(filePath);
-		if (!config)
-		{
-			return nullptr;
-		}
-		vscode::Range range;
-
-		range.Deserialize(param->arguments[1]);
-
-		std::string moduleName = param->arguments[2];
-
-		std::string moduleDefineName = param->arguments[3];
-
-		std::string requireString = Util::format("local {} = {}(\"{}\")\n", moduleDefineName, config->import_function,
-		                                   moduleName);
-		auto parser = LanguageClient::GetInstance().GetFileParser(uri);
-		auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();
-		auto it = applyParams->edit.changes.emplace(uri, std::vector<vscode::TextEdit>());
-		auto& change = it.first->second;
-
-		auto& edit = change.emplace_back();
-
-		edit.newText = requireString;
-
-		edit.range = LanguageClient::GetInstance().GetService<ModuleService>()->FindRequireRange(parser, config);
-
-		LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
-	}
-	else if(param->command == "emmylua.spell.correct")
-	{
-		std::string uri = param->arguments[0];
-		vscode::Range range;
-
-		range.Deserialize(param->arguments[1]);
-
-		std::string newText = param->arguments[2];
-
-		auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();
-		auto it = applyParams->edit.changes.emplace(uri, std::vector<vscode::TextEdit>());
-		auto& change = it.first->second;
-
-		auto& edit = change.emplace_back();
-
-		edit.newText = newText;
-
-		edit.range = range;
-
-		LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
-	}
-
-	return result;
+	LanguageClient::GetInstance().GetService<CommandService>()->Dispatch(param->command, param);
+	return nullptr;
 }
 
 std::shared_ptr<vscode::Serializable> LanguageService::OnDidChangeWatchedFiles(
@@ -528,6 +436,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChangeWatchedFiles(
 	return nullptr;
 }
 
+//@depreacated
 std::shared_ptr<vscode::CompletionList> LanguageService::OnCompletion(std::shared_ptr<vscode::CompletionParams> param)
 {
 	auto list = std::make_shared<vscode::CompletionList>();

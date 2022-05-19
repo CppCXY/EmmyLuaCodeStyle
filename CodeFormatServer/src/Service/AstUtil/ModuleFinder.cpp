@@ -41,7 +41,6 @@ std::set<std::string> ModuleFinder::GetDefinedName(std::shared_ptr<LuaAstNode> u
 	return definedName;
 }
 
-
 void ModuleFinder::VisitParamList(const std::shared_ptr<LuaAstNode>& paramList)
 {
 	for (auto param : paramList->GetChildren())

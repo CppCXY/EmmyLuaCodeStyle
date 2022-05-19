@@ -29,7 +29,7 @@ std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePat
 			if (StringUtil::IsStringEqualIgnoreCase(undefinedModuleName, luaModule->MatchName))
 			{
 				auto& diagnostic = result.emplace_back();
-				diagnostic.message = "need import module";
+				diagnostic.message = Util::format("import module '{}'", luaModule->ModuleName);
 				auto textRange = undefinedModule->GetTextRange();
 				auto range = vscode::Range(
 					vscode::Position(
@@ -51,6 +51,7 @@ std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePat
 				});
 
 				diagnostic.range = range;
+				diagnostic.code = "EmmyLua module-check";
 				diagnostic.severity = vscode::DiagnosticSeverity::Hint;
 			}
 		}
@@ -59,29 +60,9 @@ std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePat
 	return result;
 }
 
-bool ModuleService::IsDiagnosticRange(std::string_view filePath, vscode::Range range)
+bool ModuleService::IsModuleDiagnostic(vscode::Diagnostic& diagnostic)
 {
-	auto it = _diagnosticCaches.find(filePath);
-	if (it == _diagnosticCaches.end())
-	{
-		return false;
-	}
-
-	if (range.start == range.end)
-	{
-		for (auto& pair : it->second)
-		{
-			if (pair.first.start <= range.start && pair.first.end >= range.end)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	else
-	{
-		return it->second.count(range) > 0;
-	}
+	return diagnostic.code == "EmmyLua module-check";
 }
 
 std::vector<ModuleService::LuaModule> ModuleService::GetImportModules(std::string_view filePath, vscode::Range range)

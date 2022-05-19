@@ -1,4 +1,6 @@
 #include "CodeFormatServer/Service/CodeFormatService.h"
+
+#include "CodeFormatServer/Service/CommandService.h"
 #include "CodeService/LuaFormatter.h"
 #include "CodeService/FormatElement/DiagnosisContext.h"
 #include "CodeService/NameStyle/NameStyleChecker.h"
@@ -49,13 +51,14 @@ std::vector<vscode::Diagnostic> CodeFormatService::Diagnose(std::string_view fil
 		case DiagnosisType::Blank:
 		case DiagnosisType::Align:
 			{
-				diagnosis.data = "emmylua.format";
+				diagnosis.code = "Emmylua style-check";
 				break;
 			}
 		case DiagnosisType::Spell:
 			{
 				diagnosis.severity = vscode::DiagnosticSeverity::Information;
-				diagnosis.data = "emmylua.spell|" + diagnosisInfo.Data;
+				diagnosis.code = "Emmylua spell-check";
+				diagnosis.data = diagnosisInfo.Data;
 				break;
 			}
 		default:
@@ -88,13 +91,8 @@ std::string CodeFormatService::RangeFormat(LuaFormatRange& range,
 void CodeFormatService::MakeSpellActions(std::shared_ptr<vscode::CodeActionResult> result,
                                          vscode::Diagnostic& diagnostic, std::string_view uri)
 {
-	auto pos = diagnostic.data.find_first_of("|");
-	if (pos == std::string::npos)
-	{
-		return;
-	}
 
-	auto originText = diagnostic.data.substr(pos + 1);
+	auto& originText = diagnostic.data;
 	if (originText.empty())
 	{
 		return;
@@ -103,13 +101,14 @@ void CodeFormatService::MakeSpellActions(std::shared_ptr<vscode::CodeActionResul
 	auto suggests = _spellChecker->GetSuggests(originText);
 	for (auto& suggest : suggests)
 	{
-		if (!suggest.Term.empty()) {
+		if (!suggest.Term.empty())
+		{
 			auto& action = result->actions.emplace_back();
 			auto& term = suggest.Term;
 
 			action.title = term;
 			action.command.title = term;
-			action.command.command = "emmylua.spell.correct";
+			action.command.command = GetService<CommandService>()->GetCommand(CommandService::Command::SpellCorrect);
 			action.command.arguments.push_back(uri);
 			action.command.arguments.push_back(diagnostic.range.Serialize());
 			action.command.arguments.push_back(term);
@@ -126,10 +125,10 @@ void CodeFormatService::LoadDictionary(std::string_view path)
 
 bool CodeFormatService::IsCodeFormatDiagnostic(vscode::Diagnostic& diagnostic)
 {
-	return diagnostic.data == "emmylua.format";
+	return diagnostic.code == "Emmylua style-check";
 }
 
 bool CodeFormatService::IsSpellDiagnostic(vscode::Diagnostic& diagnostic)
 {
-	return diagnostic.data.starts_with("emmylua.spell");
+	return diagnostic.code == "Emmylua spell-check";
 }

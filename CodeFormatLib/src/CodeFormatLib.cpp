@@ -442,7 +442,7 @@ int spell_analysis(lua_State* L)
 			std::string filename = lua_tostring(L, 1);
 			std::string text = lua_tostring(L, 2);
 
-			std::set<std::string> tempDict;
+			CodeSpellChecker::CustomDictionary tempDict;
 
 			if (top == 3 && lua_istable(L, 3))
 			{

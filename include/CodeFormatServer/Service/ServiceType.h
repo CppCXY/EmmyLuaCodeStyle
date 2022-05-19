@@ -6,6 +6,7 @@ enum class ServiceType
 	CodeFormatService = 0,
 	ModuleService = 1,
 	CompletionService = 2,
+	CommandService = 3,
 
 	ServiceCount 
 };
