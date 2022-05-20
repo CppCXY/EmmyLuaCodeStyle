@@ -27,8 +27,6 @@ public:
 
 	std::vector<vscode::Diagnostic> Diagnose(std::string_view filePath, std::shared_ptr<LuaParser> parser);
 
-	bool IsModuleDiagnostic(vscode::Diagnostic& diagnostic);
-
 	std::vector<LuaModule> GetImportModules(std::string_view filePath, vscode::Range range);
 
 	vscode::Range FindRequireRange(std::shared_ptr<LuaParser> parser, std::shared_ptr<ModuleConfig> config);

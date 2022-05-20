@@ -7,6 +7,7 @@
 #include "Util/Url.h"
 #include "Util/FileFinder.h"
 #include "asio.hpp"
+#include "CodeFormatServer/Service/CodeActionService.h"
 #include "CodeFormatServer/Service/ModuleService.h"
 #include "CodeFormatServer/Service/CodeFormatService.h"
 #include "CodeFormatServer/Service/CompletionService.h"
@@ -31,6 +32,7 @@ void LanguageClient::InitializeService()
 	AddService<ModuleService>();
 	AddService<CompletionService>();
 	AddService<CommandService>();
+	AddService<CodeActionService>();
 
 	for (auto service : _services)
 	{
@@ -154,12 +156,12 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 		return;
 	}
 
-	if (_vscodeSettings.lintCodeStyle) {
-		auto formatDiagnostic = GetService<CodeFormatService>()->Diagnose(filename, parser, options);
-		std::copy(formatDiagnostic.begin(), formatDiagnostic.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
-	}
+	// TODO move spell check to SpellService
+	auto formatDiagnostic = GetService<CodeFormatService>()->Diagnose(filename, parser, options);
+	std::copy(formatDiagnostic.begin(), formatDiagnostic.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
 
-	if (_vscodeSettings.lintModule) {
+	if (_vscodeSettings.lintModule)
+	{
 		auto moduleDiagnosis = GetService<ModuleService>()->Diagnose(filename, parser);
 		std::copy(moduleDiagnosis.begin(), moduleDiagnosis.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
 	}
@@ -177,8 +179,9 @@ void LanguageClient::DelayDiagnosticFile(std::string_view uri)
 		it->second->cancel();
 		it->second = task;
 	}
-	else {
-		_fileDiagnosticTask.insert({ stringUri, task });
+	else
+	{
+		_fileDiagnosticTask.insert({stringUri, task});
 	}
 
 	task->async_wait([this, stringUri](const asio::error_code& code)
@@ -316,7 +319,7 @@ asio::io_context& LanguageClient::GetIOContext()
 	return _ioc;
 }
 
-vscode::VscodeSettings LanguageClient::GetSettings() const
+vscode::VscodeSettings& LanguageClient::GetSettings()
 {
 	return _vscodeSettings;
 }
@@ -324,6 +327,8 @@ vscode::VscodeSettings LanguageClient::GetSettings() const
 void LanguageClient::SetVscodeSettings(vscode::VscodeSettings& settings)
 {
 	_vscodeSettings = settings;
+
+	GetService<CodeFormatService>()->SetCustomDictionary(_vscodeSettings.spellDict);
 }
 
 uint64_t LanguageClient::GetRequestId()

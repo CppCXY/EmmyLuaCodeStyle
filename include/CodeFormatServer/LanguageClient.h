@@ -69,7 +69,7 @@ public:
 	template <ServiceClass Service>
 	std::shared_ptr<Service> GetService();
 
-	vscode::VscodeSettings GetSettings() const;
+	vscode::VscodeSettings& GetSettings();
 
 	void SetVscodeSettings(vscode::VscodeSettings& settings);
 private:

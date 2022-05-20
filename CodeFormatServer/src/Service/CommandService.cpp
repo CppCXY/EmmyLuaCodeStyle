@@ -20,7 +20,7 @@ bool CommandService::Initialize()
 	CommandProtocol("emmylua.reformat.me", &CommandService::Reformat);
 	CommandProtocol("emmylua.import.me", &CommandService::Import);
 	CommandProtocol("emmylua.spell.correct", &CommandService::SpellCorrect);
-	CommandProtocol("emmylua.spell.addDict", &CommandService::SpellAddDict);
+	// CommandProtocol("emmylua.spell.addDict", &CommandService::SpellAddDict);
 
 	return true;
 }
@@ -160,6 +160,6 @@ void CommandService::SpellCorrect(std::shared_ptr<vscode::ExecuteCommandParams> 
 	LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
 }
 
-void CommandService::SpellAddDict(std::shared_ptr<vscode::ExecuteCommandParams> param)
-{
-}
+// void CommandService::SpellAddDict(std::shared_ptr<vscode::ExecuteCommandParams> param)
+// {
+// }

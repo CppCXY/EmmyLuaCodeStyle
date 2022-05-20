@@ -218,9 +218,12 @@ void vscode::InitializationOptions::Deserialize(nlohmann::json json)
 		vscodeConfig.Deserialize(json["vscodeConfig"]);
 	}
 
-	if (json["dictionaryPath"].is_string())
+	if (json["dictionaryPath"].is_array())
 	{
-		dictionaryPath = json["dictionaryPath"];
+		for(auto& j: json["dictionaryPath"])
+		{
+			dictionaryPath.push_back(j);
+		}
 	}
 }
 
@@ -330,9 +333,29 @@ void vscode::ConfigSource::Deserialize(nlohmann::json json)
 
 void vscode::VscodeSettings::Deserialize(nlohmann::json json)
 {
-	lintCodeStyle = json["lint.codeStyle"];
-	lintModule = json["lint.moduleCheck"];
-	autoImport = json["autoImport"];
+	if (json["emmylua.lint.moduleCheck"].is_boolean())
+	{
+		lintModule = json["emmylua.lint.moduleCheck"];
+	}
+
+	if (json["emmylua.lint.codeStyle"].is_boolean())
+	{
+		lintCodeStyle = json["emmylua.lint.codeStyle"];
+	}
+
+	if (json["emmylua.spell.enable"].is_boolean())
+	{
+		spellEnable = json["emmylua.spell.enable"];
+	}
+
+	if (json["emmylua.spell.dict"].is_array())
+	{
+		spellDict.clear();
+		for(auto j: json["emmylua.spell.dict"])
+		{
+			spellDict.push_back(j);
+		}
+	}
 }
 
 void vscode::ConfigUpdateParams::Deserialize(nlohmann::json json)
@@ -611,4 +634,12 @@ nlohmann::json vscode::CompletionList::Serialize()
 	object["items"] = SerializeArray(items);
 
 	return object;
+}
+
+void vscode::DidChangeConfigurationParams::Deserialize(nlohmann::json json)
+{
+	if(json["settings"].is_object())
+	{
+		settings = json["settings"];
+	}
 }

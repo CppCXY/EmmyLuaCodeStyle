@@ -1,5 +1,6 @@
 #include "CodeFormatServer/Service/CodeFormatService.h"
 
+#include "CodeFormatServer/Service/CodeActionService.h"
 #include "CodeFormatServer/Service/CommandService.h"
 #include "CodeService/LuaFormatter.h"
 #include "CodeService/FormatElement/DiagnosisContext.h"
@@ -15,6 +16,7 @@ std::vector<vscode::Diagnostic> CodeFormatService::Diagnose(std::string_view fil
                                                             std::shared_ptr<LuaParser> parser,
                                                             std::shared_ptr<LuaCodeStyleOptions> options)
 {
+	auto& settings = _owner->GetSettings();
 	std::vector<vscode::Diagnostic> diagnostics;
 
 	LuaFormatter formatter(parser, *options);
@@ -22,13 +24,16 @@ std::vector<vscode::Diagnostic> CodeFormatService::Diagnose(std::string_view fil
 	DiagnosisContext ctx(parser, *options);
 	formatter.CalculateDiagnosisInfos(ctx);
 
-	if (options->enable_check_codestyle)
+	if (options->enable_check_codestyle && settings.lintCodeStyle)
 	{
 		NameStyleChecker styleChecker(ctx);
 		styleChecker.Analysis();
 	}
 
-	_spellChecker->Analysis(ctx);
+	if (settings.spellEnable)
+	{
+		_spellChecker->Analysis(ctx, _customDictionary);
+	}
 
 	auto diagnosisInfos = ctx.GetDiagnosisInfos();
 	for (auto diagnosisInfo : diagnosisInfos)
@@ -51,13 +56,13 @@ std::vector<vscode::Diagnostic> CodeFormatService::Diagnose(std::string_view fil
 		case DiagnosisType::Blank:
 		case DiagnosisType::Align:
 			{
-				diagnosis.code = "Emmylua style-check";
+				diagnosis.code = GetService<CodeActionService>()->GetCode(CodeActionService::DiagnosticCode::Reformat);
 				break;
 			}
 		case DiagnosisType::Spell:
 			{
 				diagnosis.severity = vscode::DiagnosticSeverity::Information;
-				diagnosis.code = "Emmylua spell-check";
+				diagnosis.code = GetService<CodeActionService>()->GetCode(CodeActionService::DiagnosticCode::Spell);
 				diagnosis.data = diagnosisInfo.Data;
 				break;
 			}
@@ -88,47 +93,25 @@ std::string CodeFormatService::RangeFormat(LuaFormatRange& range,
 	return formatter.GetRangeFormattedText(range);
 }
 
-void CodeFormatService::MakeSpellActions(std::shared_ptr<vscode::CodeActionResult> result,
-                                         vscode::Diagnostic& diagnostic, std::string_view uri)
-{
-
-	auto& originText = diagnostic.data;
-	if (originText.empty())
-	{
-		return;
-	}
-
-	auto suggests = _spellChecker->GetSuggests(originText);
-	for (auto& suggest : suggests)
-	{
-		if (!suggest.Term.empty())
-		{
-			auto& action = result->actions.emplace_back();
-			auto& term = suggest.Term;
-
-			action.title = term;
-			action.command.title = term;
-			action.command.command = GetService<CommandService>()->GetCommand(CommandService::Command::SpellCorrect);
-			action.command.arguments.push_back(uri);
-			action.command.arguments.push_back(diagnostic.range.Serialize());
-			action.command.arguments.push_back(term);
-
-			action.kind = vscode::CodeActionKind::QuickFix;
-		}
-	}
-}
-
 void CodeFormatService::LoadDictionary(std::string_view path)
 {
-	_spellChecker->LoadDictionary(path);
+	if (_owner->GetSettings().spellEnable)
+	{
+		_spellChecker->LoadDictionary(path);
+	}
 }
 
-bool CodeFormatService::IsCodeFormatDiagnostic(vscode::Diagnostic& diagnostic)
+void CodeFormatService::SetCustomDictionary(std::vector<std::string>& dictionary)
 {
-	return diagnostic.code == "Emmylua style-check";
+	_customDictionary.clear();
+
+	for (auto& word : dictionary)
+	{
+		_customDictionary.insert(word);
+	}
 }
 
-bool CodeFormatService::IsSpellDiagnostic(vscode::Diagnostic& diagnostic)
+std::shared_ptr<CodeSpellChecker> CodeFormatService::GetSpellChecker()
 {
-	return diagnostic.code == "Emmylua spell-check";
+	return _spellChecker;
 }

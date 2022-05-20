@@ -7,6 +7,7 @@ enum class ServiceType
 	ModuleService = 1,
 	CompletionService = 2,
 	CommandService = 3,
+	CodeActionService = 4,
 
 	ServiceCount 
 };

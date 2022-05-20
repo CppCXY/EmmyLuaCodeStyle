@@ -43,7 +43,7 @@ private:
 
 	void SpellCorrect(std::shared_ptr<vscode::ExecuteCommandParams> param);
 
-	void SpellAddDict(std::shared_ptr<vscode::ExecuteCommandParams> param);
+	// void SpellAddDict(std::shared_ptr<vscode::ExecuteCommandParams> param);
 
 	std::map<std::string, CommandHandle> _handles;
 };

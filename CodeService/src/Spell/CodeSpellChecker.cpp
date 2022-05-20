@@ -182,7 +182,7 @@ void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, 
 			                       token.Range.StartOffset + word.Range.Start + word.Range.Count - 1
 			);
 			std::string originText(token.Text.substr(word.Range.Start, word.Range.Count));
-			ctx.PushDiagnosis(Util::format("Typo: in word '{}'", originText), range, DiagnosisType::Spell, originText);
+			ctx.PushDiagnosis(Util::format("Typo in identifier '{}'", originText), range, DiagnosisType::Spell, originText);
 		}
 	}
 }

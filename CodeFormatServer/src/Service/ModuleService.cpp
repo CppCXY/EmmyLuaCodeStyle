@@ -1,4 +1,6 @@
 ﻿#include "CodeFormatServer/Service/ModuleService.h"
+
+#include "CodeFormatServer/Service/CodeActionService.h"
 #include "CodeFormatServer/Service/AstUtil/ModuleFinder.h"
 #include "LuaParser/LuaAstVisitor.h"
 #include "Util/StringUtil.h"
@@ -51,18 +53,13 @@ std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePat
 				});
 
 				diagnostic.range = range;
-				diagnostic.code = "EmmyLua module-check";
+				diagnostic.code = GetService<CodeActionService>()->GetCode(CodeActionService::DiagnosticCode::Module);
 				diagnostic.severity = vscode::DiagnosticSeverity::Hint;
 			}
 		}
 	}
 	_diagnosticCaches[std::string(filePath)] = std::move(rangeModule);
 	return result;
-}
-
-bool ModuleService::IsModuleDiagnostic(vscode::Diagnostic& diagnostic)
-{
-	return diagnostic.code == "EmmyLua module-check";
 }
 
 std::vector<ModuleService::LuaModule> ModuleService::GetImportModules(std::string_view filePath, vscode::Range range)

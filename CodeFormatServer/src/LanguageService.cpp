@@ -8,6 +8,7 @@
 #include "CodeService/LuaCodeStyleOptions.h"
 #include "CodeService/LuaFormatter.h"
 #include "CodeFormatServer/LanguageClient.h"
+#include "CodeFormatServer/Service/CodeActionService.h"
 #include "CodeFormatServer/Service/CodeFormatService.h"
 #include "CodeFormatServer/Service/CommandService.h"
 #include "CodeFormatServer/Service/ModuleService.h"
@@ -42,6 +43,7 @@ bool LanguageService::Initialize()
 	JsonProtocol("workspace/executeCommand", &LanguageService::OnExecuteCommand);
 	JsonProtocol("workspace/didChangeWatchedFiles", &LanguageService::OnDidChangeWatchedFiles);
 	JsonProtocol("textDocument/completion", &LanguageService::OnCompletion);
+	JsonProtocol("workspace/didChangeConfiguration", &LanguageService::OnWorkspaceDidChangeConfiguration);
 	return true;
 }
 
@@ -140,7 +142,10 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 	auto dictionaryPath = param->initializationOptions.dictionaryPath;
 	if (!dictionaryPath.empty())
 	{
-		LanguageClient::GetInstance().GetService<CodeFormatService>()->LoadDictionary(dictionaryPath);
+		for (auto& path : dictionaryPath)
+		{
+			LanguageClient::GetInstance().GetService<CodeFormatService>()->LoadDictionary(path);
+		}
 	}
 	return result;
 }
@@ -344,58 +349,11 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 
 std::shared_ptr<vscode::CodeActionResult> LanguageService::OnCodeAction(std::shared_ptr<vscode::CodeActionParams> param)
 {
-	// TODO refactor move to CodeActionService
-	auto range = param->range;
-	auto uri = param->textDocument.uri;
-	auto filePath = url::UrlToFilePath(uri);
 	auto codeActionResult = std::make_shared<vscode::CodeActionResult>();
 
 	for (auto& diagnostic : param->context.diagnostics)
 	{
-		if (LanguageClient::GetInstance().GetService<CodeFormatService>()->IsCodeFormatDiagnostic(diagnostic))
-		{
-			auto& action = codeActionResult->actions.emplace_back();
-			std::string title = "reformat current line";
-			action.title = title;
-			action.command.title = title;
-			action.command.command = LanguageClient::GetInstance().
-			                         GetService<CommandService>()->GetCommand(CommandService::Command::Reformat);
-			action.command.arguments.push_back(param->textDocument.uri);
-			action.command.arguments.push_back(param->range.Serialize());
-
-			action.kind = vscode::CodeActionKind::QuickFix;
-		}
-		else if (LanguageClient::GetInstance().GetService<CodeFormatService>()->IsSpellDiagnostic(diagnostic))
-		{
-			LanguageClient::GetInstance().GetService<CodeFormatService>()->MakeSpellActions(
-				codeActionResult, diagnostic, param->textDocument.uri);
-		}
-		else if (LanguageClient::GetInstance().GetService<ModuleService>()->IsModuleDiagnostic(diagnostic))
-		{
-			auto modules = LanguageClient::GetInstance().GetService<ModuleService>()->GetImportModules(filePath, range);
-			auto& action = codeActionResult->actions.emplace_back();
-			std::string title = "import multi choice";
-			if (modules.size() == 1)
-			{
-				title = Util::format("import '{}'", modules.front().ModuleName);
-			}
-			action.title = title;
-			action.command.title = title;
-			action.command.command = LanguageClient::GetInstance().
-			                         GetService<CommandService>()->GetCommand(CommandService::Command::Import);
-			action.command.arguments.push_back(param->textDocument.uri);
-			action.command.arguments.push_back(param->range.Serialize());
-			for (auto& module : modules)
-			{
-				auto object = nlohmann::json::object();
-				object["moduleName"] = module.ModuleName;
-				object["path"] = module.FilePath;
-				object["name"] = module.Name;
-				action.command.arguments.push_back(object);
-			}
-
-			action.kind = vscode::CodeActionKind::QuickFix;
-		}
+		LanguageClient::GetInstance().GetService<CodeActionService>()->Dispatch(diagnostic, param, codeActionResult);
 	}
 	return codeActionResult;
 }
@@ -441,10 +399,10 @@ std::shared_ptr<vscode::CompletionList> LanguageService::OnCompletion(std::share
 {
 	auto list = std::make_shared<vscode::CompletionList>();
 
-	if (!LanguageClient::GetInstance().GetSettings().autoImport)
-	{
-		return list;
-	}
+	// if (!LanguageClient::GetInstance().GetSettings().autoImport)
+	// {
+	// 	return list;
+	// }
 
 	auto uri = param->textDocument.uri;
 
@@ -457,4 +415,53 @@ std::shared_ptr<vscode::CompletionList> LanguageService::OnCompletion(std::share
 		param->textDocument.uri, param->position, parser, options);
 
 	return list;
+}
+
+std::shared_ptr<vscode::Serializable> LanguageService::OnWorkspaceDidChangeConfiguration(
+	std::shared_ptr<vscode::DidChangeConfigurationParams> param)
+{
+	vscode::VscodeSettings& setting = LanguageClient::GetInstance().GetSettings();
+	// TODO more modern method
+	if (param->settings["emmylua"].is_object())
+	{
+		auto emmylua = param->settings["emmylua"];
+		if (emmylua["lint"].is_object())
+		{
+			auto lint = emmylua["lint"];
+			if (lint["moduleCheck"].is_boolean())
+			{
+				setting.lintModule = lint["moduleCheck"];
+			}
+			if (lint["codeStyle"].is_boolean())
+			{
+				setting.lintCodeStyle = lint["codeStyle"];
+			}
+		}
+
+		if (emmylua["spell"].is_object())
+		{
+			auto spell = emmylua["spell"];
+			if (spell["enable"].is_boolean())
+			{
+				setting.spellEnable = spell["enable"];
+			}
+
+			if (spell["dict"].is_array())
+			{
+				setting.spellDict.clear();
+				for (auto j : spell["dict"])
+				{
+					if (j.is_string())
+					{
+						setting.spellDict.push_back(j);
+					}
+				}
+			}
+		}
+	}
+
+
+	LanguageClient::GetInstance().SetVscodeSettings(setting);
+
+	return nullptr;
 }

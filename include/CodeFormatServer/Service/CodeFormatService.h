@@ -26,14 +26,14 @@ public:
 	std::string RangeFormat(LuaFormatRange& range, std::shared_ptr<LuaParser> parser,
 	                        std::shared_ptr<LuaCodeStyleOptions> options);
 
-	void MakeSpellActions(std::shared_ptr<vscode::CodeActionResult> result, vscode::Diagnostic& diagnostic, std::string_view uri);
-
 	void LoadDictionary(std::string_view path);
 
-	bool IsCodeFormatDiagnostic(vscode::Diagnostic& diagnostic);
+	void SetCustomDictionary(std::vector<std::string>& dictionary);
 
-	bool IsSpellDiagnostic(vscode::Diagnostic& diagnostic);
+	std::shared_ptr<CodeSpellChecker> GetSpellChecker();
 private:
 
 	std::shared_ptr<CodeSpellChecker> _spellChecker;
+
+	CodeSpellChecker::CustomDictionary _customDictionary;
 };

@@ -65,6 +65,8 @@ private:
 
 	std::shared_ptr<vscode::CompletionList> OnCompletion(std::shared_ptr<vscode::CompletionParams> param);
 
+	std::shared_ptr<vscode::Serializable> OnWorkspaceDidChangeConfiguration(std::shared_ptr<vscode::DidChangeConfigurationParams> param);
+
 	std::map<std::string, MessageHandle, std::less<>> _handles;
 };
 
