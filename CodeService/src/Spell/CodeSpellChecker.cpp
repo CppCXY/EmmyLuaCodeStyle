@@ -146,12 +146,12 @@ std::vector<SuggestItem> CodeSpellChecker::GetSuggests(std::string word)
 	return suggests;
 }
 
-void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, const CustomDictionary& cutomDict)
+void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, const CustomDictionary& customDict)
 {
 	std::shared_ptr<spell::IdentifyParser> parser = nullptr;
 	std::string text(token.Text);
 
-	if (cutomDict.count(text) != 0)
+	if (customDict.count(text) != 0)
 	{
 		return;
 	}
@@ -176,7 +176,7 @@ void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, 
 
 	for (auto& word : words)
 	{
-		if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item) && cutomDict.count(word.Item) == 0)
+		if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item) && customDict.count(word.Item) == 0)
 		{
 			auto range = TextRange(token.Range.StartOffset + word.Range.Start,
 			                       token.Range.StartOffset + word.Range.Start + word.Range.Count - 1

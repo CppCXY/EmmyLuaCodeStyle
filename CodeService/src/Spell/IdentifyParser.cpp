@@ -1,4 +1,4 @@
-#include "CodeService/Spell/IdentifyParser.h"
+﻿#include "CodeService/Spell/IdentifyParser.h"
 #include <climits>
 
 using namespace spell;
@@ -120,6 +120,8 @@ IdentifyParser::IdentifyType IdentifyParser::Lex()
 				{
 					break;
 				}
+				// 忽略会忽略掉当前扫描到的字符，所以这里退格一位
+				--_currentIndex;
 				return IdentifyType::Ignore;
 			}
 		case ParseState::LowerCase:
