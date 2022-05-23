@@ -9,8 +9,7 @@
 
 // 命名风格和vscode一样
 
-namespace vscode
-{
+namespace vscode {
 class Serializable
 {
 public:
@@ -227,6 +226,16 @@ public:
 	nlohmann::json Serialize() override;
 };
 
+class DiagnosticOptions : public Serializable
+{
+public:
+	std::string identifier;
+	bool workspaceDiagnostics = false;
+	bool interFileDependencies = false;
+
+	nlohmann::json Serialize() override;
+};
+
 class ServerCapabilities : public Serializable
 {
 public:
@@ -237,6 +246,7 @@ public:
 	bool codeActionProvider = false;
 	ExecuteCommandOptions executeCommandProvider;
 	CompletionOptions completionProvider;
+	DiagnosticOptions diagnosticProvider;
 
 	nlohmann::json Serialize() override;
 };
@@ -601,6 +611,70 @@ public:
 	nlohmann::json settings;
 
 	void Deserialize(nlohmann::json json) override;
+};
+
+class DocumentDiagnosticParams : public Serializable
+{
+public:
+	TextDocument textDocument;
+	std::string identifier;
+	std::string previousResultId;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+namespace DocumentDiagnosticReportKind {
+static constexpr std::string_view Full = "full";
+static constexpr std::string_view Unchanged = "unchanged";
+};
+
+
+class DocumentDiagnosticReport : public Serializable
+{
+public:
+	std::string kind;
+
+	std::string resultId;
+
+	std::vector<Diagnostic> items;
+
+	nlohmann::json Serialize() override;
+};
+
+class PreviousResultId : public Serializable
+{
+public:
+	std::string uri;
+	std::string value;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+class WorkspaceDiagnosticParams : public Serializable
+{
+public:
+	std::string identifier;
+
+	std::vector<PreviousResultId> previousResultIds;
+
+	void Deserialize(nlohmann::json json) override;
+};
+
+class WorkspaceDocumentDiagnosticReport : public DocumentDiagnosticReport
+{
+public:
+	std::string uri;
+	std::optional<int64_t> version;
+
+	nlohmann::json Serialize() override;
+};
+
+class WorkspaceDiagnosticReport : public Serializable
+{
+public:
+	std::vector<WorkspaceDocumentDiagnosticReport> items;
+
+	nlohmann::json Serialize() override;
 };
 
 }

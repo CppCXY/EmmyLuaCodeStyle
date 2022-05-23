@@ -164,10 +164,13 @@ nlohmann::json vscode::ServerCapabilities::Serialize()
 	object["documentOnTypeFormattingProvider"] = documentOnTypeFormattingProvider.Serialize();
 	object["codeActionProvider"] = codeActionProvider;
 	object["executeCommandProvider"] = executeCommandProvider.Serialize();
+	object["diagnosticProvider"] = diagnosticProvider.Serialize();
 	if (completionProvider.supportCompletion)
 	{
 		object["completionProvider"] = completionProvider.Serialize();
 	}
+
+
 	return object;
 }
 
@@ -220,7 +223,7 @@ void vscode::InitializationOptions::Deserialize(nlohmann::json json)
 
 	if (json["dictionaryPath"].is_array())
 	{
-		for(auto& j: json["dictionaryPath"])
+		for (auto& j : json["dictionaryPath"])
 		{
 			dictionaryPath.push_back(j);
 		}
@@ -351,7 +354,7 @@ void vscode::VscodeSettings::Deserialize(nlohmann::json json)
 	if (json["emmylua.spell.dict"].is_array())
 	{
 		spellDict.clear();
-		for(auto j: json["emmylua.spell.dict"])
+		for (auto j : json["emmylua.spell.dict"])
 		{
 			spellDict.push_back(j);
 		}
@@ -413,6 +416,15 @@ nlohmann::json vscode::CompletionOptions::Serialize()
 	object["triggerCharacters"] = SerializeArray(triggerCharacters);
 	object["resolveProvider"] = resolveProvider;
 	object["completionItem"] = completionItem.Serialize();
+	return object;
+}
+
+nlohmann::json vscode::DiagnosticOptions::Serialize()
+{
+	auto object = nlohmann::json::object();
+	object["identifier"] = identifier;
+	object["workspaceDiagnostics"] = workspaceDiagnostics;
+	object["interFileDependencies"] = interFileDependencies;
 	return object;
 }
 
@@ -638,8 +650,98 @@ nlohmann::json vscode::CompletionList::Serialize()
 
 void vscode::DidChangeConfigurationParams::Deserialize(nlohmann::json json)
 {
-	if(json["settings"].is_object())
+	if (json["settings"].is_object())
 	{
 		settings = json["settings"];
 	}
+}
+
+void vscode::DocumentDiagnosticParams::Deserialize(nlohmann::json json)
+{
+	if (json["textDocument"].is_object())
+	{
+		textDocument.Deserialize(json["textDocument"]);
+	}
+
+	if (json["identifier"].is_string())
+	{
+		identifier = json["identifier"];
+	}
+
+	if (json["previousResultId"].is_string())
+	{
+		previousResultId = json["previousResultId"];
+	}
+}
+
+nlohmann::json vscode::DocumentDiagnosticReport::Serialize()
+{
+	auto object = nlohmann::json::object();
+	object["kind"] = kind;
+	if(kind == DocumentDiagnosticReportKind::Full)
+	{
+		object["items"] = SerializeArray(items);
+	}
+
+	if(!resultId.empty())
+	{
+		object["resultId"] = resultId;
+	}
+
+	return object;
+}
+
+void vscode::PreviousResultId::Deserialize(nlohmann::json json)
+{
+	if (json["uri"].is_string())
+	{
+		uri = json["uri"];
+	}
+
+	if (json["value"].is_string())
+	{
+		value = json["value"];
+	}
+}
+
+void vscode::WorkspaceDiagnosticParams::Deserialize(nlohmann::json json)
+{
+	if (json["identifier"].is_string())
+	{
+		identifier = json["identifier"];
+	}
+
+	if (json["previousResultIds"].is_array())
+	{
+		for (auto j : json["previousResultIds"])
+		{
+			if (j.is_object())
+			{
+				previousResultIds.emplace_back().Deserialize(j);
+			}
+		}
+	}
+}
+
+nlohmann::json vscode::WorkspaceDocumentDiagnosticReport::Serialize()
+{
+	auto object = DocumentDiagnosticReport::Serialize();
+	object["uri"] = uri;
+	if(version.has_value())
+	{
+		object["version"] = version.value();
+	}
+	else
+	{
+		object["version"] = nullptr;
+	}
+
+	return object;
+}
+
+nlohmann::json vscode::WorkspaceDiagnosticReport::Serialize()
+{
+	auto object = nlohmann::json::object();
+	object["items"] = SerializeArray(items);
+	return object;
 }

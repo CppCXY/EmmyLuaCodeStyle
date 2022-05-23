@@ -24,7 +24,7 @@ std::vector<vscode::Diagnostic> CodeFormatService::Diagnose(std::string_view fil
 	DiagnosisContext ctx(parser, *options);
 	formatter.CalculateDiagnosisInfos(ctx);
 
-	if (options->enable_check_codestyle && settings.lintCodeStyle)
+	if (settings.lintCodeStyle)
 	{
 		NameStyleChecker styleChecker(ctx);
 		styleChecker.Analysis();

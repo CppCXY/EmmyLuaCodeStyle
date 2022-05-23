@@ -67,8 +67,14 @@ private:
 
 	std::shared_ptr<vscode::Serializable> OnWorkspaceDidChangeConfiguration(std::shared_ptr<vscode::DidChangeConfigurationParams> param);
 
+	std::shared_ptr<vscode::DocumentDiagnosticReport> OnTextDocumentDiagnostic(std::shared_ptr<vscode::DocumentDiagnosticParams> param);
+
+	std::shared_ptr<vscode::WorkspaceDiagnosticReport> OnWorkspaceDiagnostic(std::shared_ptr<vscode::WorkspaceDiagnosticParams> param);
+
 	std::map<std::string, MessageHandle, std::less<>> _handles;
 };
+
+
 
 
 

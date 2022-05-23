@@ -1,5 +1,6 @@
 #include "CodeFormatServer/LanguageClient.h"
 #include <iterator>
+#include <fstream>
 #include "CodeService/LuaEditorConfig.h"
 #include "CodeService/LuaFormatter.h"
 #include "LuaParser/LuaParser.h"
@@ -22,7 +23,8 @@ LanguageClient& LanguageClient::GetInstance()
 LanguageClient::LanguageClient()
 	: _defaultOptions(std::make_shared<LuaCodeStyleOptions>()),
 	  _idCounter(0),
-	  _ioc(1)
+	  _ioc(1),
+	  _configVersion(0)
 {
 }
 
@@ -60,7 +62,14 @@ void LanguageClient::SendNotification(std::string_view method, std::shared_ptr<v
 	auto json = nlohmann::json::object();
 	json["jsonrpc"] = "2.0";
 	json["method"] = method;
-	json["params"] = param->Serialize();
+	if (param != nullptr)
+	{
+		json["params"] = param->Serialize();
+	}
+	else
+	{
+		json["params"] = nullptr;
+	}
 
 	if (_session)
 	{
@@ -130,22 +139,29 @@ void LanguageClient::ClearFile(std::string_view uri)
 	}
 }
 
-void LanguageClient::DiagnosticFile(std::string_view uri)
+void LanguageClient::DiagnosticFile(std::string_view uri, std::string_view prevId,
+                                    std::shared_ptr<vscode::DocumentDiagnosticReport> report)
 {
+	report->kind = vscode::DocumentDiagnosticReportKind::Unchanged;
 	auto filename = url::UrlToFilePath(uri);
 	auto it = _fileMap.find(filename);
 	if (it == _fileMap.end())
 	{
 		return;
 	}
+	auto& virtualFile = it->second;
 
-	auto vscodeDiagnosis = std::make_shared<vscode::PublishDiagnosticsParams>();
-	vscodeDiagnosis->uri = uri;
+	auto resultId = std::to_string(_configVersion) + "|" + std::to_string(virtualFile->GetVersion());
+	report->resultId = resultId;
+	if(resultId == prevId)
+	{
+		return;
+	}
 
 	auto options = GetOptions(uri);
 	if (!options->enable_check_codestyle)
 	{
-		SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
+		report->kind = vscode::DocumentDiagnosticReportKind::Full;
 		return;
 	}
 
@@ -153,51 +169,104 @@ void LanguageClient::DiagnosticFile(std::string_view uri)
 
 	if (parser->HasError())
 	{
+		report->kind = vscode::DocumentDiagnosticReportKind::Unchanged;
 		return;
 	}
 
+	report->kind = vscode::DocumentDiagnosticReportKind::Full;
+
 	// TODO move spell check to SpellService
 	auto formatDiagnostic = GetService<CodeFormatService>()->Diagnose(filename, parser, options);
-	std::copy(formatDiagnostic.begin(), formatDiagnostic.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
+	std::copy(formatDiagnostic.begin(), formatDiagnostic.end(), std::back_inserter(report->items));
 
 	if (_vscodeSettings.lintModule)
 	{
 		auto moduleDiagnosis = GetService<ModuleService>()->Diagnose(filename, parser);
-		std::copy(moduleDiagnosis.begin(), moduleDiagnosis.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
+		std::copy(moduleDiagnosis.begin(), moduleDiagnosis.end(), std::back_inserter(report->items));
 	}
-
-	SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
 }
 
-void LanguageClient::DelayDiagnosticFile(std::string_view uri)
+std::optional<uint64_t> LanguageClient::GetFileVersion(std::string_view uri)
 {
-	auto stringUri = std::string(uri);
-	auto task = std::make_shared<asio::steady_timer>(GetIOContext(), std::chrono::milliseconds(300));
-	auto it = _fileDiagnosticTask.find(uri);
-	if (it != _fileDiagnosticTask.end())
+	auto filename = url::UrlToFilePath(uri);
+	auto it = _fileMap.find(filename);
+	if (it == _fileMap.end())
 	{
-		it->second->cancel();
-		it->second = task;
+		return {};
 	}
-	else
-	{
-		_fileDiagnosticTask.insert({stringUri, task});
-	}
-
-	task->async_wait([this, stringUri](const asio::error_code& code)
-	{
-		if (code == asio::error::operation_aborted)
-		{
-			return;
-		}
-		DiagnosticFile(stringUri);
-		auto it = _fileDiagnosticTask.find(stringUri);
-		if (it != _fileDiagnosticTask.end())
-		{
-			_fileDiagnosticTask.erase(it);
-		}
-	});
+	auto& virtualFile = it->second;
+	return virtualFile->GetVersion();
 }
+
+//
+// void LanguageClient::DiagnosticFile(std::string_view uri)
+// {
+// 	auto filename = url::UrlToFilePath(uri);
+// 	auto it = _fileMap.find(filename);
+// 	if (it == _fileMap.end())
+// 	{
+// 		return;
+// 	}
+//
+// 	auto vscodeDiagnosis = std::make_shared<vscode::PublishDiagnosticsParams>();
+// 	vscodeDiagnosis->uri = uri;
+//
+// 	auto options = GetOptions(uri);
+// 	if (!options->enable_check_codestyle)
+// 	{
+// 		SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
+// 		return;
+// 	}
+//
+// 	std::shared_ptr<LuaParser> parser = it->second->GetLuaParser();
+//
+// 	if (parser->HasError())
+// 	{
+// 		return;
+// 	}
+//
+// 	// TODO move spell check to SpellService
+// 	auto formatDiagnostic = GetService<CodeFormatService>()->Diagnose(filename, parser, options);
+// 	std::copy(formatDiagnostic.begin(), formatDiagnostic.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
+//
+// 	if (_vscodeSettings.lintModule)
+// 	{
+// 		auto moduleDiagnosis = GetService<ModuleService>()->Diagnose(filename, parser);
+// 		std::copy(moduleDiagnosis.begin(), moduleDiagnosis.end(), std::back_inserter(vscodeDiagnosis->diagnostics));
+// 	}
+//
+// 	SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
+// }
+
+// void LanguageClient::DelayDiagnosticFile(std::string_view uri)
+// {
+// 	auto stringUri = std::string(uri);
+// 	auto task = std::make_shared<asio::steady_timer>(GetIOContext(), std::chrono::milliseconds(300));
+// 	auto it = _fileDiagnosticTask.find(uri);
+// 	if (it != _fileDiagnosticTask.end())
+// 	{
+// 		it->second->cancel();
+// 		it->second = task;
+// 	}
+// 	else
+// 	{
+// 		_fileDiagnosticTask.insert({stringUri, task});
+// 	}
+//
+// 	task->async_wait([this, stringUri](const asio::error_code& code)
+// 	{
+// 		if (code == asio::error::operation_aborted)
+// 		{
+// 			return;
+// 		}
+// 		DiagnosticFile(stringUri);
+// 		auto it = _fileDiagnosticTask.find(stringUri);
+// 		if (it != _fileDiagnosticTask.end())
+// 		{
+// 			_fileDiagnosticTask.erase(it);
+// 		}
+// 	});
+// }
 
 std::shared_ptr<LuaParser> LanguageClient::GetFileParser(std::string_view uri)
 {
@@ -250,6 +319,7 @@ std::shared_ptr<LuaCodeStyleOptions> LanguageClient::GetOptions(std::string_view
 
 void LanguageClient::UpdateCodeStyleOptions(std::string_view workspaceUri, std::string_view configPath)
 {
+	_configVersion++;
 	auto workspace = url::UrlToFilePath(workspaceUri);
 	for (auto& pair : _editorConfigVector)
 	{
@@ -272,6 +342,7 @@ void LanguageClient::UpdateCodeStyleOptions(std::string_view workspaceUri, std::
 
 void LanguageClient::RemoveCodeStyleOptions(std::string_view workspaceUri)
 {
+	++_configVersion;
 	auto workspace = url::UrlToFilePath(workspaceUri);
 	for (auto it = _editorConfigVector.begin(); it != _editorConfigVector.end(); it++)
 	{
@@ -282,18 +353,24 @@ void LanguageClient::RemoveCodeStyleOptions(std::string_view workspaceUri)
 		}
 	}
 }
+//
+// void LanguageClient::UpdateAllDiagnosis()
+// {
+// 	for (auto it : _fileMap)
+// 	{
+// 		auto uri = url::FilePathToUrl(it.first);
+// 		DiagnosticFile(uri);
+// 	}
+// }
 
-void LanguageClient::UpdateAllDiagnosis()
+void LanguageClient::RefreshDiagnostic()
 {
-	for (auto it : _fileMap)
-	{
-		auto uri = url::FilePathToUrl(it.first);
-		DiagnosticFile(uri);
-	}
+	SendNotification("workspace/diagnostic/refresh", nullptr);
 }
 
 void LanguageClient::UpdateModuleInfo()
 {
+	_configVersion++;
 	FileFinder finder(_root);
 
 	finder.AddIgnoreDirectory(".git");
@@ -306,7 +383,8 @@ void LanguageClient::UpdateModuleInfo()
 	finder.AddFindExtension(".lua");
 	finder.AddFindExtension(".lua.txt");
 
-	GetService<ModuleService>()->GetIndex().RebuildIndex(finder.FindFiles());
+	_workspaceReadyFiles = finder.FindFiles();
+	GetService<ModuleService>()->GetIndex().RebuildIndex(_workspaceReadyFiles);
 }
 
 void LanguageClient::SetRoot(std::string_view root)
@@ -326,9 +404,33 @@ vscode::VscodeSettings& LanguageClient::GetSettings()
 
 void LanguageClient::SetVscodeSettings(vscode::VscodeSettings& settings)
 {
+	_configVersion++;
 	_vscodeSettings = settings;
 
 	GetService<CodeFormatService>()->SetCustomDictionary(_vscodeSettings.spellDict);
+}
+
+void LanguageClient::LoadWorkspace()
+{
+	if(_workspaceReadyFiles.empty())
+	{
+		return;
+	}
+
+	for(auto& filename: _workspaceReadyFiles)
+	{
+		if(_fileMap.count(filename) == 0)
+		{
+			std::fstream fin(filename, std::ios::in);
+			if (fin.is_open())
+			{
+				std::stringstream s;
+				s << fin.rdbuf();
+				UpdateFile(url::FilePathToUrl(filename), vscode::Range(), std::move(s.str()));
+			}
+		}
+	}
+	_workspaceReadyFiles.clear();
 }
 
 uint64_t LanguageClient::GetRequestId()

@@ -44,6 +44,8 @@ bool LanguageService::Initialize()
 	JsonProtocol("workspace/didChangeWatchedFiles", &LanguageService::OnDidChangeWatchedFiles);
 	JsonProtocol("textDocument/completion", &LanguageService::OnCompletion);
 	JsonProtocol("workspace/didChangeConfiguration", &LanguageService::OnWorkspaceDidChangeConfiguration);
+	JsonProtocol("textDocument/diagnostic", &LanguageService::OnTextDocumentDiagnostic);
+	JsonProtocol("workspace/diagnostic", &LanguageService::OnWorkspaceDiagnostic);
 	return true;
 }
 
@@ -87,6 +89,10 @@ std::shared_ptr<vscode::InitializeResult> LanguageService::OnInitialize(std::sha
 	// result->capabilities.completionProvider.completionItem.labelDetailsSupport = true;
 	// 砍掉代码补全
 	result->capabilities.completionProvider.supportCompletion = false;
+
+	result->capabilities.diagnosticProvider.identifier = "EmmyLuaCodeStyle";
+	result->capabilities.diagnosticProvider.workspaceDiagnostics = false;
+	result->capabilities.diagnosticProvider.interFileDependencies = false;
 
 	auto& editorConfigFiles = param->initializationOptions.editorConfigFiles;
 	for (auto& configFile : editorConfigFiles)
@@ -179,7 +185,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChange(
 		LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, param->contentChanges);
 	}
 
-	LanguageClient::GetInstance().DelayDiagnosticFile(param->textDocument.uri);
+	// LanguageClient::GetInstance().DelayDiagnosticFile(param->textDocument.uri);
 	return nullptr;
 }
 
@@ -187,7 +193,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidOpen(
 	std::shared_ptr<vscode::DidOpenTextDocumentParams> param)
 {
 	LanguageClient::GetInstance().UpdateFile(param->textDocument.uri, {}, std::move(param->textDocument.text));
-	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
+	// LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri);
 	return nullptr;
 }
 
@@ -251,7 +257,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnEditorConfigUpdate(
 		}
 	}
 
-	LanguageClient::GetInstance().UpdateAllDiagnosis();
+	LanguageClient::GetInstance().RefreshDiagnostic();
 
 	return nullptr;
 }
@@ -463,5 +469,43 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnWorkspaceDidChangeConfi
 
 	LanguageClient::GetInstance().SetVscodeSettings(setting);
 
+	// LanguageClient::GetInstance().DelayDiagnosticFile(param->textDocument.uri);
+	LanguageClient::GetInstance().RefreshDiagnostic();
+
 	return nullptr;
+}
+
+std::shared_ptr<vscode::DocumentDiagnosticReport> LanguageService::OnTextDocumentDiagnostic(
+	std::shared_ptr<vscode::DocumentDiagnosticParams> param)
+{
+	auto report = std::make_shared<vscode::DocumentDiagnosticReport>();
+	LanguageClient::GetInstance().DiagnosticFile(param->textDocument.uri, param->previousResultId, report);
+
+	return report;
+}
+
+
+std::shared_ptr<vscode::WorkspaceDiagnosticReport> LanguageService::OnWorkspaceDiagnostic(
+	std::shared_ptr<vscode::WorkspaceDiagnosticParams> param)
+{
+
+	// if(param->previousResultIds.empty())
+	// {
+	// 	LanguageClient::GetInstance().LoadWorkspace();
+	// }
+
+	auto workspaceReport = std::make_shared<vscode::WorkspaceDiagnosticReport>();
+	for (auto& result : param->previousResultIds)
+	{
+		auto documentReport = std::make_shared<vscode::DocumentDiagnosticReport>();
+		LanguageClient::GetInstance().DiagnosticFile(result.uri, result.value, documentReport);
+		auto& item = workspaceReport->items.emplace_back();
+		item.uri = result.uri;
+		item.kind = documentReport->kind;
+		item.items = documentReport->items;
+		item.resultId = documentReport->resultId;
+		item.version = LanguageClient::GetInstance().GetFileVersion(result.uri);
+	}
+
+	return workspaceReport;
 }

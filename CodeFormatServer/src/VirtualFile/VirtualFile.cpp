@@ -4,7 +4,8 @@
 VirtualFile::VirtualFile(std::string_view fileUri)
 	: _fileUri(fileUri),
 	  _luaFile(nullptr),
-	  _luaParser(nullptr)
+	  _luaParser(nullptr),
+	  _version(0)
 {
 }
 
@@ -46,6 +47,7 @@ void VirtualFile::UpdateFile(vscode::Range range, std::string&& content)
 
 	_luaFile->UpdateLineInfo(range.start.line);
 	_luaParser = nullptr;
+	++_version;
 }
 
 void VirtualFile::UpdateFile(std::vector<vscode::TextDocumentContentChangeEvent>& changeEvent)
@@ -110,6 +112,7 @@ void VirtualFile::UpdateFile(std::string&& text)
 {
 	_luaFile = std::make_shared<LuaFile>(std::filesystem::path(url::UrlToFilePath(_fileUri)).filename().string(),
 	                                     std::move(text));
+	++_version;
 	MakeParser();
 }
 
@@ -133,4 +136,9 @@ void VirtualFile::MakeParser()
 	tokenParser->Parse();
 	_luaParser = std::make_shared<LuaParser>(tokenParser);
 	_luaParser->BuildAstWithComment();
+}
+
+uint64_t VirtualFile::GetVersion()
+{
+	return _version;
 }

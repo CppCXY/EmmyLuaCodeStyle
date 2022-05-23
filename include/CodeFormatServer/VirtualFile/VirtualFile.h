@@ -20,10 +20,11 @@ public:
 	std::shared_ptr<LuaParser> GetLuaParser();
 
 	void MakeParser();
+
+	uint64_t GetVersion();
 private:
 	std::string _fileUri;
 	std::shared_ptr<LuaFile> _luaFile;
 	std::shared_ptr<LuaParser> _luaParser;
-	// std::shared_ptr<LuaToken>
-	// bool _isOpen;
+	uint64_t _version;
 };

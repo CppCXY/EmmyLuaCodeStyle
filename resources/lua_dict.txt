@@ -1,4 +1,5 @@
 config
+configs
 assert
 collectgarbage
 dofile
@@ -187,3 +188,11 @@ coroutine
 IDE
 editorconfig
 docs
+http
+https
+url
+hub
+vscode
+github
+udp
+tcp

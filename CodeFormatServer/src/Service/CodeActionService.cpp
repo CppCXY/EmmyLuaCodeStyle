@@ -40,9 +40,9 @@ std::string CodeActionService::GetCode(DiagnosticCode code)
 {
 	switch (code)
 	{
-	case DiagnosticCode::Spell: return "EmmyLua (spell-check)";
-	case DiagnosticCode::Module: return "EmmyLua (module-check)";
-	case DiagnosticCode::Reformat: return "EmmyLua (style-check)";
+	case DiagnosticCode::Spell: return "EmmyLua [spell-check]";
+	case DiagnosticCode::Module: return "EmmyLua [module-check]";
+	case DiagnosticCode::Reformat: return "EmmyLua [style-check]";
 	}
 
 	return "";
@@ -84,7 +84,7 @@ void CodeActionService::Spell(vscode::Diagnostic& diagnostic, std::shared_ptr<vs
 	{
 		auto& action = result->actions.emplace_back();
 
-		action.title = Util::format("Add '{}' to user dictionary", originText);
+		action.title = Util::format("Add '{}' to workspace dictionary", originText);
 		action.command.title = action.title;
 		action.command.command = GetService<CommandService>()->GetCommand(CommandService::Command::SpellAddDict);
 		action.command.arguments.push_back(originText);

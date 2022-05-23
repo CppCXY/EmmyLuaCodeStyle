@@ -44,9 +44,10 @@ public:
 
 	void ClearFile(std::string_view uri);
 
-	void DiagnosticFile(std::string_view uri);
+	void DiagnosticFile(std::string_view uri, std::string_view prevId, std::shared_ptr<vscode::DocumentDiagnosticReport> report);
 
-	void DelayDiagnosticFile(std::string_view uri);
+	std::optional<uint64_t> GetFileVersion(std::string_view uri);
+	// void DelayDiagnosticFile(std::string_view uri);
 
 	std::shared_ptr<LuaParser> GetFileParser(std::string_view uri);
 
@@ -58,7 +59,9 @@ public:
 
 	void RemoveCodeStyleOptions(std::string_view workspaceUri);
 
-	void UpdateAllDiagnosis();
+	// void UpdateAllDiagnosis();
+
+	void RefreshDiagnostic();
 
 	void UpdateModuleInfo();
 
@@ -72,6 +75,8 @@ public:
 	vscode::VscodeSettings& GetSettings();
 
 	void SetVscodeSettings(vscode::VscodeSettings& settings);
+
+	void LoadWorkspace();
 private:
 	uint64_t GetRequestId();
 
@@ -96,6 +101,10 @@ private:
 	std::array<std::shared_ptr<Service>, static_cast<std::size_t>(ServiceType::ServiceCount)> _services;
 
 	vscode::VscodeSettings _vscodeSettings;
+
+	uint64_t _configVersion;
+
+	std::vector<std::string> _workspaceReadyFiles;
 };
 
 template <ServiceClass Service>
