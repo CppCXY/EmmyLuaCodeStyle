@@ -181,3 +181,9 @@ unlua
 xlua
 tolua
 slua
+async
+await
+coroutine
+IDE
+editorconfig
+docs
