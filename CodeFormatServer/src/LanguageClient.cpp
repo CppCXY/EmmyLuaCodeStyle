@@ -87,8 +87,13 @@ void LanguageClient::SendRequest(std::string_view method, std::shared_ptr<vscode
 	json["jsonrpc"] = "2.0";
 	json["method"] = method;
 	json["id"] = GetRequestId();
-	json["params"] = param->Serialize();
-
+	if (param) {
+		json["params"] = param->Serialize();
+	}
+	else
+	{
+		json["params"] = nullptr;
+	}
 	if (_session)
 	{
 		auto dumpResult = json.dump();
@@ -365,7 +370,7 @@ void LanguageClient::RemoveCodeStyleOptions(std::string_view workspaceUri)
 
 void LanguageClient::RefreshDiagnostic()
 {
-	SendNotification("workspace/diagnostic/refresh", nullptr);
+	SendRequest("workspace/diagnostic/refresh", nullptr);
 }
 
 void LanguageClient::UpdateModuleInfo()
