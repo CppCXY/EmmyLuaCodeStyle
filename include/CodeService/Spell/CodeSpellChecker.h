@@ -26,6 +26,9 @@ public:
 private:
 	void IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, const CustomDictionary& customDict);
 
+	void TextAnalysis(DiagnosisContext& ctx, LuaToken& token, const CustomDictionary& customDict);
+
 	std::shared_ptr<SymSpell> _symSpell;
 	std::unordered_map<std::string, std::shared_ptr<spell::IdentifyParser>> _caches;
 };
+

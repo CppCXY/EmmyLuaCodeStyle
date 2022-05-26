@@ -8,19 +8,17 @@ namespace spell {
 class TextParser
 {
 public:
-	enum class TextType
-	{
-		Unknown,
-		End,
-	};
-
 	TextParser(std::string_view source);
 
 	void Parse();
 
-	std::vector<spell::Word>& GetWords();
+	std::vector<Word>& GetIdentifiers();
 
 private:
-	TextType Lex();
+
+
+	void PushIdentifier(spell::WordRange range);
+	std::string_view _source;
+	std::vector<Word> _identifiers;
 };
 }

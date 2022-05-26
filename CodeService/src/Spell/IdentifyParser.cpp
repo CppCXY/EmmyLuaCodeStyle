@@ -168,6 +168,12 @@ int IdentifyParser::GetCurrentChar()
 
 void IdentifyParser::PushWords(WordRange range)
 {
+	// 因为这极大可能是缩写
+	if (range.Count <= 3)
+	{
+		return;
+	}
+
 	std::string_view wordView = _source.substr(range.Start, range.Count);
 	std::string word;
 	word.resize(wordView.size());

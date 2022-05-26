@@ -1,6 +1,7 @@
 ﻿#include "CodeService/Spell/CodeSpellChecker.h"
 #include "LuaParser/LuaTokenTypeDetail.h"
 #include "Util/format.h"
+#include "CodeService/Spell/TextParser.h"
 
 CodeSpellChecker::CodeSpellChecker()
 	: _symSpell(std::make_shared<SymSpell>(SymSpell::Strategy::LazyLoaded))
@@ -28,6 +29,10 @@ void CodeSpellChecker::Analysis(DiagnosisContext& ctx, const CustomDictionary& c
 		if (token.TokenType == TK_NAME)
 		{
 			IdentifyAnalysis(ctx, token, customDict);
+		}
+		else if (token.TokenType == TK_STRING)
+		{
+			TextAnalysis(ctx, token, customDict);
 		}
 	}
 }
@@ -182,7 +187,62 @@ void CodeSpellChecker::IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, 
 			                       token.Range.StartOffset + word.Range.Start + word.Range.Count - 1
 			);
 			std::string originText(token.Text.substr(word.Range.Start, word.Range.Count));
-			ctx.PushDiagnosis(Util::format("Typo in identifier '{}'", originText), range, DiagnosisType::Spell, originText);
+			ctx.PushDiagnosis(Util::format("Typo in identifier '{}'", originText), range, DiagnosisType::Spell,
+			                  originText);
+		}
+	}
+}
+
+void CodeSpellChecker::TextAnalysis(DiagnosisContext& ctx, LuaToken& token, const CustomDictionary& customDict)
+{
+	std::shared_ptr<spell::TextParser> parser = std::make_shared<spell::TextParser>(token.Text);
+	parser->Parse();
+	auto& identifiers = parser->GetIdentifiers();
+	if (identifiers.empty())
+	{
+		return;
+	}
+
+	for (auto& identifier : identifiers)
+	{
+		auto& text = identifier.Item;
+
+		if (customDict.count(text) != 0)
+		{
+			continue;
+		}
+		std::shared_ptr<spell::IdentifyParser> identifierParser = nullptr;
+
+		auto it = _caches.find(text);
+		if (it != _caches.end())
+		{
+			identifierParser = it->second;
+		}
+		else
+		{
+			identifierParser = std::make_shared<spell::IdentifyParser>(text);
+			identifierParser->Parse();
+			_caches.insert({text, identifierParser});
+		}
+
+		auto& words = identifierParser->GetWords();
+		if (words.empty())
+		{
+			continue;
+		}
+
+		for (auto& word : words)
+		{
+			if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item) && customDict.count(word.Item) == 0)
+			{
+				auto range = TextRange(token.Range.StartOffset + identifier.Range.Start + word.Range.Start,
+				                       token.Range.StartOffset + identifier.Range.Start + word.Range.Start + word.Range.
+				                       Count - 1
+				);
+				std::string originText(token.Text.substr(identifier.Range.Start + word.Range.Start, word.Range.Count));
+				ctx.PushDiagnosis(Util::format("Typo in string '{}'", originText), range, DiagnosisType::Spell,
+				                  originText);
+			}
 		}
 	}
 }
