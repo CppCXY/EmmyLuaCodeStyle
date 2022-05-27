@@ -157,7 +157,7 @@ bool FormatContext::ShouldBreakLine(TextRange range)
 		column += _parser->GetLuaFile()->GetLineRestCharacter(range.StartOffset);
 	}
 
-	return column >= _options.max_line_length;
+	return static_cast<int>(column) >= _options.max_line_length;
 }
 
 std::shared_ptr<LuaParser> FormatContext::GetParser()
