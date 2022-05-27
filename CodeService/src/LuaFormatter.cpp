@@ -422,7 +422,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalStatement(std::shared_pt
 			}
 		case LuaAstNodeType::NameDefList:
 			{
-				env->AddChild(FormatNode(node));
+				env->AddChild(FormatNameDefList(node));
 				break;
 			}
 		case LuaAstNodeType::ExpressionList:

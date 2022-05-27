@@ -40,6 +40,8 @@ public:
 
 	bool OnlyEmptyCharBefore(int offset);
 
+	bool ShouldBreakLine(TextRange range);
+
 	std::shared_ptr<LuaParser> GetParser();
 
 	LuaCodeStyleOptions& GetOptions();

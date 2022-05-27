@@ -235,3 +235,24 @@ EndOfLine LuaFile::GetEndOfLine() const
 {
 	return _lineState;
 }
+
+int LuaFile::GetLineRestCharacter(int offset)
+{
+	int line = GetLine(offset);
+	int bytesLength = 0;
+	if(line < static_cast<int>(_lineOffsetVec.size()) - 1)
+	{
+		auto nextOffset = _lineOffsetVec[line + 1];
+		bytesLength = nextOffset - offset;
+	}
+	else
+	{
+		bytesLength = static_cast<int>(_source.size()) - 1 - offset;
+	}
+	if (bytesLength > 0) {
+		return static_cast<int>(utf8::Utf8nLen(_source.data() + offset, static_cast<std::size_t>(bytesLength)));
+	}
+	else {
+		return 0;
+	}
+}

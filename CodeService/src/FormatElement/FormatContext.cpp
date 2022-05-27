@@ -98,7 +98,7 @@ FormatContext::IndentState FormatContext::CalculateIndentState(int offset)
 		}
 	}
 
-	if(state.TabIndent == 0 && state.SpaceIndent == 0)
+	if (state.TabIndent == 0 && state.SpaceIndent == 0)
 	{
 		state.Style = _options.indent_style;
 	}
@@ -125,7 +125,7 @@ FormatContext::IndentState FormatContext::GetLastIndent() const
 {
 	if (_indentStack.size() < 2)
 	{
-		return IndentState{ 0, 0, _options.indent_style };
+		return IndentState{0, 0, _options.indent_style};
 	}
 
 	return _indentStack[_indentStack.size() - 2];
@@ -135,6 +135,29 @@ bool FormatContext::OnlyEmptyCharBefore(int offset)
 {
 	auto file = _parser->GetLuaFile();
 	return file->OnlyEmptyCharBefore(offset);
+}
+
+bool FormatContext::ShouldBreakLine(TextRange range)
+{
+	auto column = GetCharacterCount();
+	if (column == 0)
+	{
+		return false;
+	}
+
+	auto startLine = GetLine(range.StartOffset);
+	auto endLine = GetLine(range.EndOffset);
+
+	if (startLine == endLine)
+	{
+		column += GetColumn(range.EndOffset) - GetColumn(range.StartOffset);
+	}
+	else
+	{
+		column += _parser->GetLuaFile()->GetLineRestCharacter(range.StartOffset);
+	}
+
+	return column >= _options.max_line_length;
 }
 
 std::shared_ptr<LuaParser> FormatContext::GetParser()

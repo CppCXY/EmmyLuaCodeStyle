@@ -44,6 +44,8 @@ public:
 	bool ConsumeAllTokens();
 
 	std::vector<LuaToken>& GetTokens();
+
+	// void SetUnStandardToken();
 private:
 	static std::map<std::string, LuaTokenType, std::less<>> LuaReserved;
 

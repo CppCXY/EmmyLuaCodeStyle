@@ -51,6 +51,8 @@ public:
 
 	void Reset();
 protected:
+	static std::shared_ptr<FormatElement> GetNextValidElement (ChildIterator& it, FormatElement& parent);
+
 	static int GetLastValidOffset(ChildIterator& it, FormatElement& parent);
 	static int GetNextValidOffset(ChildIterator& it, FormatElement& parent);
 

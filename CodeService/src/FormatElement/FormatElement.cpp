@@ -219,6 +219,22 @@ void FormatElement::Reset()
 	_children.clear();
 }
 
+std::shared_ptr<FormatElement> FormatElement::GetNextValidElement(ChildIterator& it, FormatElement& parent)
+{
+	auto& siblings = parent.GetChildren();
+	++it;
+	for (; it != siblings.end(); ++it)
+	{
+		auto child = *it;
+		if (child->HasValidTextRange())
+		{
+			return child;
+		}
+	}
+
+	return nullptr;
+}
+
 int FormatElement::GetLastValidOffset(ChildIterator& it, FormatElement& parent)
 {
 	auto& siblings = parent.GetChildren();
@@ -239,16 +255,10 @@ int FormatElement::GetLastValidOffset(ChildIterator& it, FormatElement& parent)
 
 int FormatElement::GetNextValidOffset(ChildIterator& it, FormatElement& parent)
 {
-	auto& siblings = parent.GetChildren();
-	++it;
-	for (; it != siblings.end(); ++it)
+	auto nextElement = GetNextValidElement(it, parent);
+	if(nextElement)
 	{
-		auto child = *it;
-		if (child->HasValidTextRange())
-		{
-			return child->GetTextRange().StartOffset;
-		}
+		return nextElement->GetTextRange().StartOffset;
 	}
-
 	return -1;
 }

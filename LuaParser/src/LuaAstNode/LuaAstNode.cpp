@@ -1,15 +1,17 @@
 ﻿#include "LuaParser/LuaAstNode/LuaAstNode.h"
 #include "LuaParser/LuaAstVisitor.h"
 
-LuaAstNode::LuaAstNode(LuaAstNodeType type, std::string_view text, TextRange range)
+LuaAstNode::LuaAstNode(LuaAstNodeType type, std::string_view text, TextRange range, LuaTokenType tokenType)
 	: _type(type),
+	  _tokenType(tokenType),
 	  _text(text),
 	  _textRange(range)
+
 {
 }
 
 LuaAstNode::LuaAstNode(LuaAstNodeType type, LuaToken& token)
-	: LuaAstNode(type, token.Text, token.Range)
+	: LuaAstNode(type, token.Text, token.Range, token.TokenType)
 {
 }
 
@@ -109,6 +111,11 @@ void LuaAstNode::AddChild(std::shared_ptr<LuaAstNode> child)
 LuaAstNodeType LuaAstNode::GetType() const
 {
 	return _type;
+}
+
+LuaTokenType LuaAstNode::GetTokenType() const
+{
+	return _tokenType;
 }
 
 void LuaAstNode::AddComment(std::shared_ptr<LuaAstNode> comment)

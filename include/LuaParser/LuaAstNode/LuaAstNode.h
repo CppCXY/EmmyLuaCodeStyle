@@ -17,7 +17,7 @@ public:
 	using ChildrenContainer = std::vector<std::shared_ptr<LuaAstNode>>;
 	using ChildIterator = ChildrenContainer::iterator;
 
-	LuaAstNode(LuaAstNodeType type, std::string_view text, TextRange range);
+	LuaAstNode(LuaAstNodeType type, std::string_view text, TextRange range, LuaTokenType tokenType = 0);
 
 	LuaAstNode(LuaAstNodeType type, LuaToken& token);
 
@@ -40,6 +40,8 @@ public:
 	void AddChild(std::shared_ptr<LuaAstNode> child);
 
 	LuaAstNodeType GetType() const;
+
+	LuaTokenType GetTokenType() const;
 
 	virtual void AddComment(std::shared_ptr<LuaAstNode> comment);
 
@@ -64,6 +66,7 @@ protected:
 	void AddChildBefore(ChildIterator it, std::shared_ptr<LuaAstNode> child);
 
 	LuaAstNodeType _type;
+	LuaTokenType _tokenType;
 	std::string_view _text;
 	TextRange _textRange;
 

@@ -39,6 +39,8 @@ public:
 	void SetEndOfLineState(EndOfLine endOfLine);
 
 	EndOfLine GetEndOfLine() const;
+
+	int GetLineRestCharacter(int offset);
 protected:
 	std::string _source;
 	std::string _filename;
