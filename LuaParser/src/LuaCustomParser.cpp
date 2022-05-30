@@ -10,6 +10,7 @@ int GetCurrentChar(std::string_view source, std::size_t i)
 		unsigned char ch = source[i];
 		return ch;
 	}
+	return EOZ;
 }
 
 LuaTokenType LuaCustomParser::Lex(std::string_view source, std::size_t start, std::size_t& consumeSize)
