@@ -16,8 +16,8 @@ std::shared_ptr<FormatElement> FindLastValidChild(FormatElement::ChildIterator i
 	return nullptr;
 }
 
-AlignmentLayoutElement::AlignmentLayoutElement(std::string_view alignSign)
-	: _alignSign(alignSign)
+AlignmentLayoutElement::AlignmentLayoutElement(LuaTokenType alignToken)
+	: _alignToken(alignToken)
 {
 }
 
@@ -144,7 +144,8 @@ int AlignmentLayoutElement::GetAlignOffsetWithWeakRule(FormatContext& ctx)
 			if (textChild->GetType() == FormatElementType::TextElement)
 			{
 				const auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
-				if (textElement->GetText() == _alignSign)
+				const auto textNode = textElement->GetNode();
+				if (textNode && textNode->GetTokenType() == _alignToken)
 				{
 					const auto signPosition = ctx.GetColumn(textElement->GetTextRange().StartOffset);
 
@@ -185,7 +186,8 @@ void AlignmentLayoutElement::AlignmentSerialize(SerializeContext& ctx, ChildIter
 			if (textChild->GetType() == FormatElementType::TextElement)
 			{
 				const auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
-				if (textElement->GetText() == _alignSign && it != statChildren.begin())
+				const auto textNode = textElement->GetNode();
+				if (textNode && textNode->GetTokenType() == _alignToken && it != statChildren.begin())
 				{
 					auto lastIt = it;
 					--lastIt;
@@ -214,7 +216,8 @@ void AlignmentLayoutElement::AlignmentDiagnosis(DiagnosisContext& ctx,
 			if (textChild->GetType() == FormatElementType::TextElement)
 			{
 				const auto textElement = std::dynamic_pointer_cast<TextElement>(textChild);
-				if (textElement->GetText() == _alignSign && it != statChildren.begin())
+				const auto textNode = textElement->GetNode();
+				if (textNode && textNode->GetTokenType() == _alignToken && it != statChildren.begin())
 				{
 					auto lastIt = it;
 					--lastIt;

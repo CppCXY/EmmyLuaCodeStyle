@@ -5,7 +5,7 @@
 class AlignmentLayoutElement : public FormatElement
 {
 public:
-	AlignmentLayoutElement(std::string_view alignSign);
+	AlignmentLayoutElement(LuaTokenType alignToken);
 	FormatElementType GetType() override;
 
 	void Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
@@ -18,5 +18,5 @@ private:
 	                        FormatElement& parent);
 	void AlignmentDiagnosis(DiagnosisContext& ctx, ChildIterator selfIt, int alignSignPosition,
 	                        FormatElement& parent);
-	std::string _alignSign;
+	LuaTokenType _alignToken;
 };

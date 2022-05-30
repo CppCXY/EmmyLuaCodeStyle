@@ -53,7 +53,8 @@ LuaTokenParser::LuaTokenParser(std::shared_ptr<LuaFile> file)
 	_currentIndex(0),
 	_source(file->GetSource()),
 	_eosToken(LuaToken{TK_EOS, "", TextRange(0, 0)}),
-	_file(file)
+	_file(file),
+	_customParser(nullptr)
 {
 }
 
@@ -180,9 +181,23 @@ std::vector<LuaToken>& LuaTokenParser::GetTokens()
 	return _tokens;
 }
 
+void LuaTokenParser::SetCustomParser(std::shared_ptr<LuaCustomParser> parser)
+{
+	_customParser = parser;
+}
+
 LuaTokenType LuaTokenParser::Lex()
 {
 	ResetBuffer();
+
+	if (_customParser)
+	{
+		auto customType = CustomLex();
+		if (customType != TK_UNKNOWN)
+		{
+			return customType;
+		}
+	}
 
 	for (;;)
 	{
@@ -418,6 +433,56 @@ LuaTokenType LuaTokenParser::Lex()
 			}
 		}
 	}
+}
+
+LuaTokenType LuaTokenParser::CustomLex()
+{
+	if (_customParser)
+	{
+		// skip space
+		for (;;)
+		{
+			int ch = GetCurrentChar();
+			switch (ch)
+			{
+			case '\n':
+			case '\r':
+				{
+					IncLinenumber();
+					break;
+				}
+			case ' ':
+			case '\f':
+			case '\t':
+			case '\v':
+				{
+					NextChar();
+					break;
+				}
+			case EOZ:
+				{
+					return TK_EOS;
+				}
+			default:
+				{
+					goto endSkip;
+				}
+			}
+		}
+	endSkip:
+
+		std::size_t consumeSize = 0;
+		auto type = _customParser->Lex(_source, _currentParseIndex, consumeSize);
+		if (type != TK_UNKNOWN)
+		{
+			for (std::size_t i = 0; i != consumeSize; i++)
+			{
+				SaveAndNext();
+			}
+			return type;
+		}
+	}
+	return TK_UNKNOWN;
 }
 
 int LuaTokenParser::NextChar()

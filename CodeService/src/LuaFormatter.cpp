@@ -24,6 +24,7 @@
 #include "CodeService/FormatElement/CallArgsListLayoutElement.h"
 #include "Util/StringUtil.h"
 #include "CodeService/AstUtil.h"
+#include "LuaParser/LuaTokenTypeDetail.h"
 
 bool NextMatch(LuaAstNode::ChildIterator it, LuaAstNodeType type, const LuaAstNode::ChildrenContainer& container)
 {
@@ -411,7 +412,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalStatement(std::shared_pt
 		case LuaAstNodeType::GeneralOperator:
 			{
 				// 基于这样的考虑 可能local 语句没有等号所以nameDefList的空格移上来
-				if (node->GetText() == "=")
+				if (node->GetTokenType() == '=')
 				{
 					env->Add<KeepBlankElement>(1);
 				}
@@ -1012,7 +1013,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatForBody(std::shared_ptr<LuaAs
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				if (child->GetText() == "do")
+				if (child->GetTokenType() == TK_DO)
 				{
 					bool singleLine = false;
 					env->AddChild(FormatNodeAndBlockOrEnd(it, singleLine, children));
@@ -1064,7 +1065,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatRepeatStatement(std::shared_p
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				if (child->GetText() == "repeat")
+				if (child->GetTokenType() == TK_REPEAT)
 				{
 					bool singleLine = false;
 					env->AddChild(FormatNodeAndBlockOrEnd(it, singleLine, children));
@@ -1110,13 +1111,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 		{
 		case LuaAstNodeType::KeyWord:
 			{
-				if (child->GetText() == "then" || child->GetText() == "else")
+				if (child->GetTokenType() == TK_THEN || child->GetTokenType() == TK_ELSE)
 				{
 					bool singleLine = false;
 					env->AddChild(FormatNodeAndBlockOrEnd(it, singleLine, children));
 					env->Add<KeepElement>(1, !singleLine);
 				}
-				else if (child->GetText() == "if" || child->GetText() == "elseif")
+				else if (child->GetTokenType() == TK_IF || child->GetTokenType() == TK_ELSEIF)
 				{
 					env->Add<TextElement>(child);
 					env->Add<KeepBlankElement>(1);
@@ -1183,7 +1184,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 					if (indexExpression)
 					{
 						auto indexOp = indexExpression->FindFirstOf(LuaAstNodeType::IndexOperator);
-						if (indexOp->GetText() == "." || indexOp->GetText() == ":")
+						if (indexOp->GetTokenType() == '.' || indexOp->GetTokenType() == ':')
 						{
 							auto continuationIndent = _parser->GetColumn(indexOp->GetTextRange().StartOffset)
 								- _parser->GetColumn(child->GetTextRange().StartOffset);
@@ -1366,9 +1367,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 		{
 		case LuaAstNodeType::GeneralOperator:
 			{
-				if (child->GetText() == ",")
+				if (child->GetTokenType() == ',')
 				{
-					if(_options.remove_expression_list_finish_comma
+					if (_options.remove_expression_list_finish_comma
 						&& NextMatch(it, LuaAstNodeType::GeneralOperator, children))
 					{
 						break;
@@ -1376,7 +1377,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 					paramListLayoutEnv->Add<TextElement>(child);
 					paramListLayoutEnv->Add<KeepElement>(1);
 				}
-				else if (child->GetText() == ")")
+				else if (child->GetTokenType() == ')')
 				{
 					env->AddChild(paramListLayoutEnv);
 					if (!paramListLayoutEnv->GetChildren().empty())
@@ -1541,12 +1542,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 		{
 		case LuaAstNodeType::GeneralOperator:
 			{
-				if (child->GetText() == "{")
+				if (child->GetTokenType() == '{')
 				{
 					env->Add<TextElement>(child);
 					leftBraceLine = _parser->GetLine(child->GetTextRange().EndOffset);
 				}
-				else if (child->GetText() == "}")
+				else if (child->GetTokenType() == '}')
 				{
 					if (tableFieldLayout->GetChildren().empty())
 					{
@@ -1591,7 +1592,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 		{
 		case LuaAstNodeType::GeneralOperator:
 			{
-				if (child->GetText() == "=")
+				if (child->GetTokenType() == '=')
 				{
 					eqSignFounded = true;
 					env->Add<KeepBlankElement>(1);
@@ -1672,7 +1673,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 	std::shared_ptr<FormatElement> env = nullptr;
 	if (_options.continuous_assign_statement_align_to_equal_sign)
 	{
-		env = std::make_shared<AlignmentLayoutElement>("=");
+		env = std::make_shared<AlignmentLayoutElement>('=');
 	}
 	else
 	{
@@ -1842,7 +1843,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 
 	if (canAlign && _options.continuous_assign_table_field_align_to_equal_sign && layout->GetChildren().size() > 1)
 	{
-		auto alignmentLayoutElement = std::make_shared<AlignmentLayoutElement>("=");
+		auto alignmentLayoutElement = std::make_shared<AlignmentLayoutElement>('=');
 		alignmentLayoutElement->CopyFrom(layout);
 		layout = alignmentLayoutElement;
 	}
@@ -1920,7 +1921,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 	if (NextMatch(it, LuaAstNodeType::KeyWord, children))
 	{
 		auto next = NextNode(it, children);
-		if (next->GetText() == "end")
+		if (next->GetTokenType() == TK_END)
 		{
 			env->Add<TextElement>(next);
 			++it;
@@ -1983,7 +1984,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(LuaAstNode::C
 		auto nextKey = NextNode(it, siblings);
 		if (_options.if_branch_comments_after_block_no_indent
 			&& nextKey && nextKey->GetType() == LuaAstNodeType::KeyWord
-			&& (nextKey->GetText() == "elseif" || nextKey->GetText() == "else"))
+			&& (nextKey->GetTokenType() == TK_ELSEIF || nextKey->GetTokenType() == TK_ELSE))
 		{
 			auto blockEnv = FormatBlock(copyBlock);
 			auto noIndentEnv = std::make_shared<NoIndentElement>();
@@ -2113,7 +2114,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatUnaryExpression(std::shared_p
 		case LuaAstNodeType::UnaryOperator:
 			{
 				env->Add<TextElement>(child);
-				if (child->GetText() == "not")
+				if (child->GetTokenType() == TK_NOT)
 				{
 					env->Add<KeepElement>(1);
 				}
@@ -2185,7 +2186,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 			{
 				if (_options.table_append_expression_no_space)
 				{
-					if (child->GetText() == "[")
+					if (child->GetTokenType() == '[')
 					{
 						expressionAfterIndexOperator = true;
 					}
@@ -2194,7 +2195,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 				env->Add<TextElement>(child);
 				if (_options.long_chain_expression_allow_one_space_after_colon)
 				{
-					if (child->GetText() == ":" && _parser->GetLuaFile()->OnlyEmptyCharBefore(
+					if (child->GetTokenType() == ':' && _parser->GetLuaFile()->OnlyEmptyCharBefore(
 						child->GetTextRange().StartOffset))
 					{
 						env->Add<MaxSpaceElement>(1);

@@ -10,6 +10,7 @@
 #include "LuaToken.h"
 #include "LuaTokenType.h"
 #include "LuaFile.h"
+#include "LuaCustomParser.h"
 
 /*
  * token 解析来自于lua 源代码,实现上非常接近但细节处并不相同
@@ -45,11 +46,13 @@ public:
 
 	std::vector<LuaToken>& GetTokens();
 
-	// void SetUnStandardToken();
+	void SetCustomParser(std::shared_ptr<LuaCustomParser> parser);
 private:
 	static std::map<std::string, LuaTokenType, std::less<>> LuaReserved;
 
 	LuaTokenType Lex();
+
+	LuaTokenType CustomLex();
 
 	int NextChar();
 
@@ -103,4 +106,6 @@ private:
 	LuaToken _eosToken;
 
 	std::shared_ptr<LuaFile> _file;
+
+	std::shared_ptr<LuaCustomParser> _customParser;
 };

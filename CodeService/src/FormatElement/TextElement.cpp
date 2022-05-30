@@ -3,12 +3,16 @@
 
 TextElement::TextElement(std::string_view text, TextRange range)
 	: FormatElement(range),
-	  _text(text)
+	  _text(text),
+	  _node(nullptr)
 {
 }
 
 TextElement::TextElement(std::shared_ptr<LuaAstNode> node)
-	: TextElement(node->GetText(), node->GetTextRange())
+	: FormatElement(node->GetTextRange()),
+	  _node(node),
+	  _text(node->GetText())
+
 {
 }
 
@@ -37,4 +41,9 @@ void TextElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatE
 std::string_view TextElement::GetText() const
 {
 	return _text;
+}
+
+std::shared_ptr<LuaAstNode> TextElement::GetNode() const
+{
+	return _node;
 }
