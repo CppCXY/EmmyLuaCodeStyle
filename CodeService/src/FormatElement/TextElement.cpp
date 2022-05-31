@@ -3,8 +3,9 @@
 
 TextElement::TextElement(std::string_view text, TextRange range)
 	: FormatElement(range),
-	  _text(text),
-	  _node(nullptr)
+	  _node(nullptr),
+	  _text(text)
+
 {
 }
 
