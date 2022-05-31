@@ -631,6 +631,7 @@ static const luaL_Reg lib[] = {
 	{"spell_load_dictionary_from_buffer", spell_load_dictionary_from_buffer},
 	{"spell_analysis", spell_analysis},
 	{"spell_suggest", spell_suggest},
+	{"set_nonstandard_symbol", set_nonstandard_symbol},
 	{nullptr, nullptr}
 };
 
