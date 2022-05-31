@@ -1,5 +1,7 @@
 #include "CodeService/FormatElement/AlignToFirstElement.h"
 
+#include "CodeService/FormatElement/KeepElement.h"
+
 AlignToFirstElement::AlignToFirstElement()
 {
 }
@@ -62,7 +64,16 @@ void AlignToFirstElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 			ctx.AddIndent(indentState);
 		}
 
-		child->Serialize(ctx, it, *this);
+		if (child->Is(FormatElementType::KeepElement))
+		{
+			auto keepElement = std::dynamic_pointer_cast<KeepElement>(child);
+
+			keepElement->AllowBreakLineSerialize(ctx, it, *this);
+		}
+		else
+		{
+			child->Serialize(ctx, it, *this);
+		}
 	}
 
 	if (!_children.empty())
@@ -83,43 +94,43 @@ void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 			switch (indentState.Style)
 			{
 			case IndentStyle::Space:
-			{
-				if (writeCount > indentState.SpaceIndent)
 				{
-					indentState.SpaceIndent = writeCount;
-				}
-				else
-				{
-					indentState.SpaceIndent = ctx.GetColumn(child->GetTextRange().StartOffset);
-				}
-				break;
-			}
-			case IndentStyle::Tab:
-			{
-				if (writeCount > indentState.TabIndent)
-				{
-					indentState.SpaceIndent += writeCount - indentState.TabIndent;
-				}
-				else
-				{
-					auto& options = ctx.GetOptions();
-					auto state = ctx.CalculateIndentState(child->GetTextRange().StartOffset);
-					if (state.TabIndent < indentState.TabIndent)
+					if (writeCount > indentState.SpaceIndent)
 					{
-						auto diff = (indentState.TabIndent - state.TabIndent) * options.tab_width;
-						if (state.SpaceIndent > diff)
-						{
-							indentState.SpaceIndent = state.SpaceIndent - diff;
-						}
+						indentState.SpaceIndent = writeCount;
 					}
 					else
 					{
-						indentState.SpaceIndent = (state.TabIndent - indentState.TabIndent) * options.tab_width +
-							state.SpaceIndent;
+						indentState.SpaceIndent = ctx.GetColumn(child->GetTextRange().StartOffset);
 					}
+					break;
 				}
-				break;
-			}
+			case IndentStyle::Tab:
+				{
+					if (writeCount > indentState.TabIndent)
+					{
+						indentState.SpaceIndent += writeCount - indentState.TabIndent;
+					}
+					else
+					{
+						auto& options = ctx.GetOptions();
+						auto state = ctx.CalculateIndentState(child->GetTextRange().StartOffset);
+						if (state.TabIndent < indentState.TabIndent)
+						{
+							auto diff = (indentState.TabIndent - state.TabIndent) * options.tab_width;
+							if (state.SpaceIndent > diff)
+							{
+								indentState.SpaceIndent = state.SpaceIndent - diff;
+							}
+						}
+						else
+						{
+							indentState.SpaceIndent = (state.TabIndent - indentState.TabIndent) * options.tab_width +
+								state.SpaceIndent;
+						}
+					}
+					break;
+				}
 			}
 			ctx.AddIndent(indentState);
 		}

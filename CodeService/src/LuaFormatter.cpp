@@ -1172,7 +1172,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 		{
 		case LuaAstNodeType::CallExpression:
 			{
-				env->AddChild(FormatNode(child));
+				env->AddChild(FormatCallExpression(child));
 				break;
 			}
 		case LuaAstNodeType::Expression:
@@ -1569,7 +1569,14 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 			{
 				if (tableFieldLayout)
 				{
-					tableFieldLayout->AddChild(FormatAlignTableField(it, leftBraceLine, children));
+					auto fields = FormatAlignTableField(it, leftBraceLine, children);
+					if (fields->Is(FormatElementType::ExpressionElement)) {
+						tableFieldLayout->AddChildren(fields->GetChildren());
+					}
+					else
+					{
+						tableFieldLayout->AddChild(fields);
+					}
 					tableFieldLayout->Add<KeepElement>(1);
 				}
 				else
@@ -1597,7 +1604,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 					eqSignFounded = true;
 					env->Add<KeepBlankElement>(1);
 					env->Add<TextElement>(child);
-					env->Add<KeepBlankElement>(1);
+					env->Add<KeepElement>(1);
 				}
 				else
 				{
@@ -1804,7 +1811,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 					canAlign = false;
 					layout->AddChild(FormatNode(current));
 					// 此时认为table 不应该考虑对齐到等号
-					layout->Add<KeepBlankElement>(1);
+					layout->Add<KeepElement>(1);
 				}
 				else if (current->GetType() == LuaAstNodeType::TableField
 					&& nextSibling->GetType() == LuaAstNodeType::TableFieldSep)

@@ -18,8 +18,11 @@ public:
 
 	void Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
 	void Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
+
+	void AllowBreakLineSerialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent);
 private:
 	int _keepBlank;
 	bool _hasLinebreak;
 	bool _allowContinueIndent;
 };
+

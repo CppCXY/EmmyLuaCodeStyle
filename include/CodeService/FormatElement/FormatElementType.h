@@ -18,6 +18,7 @@ enum class FormatElementType
 	AlignIfLayoutElement,
 	StringLiteralElement,
 	CallArgsListLayoutElement,
+	NormalTableLayoutElement,
 
 	ControlStart,
 	KeepLineElement,

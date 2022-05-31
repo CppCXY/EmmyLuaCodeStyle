@@ -17,7 +17,6 @@ void KeepElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
                             FormatElement& parent)
 {
 	const int lastElementLine = GetLastValidLine(ctx, selfIt, parent);
-
 	const auto nextElement = GetNextValidElement(selfIt, parent);
 	if (!nextElement)
 	{
@@ -34,13 +33,6 @@ void KeepElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 	// 这个条件的意思是如果上一个元素和下一个元素没有实质的换行则保持一定的空格
 	if (nextElementLine == lastElementLine && ctx.GetCharacterCount() != 0)
 	{
-		// 暂时不打断
-		// if (nextElement->GetType() == FormatElementType::TextElement && ctx.ShouldBreakLine(nextRange))
-		// {
-		// 	ctx.PrintLine(1);
-		// 	return;
-		// }
-
 		ctx.PrintBlank(_keepBlank);
 	}
 	else
@@ -85,5 +77,48 @@ void KeepElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 	else
 	{
 		ctx.SetCharacterCount(0);
+	}
+}
+
+void KeepElement::AllowBreakLineSerialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
+{
+	if(!_allowContinueIndent)
+	{
+		return Serialize(ctx, selfIt, parent);
+	}
+
+	const int lastElementLine = GetLastValidLine(ctx, selfIt, parent);
+	const auto nextElement = GetNextValidElement(selfIt, parent);
+	if (!nextElement)
+	{
+		return;
+	}
+	const auto nextRange = nextElement->GetTextRange();
+	const int nextElementLine = ctx.GetLine(nextRange.StartOffset);
+
+	if (nextElementLine == -1)
+	{
+		return;
+	}
+
+	// 这个条件的意思是如果上一个元素和下一个元素没有实质的换行则保持一定的空格
+	if (nextElementLine == lastElementLine && ctx.GetCharacterCount() != 0)
+	{
+		if (ctx.ShouldBreakLine(nextRange))
+		{
+			ctx.PrintLine(1);
+			return;
+		}
+		ctx.PrintBlank(_keepBlank);
+	}
+	else
+	{
+		int line = nextElementLine - lastElementLine;
+		if (_hasLinebreak)
+		{
+			line--;
+		}
+
+		ctx.PrintLine(line);
 	}
 }

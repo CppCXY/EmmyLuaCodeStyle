@@ -1,5 +1,7 @@
 ﻿#include "CodeService/FormatElement/CallArgsListLayoutElement.h"
 
+#include "CodeService/FormatElement/KeepElement.h"
+
 CallArgsListLayoutElement::CallArgsListLayoutElement()
 	: _hasLineBreak(false)
 {
@@ -38,6 +40,11 @@ void CallArgsListLayoutElement::Serialize(SerializeContext& ctx, ChildIterator s
 		if (arg->Is(FormatElementType::SubExpressionElement))
 		{
 			SerializeSubExpression(ctx, arg, true);
+		}
+		else if(arg->Is(FormatElementType::KeepElement))
+		{
+			auto keepElement = std::dynamic_pointer_cast<KeepElement>(arg);
+			keepElement->AllowBreakLineSerialize(ctx, it, *this);
 		}
 		else
 		{
@@ -130,17 +137,20 @@ void CallArgsListLayoutElement::SerializeSubExpression(SerializeContext& ctx, st
 		{
 			SerializeSubExpression(ctx, child, false);
 		}
-		else
+		else if(child->Is(FormatElementType::KeepElement))
 		{
-			child->Serialize(ctx, it, *parent);
-		}
-		if (child->Is(FormatElementType::KeepElement))
-		{
+			auto keepElement = std::dynamic_pointer_cast<KeepElement>(child);
+
+			keepElement->AllowBreakLineSerialize(ctx, it, *parent);
 			if (ctx.GetCharacterCount() == 0 && !_hasLineBreak)
 			{
 				_hasLineBreak = true;
 				ctx.AddIndent();
 			}
+		}
+		else
+		{
+			child->Serialize(ctx, it, *parent);
 		}
 	}
 }
