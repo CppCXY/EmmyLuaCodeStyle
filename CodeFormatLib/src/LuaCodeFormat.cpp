@@ -14,7 +14,8 @@ LuaCodeFormat& LuaCodeFormat::GetInstance()
 
 LuaCodeFormat::LuaCodeFormat()
 	: _defaultOptions(std::make_shared<LuaCodeStyleOptions>()),
-	  _codeSpellChecker(std::make_shared<CodeSpellChecker>())
+	  _codeSpellChecker(std::make_shared<CodeSpellChecker>()),
+	  _customParser(std::make_shared<LuaCustomParser>())
 {
 }
 
@@ -63,6 +64,14 @@ void LuaCodeFormat::SetDefaultCodeStyle(ConfigMap& configMap)
 	}
 }
 
+void LuaCodeFormat::SetSupportNonStandardSymbol(const std::string& tokenType,const std::vector<std::string>& tokens)
+{
+	if (tokenType.size() == 1)
+	{
+		_customParser->SetTokens(tokenType.front(), tokens); 
+	}
+}
+
 void LuaCodeFormat::LoadSpellDictionary(const std::string& path)
 {
 	_codeSpellChecker->LoadDictionary(path);
@@ -76,6 +85,9 @@ void LuaCodeFormat::LoadSpellDictionaryFromBuffer(const std::string& buffer)
 std::string LuaCodeFormat::Reformat(const std::string& uri, std::string&& text, ConfigMap& configMap)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
+	if (_customParser->IsSupportCustomTokens()) {
+		parser->GetTokenParser()->SetCustomParser(_customParser);
+	}
 	parser->BuildAstWithComment();
 
 	if (!parser->GetErrors().empty())
@@ -93,6 +105,9 @@ std::string LuaCodeFormat::RangeFormat(const std::string& uri, LuaFormatRange& r
                                        ConfigMap& configMap)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
+	if (_customParser->IsSupportCustomTokens()) {
+		parser->GetTokenParser()->SetCustomParser(_customParser);
+	}
 	parser->BuildAstWithComment();
 
 	if (!parser->GetErrors().empty())
@@ -111,6 +126,9 @@ std::string LuaCodeFormat::RangeFormat(const std::string& uri, LuaFormatRange& r
 std::pair<bool, std::vector<LuaDiagnosisInfo>> LuaCodeFormat::Diagnose(const std::string& uri, std::string&& text)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
+	if (_customParser->IsSupportCustomTokens()) {
+		parser->GetTokenParser()->SetCustomParser(_customParser);
+	}
 	parser->BuildAstWithComment();
 
 	if (!parser->GetErrors().empty())
@@ -137,6 +155,10 @@ std::vector<LuaDiagnosisInfo> LuaCodeFormat::SpellCheck(const std::string& uri, 
                                                         const CodeSpellChecker::CustomDictionary& tempDict)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
+	if (_customParser->IsSupportCustomTokens()) {
+		parser->GetTokenParser()->SetCustomParser(_customParser);
+	}
+	parser->GetTokenParser()->Parse();
 
 	auto options = GetOptions(uri);
 

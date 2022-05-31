@@ -21,6 +21,7 @@ public:
 	void UpdateCodeStyle(const std::string& workspaceUri, const std::string& configPath);
 	void RemoveCodeStyle(const std::string& workspaceUri);
 	void SetDefaultCodeStyle(ConfigMap& configMap);
+	void SetSupportNonStandardSymbol(const std::string& tokenType, const std::vector<std::string>& tokens);
 
 	void LoadSpellDictionary(const std::string& path);
 
@@ -46,4 +47,6 @@ private:
 	std::shared_ptr<LuaCodeStyleOptions> _defaultOptions;
 
 	std::shared_ptr<CodeSpellChecker> _codeSpellChecker;
+
+	std::shared_ptr<LuaCustomParser> _customParser;
 };

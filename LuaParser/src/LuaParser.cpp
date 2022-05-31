@@ -33,15 +33,15 @@ std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 std::shared_ptr<LuaParser> LuaParser::LoadFromBuffer(std::string&& buffer)
 {
 	auto file = std::make_shared<LuaFile>("chunk", std::move(buffer));
-
+	
 	auto tokenParser = std::make_shared<LuaTokenParser>(file);
-	tokenParser->Parse();
 
 	return std::make_shared<LuaParser>(tokenParser);
 }
 
 void LuaParser::BuildAst()
 {
+	_tokenParser->Parse();
 	_chunkAstNode = CreateAstNode(LuaAstNodeType::Chunk);
 	try
 	{

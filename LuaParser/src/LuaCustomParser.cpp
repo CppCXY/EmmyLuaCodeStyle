@@ -98,10 +98,25 @@ endLoop:
 	return it->second;
 }
 
-void LuaCustomParser::SetEqToken(std::vector<std::string>& customTokens)
+void LuaCustomParser::SetTokens(LuaTokenType type, const std::vector<std::string>& customTokens)
 {
+	for (auto it = _customTokens.begin(); it != _customTokens.end();)
+	{
+		if (it->second == type)
+		{
+			_customTokens.erase(it++);
+			continue;
+		}
+		++it;
+	}
+
 	for (auto& token : customTokens)
 	{
-		_customTokens.insert({token, '='});
+		_customTokens.insert({token, type});
 	}
+}
+
+bool LuaCustomParser::IsSupportCustomTokens() const
+{
+	return !_customTokens.empty();
 }

@@ -361,6 +361,47 @@ int set_default_config(lua_State* L)
 	return 0;
 }
 
+int set_nonstandard_symbol(lua_State* L)
+{
+	int top = lua_gettop(L);
+
+	if (top != 2)
+	{
+		return 0;
+	}
+
+	if (lua_isstring(L, 1) && lua_istable(L, 2))
+	{
+		try
+		{
+			std::string type = lua_tostring(L, 1);
+			std::vector<std::string> tokens;
+			lua_pushnil(L);
+			while (lua_next(L, -2) != 0)
+			{
+				auto value = luaToString(L, -1);
+				tokens.push_back(value);
+				lua_pop(L, 1);
+			}
+			lua_settop(L, top);
+
+			LuaCodeFormat::GetInstance().SetSupportNonStandardSymbol(type, tokens);
+			lua_pushboolean(L, true);
+			return 1;
+		}
+		catch (std::exception& e)
+		{
+			std::string err = e.what();
+			lua_settop(L, top);
+			lua_pushboolean(L, false);
+			lua_pushlstring(L, err.c_str(), err.size());
+			return 2;
+		}
+	}
+
+	return 0;
+}
+
 int spell_load_dictionary_from_path(lua_State* L)
 {
 	int top = lua_gettop(L);
