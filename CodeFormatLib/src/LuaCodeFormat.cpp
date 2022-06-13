@@ -90,7 +90,7 @@ std::string LuaCodeFormat::Reformat(const std::string& uri, std::string&& text, 
 	}
 	parser->BuildAstWithComment();
 
-	if (!parser->GetErrors().empty())
+	if (parser->HasError())
 	{
 		return "";
 	}
@@ -110,7 +110,7 @@ std::string LuaCodeFormat::RangeFormat(const std::string& uri, LuaFormatRange& r
 	}
 	parser->BuildAstWithComment();
 
-	if (!parser->GetErrors().empty())
+	if (parser->HasError())
 	{
 		return "";
 	}
