@@ -133,7 +133,6 @@ std::shared_ptr<LuaParser> VirtualFile::GetLuaParser()
 void VirtualFile::MakeParser()
 {
 	auto tokenParser = std::make_shared<LuaTokenParser>(_luaFile);
-	tokenParser->Parse();
 	_luaParser = std::make_shared<LuaParser>(tokenParser);
 	_luaParser->BuildAstWithComment();
 }

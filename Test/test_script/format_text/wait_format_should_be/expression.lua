@@ -24,7 +24,7 @@ function f()
         .eeeee()
         .fffff()
         .jjjjj()
-
+    aaaa[ [[bbbb]] ] = 123
     local t = {
         aaa, bbbb, cccc
     }

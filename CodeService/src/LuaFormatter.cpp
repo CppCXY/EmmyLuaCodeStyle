@@ -1195,7 +1195,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatExpressionStatement(std::shar
 				env->AddChild(FormatExpression(child, expressionEnv));
 				break;
 			}
-			// default 一般只有一个分号
+		// default 一般只有一个分号
 		default:
 			{
 				DefaultHandle(child, env);
@@ -1570,7 +1570,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 				if (tableFieldLayout)
 				{
 					auto fields = FormatAlignTableField(it, leftBraceLine, children);
-					if (fields->Is(FormatElementType::ExpressionElement)) {
+					if (fields->Is(FormatElementType::ExpressionElement))
+					{
 						tableFieldLayout->AddChildren(fields->GetChildren());
 					}
 					else
@@ -1593,8 +1594,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 {
 	auto env = std::make_shared<ExpressionElement>();
 	auto eqSignFounded = false;
-	for (auto& child : tableField->GetChildren())
+	auto& children = tableField->GetChildren();
+	bool isIndexExprLongString = false;
+	for (auto it = children.begin(); it != children.end(); ++it)
 	{
+		auto& child = *it;
 		switch (child->GetType())
 		{
 		case LuaAstNodeType::GeneralOperator:
@@ -1610,6 +1614,30 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 				{
 					env->Add<TextElement>(child);
 				}
+				break;
+			}
+		case LuaAstNodeType::IndexOperator:
+			{
+				if(child->GetTokenType() == '[')
+				{
+					auto nextNode = NextNode(it, children);
+					if(nextNode && nextNode->GetType() == LuaAstNodeType::Expression)
+					{
+						auto stringExpr = nextNode->FindFirstOf(LuaAstNodeType::StringLiteralExpression);
+						if (stringExpr && StringUtil::StartWith(stringExpr->GetText(), "[")) {
+							isIndexExprLongString = true;
+							env->Add<TextElement>(child);
+							env->Add<KeepElement>(1);
+							continue;
+						}
+					}
+				}
+				else if(child->GetTokenType() == ']' && isIndexExprLongString)
+				{
+					env->Add<KeepElement>(1);
+				}
+
+				env->Add<TextElement>(child);
 				break;
 			}
 		case LuaAstNodeType::Identify:
@@ -2184,33 +2212,58 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatPrimaryExpression(std::shared
 std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_ptr<LuaAstNode> indexExpression)
 {
 	bool expressionAfterIndexOperator = false;
+	bool isIndexExprLongString = false;
 	auto env = std::make_shared<SubExpressionElement>();
-	for (auto& child : indexExpression->GetChildren())
+	auto& children = indexExpression->GetChildren();
+	for (auto it = children.begin(); it != children.end(); it++)
 	{
+		auto& child = *it;
 		switch (child->GetType())
 		{
 		case LuaAstNodeType::IndexOperator:
 			{
-				if (_options.table_append_expression_no_space)
+				if (child->GetTokenType() == '[')
 				{
-					if (child->GetTokenType() == '[')
+					expressionAfterIndexOperator = true;
+					auto nextNode = NextNode(it, children);
+					if (nextNode && nextNode->GetType() == LuaAstNodeType::Expression)
 					{
-						expressionAfterIndexOperator = true;
+						auto stringExpr = nextNode->FindFirstOf(LuaAstNodeType::StringLiteralExpression);
+						if (stringExpr && StringUtil::StartWith(stringExpr->GetText(), "[")) {
+							isIndexExprLongString = true;
+							env->Add<TextElement>(child);
+							env->Add<KeepElement>(1);
+							continue;
+						}
 					}
-				}
 
-				env->Add<TextElement>(child);
-				if (_options.long_chain_expression_allow_one_space_after_colon)
+					env->Add<TextElement>(child);
+					env->Add<KeepElement>(0);
+				}
+				else if (child->GetTokenType() == ']' )
 				{
-					if (child->GetTokenType() == ':' && _parser->GetLuaFile()->OnlyEmptyCharBefore(
-						child->GetTextRange().StartOffset))
-					{
-						env->Add<MaxSpaceElement>(1);
-						continue;
-					}
+					env->Add<KeepElement>(isIndexExprLongString? 1:0);
+					env->Add<TextElement>(child);
+					env->Add<KeepElement>(0);
 				}
-
-				env->Add<KeepElement>(0);
+				else if (child->GetTokenType() == ':')
+				{
+					env->Add<TextElement>(child);
+					if (_options.long_chain_expression_allow_one_space_after_colon)
+					{
+						if (_parser->GetLuaFile()->OnlyEmptyCharBefore(
+							child->GetTextRange().StartOffset))
+						{
+							env->Add<MaxSpaceElement>(1);
+							continue;
+						}
+					}
+					env->Add<KeepElement>(0);
+				}
+				else
+				{
+					DefaultHandle(child, env);
+				}
 
 				break;
 			}
@@ -2228,13 +2281,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 					if (StringUtil::StartWith(text, "#"))
 					{
 						env->AddChild(FormatTableAppendExpression(child));
-						env->Add<KeepElement>(0);
 						continue;
 					}
 				}
 
 				FormatSubExpression(child, env);
-				env->Add<KeepElement>(0);
 				break;
 			}
 		default:
