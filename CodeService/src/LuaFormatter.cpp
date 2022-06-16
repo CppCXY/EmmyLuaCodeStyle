@@ -1618,21 +1618,21 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 			}
 		case LuaAstNodeType::IndexOperator:
 			{
-				if(child->GetTokenType() == '[')
+				if (child->GetTokenType() == '[')
 				{
 					auto nextNode = NextNode(it, children);
-					if(nextNode && nextNode->GetType() == LuaAstNodeType::Expression)
+					if (nextNode && nextNode->GetType() == LuaAstNodeType::Expression
+						&& (StringUtil::StartWith(nextNode->GetText(), "[")
+							|| StringUtil::EndWith(nextNode->GetText(), "]"))
+					)
 					{
-						auto stringExpr = nextNode->FindFirstOf(LuaAstNodeType::StringLiteralExpression);
-						if (stringExpr && StringUtil::StartWith(stringExpr->GetText(), "[")) {
-							isIndexExprLongString = true;
-							env->Add<TextElement>(child);
-							env->Add<KeepElement>(1);
-							continue;
-						}
+						isIndexExprLongString = true;
+						env->Add<TextElement>(child);
+						env->Add<KeepElement>(1);
+						continue;
 					}
 				}
-				else if(child->GetTokenType() == ']' && isIndexExprLongString)
+				else if (child->GetTokenType() == ']' && isIndexExprLongString)
 				{
 					env->Add<KeepElement>(1);
 				}
@@ -2226,23 +2226,22 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 				{
 					expressionAfterIndexOperator = true;
 					auto nextNode = NextNode(it, children);
-					if (nextNode && nextNode->GetType() == LuaAstNodeType::Expression)
+					if (nextNode && nextNode->GetType() == LuaAstNodeType::Expression
+						&& (StringUtil::StartWith(nextNode->GetText(), "[")
+							|| StringUtil::EndWith(nextNode->GetText(), "]")))
 					{
-						auto stringExpr = nextNode->FindFirstOf(LuaAstNodeType::StringLiteralExpression);
-						if (stringExpr && StringUtil::StartWith(stringExpr->GetText(), "[")) {
-							isIndexExprLongString = true;
-							env->Add<TextElement>(child);
-							env->Add<KeepElement>(1);
-							continue;
-						}
+						isIndexExprLongString = true;
+						env->Add<TextElement>(child);
+						env->Add<KeepElement>(1);
+						continue;
 					}
 
 					env->Add<TextElement>(child);
 					env->Add<KeepElement>(0);
 				}
-				else if (child->GetTokenType() == ']' )
+				else if (child->GetTokenType() == ']')
 				{
-					env->Add<KeepElement>(isIndexExprLongString? 1:0);
+					env->Add<KeepElement>(isIndexExprLongString ? 1 : 0);
 					env->Add<TextElement>(child);
 					env->Add<KeepElement>(0);
 				}

@@ -25,6 +25,8 @@ function f()
         .fffff()
         .jjjjj()
     aaaa[ [[bbbb]] ] = 123
+    aaaa[ [[bbbbb]] + 1 ] = 456
+    aaaa[ ~[[cccccc]] ] = 789
     local t = {
         aaa, bbbb, cccc
     }
