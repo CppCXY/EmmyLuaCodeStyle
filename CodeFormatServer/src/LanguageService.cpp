@@ -400,7 +400,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnDidChangeWatchedFiles(
 	return nullptr;
 }
 
-//@depreacated
+//@deprecated
 std::shared_ptr<vscode::CompletionList> LanguageService::OnCompletion(std::shared_ptr<vscode::CompletionParams> param)
 {
 	auto list = std::make_shared<vscode::CompletionList>();

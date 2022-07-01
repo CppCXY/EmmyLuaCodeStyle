@@ -263,3 +263,24 @@ std::shared_ptr<LuaAstNode> ast_util::FindLeftIndexExpression(std::shared_ptr<Lu
 
 	return leftIndex;
 }
+
+bool ast_util::WillIndexExpressionFormatError(std::shared_ptr<LuaAstNode> expression)
+{
+	auto text = expression->GetText();
+	if(text.empty())
+	{
+		return false;
+	}
+
+	if(text.front() == '[')
+	{
+		return text.length() > 2 && (text[1] == '[' || text[1] == '=');
+	}
+
+	if(text.back() == ']')
+	{
+		return text.length() > 2 && (text[text.length() - 2] == ']' || text[text.length() - 2] == '=');
+	}
+
+	return false;
+}

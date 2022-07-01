@@ -1622,9 +1622,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 				{
 					auto nextNode = NextNode(it, children);
 					if (nextNode && nextNode->GetType() == LuaAstNodeType::Expression
-						&& (StringUtil::StartWith(nextNode->GetText(), "[")
-							|| StringUtil::EndWith(nextNode->GetText(), "]"))
-					)
+						&& ast_util::WillIndexExpressionFormatError(nextNode))
 					{
 						isIndexExprLongString = true;
 						env->Add<TextElement>(child);
@@ -2227,8 +2225,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 					expressionAfterIndexOperator = true;
 					auto nextNode = NextNode(it, children);
 					if (nextNode && nextNode->GetType() == LuaAstNodeType::Expression
-						&& (StringUtil::StartWith(nextNode->GetText(), "[")
-							|| StringUtil::EndWith(nextNode->GetText(), "]")))
+						&& ast_util::WillIndexExpressionFormatError(nextNode))
 					{
 						isIndexExprLongString = true;
 						env->Add<TextElement>(child);

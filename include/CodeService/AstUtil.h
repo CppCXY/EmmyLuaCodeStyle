@@ -16,4 +16,6 @@ namespace ast_util
 	bool WillCallArgHaveParentheses(std::shared_ptr<LuaAstNode> callArgList, CallArgParentheses callArgParentheses);
 
 	std::shared_ptr<LuaAstNode> FindLeftIndexExpression(std::shared_ptr<LuaAstNode> expression);
+
+	bool WillIndexExpressionFormatError(std::shared_ptr<LuaAstNode> expression);
 }

@@ -124,7 +124,7 @@ void CommandService::Import(std::shared_ptr<vscode::ExecuteCommandParams> param)
 
 	std::string requireString = Util::format("local {} = {}(\"{}\")\n", moduleDefineName, config->import_function,
 	                                         moduleName);
-	auto parser = LanguageClient::GetInstance().GetFileParser(uri);
+	auto parser = _owner->GetFileParser(uri);
 	auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();
 	auto it = applyParams->edit.changes.emplace(uri, std::vector<vscode::TextEdit>());
 	auto& change = it.first->second;
@@ -133,9 +133,9 @@ void CommandService::Import(std::shared_ptr<vscode::ExecuteCommandParams> param)
 
 	edit.newText = requireString;
 
-	edit.range = LanguageClient::GetInstance().GetService<ModuleService>()->FindRequireRange(parser, config);
+	edit.range = GetService<ModuleService>()->FindRequireRange(parser, config);
 
-	LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
+	_owner->SendRequest("workspace/applyEdit", applyParams);
 }
 
 void CommandService::SpellCorrect(std::shared_ptr<vscode::ExecuteCommandParams> param)
@@ -157,7 +157,7 @@ void CommandService::SpellCorrect(std::shared_ptr<vscode::ExecuteCommandParams> 
 
 	edit.range = range;
 
-	LanguageClient::GetInstance().SendRequest("workspace/applyEdit", applyParams);
+	_owner->SendRequest("workspace/applyEdit", applyParams);
 }
 
 // void CommandService::SpellAddDict(std::shared_ptr<vscode::ExecuteCommandParams> param)
