@@ -343,6 +343,8 @@ LuaTokenType LuaTokenParser::Lex()
 			}
 		case '"':
 		case '\'':
+			// extend support
+		case '`':
 			{
 				ReadString(ch);
 				return TK_STRING;
