@@ -163,6 +163,9 @@ align_chained_expression_statement = true
 remove_empty_header_and_footer_lines_in_function = true
 [{remove_expression_list_finish_comma-eq-true.lua}]
 remove_expression_list_finish_comma = true
+[{space_option.lua}]
+space_before_function_open_parenthesis = true
+space_before_open_square_bracket = true
 [{minLine-eq-1.lua}]
 keep_line_after_if_statement = minLine:1
 keep_line_after_do_statement = minLine:1

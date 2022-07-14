@@ -5,10 +5,13 @@
 #include "LuaCodeStyleOptions.h"
 #include "FormatElement/FormatElement.h"
 #include "LuaFormatRange.h"
+#include <functional>
 
 class LuaFormatter
 {
 public:
+	using BlockFilter = std::function<bool(std::shared_ptr<LuaAstNode>)>;
+
 	LuaFormatter(std::shared_ptr<LuaParser> luaParser, LuaCodeStyleOptions& options);
 	~LuaFormatter() = default;
 
@@ -26,6 +29,9 @@ protected:
 	std::shared_ptr<FormatElement> FormatNode(std::shared_ptr<LuaAstNode> node);
 
 	std::shared_ptr<FormatElement> FormatBlock(std::shared_ptr<LuaAstNode> blockNode);
+
+	// special handle range format
+	std::shared_ptr<FormatElement> FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode, LuaFormatRange& validRange);
 
 	std::shared_ptr<FormatElement> FormatLocalStatement(std::shared_ptr<LuaAstNode> localStatement);
 
@@ -131,9 +137,6 @@ protected:
 
 	// special rule [#8](https://github.com/CppCXY/EmmyLuaCodeStyle/issues/8)
 	std::shared_ptr<FormatElement> FormatTableAppendExpression(std::shared_ptr<LuaAstNode> expression);
-
-	// special handle range format
-	std::shared_ptr<FormatElement> FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode, LuaFormatRange& validRange);
 
 private:
 	std::shared_ptr<LuaParser> _parser;

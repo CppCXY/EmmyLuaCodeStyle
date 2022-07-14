@@ -358,6 +358,18 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("remove_expression_list_finish_comma") == "true";
 	}
 
+	if(configMap.count("space_before_function_open_parenthesis"))
+	{
+		options->space_before_function_open_parenthesis =
+			configMap.at("space_before_function_open_parenthesis") == "true";
+	}
+
+	if (configMap.count("space_before_open_square_bracket"))
+	{
+		options->space_before_open_square_bracket =
+			configMap.at("space_before_open_square_bracket") == "true";
+	}
+
 	if (configMap.count("end_of_line"))
 	{
 		auto lineSeparatorSymbol = configMap.at("end_of_line");

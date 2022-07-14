@@ -1320,6 +1320,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatFunctionStatement(std::shared
 			}
 		case LuaAstNodeType::FunctionBody:
 			{
+				if (_options.space_before_function_open_parenthesis)
+				{
+					env->Add<KeepBlankElement>(1);
+				}
+
 				env->AddChild(FormatNode(child));
 				break;
 			}
@@ -1449,6 +1454,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatClosureExpression(std::shared
 			}
 		case LuaAstNodeType::FunctionBody:
 			{
+				if (_options.space_before_function_open_parenthesis)
+				{
+					env->Add<KeepBlankElement>(1);
+				}
 				env->AddChild(FormatNode(child));
 				break;
 			}
@@ -2287,7 +2296,20 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 		default:
 			{
 				FormatSubExpression(child, env);
-				env->Add<KeepElement>(0);
+
+				auto nextNode = NextNode(it, children);
+				if (_options.space_before_open_square_bracket
+					&& nextNode != nullptr
+					&& nextNode->GetType() == LuaAstNodeType::IndexOperator
+					&& nextNode->GetTokenType() == '['
+					&& !StringUtil::EndWith(child->GetText(), "]"))
+				{
+					env->Add<KeepElement>(1);
+				}
+				else
+				{
+					env->Add<KeepElement>(0);
+				}
 			}
 		}
 	}
@@ -2313,7 +2335,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallExpression(std::shared_pt
 				auto next = NextNode(it, children);
 				if (next && next->GetType() == LuaAstNodeType::CallArgList)
 				{
-					if (!ast_util::WillCallArgHaveParentheses(next, _options.call_arg_parentheses))
+					if (!ast_util::WillCallArgHaveParentheses(next, _options.call_arg_parentheses) || _options.
+						space_before_function_open_parenthesis)
 					{
 						//TODO workaround
 						env->Add<KeepElement>(1, false, false);

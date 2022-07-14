@@ -72,6 +72,10 @@ public:
 	 */
 	bool keep_one_space_between_namedef_and_attribute = true;
 
+	bool space_before_function_open_parenthesis = false;
+
+	bool space_before_open_square_bracket = false;
+
 	/*
 	 * 标签无缩进
 	 */
