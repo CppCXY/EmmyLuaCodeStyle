@@ -1254,8 +1254,15 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 
 							if (startLine != endLine)
 							{
-								canAligned = false;
-								break;
+								if(!expression->GetChildren().empty())
+								{
+									auto first = expression->GetChildren().front();
+									if(first->GetType() == LuaAstNodeType::ClosureExpression || first->GetType() == LuaAstNodeType::TableExpression)
+									{
+										canAligned = false;
+										break;
+									}
+								}
 							}
 						}
 					}
