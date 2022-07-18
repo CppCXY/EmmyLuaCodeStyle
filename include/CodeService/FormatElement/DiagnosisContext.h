@@ -19,6 +19,8 @@ public:
 
 	void SetLineMaxLength(int line, int character);
 
+	void DiagnoseLine();
+
 	std::vector<LuaDiagnosisInfo> GetDiagnosisInfos();
 private:
 	std::vector<LuaDiagnosisInfo> _diagnosisInfos;
