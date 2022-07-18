@@ -482,7 +482,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignment(std::shared_ptr<Lu
 		case LuaAstNodeType::GeneralOperator:
 			{
 				env->Add<TextElement>(node);
-				env->Add<KeepBlankElement>(1);
+				env->Add<KeepElement>(1);
 				break;
 			}
 		case LuaAstNodeType::ExpressionList:
