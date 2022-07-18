@@ -31,7 +31,7 @@ void DiagnosisContext::SetLineMaxLength(int line, int character)
 	_lineMaxLengthMap[line] = character;
 }
 
-std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
+void DiagnosisContext::DiagnoseLine()
 {
 	if (!_lineMaxLengthMap.empty())
 	{
@@ -39,8 +39,9 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 		{
 			LuaDiagnosisPosition start(line, _options.max_line_length);
 			LuaDiagnosisPosition end(line, character);
-			PushDiagnosis(Util::format(LText("The line width should not exceed {}"), _options.max_line_length), start, end,
-			              DiagnosisType::MaxLineWidth);
+			PushDiagnosis(Util::format(LText("The line width should not exceed {}"), _options.max_line_length), start,
+				end,
+				DiagnosisType::MaxLineWidth);
 		}
 		_lineMaxLengthMap.clear();
 	}
@@ -48,9 +49,13 @@ std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
 	if (_options.insert_final_newline && !_parser->IsEmptyLine(_parser->GetTotalLine()))
 	{
 		LuaDiagnosisPosition start(_parser->GetTotalLine(), _parser->GetColumn(
-			                           static_cast<int>(_parser->GetSource().size())));
+			static_cast<int>(_parser->GetSource().size())));
 		LuaDiagnosisPosition end(_parser->GetTotalLine() + 1, 0);
 		PushDiagnosis(LText("The code must end with a new line"), start, end, DiagnosisType::EndWithNewLine);
 	}
+}
+
+std::vector<LuaDiagnosisInfo> DiagnosisContext::GetDiagnosisInfos()
+{
 	return _diagnosisInfos;
 }

@@ -148,6 +148,8 @@ std::pair<bool, std::vector<LuaDiagnosisInfo>> LuaCodeFormat::Diagnose(const std
 		styleChecker.Analysis();
 	}
 
+	ctx.DiagnoseLine();
+
 	return std::make_pair(true, ctx.GetDiagnosisInfos());
 }
 

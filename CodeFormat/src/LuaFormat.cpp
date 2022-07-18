@@ -191,6 +191,8 @@ bool LuaFormat::Check(std::string_view workspace, std::shared_ptr<CodeSpellCheck
 		spellChecker->Analysis(ctx);
 	}
 
+	ctx.DiagnoseLine();
+
 	auto diagnosis = ctx.GetDiagnosisInfos();
 	if (!diagnosis.empty())
 	{

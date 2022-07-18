@@ -35,6 +35,8 @@ std::vector<vscode::Diagnostic> CodeFormatService::Diagnose(std::string_view fil
 		_spellChecker->Analysis(ctx, _customDictionary);
 	}
 
+	ctx.DiagnoseLine();
+
 	auto diagnosisInfos = ctx.GetDiagnosisInfos();
 	for (auto diagnosisInfo : diagnosisInfos)
 	{
