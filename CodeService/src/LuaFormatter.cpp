@@ -388,6 +388,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 
 				break;
 			}
+		case LuaAstNodeType::EmptyStatement:
+			{
+				break;
+			}
 		default:
 			{
 				auto childEnv = FormatNode(statement);
