@@ -91,3 +91,13 @@ p6(haode
     function()
 
     end)
+
+a =
+{
+    b = 1,
+    c =
+    {
+        d = 2,
+        e = 3
+    }
+}

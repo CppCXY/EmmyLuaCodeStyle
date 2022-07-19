@@ -1254,10 +1254,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 
 							if (startLine != endLine)
 							{
-								if(!expression->GetChildren().empty())
+								if (!expression->GetChildren().empty())
 								{
 									auto first = expression->GetChildren().front();
-									if(first->GetType() == LuaAstNodeType::ClosureExpression || first->GetType() == LuaAstNodeType::TableExpression)
+									if (first->GetType() == LuaAstNodeType::ClosureExpression || first->GetType() ==
+										LuaAstNodeType::TableExpression)
 									{
 										canAligned = false;
 										break;
@@ -1550,6 +1551,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 	}
 
 	int leftBraceLine = 0;
+	bool forceChopDownEndBracket = false;
 
 	for (auto it = children.begin(); it != children.end(); ++it)
 	{
@@ -1562,6 +1564,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 				{
 					env->Add<TextElement>(child);
 					leftBraceLine = _parser->GetLine(child->GetTextRange().EndOffset);
+					auto next = NextNode(it, children);
+					if (next && next->GetTokenType() != '}')
+					{
+						forceChopDownEndBracket = leftBraceLine != _parser->GetLine(next->GetTextRange().StartOffset);
+					}
 				}
 				else if (child->GetTokenType() == '}')
 				{
@@ -1573,8 +1580,24 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 					{
 						env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
 						env->AddChild(tableFieldLayout);
+
+						if (forceChopDownEndBracket)
+						{
+							if (_parser->GetLine(tableFieldLayout->GetTextRange().EndOffset) != _parser->GetLine(
+								child->GetTextRange().StartOffset))
+							{
+								env->Add<KeepElement>(1);
+							}
+							else
+							{
+								env->Add<LineElement>();
+							}
+						}
+						else
+						{
+							env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
+						}
 						tableFieldLayout = nullptr;
-						env->Add<KeepElement>(_options.keep_one_space_between_table_and_bracket ? 1 : 0);
 					}
 					env->Add<TextElement>(child);
 				}
