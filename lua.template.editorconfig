@@ -18,7 +18,7 @@ continuation_indent_size = 4
 # however, if the expression list has cross row expression, it will not be aligned to the first expression
 local_assign_continuation_align_to_first_expression = false
 # function call expression's args will align to first arg
-# however, if the args has cross row arg, it will not be aligned to the first arg
+# optional true/false/only_after_more_indention_statement
 align_call_args = false
 # if true, all function define params will align to first param
 align_function_define_params = true
