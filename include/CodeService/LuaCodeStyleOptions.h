@@ -52,7 +52,9 @@ public:
 	/*
 	 * 调用参数对齐到第一个参数
 	 */
-	bool align_call_args = false;
+	AlignCallArgs align_call_args = AlignCallArgs::False;
+
+	bool only_align_call_args_after_assignment = false;
 
 	/*
 	 * 函数定义的参数保持对齐到第一个参数

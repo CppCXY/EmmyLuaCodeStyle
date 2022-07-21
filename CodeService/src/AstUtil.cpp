@@ -267,19 +267,52 @@ std::shared_ptr<LuaAstNode> ast_util::FindLeftIndexExpression(std::shared_ptr<Lu
 bool ast_util::WillIndexExpressionFormatError(std::shared_ptr<LuaAstNode> expression)
 {
 	auto text = expression->GetText();
-	if(text.empty())
+	if (text.empty())
 	{
 		return false;
 	}
 
-	if(text.front() == '[')
+	if (text.front() == '[')
 	{
 		return text.length() > 2 && (text[1] == '[' || text[1] == '=');
 	}
 
-	if(text.back() == ']')
+	if (text.back() == ']')
 	{
 		return text.length() > 2 && (text[text.length() - 2] == ']' || text[text.length() - 2] == '=');
+	}
+
+	return false;
+}
+
+bool ast_util::IsNodeAfterMoreIndentionStatement(std::shared_ptr<LuaAstNode> node)
+{
+	if (!node)
+	{
+		return false;
+	}
+
+	std::shared_ptr<LuaAstNode> parent = node->GetParent();
+	while (parent)
+	{
+		switch (parent->GetType())
+		{
+		case LuaAstNodeType::LocalStatement:
+		case LuaAstNodeType::AssignStatement:
+		case LuaAstNodeType::ReturnStatement:
+			{
+				return true;
+			}
+		case LuaAstNodeType::Block:
+			{
+				return false;
+			}
+		default:
+			{
+				break;
+			}
+		}
+		parent = parent->GetParent();
 	}
 
 	return false;

@@ -263,7 +263,19 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 
 	if (configMap.count("align_call_args"))
 	{
-		options->align_call_args = configMap.at("align_call_args") == "true";
+		auto& value = configMap.at("align_call_args");
+		if(value == "true")
+		{
+			options->align_call_args = AlignCallArgs::True;
+		}
+		else if(value == "false")
+		{
+			options->align_call_args = AlignCallArgs::False;
+		}
+		else if(value == "only_after_more_indention_statement")
+		{
+			options->align_call_args = AlignCallArgs::OnlyAfterMoreIndentionStatement;
+		}
 	}
 
 	if (configMap.count("align_chained_expression_statement"))

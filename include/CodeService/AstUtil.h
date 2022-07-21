@@ -18,4 +18,6 @@ namespace ast_util
 	std::shared_ptr<LuaAstNode> FindLeftIndexExpression(std::shared_ptr<LuaAstNode> expression);
 
 	bool WillIndexExpressionFormatError(std::shared_ptr<LuaAstNode> expression);
+
+	bool IsNodeAfterMoreIndentionStatement(std::shared_ptr<LuaAstNode> node);
 }
