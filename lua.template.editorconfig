@@ -2,6 +2,7 @@
 # see https://github.com/CppCXY/EmmyLuaCodeStyle
 [*.lua]
 # [basic]
+
 # optional space/tab
 indent_style = space
 # if indent_style is space, this is valid
@@ -27,6 +28,7 @@ max_line_length = 120
 insert_final_newline = true
 
 # [function]
+
 # function call expression's args will align to first arg
 # optional true/false/only_after_more_indention_statement
 align_call_args = false
@@ -40,6 +42,7 @@ remove_expression_list_finish_comma = true
 call_arg_parentheses = keep
 
 # [table]
+
 # see document for detail
 continuous_assign_table_field_align_to_equal_sign = true
 
@@ -50,6 +53,7 @@ keep_one_space_between_table_and_bracket = true
 align_table_field_to_first_field = false
 
 # [statement]
+
 align_chained_expression_statement = false
 
 # continous line distance
@@ -66,6 +70,7 @@ if_condition_align_with_each_other = false
 local_assign_continuation_align_to_first_expression = false
 
 # [indentation]
+
 # if true, the label loses its current indentation
 label_no_indent = false
 # if true, there will be no indentation in the do statement
@@ -76,6 +81,7 @@ if_condition_no_continuation_indent = false
 if_branch_comments_after_block_no_indent = false
 
 # [space]
+
 # if true, t[#t+1] will not space wrapper '+'
 table_append_expression_no_space = false
 
@@ -114,6 +120,7 @@ keep_line_after_function_define_statement = keepLine:1
 keep_line_after_expression_statement = keepLine
 
 # [diagnostic]
+
 # the following is code diagnostic options
 enable_check_codestyle = true
 
