@@ -26,5 +26,6 @@ enum class AlignCallArgs
 {
 	True,
 	False,
-	OnlyAfterMoreIndentionStatement
+	OnlyAfterMoreIndentionStatement,
+	OnlyNotExistCrossExpression,
 };

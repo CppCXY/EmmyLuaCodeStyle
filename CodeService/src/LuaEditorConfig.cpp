@@ -276,6 +276,10 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		{
 			options->align_call_args = AlignCallArgs::OnlyAfterMoreIndentionStatement;
 		}
+		else if(value == "only_not_exist_cross_row_expression")
+		{
+			options->align_call_args = AlignCallArgs::OnlyNotExistCrossExpression;
+		}
 	}
 
 	if (configMap.count("align_chained_expression_statement"))

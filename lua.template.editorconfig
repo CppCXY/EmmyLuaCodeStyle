@@ -30,7 +30,7 @@ insert_final_newline = true
 # [function]
 
 # function call expression's args will align to first arg
-# optional true/false/only_after_more_indention_statement
+# optional true/false/only_after_more_indention_statement/only_not_exist_cross_row_expression
 align_call_args = false
 
 # if true, all function define params will align to first param

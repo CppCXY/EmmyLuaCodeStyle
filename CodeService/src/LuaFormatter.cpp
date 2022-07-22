@@ -1261,8 +1261,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 								if (!expression->GetChildren().empty())
 								{
 									auto first = expression->GetChildren().front();
-									if (first->GetType() == LuaAstNodeType::ClosureExpression || first->GetType() ==
-										LuaAstNodeType::TableExpression)
+									if (first->GetType() == LuaAstNodeType::ClosureExpression 
+										|| first->GetType() == LuaAstNodeType::TableExpression
+										|| _options.align_call_args == AlignCallArgs::OnlyNotExistCrossExpression)
 									{
 										canAligned = false;
 										break;
