@@ -23,7 +23,7 @@ keep_one_space_between_namedef_and_attribute = true
 
 # [function]
 # function call expression's args will align to first arg
-# however, if the args has cross row arg, it will not be aligned to the first arg
+# optional true/false/only_after_more_indention_statement
 align_call_args = false
 
 

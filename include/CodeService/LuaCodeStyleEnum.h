@@ -22,3 +22,9 @@ enum class CallArgParentheses : int
 	UnambiguousRemoveStringOnly
 };
 
+enum class AlignCallArgs
+{
+	True,
+	False,
+	OnlyAfterMoreIndentionStatement
+};

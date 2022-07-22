@@ -1245,7 +1245,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 		case LuaAstNodeType::ExpressionList:
 			{
 				std::shared_ptr<FormatElement> layout = nullptr;
-				if (_options.align_call_args)
+				if (_options.align_call_args != AlignCallArgs::False)
 				{
 					bool canAligned = true;
 					// 但是如果表达式列表中出现跨行表达式,则采用长表达式对齐
@@ -1270,6 +1270,14 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 								}
 							}
 						}
+					}
+
+					if(canAligned 
+						&& _options.align_call_args == AlignCallArgs::OnlyAfterMoreIndentionStatement
+						&& (!ast_util::IsNodeAfterMoreIndentionStatement(child))
+						)
+					{
+						canAligned = false;
 					}
 
 					if (canAligned)
