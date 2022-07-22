@@ -1,7 +1,7 @@
 
 # see https://github.com/CppCXY/EmmyLuaCodeStyle
 [*.lua]
-# [basic code reformat option]
+# [basic]
 # optional space/tab
 indent_style = space
 # if indent_style is space, this is valid
@@ -17,25 +17,34 @@ continuation_indent_size = 4
 # if true, continuation_indent_size for local or assign statement is invalid
 # however, if the expression list has cross row expression, it will not be aligned to the first expression
 local_assign_continuation_align_to_first_expression = false
+
+# if true, ormat like this "local t <const> = 1"
+keep_one_space_between_namedef_and_attribute = true
+
+# [function]
 # function call expression's args will align to first arg
 # however, if the args has cross row arg, it will not be aligned to the first arg
 align_call_args = false
+
+
 # if true, all function define params will align to first param
 align_function_define_params = true
-# 
+
+# [table]
+# see document for detail
+continuous_assign_table_field_align_to_equal_sign = true
+
+# [statement]
 align_chained_expression_statement = false
 # if true, format like this "local t = { 1, 2, 3 }"
 keep_one_space_between_table_and_bracket = true
 # if indent_style is tab, this option is invalid
 align_table_field_to_first_field = false
-# if true, ormat like this "local t <const> = 1"
-keep_one_space_between_namedef_and_attribute = true
 # continous line distance
 max_continuous_line_distance = 1
 # see document for detail
 continuous_assign_statement_align_to_equal_sign = true
-# see document for detail
-continuous_assign_table_field_align_to_equal_sign = true
+
 # if true, the label loses its current indentation
 label_no_indent = false
 # if true, there will be no indentation in the do statement
