@@ -70,6 +70,23 @@ void SerializeContext::PrintBlank(int blank)
 
 std::string SerializeContext::GetText()
 {
+	if (!_options.insert_final_newline && !_buffer.empty())
+	{
+		std::size_t validSize = _buffer.size();
+		for (; validSize >= 1; validSize--)
+		{
+			char ch = _buffer[validSize - 1];
+			if (ch != '\r' && ch != '\n')
+			{
+				break;
+			}
+		}
+		if (validSize > 0 && validSize <= _buffer.size())
+		{
+			_buffer.resize(validSize);
+		}
+	}
+
 	return std::move(_buffer);
 }
 

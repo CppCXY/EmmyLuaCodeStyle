@@ -206,12 +206,6 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnFormatting(
 
 	auto result = std::make_shared<vscode::DocumentFormattingResult>();
 
-	if (totalLine == 0)
-	{
-		result->hasError = true;
-		return result;
-	}
-
 	auto options = LanguageClient::GetInstance().GetOptions(param->textDocument.uri);
 
 	if (parser->HasError())
@@ -343,6 +337,12 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 
 	auto formatResult = LanguageClient::GetInstance().GetService<CodeFormatService>()->RangeFormat(
 		formattedRange, parser, options);
+
+	auto totalLine = parser->GetTotalLine();
+	if(totalLine == position.line)
+	{
+		formatResult.push_back('\n');
+	}
 
 	auto& edit = result->edits.emplace_back();
 	edit.newText = std::move(formatResult);
