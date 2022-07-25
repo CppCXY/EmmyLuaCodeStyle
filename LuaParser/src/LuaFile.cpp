@@ -133,6 +133,7 @@ bool LuaFile::IsEmptyLine(int line)
 void LuaFile::PushLine(int offset)
 {
 	_lineOffsetVec.push_back(offset);
+	_linenumber++;
 }
 
 bool LuaFile::OnlyEmptyCharBefore(int offset)

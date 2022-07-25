@@ -33,7 +33,7 @@ std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename)
 std::shared_ptr<LuaParser> LuaParser::LoadFromBuffer(std::string&& buffer)
 {
 	auto file = std::make_shared<LuaFile>("chunk", std::move(buffer));
-	
+
 	auto tokenParser = std::make_shared<LuaTokenParser>(file);
 
 	return std::make_shared<LuaParser>(tokenParser);
@@ -205,7 +205,7 @@ void LuaParser::StatementList(std::shared_ptr<LuaAstNode> blockNode)
 
 void LuaParser::Statement(std::shared_ptr<LuaAstNode> blockNode)
 {
-	switch (_tokenParser->Current().TokenType)
+	switch (_tokenParser->CurrentWithComment().TokenType)
 	{
 	case ';':
 		{
@@ -274,6 +274,18 @@ void LuaParser::Statement(std::shared_ptr<LuaAstNode> blockNode)
 	case TK_GOTO:
 		{
 			GotoStatement(blockNode);
+			break;
+		}
+	case TK_LONG_COMMENT:
+	case TK_SHORT_COMMENT:
+	case TK_SHEBANG:
+		{
+			Comment(blockNode);
+			break;
+		}
+	case TK_DOC_COMMENT:
+		{
+			_tokenParser->Next();
 			break;
 		}
 	default:
@@ -553,6 +565,35 @@ void LuaParser::AssignStatement(std::shared_ptr<LuaAstNode> expressionListNode,
 	}
 }
 
+void LuaParser::Comment(std::shared_ptr<LuaAstNode> block)
+{
+	std::shared_ptr<LuaAstNode> commentAst = CreateAstNode(LuaAstNodeType::Comment);
+	if (_tokenParser->Current().TokenType == TK_SHORT_COMMENT)
+	{
+		commentAst->AddChild(CreateAstNodeFromCurrentToken(LuaAstNodeType::ShortComment));
+	}
+	else if (_tokenParser->Current().TokenType == TK_LONG_COMMENT)
+	{
+		commentAst->AddChild(CreateAstNodeFromCurrentToken(LuaAstNodeType::LongComment));
+	}
+	else
+	{
+		commentAst->AddChild(CreateAstNodeFromCurrentToken(LuaAstNodeType::ShebangComment));
+	}
+	_tokenParser->Next();
+
+	block->AddChild(commentAst);
+}
+
+void LuaParser::DocStatement(std::shared_ptr<LuaAstNode> blockNode)
+{
+
+	// 退化情况
+	std::shared_ptr<LuaAstNode> commentAst = CreateAstNode(LuaAstNodeType::Comment);
+	commentAst->AddChild(CreateAstNodeFromCurrentToken(LuaAstNodeType::ShortComment));
+
+	blockNode->AddChild(commentAst);
+}
 
 void LuaParser::Condition(std::shared_ptr<LuaAstNode> parent)
 {

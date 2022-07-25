@@ -68,16 +68,8 @@ bool LuaTokenParser::Parse()
 
 		if (!text.empty())
 		{
-			if (type == TK_LONG_COMMENT || type == TK_SHEBANG || type == TK_SHORT_COMMENT)
-			{
-				_commentTokens.emplace_back(type, text, TextRange(
-					                            static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
-			}
-			else
-			{
-				_tokens.emplace_back(type, text, TextRange(
-					                     static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
-			}
+			_tokens.emplace_back(type, text, TextRange(
+				static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
 		}
 		else
 		{
@@ -119,6 +111,37 @@ LuaToken& LuaTokenParser::LookAhead()
 }
 
 LuaToken& LuaTokenParser::Current()
+{
+	if (_currentIndex < _tokens.size())
+	{
+		do
+		{
+			switch (_tokens[_currentIndex].TokenType)
+			{
+			case TK_DOC_COMMENT:
+			case TK_SHORT_COMMENT:
+			case TK_LONG_COMMENT:
+			case TK_SHEBANG:
+				{
+					_commentTokens.push_back(_tokens[_currentIndex]);
+					Next();
+					break;
+				}
+			default:
+				{
+					goto endLoop;
+				}
+			}
+		}
+		while (true);
+	endLoop:
+		return _tokens[_currentIndex];
+	}
+
+	return _eosToken;
+}
+
+LuaToken& LuaTokenParser::CurrentWithComment()
 {
 	if (_currentIndex < _tokens.size())
 	{
@@ -228,6 +251,7 @@ LuaTokenType LuaTokenParser::Lex()
 				// is comment
 				SaveAndNext();
 
+				LuaTokenType type = TK_SHORT_COMMENT;
 				if (GetCurrentChar() == '[')
 				{
 					std::size_t sep = SkipSep();
@@ -237,6 +261,11 @@ LuaTokenType LuaTokenParser::Lex()
 						return TK_LONG_COMMENT;
 					}
 				}
+				else if (GetCurrentChar() == '-')
+				{
+					SaveAndNext();
+					type = TK_DOC_COMMENT;
+				}
 
 				// is short comment
 				while (!CurrentIsNewLine() && GetCurrentChar() != EOZ)
@@ -244,7 +273,7 @@ LuaTokenType LuaTokenParser::Lex()
 					SaveAndNext();
 				}
 
-				return TK_SHORT_COMMENT;
+				return type;
 			}
 		case '[':
 			{
@@ -343,7 +372,7 @@ LuaTokenType LuaTokenParser::Lex()
 			}
 		case '"':
 		case '\'':
-			// extend support
+		// extend support
 		case '`':
 			{
 				ReadString(ch);
@@ -810,6 +839,17 @@ std::string_view LuaTokenParser::GetSaveText() const
 bool LuaTokenParser::IsReserved(std::string_view text)
 {
 	return LuaReserved.find(text) != LuaReserved.end();
+}
+
+bool LuaTokenParser::IsInlineComment()
+{
+	if (_tokens.empty())
+	{
+		return false;
+	}
+
+	auto lastTokenLine = _file->GetLine(_tokens.back().Range.EndOffset);
+	return _file->GetLine(static_cast<int>(_buffStart)) == lastTokenLine;
 }
 
 void LuaTokenParser::PushLuaError(std::string_view message, TextRange range)

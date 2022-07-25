@@ -28,6 +28,8 @@ public:
 
 	LuaToken& Current();
 
+	LuaToken& CurrentWithComment();
+
 	int LastValidOffset();
 
 	std::string_view GetSource();
@@ -83,6 +85,8 @@ private:
 	std::string_view GetSaveText() const;
 
 	bool IsReserved(std::string_view text);
+
+	bool IsInlineComment();
 
 	void PushLuaError(std::string_view message, TextRange range);
 

@@ -47,6 +47,7 @@ enum LuaTokenTypeDetail : int
 	TK_STRING,
 	// custom
 	TK_SHORT_COMMENT,// 短注释
+	TK_DOC_COMMENT, // emmylua doc
 	TK_LONG_COMMENT, //长注释
 	TK_SHEBANG, //shebang
 	TK_UNKNOWN //对自定义tokenParser来说是未知

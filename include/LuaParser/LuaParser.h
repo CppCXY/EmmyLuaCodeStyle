@@ -79,6 +79,10 @@ private:
 
 	void AssignStatement(std::shared_ptr<LuaAstNode> expressionListNode, std::shared_ptr<LuaAstNode> assignStatementNode);
 
+	void Comment(std::shared_ptr<LuaAstNode> block);
+
+	void DocStatement(std::shared_ptr<LuaAstNode> blockNode);
+
 	void ForNumber(std::shared_ptr<LuaAstNode> forStatement);
 
 	void ForList(std::shared_ptr<LuaAstNode> forStatement);
