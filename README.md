@@ -28,6 +28,7 @@
 * [格式化行为介绍](docs/format_action.md)
 * [如何配置格式化](docs/format_config.md)
 * [代码诊断配置](docs/diagnosis_config.md)
+* [部分屏蔽格式化](docs/disable_format.md)
 * [auto import配置](docs/auto_import_config.md)
 # Contribute
 
