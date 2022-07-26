@@ -68,8 +68,24 @@ bool LuaTokenParser::Parse()
 
 		if (!text.empty())
 		{
-			_tokens.emplace_back(type, text, TextRange(
-				static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
+			switch (type)
+			{
+			case TK_DOC_COMMENT:
+			case TK_SHORT_COMMENT:
+			case TK_LONG_COMMENT:
+			case TK_SHEBANG:
+				{
+					_commentTokens.emplace_back(type, text,
+					                            TextRange(static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
+					break;
+				}
+			default:
+				{
+					_tokens.emplace_back(type, text,
+					                     TextRange(static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
+					break;
+				}
+			}
 		}
 		else
 		{
@@ -88,15 +104,14 @@ bool LuaTokenParser::Parse()
 	return true;
 }
 
-LuaToken& LuaTokenParser::Next()
+void LuaTokenParser::Next()
 {
 	if (_currentIndex < _tokens.size())
 	{
-		return _tokens[_currentIndex++];
+		_currentIndex++;
 	}
-
-	return _eosToken;
 }
+
 
 LuaToken& LuaTokenParser::LookAhead()
 {
@@ -114,42 +129,12 @@ LuaToken& LuaTokenParser::Current()
 {
 	if (_currentIndex < _tokens.size())
 	{
-		do
-		{
-			switch (_tokens[_currentIndex].TokenType)
-			{
-			case TK_DOC_COMMENT:
-			case TK_SHORT_COMMENT:
-			case TK_LONG_COMMENT:
-			case TK_SHEBANG:
-				{
-					_commentTokens.push_back(_tokens[_currentIndex]);
-					Next();
-					break;
-				}
-			default:
-				{
-					goto endLoop;
-				}
-			}
-		}
-		while (true);
-	endLoop:
 		return _tokens[_currentIndex];
 	}
 
 	return _eosToken;
 }
 
-LuaToken& LuaTokenParser::CurrentWithComment()
-{
-	if (_currentIndex < _tokens.size())
-	{
-		return _tokens[_currentIndex];
-	}
-
-	return _eosToken;
-}
 
 int LuaTokenParser::LastValidOffset()
 {

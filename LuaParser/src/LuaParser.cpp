@@ -155,17 +155,34 @@ void LuaParser::BuildAstWithComment()
 		for (auto& comment : comments)
 		{
 			std::shared_ptr<LuaAstNode> commentAst = CreateAstNode(LuaAstNodeType::Comment);
-			if (comment.TokenType == TK_SHORT_COMMENT)
+			switch (comment.TokenType)
 			{
-				commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::ShortComment, comment));
-			}
-			else if (comment.TokenType == TK_LONG_COMMENT)
-			{
-				commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::LongComment, comment));
-			}
-			else
-			{
-				commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::ShebangComment, comment));
+			case TK_SHORT_COMMENT:
+				{
+					commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::ShortComment, comment));
+					break;
+				}
+			case TK_LONG_COMMENT:
+				{
+					commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::LongComment, comment));
+					break;
+				}
+			case TK_SHEBANG:
+				{
+					commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::ShebangComment, comment));
+					break;
+				}
+			case TK_DOC_COMMENT:
+				{
+					auto shortComment = CreateAstNodeFromToken(LuaAstNodeType::ShortComment, comment);
+					DocStatement(shortComment, comment);
+					commentAst->AddChild(shortComment);
+					break;
+				}
+			default:
+				{
+					break;
+				}
 			}
 
 			blockNode->AddComment(commentAst);
@@ -205,7 +222,7 @@ void LuaParser::StatementList(std::shared_ptr<LuaAstNode> blockNode)
 
 void LuaParser::Statement(std::shared_ptr<LuaAstNode> blockNode)
 {
-	switch (_tokenParser->CurrentWithComment().TokenType)
+	switch (_tokenParser->Current().TokenType)
 	{
 	case ';':
 		{
@@ -274,18 +291,6 @@ void LuaParser::Statement(std::shared_ptr<LuaAstNode> blockNode)
 	case TK_GOTO:
 		{
 			GotoStatement(blockNode);
-			break;
-		}
-	case TK_LONG_COMMENT:
-	case TK_SHORT_COMMENT:
-	case TK_SHEBANG:
-		{
-			Comment(blockNode);
-			break;
-		}
-	case TK_DOC_COMMENT:
-		{
-			_tokenParser->Next();
 			break;
 		}
 	default:
@@ -585,14 +590,45 @@ void LuaParser::Comment(std::shared_ptr<LuaAstNode> block)
 	block->AddChild(commentAst);
 }
 
-void LuaParser::DocStatement(std::shared_ptr<LuaAstNode> blockNode)
+void LuaParser::DocStatement(std::shared_ptr<LuaAstNode> comment, LuaToken& docComment)
 {
+	LuaDocTokenParser docTokenParser(docComment.Text, docComment.Range);
+	docTokenParser.Next();
 
-	// 退化情况
-	std::shared_ptr<LuaAstNode> commentAst = CreateAstNode(LuaAstNodeType::Comment);
-	commentAst->AddChild(CreateAstNodeFromCurrentToken(LuaAstNodeType::ShortComment));
+	switch (docTokenParser.Current().TokenType)
+	{
+	case TK_DOC_TAG_FORMAT:
+		{
+			DocTagFormatStatement(comment, docTokenParser);
+			break;
+		}
+	default:
+		{
+			break;
+		}
+	}
+}
 
-	blockNode->AddChild(commentAst);
+void LuaParser::DocTagFormatStatement(std::shared_ptr<LuaAstNode> comment, LuaDocTokenParser& docTokenParser)
+{
+	auto docFormat = CreateAstNodeFromToken(LuaAstNodeType::DocTagFormat, docTokenParser.Current());
+
+	docTokenParser.Next();
+	switch (docTokenParser.Current().TokenType)
+	{
+	case TK_DOC_DISABLE:
+	case TK_DOC_DISABLE_NEXT:
+		{
+			docFormat->AddChild(CreateAstNodeFromToken(LuaAstNodeType::KeyWord, docTokenParser.Current()));
+			break;
+		}
+	default:
+		{
+			return;
+		}
+	}
+
+	comment->AddChild(docFormat);
 }
 
 void LuaParser::Condition(std::shared_ptr<LuaAstNode> parent)

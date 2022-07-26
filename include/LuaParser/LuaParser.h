@@ -4,6 +4,7 @@
 #include "LuaTokenParser.h"
 #include "LuaOperatorType.h"
 #include "LuaAttribute.h"
+#include "LuaDocTokenParser.h"
 #include "LuaAstNode/LuaAstNode.h"
 
 class LuaParser
@@ -81,7 +82,9 @@ private:
 
 	void Comment(std::shared_ptr<LuaAstNode> block);
 
-	void DocStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void DocStatement(std::shared_ptr<LuaAstNode> blockNode, LuaToken& docComment);
+
+	void DocTagFormatStatement(std::shared_ptr<LuaAstNode> blockNode, LuaDocTokenParser& docTokenParser);
 
 	void ForNumber(std::shared_ptr<LuaAstNode> forStatement);
 

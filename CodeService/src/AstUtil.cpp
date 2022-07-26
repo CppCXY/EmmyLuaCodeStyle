@@ -317,3 +317,16 @@ bool ast_util::IsNodeAfterMoreIndentionStatement(std::shared_ptr<LuaAstNode> nod
 
 	return false;
 }
+
+bool ast_util::IsTagFormat(std::shared_ptr<LuaAstNode> comment)
+{
+	auto shortComment = comment->FindFirstOf(LuaAstNodeType::ShortComment);
+	if (shortComment)
+	{
+		return shortComment->FindFirstOf(LuaAstNodeType::DocTagFormat) != nullptr;
+	}
+	return false;
+}
+
+
+

@@ -22,13 +22,11 @@ public:
 
 	bool Parse();
 
-	LuaToken& Next();
+	void Next();
 
 	LuaToken& LookAhead();
 
 	LuaToken& Current();
-
-	LuaToken& CurrentWithComment();
 
 	int LastValidOffset();
 

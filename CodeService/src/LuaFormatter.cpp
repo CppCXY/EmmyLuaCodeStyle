@@ -267,9 +267,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::AssignStatement:
 		case LuaAstNodeType::LocalStatement:
 			{
-				if (NextMatch(it, LuaAstNodeType::AssignStatement, statements)
-					|| NextMatch(it, LuaAstNodeType::LocalStatement, statements)
-					|| NextMatch(it, LuaAstNodeType::Comment, statements))
+				if (!indentEnv->IsDisableEnv()
+					&& (NextMatch(it, LuaAstNodeType::AssignStatement, statements)
+						|| NextMatch(it, LuaAstNodeType::LocalStatement, statements)
+						|| NextMatch(it, LuaAstNodeType::Comment, statements)))
 				{
 					indentEnv->AddChild(FormatAlignStatement(it, statements));
 				}
@@ -331,6 +332,28 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 					commentStatement->AddChild(comment);
 					indentEnv->AddChild(commentStatement);
 					indentEnv->Add<KeepLineElement>();
+
+					// emmylua doc ---@format
+					auto shortComment = statement->FindFirstOf(LuaAstNodeType::ShortComment);
+					if (shortComment)
+					{
+						auto docTagFormat = shortComment->FindFirstOf(LuaAstNodeType::DocTagFormat);
+						if (docTagFormat)
+						{
+							auto disableKeyWorld = docTagFormat->FindFirstOf(LuaAstNodeType::KeyWord);
+							if (disableKeyWorld)
+							{
+								if (disableKeyWorld->GetTokenType() == TK_DOC_DISABLE)
+								{
+									indentEnv->EnableDisableFormat();
+								}
+								else if (disableKeyWorld->GetTokenType() == TK_DOC_DISABLE_NEXT)
+								{
+									indentEnv->EnableDisableNext();
+								}
+							}
+						}
+					}
 				}
 				break;
 			}
@@ -1261,7 +1284,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 								if (!expression->GetChildren().empty())
 								{
 									auto first = expression->GetChildren().front();
-									if (first->GetType() == LuaAstNodeType::ClosureExpression 
+									if (first->GetType() == LuaAstNodeType::ClosureExpression
 										|| first->GetType() == LuaAstNodeType::TableExpression
 										|| _options.align_call_args == AlignCallArgs::OnlyNotExistCrossExpression)
 									{
@@ -1273,10 +1296,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 						}
 					}
 
-					if(canAligned 
+					if (canAligned
 						&& _options.align_call_args == AlignCallArgs::OnlyAfterMoreIndentionStatement
 						&& (!ast_util::IsNodeAfterMoreIndentionStatement(child))
-						)
+					)
 					{
 						canAligned = false;
 					}
@@ -1782,6 +1805,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 		int nextLine = _parser->GetLine(nextChild->GetTextRange().StartOffset);
 		// 这个规则是下一个连续的赋值/local/注释语句如果和上一个赋值/local/注释语句 间距2行以上，则不认为是连续
 		if (nextLine - currentLine > _options.max_continuous_line_distance)
+		{
+			break;
+		}
+
+		if (nextChild->GetType() == LuaAstNodeType::Comment && ast_util::IsTagFormat(nextChild))
 		{
 			break;
 		}

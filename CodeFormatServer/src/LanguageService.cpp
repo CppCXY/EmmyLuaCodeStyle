@@ -339,7 +339,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 		formattedRange, parser, options);
 
 	auto totalLine = parser->GetTotalLine();
-	if(totalLine == position.line)
+	if(totalLine == position.line && !options->insert_final_newline)
 	{
 		formatResult.push_back('\n');
 	}
