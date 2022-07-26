@@ -106,7 +106,10 @@ enum class LuaAstNodeType
 
 	LongComment,
 
-	ShebangComment
+	ShebangComment,
+
+	DocTagFormat,
+
 };
 
 

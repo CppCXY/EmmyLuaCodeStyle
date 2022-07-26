@@ -20,4 +20,7 @@ namespace ast_util
 	bool WillIndexExpressionFormatError(std::shared_ptr<LuaAstNode> expression);
 
 	bool IsNodeAfterMoreIndentionStatement(std::shared_ptr<LuaAstNode> node);
+
+	bool IsTagFormat(std::shared_ptr<LuaAstNode> comment);
+
 }

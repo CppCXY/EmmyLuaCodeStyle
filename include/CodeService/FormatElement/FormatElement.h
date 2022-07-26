@@ -31,7 +31,7 @@ public:
 
 	TextRange GetTextRange();
 
-	void AddChild(std::shared_ptr<FormatElement> child);
+	virtual void AddChild(std::shared_ptr<FormatElement> child);
 
 	void AddChildren(ChildContainer& children);
 

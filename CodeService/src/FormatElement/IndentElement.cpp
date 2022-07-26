@@ -1,12 +1,15 @@
 #include "CodeService/FormatElement/IndentElement.h"
 #include "Util/format.h"
 #include "CodeService/FormatElement/FormatElement.h"
+#include "CodeService/FormatElement/StatementElement.h"
+#include "CodeService/FormatElement/TextElement.h"
 
 IndentElement::IndentElement()
 	: FormatElement(),
 	  _specialIndent(0),
 	  _style(IndentStyle::Space),
-	  _defaultIndent(true)
+	  _defaultIndent(true),
+	  _formatControl(DisableFormat::None)
 {
 }
 
@@ -21,6 +24,53 @@ IndentElement::IndentElement(std::size_t specialIndent, IndentStyle style)
 FormatElementType IndentElement::GetType()
 {
 	return FormatElementType::IndentElement;
+}
+
+void IndentElement::EnableDisableNext()
+{
+	if (_formatControl == DisableFormat::None) {
+		_formatControl = DisableFormat::DisableNext;
+	}
+}
+
+void IndentElement::EnableDisableFormat()
+{
+	_formatControl = DisableFormat::Disable;
+}
+
+bool IndentElement::IsDisableEnv()
+{
+	return _formatControl != DisableFormat::None;
+}
+
+void IndentElement::AddChild(std::shared_ptr<FormatElement> child)
+{
+	switch (_formatControl)
+	{
+	case DisableFormat::None:
+		{
+			return FormatElement::AddChild(child);
+		}
+	case DisableFormat::DisableNext:
+		{
+			if (child->Is(FormatElementType::StatementElement))
+			{
+				auto statement = std::dynamic_pointer_cast<StatementElement>(child);
+				statement->SetDisableFormat();
+				_formatControl = DisableFormat::None;
+			}
+			return FormatElement::AddChild(child);
+		}
+	case DisableFormat::Disable:
+		{
+			if (child->Is(FormatElementType::StatementElement))
+			{
+				auto statement = std::dynamic_pointer_cast<StatementElement>(child);
+				statement->SetDisableFormat();
+			}
+			return FormatElement::AddChild(child);
+		}
+	}
 }
 
 void IndentElement::Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)

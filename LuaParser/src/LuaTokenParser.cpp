@@ -68,15 +68,23 @@ bool LuaTokenParser::Parse()
 
 		if (!text.empty())
 		{
-			if (type == TK_LONG_COMMENT || type == TK_SHEBANG || type == TK_SHORT_COMMENT)
+			switch (type)
 			{
-				_commentTokens.emplace_back(type, text, TextRange(
-					                            static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
-			}
-			else
-			{
-				_tokens.emplace_back(type, text, TextRange(
-					                     static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
+			case TK_DOC_COMMENT:
+			case TK_SHORT_COMMENT:
+			case TK_LONG_COMMENT:
+			case TK_SHEBANG:
+				{
+					_commentTokens.emplace_back(type, text,
+					                            TextRange(static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
+					break;
+				}
+			default:
+				{
+					_tokens.emplace_back(type, text,
+					                     TextRange(static_cast<int>(_buffStart), static_cast<int>(_buffIndex)));
+					break;
+				}
 			}
 		}
 		else
@@ -96,15 +104,14 @@ bool LuaTokenParser::Parse()
 	return true;
 }
 
-LuaToken& LuaTokenParser::Next()
+void LuaTokenParser::Next()
 {
 	if (_currentIndex < _tokens.size())
 	{
-		return _tokens[_currentIndex++];
+		_currentIndex++;
 	}
-
-	return _eosToken;
 }
+
 
 LuaToken& LuaTokenParser::LookAhead()
 {
@@ -127,6 +134,7 @@ LuaToken& LuaTokenParser::Current()
 
 	return _eosToken;
 }
+
 
 int LuaTokenParser::LastValidOffset()
 {
@@ -228,6 +236,7 @@ LuaTokenType LuaTokenParser::Lex()
 				// is comment
 				SaveAndNext();
 
+				LuaTokenType type = TK_SHORT_COMMENT;
 				if (GetCurrentChar() == '[')
 				{
 					std::size_t sep = SkipSep();
@@ -237,6 +246,11 @@ LuaTokenType LuaTokenParser::Lex()
 						return TK_LONG_COMMENT;
 					}
 				}
+				else if (GetCurrentChar() == '-')
+				{
+					SaveAndNext();
+					type = TK_DOC_COMMENT;
+				}
 
 				// is short comment
 				while (!CurrentIsNewLine() && GetCurrentChar() != EOZ)
@@ -244,7 +258,7 @@ LuaTokenType LuaTokenParser::Lex()
 					SaveAndNext();
 				}
 
-				return TK_SHORT_COMMENT;
+				return type;
 			}
 		case '[':
 			{
@@ -343,7 +357,7 @@ LuaTokenType LuaTokenParser::Lex()
 			}
 		case '"':
 		case '\'':
-			// extend support
+		// extend support
 		case '`':
 			{
 				ReadString(ch);
@@ -810,6 +824,17 @@ std::string_view LuaTokenParser::GetSaveText() const
 bool LuaTokenParser::IsReserved(std::string_view text)
 {
 	return LuaReserved.find(text) != LuaReserved.end();
+}
+
+bool LuaTokenParser::IsInlineComment()
+{
+	if (_tokens.empty())
+	{
+		return false;
+	}
+
+	auto lastTokenLine = _file->GetLine(_tokens.back().Range.EndOffset);
+	return _file->GetLine(static_cast<int>(_buffStart)) == lastTokenLine;
 }
 
 void LuaTokenParser::PushLuaError(std::string_view message, TextRange range)
