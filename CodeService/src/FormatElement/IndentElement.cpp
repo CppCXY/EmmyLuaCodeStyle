@@ -38,7 +38,7 @@ void IndentElement::EnableDisableFormat()
 	_formatControl = DisableFormat::Disable;
 }
 
-bool IndentElement::IsDisableEnv()
+bool IndentElement::IsDisableEnv() const
 {
 	return _formatControl != DisableFormat::None;
 }

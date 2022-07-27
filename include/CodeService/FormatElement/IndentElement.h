@@ -21,7 +21,7 @@ public:
 
 	void EnableDisableFormat();
 
-	bool IsDisableEnv();
+	bool IsDisableEnv() const;
 
 	void AddChild(std::shared_ptr<FormatElement> child) override;
 

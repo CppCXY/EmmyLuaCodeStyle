@@ -491,6 +491,8 @@ void LuaParser::BreakStatement(std::shared_ptr<LuaAstNode> blockNode)
 	auto breakStatement = CreateAstNode(LuaAstNodeType::BreakStatement);
 
 	CheckAndNext(TK_BREAK, breakStatement);
+
+	TestNext(';', breakStatement, LuaAstNodeType::GeneralOperator);
 	blockNode->AddChild(breakStatement);
 }
 
@@ -502,6 +504,7 @@ void LuaParser::GotoStatement(std::shared_ptr<LuaAstNode> blockNode)
 
 	CheckName(gotoStatement);
 
+	TestNext(';', gotoStatement, LuaAstNodeType::GeneralOperator);
 	blockNode->AddChild(gotoStatement);
 }
 
