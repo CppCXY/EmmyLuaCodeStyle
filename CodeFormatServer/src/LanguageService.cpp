@@ -300,7 +300,7 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnRangeFormatting(
 
 	LuaFormatRange formatRange(static_cast<int>(param->range.start.line), static_cast<int>(param->range.end.line));
 	auto formatResult = LanguageClient::GetInstance().GetService<CodeFormatService>()->RangeFormat(
-		formatRange, parser, options);
+		formatRange, parser, *options);
 
 	auto& edit = result->edits.emplace_back();
 	edit.newText = std::move(formatResult);
@@ -332,17 +332,14 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 		return result;
 	}
 
+	LuaCodeStyleOptions tempOptions = *options;
+	tempOptions.insert_final_newline = true;
 
 	LuaFormatRange formattedRange(static_cast<int>(position.line) - 1, static_cast<int>(position.line) - 1);
 
 	auto formatResult = LanguageClient::GetInstance().GetService<CodeFormatService>()->RangeFormat(
-		formattedRange, parser, options);
+		formattedRange, parser, tempOptions);
 
-	auto totalLine = parser->GetTotalLine();
-	if(totalLine == position.line && !options->insert_final_newline)
-	{
-		formatResult.push_back('\n');
-	}
 
 	auto& edit = result->edits.emplace_back();
 	edit.newText = std::move(formatResult);
