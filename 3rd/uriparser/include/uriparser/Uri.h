@@ -1,4 +1,4 @@
-/* 6db8b5726a796167bb96b3d83ff9ac6792a01474dbe3778deb3c2a25d60b3693 (0.9.5+)
+/* 0beb20dace01f4b2fa24c3bf9f7e8e616f621e4697260805a2b63a4d190e64c0 (0.9.6+)
  *
  * uriparser - RFC 3986 URI parsing library
  *
@@ -769,7 +769,7 @@ URI_PUBLIC int URI_FUNC(WindowsFilenameToUriString)(const URI_CHAR * filename,
 
 /**
  * Extracts a Unix filename from a %URI string.
- * The destination buffer must be large enough to hold len(uriString) + 1 - 7
+ * The destination buffer must be large enough to hold len(uriString) + 1 - 5
  * characters in case of an absolute %URI or len(uriString) + 1 in case
  * of a relative %URI.
  *

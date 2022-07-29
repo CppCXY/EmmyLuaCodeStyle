@@ -41,7 +41,7 @@
 
 
 
-#define PACKAGE_VERSION "0.9.5"
+#define PACKAGE_VERSION "0.9.6"
 
 /* #undef HAVE_WPRINTF */
 /* #undef HAVE_REALLOCARRAY */

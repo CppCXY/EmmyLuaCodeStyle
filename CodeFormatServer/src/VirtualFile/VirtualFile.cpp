@@ -108,9 +108,31 @@ void VirtualFile::UpdateFile(std::vector<vscode::TextDocumentContentChangeEvent>
 	UpdateFile(std::move(text));
 }
 
+std::string FilePath2FileName(std::string_view filePath)
+{
+	if(filePath.empty())
+	{
+		return "";
+	}
+
+	
+	for(std::size_t index = filePath.size(); index > 0; index--)
+	{
+		char c = filePath[index - 1];
+		if(c == '/' || c == '\\')
+		{
+			return std::string(filePath.substr(index));
+		}
+	}
+
+	return std::string(filePath);
+}
+
+
 void VirtualFile::UpdateFile(std::string&& text)
 {
-	_luaFile = std::make_shared<LuaFile>(std::filesystem::path(url::UrlToFilePath(_fileUri)).filename().string(),
+	auto filePath = url::UrlToFilePath(_fileUri);
+	_luaFile = std::make_shared<LuaFile>(FilePath2FileName(filePath),
 	                                     std::move(text));
 	++_version;
 	MakeParser();

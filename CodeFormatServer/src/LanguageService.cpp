@@ -315,10 +315,11 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 	std::shared_ptr<vscode::TextDocumentPositionParams> param)
 {
 	auto parser = LanguageClient::GetInstance().GetFileParser(param->textDocument.uri);
+
 	auto position = param->position;
 
 	auto result = std::make_shared<vscode::DocumentFormattingResult>();
-	if (parser->IsEmptyLine(static_cast<int>(position.line) - 1))
+	if (!parser || parser->IsEmptyLine(static_cast<int>(position.line) - 1))
 	{
 		result->hasError = true;
 		return result;
