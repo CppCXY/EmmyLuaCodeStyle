@@ -49,6 +49,8 @@ public:
 
 	void CopyFrom(std::shared_ptr<FormatElement> node);
 
+	void TrimEnd();
+
 	void Reset();
 protected:
 	static std::shared_ptr<FormatElement> GetNextValidElement (ChildIterator& it, FormatElement& parent);

@@ -319,8 +319,9 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				if (last && _parser->GetLine(last->GetTextRange().EndOffset)
 					== _parser->GetLine(statement->GetTextRange().StartOffset))
 				{
-					if (!last->GetChildren().empty() && last->GetChildren().back()->HasValidTextRange())
+					if (!last->GetChildren().empty())
 					{
+						last->TrimEnd();
 						last->Add<KeepBlankElement>(_options.statement_inline_comment_space);
 					}
 					last->AddChild(FormatComment(statement));
@@ -1822,6 +1823,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 			auto lastStatementEnv = env->LastValidElement();
 			if (lastStatementEnv)
 			{
+				lastStatementEnv->TrimEnd();
 				lastStatementEnv->Add<KeepBlankElement>(_options.statement_inline_comment_space);
 				lastStatementEnv->AddChild(FormatNode(nextChild));
 			}

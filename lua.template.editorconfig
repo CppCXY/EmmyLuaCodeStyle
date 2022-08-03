@@ -69,6 +69,8 @@ if_condition_align_with_each_other = false
 # however, if the expression list has cross row expression, it will not be aligned to the first expression
 local_assign_continuation_align_to_first_expression = false
 
+statement_inline_comment_space = 1
+
 # [indentation]
 
 # if true, the label loses its current indentation
