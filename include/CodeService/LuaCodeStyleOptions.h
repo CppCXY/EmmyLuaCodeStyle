@@ -54,8 +54,6 @@ public:
 	 */
 	AlignCallArgs align_call_args = AlignCallArgs::False;
 
-	bool only_align_call_args_after_assignment = false;
-
 	/*
 	 * 函数定义的参数保持对齐到第一个参数
 	 * 函数的定义通常不会太长，这种默认行为是可以接受的

@@ -70,6 +70,10 @@ void AlignToFirstElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 
 			keepElement->AllowBreakLineSerialize(ctx, it, *this);
 		}
+		else if(child->Is(FormatElementType::SubExpressionElement))
+		{
+			SerializeSubExpression(ctx, *child);
+		}
 		else
 		{
 			child->Serialize(ctx, it, *this);
@@ -141,5 +145,28 @@ void AlignToFirstElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 	if (!_children.empty())
 	{
 		ctx.RecoverIndent();
+	}
+}
+
+void AlignToFirstElement::SerializeSubExpression(SerializeContext& ctx, FormatElement& parent)
+{
+	auto& children = parent.GetChildren();
+	for (auto it = children.begin(); it != children.end(); ++it)
+	{
+		auto child = *it;
+
+		if (child->Is(FormatElementType::SubExpressionElement))
+		{
+			SerializeSubExpression(ctx, *child);
+		}
+		else if (child->Is(FormatElementType::KeepElement))
+		{
+			auto keepElement = std::dynamic_pointer_cast<KeepElement>(child);
+			keepElement->AllowBreakLineSerialize(ctx, it, parent);
+		}
+		else
+		{
+			child->Serialize(ctx, it, parent);
+		}
 	}
 }
