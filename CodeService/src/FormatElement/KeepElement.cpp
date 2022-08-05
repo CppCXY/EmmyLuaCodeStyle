@@ -68,10 +68,17 @@ void KeepElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 
 	if (nextElementLine == lastElementLine)
 	{
-		if (nextOffset - lastOffset - 1 != _keepBlank)
+		if (nextOffset - lastOffset - 1 < _keepBlank)
 		{
-			ctx.PushDiagnosis(Util::format(LText("here need keep {} space"), _keepBlank),
-			                  TextRange(lastOffset, nextOffset), DiagnosisType::Blank);
+			ctx.PushDiagnosis(Util::format(LText("missing whitespace")),
+			                  TextRange(lastOffset, nextOffset),
+			                  DiagnosisType::Blank);
+		}
+		else
+		{
+			ctx.PushDiagnosis(Util::format(LText("multiple spaces")),
+			                  TextRange(lastOffset + 1, nextOffset - 1),
+			                  DiagnosisType::Blank);
 		}
 	}
 	else
@@ -82,7 +89,7 @@ void KeepElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 
 void KeepElement::AllowBreakLineSerialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
-	if(!_allowContinueIndent)
+	if (!_allowContinueIndent)
 	{
 		return Serialize(ctx, selfIt, parent);
 	}

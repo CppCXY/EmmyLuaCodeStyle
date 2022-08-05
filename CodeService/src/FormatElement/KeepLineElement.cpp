@@ -58,9 +58,11 @@ void KeepLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 		{
 			auto character = ctx.GetColumn(nextElementOffset);
 
-			ctx.PushDiagnosis(Util::format(LText("here need keep {} empty line"), _line),
-			                  LuaDiagnosisPosition(nextElementLine, character),
-			                  LuaDiagnosisPosition(nextElementLine + 1, 0), DiagnosisType::StatementLineSpace);
+			ctx.PushDiagnosis(
+				Util::format(
+					LText("expected {} blank lines, found {}"), _line, (nextElementLine - lastElementLine - 1)),
+				LuaDiagnosisPosition(nextElementLine, character),
+				LuaDiagnosisPosition(nextElementLine + 1, 0), DiagnosisType::StatementLineSpace);
 		}
 	}
 }
