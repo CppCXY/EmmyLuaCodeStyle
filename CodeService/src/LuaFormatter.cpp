@@ -268,9 +268,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::AssignStatement:
 		case LuaAstNodeType::LocalStatement:
 			{
-				if (NextMatch(it, LuaAstNodeType::AssignStatement, statements)
-					|| NextMatch(it, LuaAstNodeType::LocalStatement, statements)
-					|| NextMatch(it, LuaAstNodeType::Comment, statements))
+				if (!indentEnv->IsDisableEnv()
+					&& (NextMatch(it, LuaAstNodeType::AssignStatement, statements)
+						|| NextMatch(it, LuaAstNodeType::LocalStatement, statements)
+						|| NextMatch(it, LuaAstNodeType::Comment, statements)))
 				{
 					indentEnv->AddChild(FormatAlignStatement(it, statements));
 				}
@@ -342,6 +343,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 				{
 					if (!last->GetChildren().empty() && last->GetChildren().back()->HasValidTextRange())
 					{
+						last->TrimEnd();
 						last->Add<SpaceElement>(_options.statement_inline_comment_space);
 					}
 					last->AddChild(FormatComment(statement));
@@ -353,6 +355,28 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 					commentStatement->AddChild(comment);
 					indentEnv->AddChild(commentStatement);
 					indentEnv->Add<KeepLineElement>();
+
+					// emmylua doc ---@format
+					auto shortComment = statement->FindFirstOf(LuaAstNodeType::ShortComment);
+					if (shortComment)
+					{
+						auto docTagFormat = shortComment->FindFirstOf(LuaAstNodeType::DocTagFormat);
+						if (docTagFormat)
+						{
+							auto disableKeyWorld = docTagFormat->FindFirstOf(LuaAstNodeType::KeyWord);
+							if (disableKeyWorld)
+							{
+								if (disableKeyWorld->GetTokenType() == TK_DOC_DISABLE)
+								{
+									indentEnv->EnableDisableFormat();
+								}
+								else if (disableKeyWorld->GetTokenType() == TK_DOC_DISABLE_NEXT)
+								{
+									indentEnv->EnableDisableNext();
+								}
+							}
+						}
+					}
 				}
 				break;
 			}
@@ -1136,7 +1160,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIfStatement(std::shared_ptr<L
 	auto env = std::make_shared<StatementElement>();
 	auto& children = ifStatement->GetChildren();
 
-	std::vector<std::shared_ptr<PlaceholderElement>> placeholderExpressions;
+	// std::vector<std::shared_ptr<PlaceholderElement>> placeholderExpressions;
 
 	for (auto it = children.begin(); it != children.end(); ++it)
 	{
@@ -1825,6 +1849,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 			break;
 		}
 
+		if (nextChild->GetType() == LuaAstNodeType::Comment && ast_util::IsTagFormat(nextChild))
+		{
+			break;
+		}
+
 		// 检查是否会是内联注释 比如 local t = 123 -- inline comment
 		if ((currentChild->GetType() == LuaAstNodeType::LocalStatement || currentChild->GetType() ==
 				LuaAstNodeType::AssignStatement) && nextChild->GetType() == LuaAstNodeType::Comment
@@ -1833,6 +1862,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 			auto lastStatementEnv = env->LastValidElement();
 			if (lastStatementEnv)
 			{
+				lastStatementEnv->TrimEnd();
 				lastStatementEnv->Add<SpaceElement>(_options.statement_inline_comment_space);
 				lastStatementEnv->AddChild(FormatNode(nextChild));
 			}
@@ -2217,10 +2247,21 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBinaryExpression(std::shared_
 	auto& children = binaryExpression->GetChildren();
 	for (auto it = children.begin(); it != children.end(); ++it)
 	{
-		const auto current = *it;
-
-		FormatSubExpression(current, env);
-		env->Add<KeepElement>(1);
+		const auto child = *it;
+		switch (child->GetType())
+		{
+		case LuaAstNodeType::BinaryOperator:
+			{
+				env->Add<OperatorElement>(child);
+				env->Add<KeepElement>(1);
+				break;
+			}
+		default:
+			{
+				FormatSubExpression(child, env);
+				env->Add<KeepElement>(1);
+			}
+		}
 	}
 
 	return env;
@@ -2504,6 +2545,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 
 	return FormatExpression(expression, env);
 }
+
 //
 // std::shared_ptr<FormatElement> LuaFormatter::FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode,
 //                                                               LuaFormatRange& validRange)

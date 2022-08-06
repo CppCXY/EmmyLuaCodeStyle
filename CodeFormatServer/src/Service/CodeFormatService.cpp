@@ -88,9 +88,9 @@ std::string CodeFormatService::Format(std::shared_ptr<LuaParser> parser, std::sh
 
 std::string CodeFormatService::RangeFormat(LuaFormatRange& range,
                                            std::shared_ptr<LuaParser> parser,
-                                           std::shared_ptr<LuaCodeStyleOptions> options)
+                                           LuaCodeStyleOptions& options)
 {
-	LuaFormatter formatter(parser, *options);
+	LuaFormatter formatter(parser, options);
 	formatter.BuildFormattedElement();
 	return formatter.GetRangeFormattedText(range);
 }

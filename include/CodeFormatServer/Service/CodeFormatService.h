@@ -23,8 +23,7 @@ public:
 
 	std::string Format(std::shared_ptr<LuaParser> parser, std::shared_ptr<LuaCodeStyleOptions> options);
 
-	std::string RangeFormat(LuaFormatRange& range, std::shared_ptr<LuaParser> parser,
-	                        std::shared_ptr<LuaCodeStyleOptions> options);
+	std::string RangeFormat(LuaFormatRange& range, std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options);
 
 	void LoadDictionary(std::string_view path);
 

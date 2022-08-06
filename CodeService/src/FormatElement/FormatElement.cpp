@@ -31,6 +31,8 @@ void FormatElement::AddChild(std::shared_ptr<FormatElement> child)
 	_children.push_back(child);
 }
 
+
+
 void FormatElement::AddChildren(ChildContainer& children)
 {
 	for (const auto& child : children)
@@ -211,6 +213,19 @@ void FormatElement::CopyFrom(std::shared_ptr<FormatElement> node)
 {
 	_textRange = node->_textRange;
 	_children = node->_children;
+}
+
+void FormatElement::TrimEnd()
+{
+	if(_children.empty())
+	{
+		return;
+	}
+
+	while(!_children.empty() && !_children.back()->HasValidTextRange())
+	{
+		_children.pop_back();
+	}
 }
 
 void FormatElement::Reset()

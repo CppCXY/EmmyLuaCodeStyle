@@ -110,7 +110,7 @@ void LanguageClient::UpdateFile(std::string_view uri, vscode::Range range, std::
 	auto it = _fileMap.find(filename);
 	if (it == _fileMap.end())
 	{
-		auto virtualFile = std::make_shared<VirtualFile>(filename);
+		auto virtualFile = std::make_shared<VirtualFile>(uri);
 		virtualFile->UpdateFile(std::move(text));
 		_fileMap[filename] = virtualFile;
 	}

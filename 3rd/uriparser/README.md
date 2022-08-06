@@ -18,8 +18,11 @@ please check out [https://uriparser.github.io/](https://uriparser.github.io/).
 
 
 # Example use from an existing CMake project
+
 ```cmake
-project(hello VERSION 1.0)
+cmake_minimum_required(VERSION 3.3)
+
+project(hello VERSION 1.0.0)
 
 find_package(uriparser 0.9.2 CONFIG REQUIRED char wchar_t)
 

@@ -88,7 +88,7 @@ void CommandService::Reformat(std::shared_ptr<vscode::ExecuteCommandParams> para
 	auto& edit = change.emplace_back();
 	LuaFormatRange formattedRange(static_cast<int>(range.start.line), static_cast<int>(range.end.line));
 
-	auto formatResult = GetService<CodeFormatService>()->RangeFormat(formattedRange, parser, options);
+	auto formatResult = GetService<CodeFormatService>()->RangeFormat(formattedRange, parser, *options);
 
 	edit.newText = std::move(formatResult);
 

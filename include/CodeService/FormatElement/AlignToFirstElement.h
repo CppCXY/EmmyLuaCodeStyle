@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "FormatElement.h"
 
@@ -11,4 +11,6 @@ public:
 
 	void Serialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
 	void Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, FormatElement& parent) override;
+private:
+	void SerializeSubExpression(SerializeContext& ctx, FormatElement& parent);
 };

@@ -22,7 +22,7 @@ public:
 
 	bool Parse();
 
-	LuaToken& Next();
+	void Next();
 
 	LuaToken& LookAhead();
 
@@ -83,6 +83,8 @@ private:
 	std::string_view GetSaveText() const;
 
 	bool IsReserved(std::string_view text);
+
+	bool IsInlineComment();
 
 	void PushLuaError(std::string_view message, TextRange range);
 

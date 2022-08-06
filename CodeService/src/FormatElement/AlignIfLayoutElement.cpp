@@ -1,4 +1,7 @@
 ﻿#include "CodeService/FormatElement/AlignIfLayoutElement.h"
+
+#include "CodeService/FormatElement/KeyWordElement.h"
+#include "CodeService/FormatElement/OperatorElement.h"
 #include "CodeService/FormatElement/TextElement.h"
 #include "CodeService/FormatElement/SpaceElement.h"
 
@@ -31,10 +34,10 @@ bool AlignIfElement::ElseifFounded()
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
 		auto child = *it;
-		if (child->GetType() == FormatElementType::TextElement)
+		if (child->Is(FormatElementType::KeyWordElement))
 		{
-			auto textElement = std::dynamic_pointer_cast<TextElement>(child);
-			if (textElement->GetText() == "elseif")
+			auto keyElement = std::dynamic_pointer_cast<KeyWordElement>(child);
+			if (keyElement->GetText() == "elseif")
 			{
 				return true;
 			}
@@ -57,13 +60,13 @@ bool AlignIfElement::OnlyEmptyCharBeforeAnd(FormatContext& ctx, FormatElement& e
 				return true;
 			}
 		}
-		else if (child->GetType() == FormatElementType::TextElement)
+		else if (child->Is(FormatElementType::OperatorElement))
 		{
-			auto textElement = std::dynamic_pointer_cast<TextElement>(child);
-			auto text = textElement->GetText();
+			auto opElement = std::dynamic_pointer_cast<OperatorElement>(child);
+			auto text = opElement->GetText();
 			if (text == "and")
 			{
-				if (ctx.OnlyEmptyCharBefore(textElement->GetTextRange().StartOffset))
+				if (ctx.OnlyEmptyCharBefore(opElement->GetTextRange().StartOffset))
 				{
 					return true;
 				}
@@ -80,9 +83,9 @@ void AlignIfElement::AlignElement(FormatContext& ctx)
 	for (auto it = _children.begin(); it != _children.end(); ++it)
 	{
 		auto child = *it;
-		if (child->GetType() == FormatElementType::TextElement)
+		if (child->Is(FormatElementType::KeyWordElement))
 		{
-			auto textElement = std::dynamic_pointer_cast<TextElement>(child);
+			auto textElement = std::dynamic_pointer_cast<KeyWordElement>(child);
 			if (textElement->GetText() == "if")
 			{
 				++it;
@@ -147,13 +150,13 @@ void AlignIfElement::AlignConditionExpression(FormatContext& ctx, FormatElement&
 		{
 			AlignConditionExpression(ctx, *child, spacePositionAfterIndent);
 		}
-		else if (child->GetType() == FormatElementType::TextElement)
+		else if (child->Is(FormatElementType::OperatorElement))
 		{
-			auto textElement = std::dynamic_pointer_cast<TextElement>(child);
-			auto text = textElement->GetText();
+			auto opElement = std::dynamic_pointer_cast<OperatorElement>(child);
+			auto text = opElement->GetText();
 			if (text == "and" || text == "or")
 			{
-				if (ctx.OnlyEmptyCharBefore(textElement->GetTextRange().StartOffset))
+				if (ctx.OnlyEmptyCharBefore(opElement->GetTextRange().StartOffset))
 				{
 					++it;
 					if (it != children.end())
