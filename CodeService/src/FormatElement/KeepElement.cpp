@@ -1,8 +1,8 @@
 ﻿#include "CodeService/FormatElement/KeepElement.h"
 #include "Util/format.h"
 
-KeepElement::KeepElement(int keepBlank, bool hasLinebreak, bool allowContinueIndent)
-	: _keepBlank(keepBlank),
+KeepElement::KeepElement(int keepSpace, bool hasLinebreak, bool allowContinueIndent)
+	: SpaceElement(keepSpace),
 	  _hasLinebreak(hasLinebreak),
 	  _allowContinueIndent(allowContinueIndent)
 {
@@ -33,7 +33,7 @@ void KeepElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 	// 这个条件的意思是如果上一个元素和下一个元素没有实质的换行则保持一定的空格
 	if (nextElementLine == lastElementLine && ctx.GetCharacterCount() != 0)
 	{
-		ctx.PrintBlank(_keepBlank);
+		ctx.PrintBlank(_space);
 	}
 	else
 	{
@@ -68,11 +68,7 @@ void KeepElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 
 	if (nextElementLine == lastElementLine)
 	{
-		if (nextOffset - lastOffset - 1 != _keepBlank)
-		{
-			ctx.PushDiagnosis(Util::format(LText("here need keep {} space"), _keepBlank),
-			                  TextRange(lastOffset, nextOffset), DiagnosisType::Blank);
-		}
+		PushSpaceDiagnostic(ctx, GetLastValidElement(selfIt, parent), GetNextValidElement(selfIt, parent));
 	}
 	else
 	{
@@ -82,7 +78,7 @@ void KeepElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 
 void KeepElement::AllowBreakLineSerialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent)
 {
-	if(!_allowContinueIndent)
+	if (!_allowContinueIndent)
 	{
 		return Serialize(ctx, selfIt, parent);
 	}
@@ -109,7 +105,7 @@ void KeepElement::AllowBreakLineSerialize(SerializeContext& ctx, ChildIterator s
 			ctx.PrintLine(1);
 			return;
 		}
-		ctx.PrintBlank(_keepBlank);
+		ctx.PrintBlank(_space);
 	}
 	else
 	{

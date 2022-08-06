@@ -1,16 +1,17 @@
 ﻿#pragma once
 
-#include "KeepLineElement.h"
+#include "SpaceElement.h"
+#include "BreakableElement.h"
 
-class KeepElement : public FormatElement
+class KeepElement : public SpaceElement
 {
 public:
 
 	/*
-	 * @param keepBlank 表示如果下一个元素和当前元素在同一行则保持几个空格
+	 * @param keepSpace 表示如果下一个元素和当前元素在同一行则保持几个空格
 	 * @remark 如果下一个元素和当前元素在不同行则换行
 	 */
-	explicit KeepElement(int keepBlank, bool hasLinebreak = false, bool allowContinueIndent = true);
+	explicit KeepElement(int keepSpace, bool hasLinebreak = false, bool allowContinueIndent = true);
 
 	FormatElementType GetType() override;
 
@@ -21,7 +22,6 @@ public:
 
 	void AllowBreakLineSerialize(SerializeContext& ctx, ChildIterator selfIt, FormatElement& parent);
 private:
-	int _keepBlank;
 	bool _hasLinebreak;
 	bool _allowContinueIndent;
 };

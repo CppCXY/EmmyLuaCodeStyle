@@ -219,7 +219,7 @@ void FormatElement::Reset()
 	_children.clear();
 }
 
-std::shared_ptr<FormatElement> FormatElement::GetNextValidElement(ChildIterator& it, FormatElement& parent)
+std::shared_ptr<FormatElement> FormatElement::GetNextValidElement(ChildIterator it, FormatElement& parent)
 {
 	auto& siblings = parent.GetChildren();
 	++it;
@@ -235,7 +235,7 @@ std::shared_ptr<FormatElement> FormatElement::GetNextValidElement(ChildIterator&
 	return nullptr;
 }
 
-int FormatElement::GetLastValidOffset(ChildIterator& it, FormatElement& parent)
+std::shared_ptr<FormatElement> FormatElement::GetLastValidElement(ChildIterator it, FormatElement& parent)
 {
 	auto& siblings = parent.GetChildren();
 	auto rIt = std::reverse_iterator<std::remove_reference_t<decltype(it)>>(it);
@@ -245,8 +245,18 @@ int FormatElement::GetLastValidOffset(ChildIterator& it, FormatElement& parent)
 		auto sibling = *rIt;
 		if (sibling->HasValidTextRange())
 		{
-			return sibling->GetTextRange().EndOffset;
+			return sibling;
 		}
+	}
+	return nullptr;
+}
+
+int FormatElement::GetLastValidOffset(ChildIterator& it, FormatElement& parent)
+{
+	auto lastElement = GetLastValidElement(it, parent);
+	if(lastElement)
+	{
+		return lastElement->GetTextRange().EndOffset;
 	}
 
 	// 那么一定是往上找不到有效范围元素

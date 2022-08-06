@@ -8,6 +8,7 @@
 #endif
 #include "Util/StringUtil.h"
 #include "CodeService/FormatElement/KeepElement.h"
+#include "CodeService/FormatElement/KeepLineElement.h"
 #include "CodeService/FormatElement/MinLineElement.h"
 #include "CodeService/FormatElement/MaxLineElement.h"
 #include "CodeService/NameStyle/NameStyleRuleMatcher.h"

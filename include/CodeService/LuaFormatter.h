@@ -31,7 +31,7 @@ protected:
 	std::shared_ptr<FormatElement> FormatBlock(std::shared_ptr<LuaAstNode> blockNode);
 
 	// special handle range format
-	std::shared_ptr<FormatElement> FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode, LuaFormatRange& validRange);
+	// std::shared_ptr<FormatElement> FormatRangeBlock(std::shared_ptr<LuaAstNode> blockNode, LuaFormatRange& validRange);
 
 	std::shared_ptr<FormatElement> FormatLocalStatement(std::shared_ptr<LuaAstNode> localStatement);
 
@@ -74,7 +74,7 @@ protected:
 	std::shared_ptr<FormatElement> FormatForBody(std::shared_ptr<LuaAstNode> forBody);
 
 	std::shared_ptr<FormatElement> FormatAttribute(std::shared_ptr<LuaAstNode> attribute);
-
+	 
 	std::shared_ptr<FormatElement> FormatRepeatStatement(std::shared_ptr<LuaAstNode> repeatStatement);
 
 	std::shared_ptr<FormatElement> FormatIfStatement(std::shared_ptr<LuaAstNode> ifStatement);

@@ -1,6 +1,6 @@
 ﻿#include "CodeService/FormatElement/AlignIfLayoutElement.h"
 #include "CodeService/FormatElement/TextElement.h"
-#include "CodeService/FormatElement/KeepBlankElement.h"
+#include "CodeService/FormatElement/SpaceElement.h"
 
 AlignIfElement::AlignIfElement()
 {
@@ -95,7 +95,7 @@ void AlignIfElement::AlignElement(FormatContext& ctx)
 				++it;
 				if (it != _children.end()
 					&& (*it)->GetType() == FormatElementType::LongExpressionLayoutElement
-					&& (*controlIt)->GetType() == FormatElementType::KeepBlankElement)
+					&& (*controlIt)->GetType() == FormatElementType::SpaceElement)
 				{
 					auto expressionLayout = *it;
 					if (elseIfFounded)
@@ -106,14 +106,14 @@ void AlignIfElement::AlignElement(FormatContext& ctx)
 						int spaceAfterIf = expressionOffset - ifOffset - 1;
 						if(spaceAfterIf == 2 || spaceAfterIf == 1)
 						{
-							*controlIt = std::make_shared<KeepBlankElement>(2);
+							*controlIt = std::make_shared<SpaceElement>(2);
 							AlignConditionExpression(ctx, *expressionLayout, 4);
 						}
 						else {
 							// if(expressionOffset - ifOffset >= )
 							// if<5 space>condition
 							// elseif<1 space>condition
-							*controlIt = std::make_shared<KeepBlankElement>(5);
+							*controlIt = std::make_shared<SpaceElement>(5);
 							AlignConditionExpression(ctx, *expressionLayout, 7);
 						}
 					}
@@ -121,7 +121,7 @@ void AlignIfElement::AlignElement(FormatContext& ctx)
 					{
 						// if<2 space>condition
 						// and<1 space>condition
-						*controlIt = std::make_shared<KeepBlankElement>(2);
+						*controlIt = std::make_shared<SpaceElement>(2);
 						AlignConditionExpression(ctx, *expressionLayout, 4);
 					}
 				}
@@ -158,7 +158,7 @@ void AlignIfElement::AlignConditionExpression(FormatContext& ctx, FormatElement&
 					++it;
 					if (it != children.end())
 					{
-						*it = std::make_shared<KeepBlankElement>(
+						*it = std::make_shared<SpaceElement>(
 							static_cast<int>(spacePositionAfterIndent - text.size())
 						);
 					}
