@@ -58,7 +58,7 @@ void MaxLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, Form
 	if (_line < (nextElementLine - lastElementLine - 1))
 	{
 		auto character = ctx.GetColumn(nextOffset);
-		ctx.PushDiagnosis(Util::format(LText("The maximum empty line here is {}"), _line),
+		ctx.PushDiagnosis(Util::format(LText("the maximum blank lines is {}, but found {}"), _line, (nextElementLine - lastElementLine - 1)),
 			LuaDiagnosisPosition(nextElementLine, character),
 			LuaDiagnosisPosition(nextElementLine + 1, 0), DiagnosisType::StatementLineSpace);
 	}

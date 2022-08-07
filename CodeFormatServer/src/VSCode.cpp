@@ -74,6 +74,7 @@ nlohmann::json vscode::Diagnostic::Serialize()
 	object["severity"] = static_cast<int>(severity);
 	object["data"] = data;
 	object["code"] = code;
+	object["source"] = source;
 	return object;
 }
 

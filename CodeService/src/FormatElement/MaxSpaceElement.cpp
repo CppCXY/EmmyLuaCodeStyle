@@ -57,6 +57,7 @@ void MaxSpaceElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt, For
 
 	if (space > maxSpace)
 	{
-		ctx.PushDiagnosis(Util::format(LText("the maximum blank length here is {}"), maxSpace), TextRange(lastOffset, nextOffset), DiagnosisType::Blank);
+		ctx.PushDiagnosis(Util::format(LText("the maximum whitespace length is {}"), maxSpace),
+		                  TextRange(lastOffset, nextOffset), DiagnosisType::Blank);
 	}
 }

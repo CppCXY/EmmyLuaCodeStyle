@@ -138,6 +138,7 @@ public:
 	std::string message;
 	std::string code;
 	std::string data;
+	std::string source;
 
 	nlohmann::json Serialize() override;
 	void Deserialize(nlohmann::json json) override;

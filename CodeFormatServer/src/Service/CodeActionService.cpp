@@ -40,9 +40,9 @@ std::string CodeActionService::GetCode(DiagnosticCode code)
 {
 	switch (code)
 	{
-	case DiagnosticCode::Spell: return "EmmyLua [spell-check]";
-	case DiagnosticCode::Module: return "EmmyLua [module-check]";
-	case DiagnosticCode::Reformat: return "EmmyLua [style-check]";
+	case DiagnosticCode::Spell: return "spell-check";
+	case DiagnosticCode::Module: return "module-check";
+	case DiagnosticCode::Reformat: return "style-check";
 	}
 
 	return "";

@@ -60,7 +60,7 @@ void KeepLineElement::Diagnosis(DiagnosisContext& ctx, ChildIterator selfIt,
 
 			ctx.PushDiagnosis(
 				Util::format(
-					LText("expected {} blank lines, found {}"), _line,
+					LText("expected {} blank lines found {}"), _line,
 					(nextElementLine - lastElementLine - 1)),
 				LuaDiagnosisPosition(nextElementLine, character),
 				LuaDiagnosisPosition(nextElementLine + 1, 0), DiagnosisType::StatementLineSpace);

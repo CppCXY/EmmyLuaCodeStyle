@@ -52,6 +52,7 @@ std::vector<vscode::Diagnostic> CodeFormatService::Diagnose(std::string_view fil
 				diagnosisInfo.Range.End.Character
 			));
 		diagnosis.severity = vscode::DiagnosticSeverity::Warning;
+		diagnosis.source = "EmmyLua";
 		switch (diagnosisInfo.type)
 		{
 		case DiagnosisType::Indent:

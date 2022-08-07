@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "SpaceElement.h"
-#include "BreakableElement.h"
 
 class KeepElement : public SpaceElement
 {

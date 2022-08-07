@@ -164,7 +164,7 @@ void FormatElement::GeneralIndentDiagnosis(DiagnosisContext& ctx, ChildIterator 
 			if (ctx.GetOptions().indent_style != indentState.Style)
 			{
 				ctx.PushDiagnosis(
-					Util::format(LText("incorrect indentation style, expect {}, but here is {}"),
+					Util::format(LText("incorrect indentation style expected {} but found {}"),
 					       GetIndentStyleName(state.Style),
 					       GetIndentStyleName(indentState.Style)
 					),
@@ -180,7 +180,7 @@ void FormatElement::GeneralIndentDiagnosis(DiagnosisContext& ctx, ChildIterator 
 				if (state.SpaceIndent != indentState.SpaceIndent)
 				{
 					ctx.PushDiagnosis(
-						Util::format(LText("incorrect indentation {}, here need {} space indentation"),
+						Util::format(LText("incorrect indentation {} expected {} space indentation"),
 						       indentState.SpaceIndent, state.SpaceIndent),
 						LuaDiagnosisPosition(line, 0),
 						LuaDiagnosisPosition(line, character),
@@ -194,7 +194,7 @@ void FormatElement::GeneralIndentDiagnosis(DiagnosisContext& ctx, ChildIterator 
 				if (state.SpaceIndent != indentState.SpaceIndent || state.TabIndent != indentState.TabIndent)
 				{
 					ctx.PushDiagnosis(
-						Util::format(LText("incorrect indentation, here need {} tab and {} space indentation"),
+						Util::format(LText("incorrect indentation expected {} tab and {} space indentation"),
 						       state.TabIndent, state.SpaceIndent),
 						LuaDiagnosisPosition(line, 0),
 						LuaDiagnosisPosition(line, character),
