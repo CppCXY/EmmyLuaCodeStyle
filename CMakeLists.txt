@@ -8,7 +8,6 @@ option(BuildAsLuaLib "Build for lua dll" OFF)
 option(BuildCodeFormat "Build CodeFormat" ON)
 option(BuildCodeFormatServer "Build CodeFormatServer" ON)
 option(EnableTest "Test project" ON)
-option(BuildInWordsDictionary "Use BuildInWordsDictionary" ON)
 
 if(APPLE)
 	include(CheckCCompilerFlag)

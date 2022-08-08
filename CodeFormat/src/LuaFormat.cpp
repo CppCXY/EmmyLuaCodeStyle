@@ -155,11 +155,10 @@ bool LuaFormat::Check(std::string_view workspace, std::shared_ptr<CodeSpellCheck
 	{
 		auto errors = _parser->GetErrors();
 
-		std::cerr << Util::format("Check {}\t{} error", inputFile, errors.size()) << std::endl;
-
+		std::cout << Util::format("Check {}\t{} error", inputFile, errors.size()) << std::endl;
+		auto luaFile = _parser->GetLuaFile();
 		for (auto& error : errors)
 		{
-			auto luaFile = _parser->GetLuaFile();
 			DiagnosisInspection(error.ErrorMessage, error.ErrorRange, luaFile, inputFile);
 		}
 
@@ -196,7 +195,7 @@ bool LuaFormat::Check(std::string_view workspace, std::shared_ptr<CodeSpellCheck
 	auto diagnosis = ctx.GetDiagnosisInfos();
 	if (!diagnosis.empty())
 	{
-		std::cerr << Util::format("Check {}\t{} warning", inputFile, diagnosis.size()) << std::endl;
+		std::cout << Util::format("Check {}\t{} warning", inputFile, diagnosis.size()) << std::endl;
 
 		for (auto& d : diagnosis)
 		{
@@ -222,6 +221,6 @@ void LuaFormat::DiagnosisInspection(std::string_view message, TextRange range, s
 	auto startChar = file->GetColumn(range.StartOffset);
 	auto endLine = file->GetLine(range.EndOffset);
 	auto endChar = file->GetColumn(range.EndOffset);
-	std::cerr << Util::format("{}({}:{} to {}:{}): {}", path, startLine + 1, startChar, endLine + 1, endChar,
+	std::cout << Util::format("\t{}({}:{} to {}:{}): {}", path, startLine + 1, startChar, endLine + 1, endChar,
 	                    message) << std::endl;
 }

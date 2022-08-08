@@ -22,6 +22,8 @@ public:
 
 	void SetKeyValues(std::map<std::string, std::string, std::less<>>& keyValues);
 
+	// void SetOutput(std::string_view out);
+
 	void ReformatWorkspace();
 
 	bool CheckWorkspace();
@@ -35,4 +37,5 @@ private:
 	std::vector<std::pair<std::string, std::shared_ptr<LuaEditorConfig>>> _editorConfigVector;
 	std::shared_ptr<LuaCodeStyleOptions> _defaultOptions;
 	std::vector<std::string> _ignorePattern;
+	// std::string _output;
 };

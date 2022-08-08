@@ -64,6 +64,11 @@ void LuaWorkspaceFormat::SetKeyValues(std::map<std::string, std::string, std::le
 	}
 }
 
+// void LuaWorkspaceFormat::SetOutput(std::string_view out)
+// {
+// 	_output = out;
+// }
+
 void LuaWorkspaceFormat::ReformatWorkspace()
 {
 	if (_autoDetectConfig)

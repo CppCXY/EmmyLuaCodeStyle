@@ -36,6 +36,7 @@ int main(int argc, char** argv)
 	);
 	cmd.AddTarget("format")
 	   .Add<std::string>("file", "f", "Specify the input file")
+	   .Add<std::string>("overwrite", "ow", "Format overwrite the input file")
 	   .Add<std::string>("workspace", "w",
 	                     "Specify workspace directory,if no input file is specified, bulk formatting is performed")
 	   .Add<int>("stdin", "i", "Read from stdin and specify read size")
@@ -71,6 +72,9 @@ int main(int argc, char** argv)
 	                     "Use file wildcards to specify how to ignore files\n"
 	                     "\t\tseparated by ';'"
 	   )
+	   // .Add<std::string>("output", "o",
+	   //                   "Diagnostic messages are output to file or standard io"
+	   //                   "\t\toptional filename/stdout/stderr, default is stderr")
 	   .EnableKeyValueArgs();
 
 
@@ -109,6 +113,10 @@ int main(int argc, char** argv)
 		if (cmd.HasOption("outfile"))
 		{
 			luaFormat->SetOutputFile(cmd.Get<std::string>("outfile"));
+		}
+		else if (cmd.HasOption("overwrite"))
+		{
+			luaFormat->SetOutputFile(cmd.Get<std::string>("file"));
 		}
 
 		if (cmd.Get<bool>("detect-config"))
