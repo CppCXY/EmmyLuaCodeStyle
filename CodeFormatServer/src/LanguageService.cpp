@@ -341,7 +341,26 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 	auto formatResult = LanguageClient::GetInstance().GetService<CodeFormatService>()->RangeFormat(
 		formattedRange, parser, tempOptions);
 
-
+	// workaround TODO 实现真正的typeformat
+	if (!formatResult.ends_with('\n'))
+	{
+		switch (options->end_of_line)
+		{
+		case EndOfLine::CRLF:
+			{
+				formatResult.append("\r\n");
+				break;
+			}
+		case EndOfLine::LF:
+			{
+				formatResult.push_back('\n');
+			}
+		default:
+			{
+				break;
+			}
+		}
+	}
 	auto& edit = result->edits.emplace_back();
 	edit.newText = std::move(formatResult);
 	edit.range = vscode::Range(
@@ -486,7 +505,6 @@ std::shared_ptr<vscode::DocumentDiagnosticReport> LanguageService::OnTextDocumen
 std::shared_ptr<vscode::WorkspaceDiagnosticReport> LanguageService::OnWorkspaceDiagnostic(
 	std::shared_ptr<vscode::WorkspaceDiagnosticParams> param)
 {
-
 	// if(param->previousResultIds.empty())
 	// {
 	// 	LanguageClient::GetInstance().LoadWorkspace();
