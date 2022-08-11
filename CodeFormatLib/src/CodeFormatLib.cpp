@@ -220,7 +220,7 @@ int type_format(lua_State* L)
 			}
 			else
 			{
-				lua_pushboolean(L, false);
+				lua_pushboolean(L, true);
 				auto result = typeFormat.GetResult();
 
 				// 结果
