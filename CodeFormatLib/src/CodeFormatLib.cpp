@@ -213,7 +213,7 @@ int type_format(lua_State* L)
 			auto typeFormat = LuaCodeFormat::GetInstance().TypeFormat(filename, line, character, std::move(text),
 			                                                          configMap);
 
-			if(!typeFormat.HasFormatResult())
+			if (!typeFormat.HasFormatResult())
 			{
 				lua_pushboolean(L, false);
 				return 1;
@@ -736,6 +736,7 @@ int spell_suggest(lua_State* L)
 static const luaL_Reg lib[] = {
 	{"format", format},
 	{"range_format", range_format},
+	{"type_format", type_format},
 	{"update_config", update_config},
 	{"diagnose_file", diagnose_file},
 	{"set_default_config", set_default_config},
