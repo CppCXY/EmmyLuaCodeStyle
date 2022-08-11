@@ -1,5 +1,6 @@
 ﻿#include "lua.hpp"
 #include "LuaCodeFormat.h"
+#include "CodeService/LuaTypeFormat.h"
 
 #ifdef _MSC_VER
 #define EXPORT    __declspec(dllexport)
@@ -171,6 +172,117 @@ int range_format(lua_State* L)
 	}
 	return 0;
 }
+
+
+int type_format(lua_State* L)
+{
+	int top = lua_gettop(L);
+
+	if (top < 4)
+	{
+		return 0;
+	}
+
+	if (lua_isstring(L, 1) && lua_isstring(L, 2) && lua_isinteger(L, 3) && lua_isinteger(L, 4))
+	{
+		try
+		{
+			std::string filename = lua_tostring(L, 1);
+			std::string text = lua_tostring(L, 2);
+			int line = lua_tointeger(L, 3);
+			int character = lua_tointeger(L, 4);
+
+			LuaCodeFormat::ConfigMap configMap;
+
+			if (top == 5 && lua_istable(L, 5))
+			{
+				lua_pushnil(L);
+				while (lua_next(L, -2) != 0)
+				{
+					auto key = luaToString(L, -2);
+					auto value = luaToString(L, -1);
+
+					if (key != "nil")
+					{
+						configMap.insert({key, value});
+					}
+
+					lua_pop(L, 1);
+				}
+			}
+			auto typeFormat = LuaCodeFormat::GetInstance().TypeFormat(filename, line, character, std::move(text),
+			                                                          configMap);
+
+			if(!typeFormat.HasFormatResult())
+			{
+				lua_pushboolean(L, false);
+				return 1;
+			}
+			else
+			{
+				lua_pushboolean(L, false);
+				auto result = typeFormat.GetResult();
+
+				// 结果
+				lua_newtable(L);
+
+				//message
+				{
+					lua_pushstring(L, "newText");
+					lua_pushlstring(L, result.Text.c_str(), result.Text.size());
+					lua_rawset(L, -3);
+				}
+
+				// range
+				{
+					lua_pushstring(L, "range");
+					//range table
+					lua_newtable(L);
+
+					lua_pushstring(L, "start");
+					// start table
+					lua_newtable(L);
+					lua_pushstring(L, "line");
+					lua_pushinteger(L, result.Range.StartLine);
+					lua_rawset(L, -3);
+
+					lua_pushstring(L, "character");
+					lua_pushinteger(L, result.Range.StartCharacter);
+					lua_rawset(L, -3);
+
+					lua_rawset(L, -3); // set start = {}
+
+					lua_pushstring(L, "end");
+					// end table
+					lua_newtable(L);
+					lua_pushstring(L, "line");
+					lua_pushinteger(L, result.Range.EndLine);
+					lua_rawset(L, -3);
+
+					lua_pushstring(L, "character");
+					lua_pushinteger(L, result.Range.EndCharacter);
+					lua_rawset(L, -3);
+
+					lua_rawset(L, -3); // set end = {}
+
+					lua_rawset(L, -3); // set range = {}
+				}
+
+				return 2;
+			}
+		}
+		catch (std::exception& e)
+		{
+			std::string err = e.what();
+			lua_settop(L, top);
+			lua_pushboolean(L, false);
+			lua_pushlstring(L, err.c_str(), err.size());
+			return 2;
+		}
+	}
+	return 0;
+}
+
 
 int update_config(lua_State* L)
 {

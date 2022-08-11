@@ -7,12 +7,15 @@
 class LuaError
 {
 public:
-	LuaError(std::string_view errorMessage, TextRange range)
+	LuaError(std::string_view errorMessage, TextRange range, LuaTokenType token)
 		: ErrorMessage(errorMessage),
-		  ErrorRange(range)
+		  ErrorRange(range),
+		  MissToken(token)
 	{
 	}
 
+
 	std::string ErrorMessage;
 	TextRange ErrorRange;
+	LuaTokenType MissToken;
 };

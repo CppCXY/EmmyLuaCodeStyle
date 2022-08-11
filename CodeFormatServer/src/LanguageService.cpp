@@ -13,6 +13,7 @@
 #include "CodeFormatServer/Service/CommandService.h"
 #include "CodeFormatServer/Service/ModuleService.h"
 #include "CodeFormatServer/Service/CompletionService.h"
+#include "CodeService/LuaTypeFormat.h"
 #include "Util/Url.h"
 #include "Util/format.h"
 #include "LuaParser/LuaIdentify.h"
@@ -315,57 +316,27 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 	std::shared_ptr<vscode::TextDocumentPositionParams> param)
 {
 	auto parser = LanguageClient::GetInstance().GetFileParser(param->textDocument.uri);
-
+	auto options = LanguageClient::GetInstance().GetOptions(param->textDocument.uri);
 	auto position = param->position;
 
 	auto result = std::make_shared<vscode::DocumentFormattingResult>();
-	if (!parser || parser->IsEmptyLine(static_cast<int>(position.line) - 1))
+	LuaTypeFormat typeFormat(parser, *options);
+	typeFormat.Analysis("\n", position.line, position.character);
+
+	if(!typeFormat.HasFormatResult())
 	{
 		result->hasError = true;
 		return result;
 	}
 
-	auto options = LanguageClient::GetInstance().GetOptions(param->textDocument.uri);
+	auto& formatResult = typeFormat.GetResult();
+	auto& formatRange = formatResult.Range;
 
-	if (parser->HasError())
-	{
-		result->hasError = true;
-		return result;
-	}
-
-	LuaCodeStyleOptions tempOptions = *options;
-	tempOptions.insert_final_newline = true;
-
-	LuaFormatRange formattedRange(static_cast<int>(position.line) - 1, static_cast<int>(position.line) - 1);
-
-	auto formatResult = LanguageClient::GetInstance().GetService<CodeFormatService>()->RangeFormat(
-		formattedRange, parser, tempOptions);
-
-	// workaround TODO 实现真正的typeformat
-	if (!formatResult.ends_with('\n'))
-	{
-		switch (options->end_of_line)
-		{
-		case EndOfLine::CRLF:
-			{
-				formatResult.append("\r\n");
-				break;
-			}
-		case EndOfLine::LF:
-			{
-				formatResult.push_back('\n');
-			}
-		default:
-			{
-				break;
-			}
-		}
-	}
 	auto& edit = result->edits.emplace_back();
-	edit.newText = std::move(formatResult);
+	edit.newText = std::move(formatResult.Text);
 	edit.range = vscode::Range(
-		vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
-		vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
+		vscode::Position(formatRange.StartLine, formatRange.StartCharacter),
+		vscode::Position(formatRange.EndLine, formatRange.EndCharacter)
 	);
 	return result;
 }

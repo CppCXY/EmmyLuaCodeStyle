@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 	);
 	cmd.AddTarget("format")
 	   .Add<std::string>("file", "f", "Specify the input file")
-	   .Add<std::string>("overwrite", "ow", "Format overwrite the input file")
+	   .Add<bool>("overwrite", "ow", "Format overwrite the input file")
 	   .Add<std::string>("workspace", "w",
 	                     "Specify workspace directory,if no input file is specified, bulk formatting is performed")
 	   .Add<int>("stdin", "i", "Read from stdin and specify read size")

@@ -64,11 +64,11 @@ void LuaCodeFormat::SetDefaultCodeStyle(ConfigMap& configMap)
 	}
 }
 
-void LuaCodeFormat::SetSupportNonStandardSymbol(const std::string& tokenType,const std::vector<std::string>& tokens)
+void LuaCodeFormat::SetSupportNonStandardSymbol(const std::string& tokenType, const std::vector<std::string>& tokens)
 {
 	if (tokenType.size() == 1)
 	{
-		_customParser->SetTokens(tokenType.front(), tokens); 
+		_customParser->SetTokens(tokenType.front(), tokens);
 	}
 }
 
@@ -85,7 +85,8 @@ void LuaCodeFormat::LoadSpellDictionaryFromBuffer(const std::string& buffer)
 std::string LuaCodeFormat::Reformat(const std::string& uri, std::string&& text, ConfigMap& configMap)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
-	if (_customParser->IsSupportCustomTokens()) {
+	if (_customParser->IsSupportCustomTokens())
+	{
 		parser->GetTokenParser()->SetCustomParser(_customParser);
 	}
 	parser->BuildAstWithComment();
@@ -105,7 +106,8 @@ std::string LuaCodeFormat::RangeFormat(const std::string& uri, LuaFormatRange& r
                                        ConfigMap& configMap)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
-	if (_customParser->IsSupportCustomTokens()) {
+	if (_customParser->IsSupportCustomTokens())
+	{
 		parser->GetTokenParser()->SetCustomParser(_customParser);
 	}
 	parser->BuildAstWithComment();
@@ -123,10 +125,29 @@ std::string LuaCodeFormat::RangeFormat(const std::string& uri, LuaFormatRange& r
 	return formatter.GetRangeFormattedText(range);
 }
 
+LuaTypeFormat LuaCodeFormat::TypeFormat(const std::string& uri, int line, int character, std::string&& text,
+                                        ConfigMap& configMap)
+{
+	auto parser = LuaParser::LoadFromBuffer(std::move(text));
+	if (_customParser->IsSupportCustomTokens())
+	{
+		parser->GetTokenParser()->SetCustomParser(_customParser);
+	}
+	parser->BuildAstWithComment();
+	auto options = GetOptions(uri);
+	auto tempOptions = CalculateOptions(uri, configMap);
+	LuaTypeFormat typeFormat(parser, tempOptions);
+	typeFormat.Analysis("\n", line, character);
+
+	return typeFormat;
+}
+
+
 std::pair<bool, std::vector<LuaDiagnosisInfo>> LuaCodeFormat::Diagnose(const std::string& uri, std::string&& text)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
-	if (_customParser->IsSupportCustomTokens()) {
+	if (_customParser->IsSupportCustomTokens())
+	{
 		parser->GetTokenParser()->SetCustomParser(_customParser);
 	}
 	parser->BuildAstWithComment();
@@ -157,7 +178,8 @@ std::vector<LuaDiagnosisInfo> LuaCodeFormat::SpellCheck(const std::string& uri, 
                                                         const CodeSpellChecker::CustomDictionary& tempDict)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
-	if (_customParser->IsSupportCustomTokens()) {
+	if (_customParser->IsSupportCustomTokens())
+	{
 		parser->GetTokenParser()->SetCustomParser(_customParser);
 	}
 	parser->GetTokenParser()->Parse();

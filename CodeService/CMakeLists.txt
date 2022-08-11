@@ -34,6 +34,7 @@ target_sources(CodeService
 	${LuaCodeStyle_SOURCE_DIR}/include/CodeService/FormatElement/TextDefineType.h
 	PRIVATE
 	${CodeService_SOURCE_DIR}/src/LuaFormatter.cpp	
+	${CodeService_SOURCE_DIR}/src/LuaTypeFormat.cpp	
 
 	${CodeService_SOURCE_DIR}/src/FormatElement/IndentElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/KeepLineElement.cpp	

@@ -7,7 +7,7 @@ class SerializeContext : public FormatContext
 public:
 	SerializeContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options);
 
-	virtual void Print(std::string_view text, TextRange range);
+	virtual void Print(std::string_view text, TextRange range = TextRange());
 
 	virtual void Print(char ch, int Offset);
 

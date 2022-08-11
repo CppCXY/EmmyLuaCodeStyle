@@ -10,8 +10,6 @@
 class LuaFormatter
 {
 public:
-	using BlockFilter = std::function<bool(std::shared_ptr<LuaAstNode>)>;
-
 	LuaFormatter(std::shared_ptr<LuaParser> luaParser, LuaCodeStyleOptions& options);
 	~LuaFormatter() = default;
 

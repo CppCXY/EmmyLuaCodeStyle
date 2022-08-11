@@ -197,7 +197,7 @@ LuaParser::LuaParser(std::shared_ptr<LuaTokenParser> tokenParser)
 {
 }
 
-bool LuaParser::BlockFollow(bool withUntil)
+bool LuaParser::BlockFollow(bool rightbrace)
 {
 	switch (_tokenParser->Current().TokenType)
 	{
@@ -205,9 +205,10 @@ bool LuaParser::BlockFollow(bool withUntil)
 	case TK_ELSEIF:
 	case TK_END:
 	case TK_EOS:
-		return true;
 	case TK_UNTIL:
-		return withUntil;
+		return true;
+	case ')':
+		return rightbrace;
 	default: return false;
 	}
 }
@@ -475,7 +476,7 @@ void LuaParser::ReturnStatement(std::shared_ptr<LuaAstNode> blockNode)
 
 	CheckAndNext(TK_RETURN, returnStatement);
 
-	if (!(BlockFollow(true) || _tokenParser->Current().TokenType == ';'))
+	if (!(BlockFollow() || _tokenParser->Current().TokenType == ';'))
 	{
 		ExpressionList(returnStatement);
 	}
@@ -669,7 +670,7 @@ void LuaParser::CheckMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<
 	{
 		auto range = parent->GetTextRange();
 		ThrowMatchError(Util::format("token {} expected ,(to close {} at", what, who),
-		                TextRange(range.EndOffset, range.EndOffset));
+		                TextRange(range.StartOffset, range.EndOffset), what);
 	}
 }
 
@@ -907,7 +908,9 @@ void LuaParser::FunctionBody(std::shared_ptr<LuaAstNode> closureExpression)
 
 	ParamList(functionBodyNode);
 
-	Block(functionBodyNode);
+	if (_tokenParser->Current().TokenType != ')') {
+		Block(functionBodyNode);
+	}
 
 	CheckMatch(TK_END, TK_FUNCTION, functionBodyNode);
 
@@ -1138,7 +1141,7 @@ LuaAttribute LuaParser::GetLocalAttribute(std::shared_ptr<LuaAstNode> nameDefLis
 			return LuaAttribute::Close;
 		}
 
-		ThrowMatchError(Util::format("unknown attribute {}", attributeName), attribute->GetTextRange());
+		ThrowMatchError(Util::format("unknown attribute {}", attributeName), attribute->GetTextRange(), 0);
 	}
 
 	return LuaAttribute::NoAttribute;
@@ -1148,7 +1151,7 @@ void LuaParser::Check(LuaTokenType c)
 {
 	if (_tokenParser->Current().TokenType != c)
 	{
-		ThrowMatchError(Util::format("{} expected", c), _tokenParser->Current().Range);
+		ThrowMatchError(Util::format("{} expected", c), _tokenParser->Current().Range, c);
 	}
 }
 
@@ -1294,22 +1297,22 @@ void LuaParser::ThrowLuaError(std::string_view message, std::shared_ptr<LuaAstNo
 		auto tokenNode = CreateAstNodeFromCurrentToken(LuaAstNodeType::Error);
 		parent->AddChild(tokenNode);
 		_tokenParser->Next();
-		_errors.emplace_back(message, tokenNode->GetTextRange());
+		_errors.emplace_back(message, tokenNode->GetTextRange(), 0);
 	}
 	else
 	{
 		auto offset = _tokenParser->LastValidOffset();
 		if (offset != 0)
 		{
-			_errors.emplace_back(message, TextRange(offset, offset));
+			_errors.emplace_back(message, TextRange(offset, offset), 0);
 		}
 	}
 	throw LuaParseException(message);
 }
 
-void LuaParser::ThrowMatchError(std::string message, TextRange range)
+void LuaParser::ThrowMatchError(std::string message, TextRange range, LuaTokenType token)
 {
-	_errors.emplace_back(message, range);
+	_errors.emplace_back(message, range, token);
 	throw LuaParseException(message);
 }
 

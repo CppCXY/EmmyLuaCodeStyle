@@ -41,6 +41,8 @@ public:
 	EndOfLine GetEndOfLine() const;
 
 	int GetLineRestCharacter(int offset);
+
+	std::string_view GetIndentString(int offset);
 protected:
 	std::string _source;
 	std::string _filename;

@@ -839,5 +839,5 @@ bool LuaTokenParser::IsInlineComment()
 
 void LuaTokenParser::PushLuaError(std::string_view message, TextRange range)
 {
-	_errors.emplace_back(message, range);
+	_errors.emplace_back(message, range, 0);
 }

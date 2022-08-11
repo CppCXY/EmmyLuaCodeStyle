@@ -46,7 +46,7 @@ public:
 
 	std::shared_ptr<LuaTokenParser> GetTokenParser();
 private:
-	bool BlockFollow(bool withUntil = false);
+	bool BlockFollow(bool rightbrace = false);
 
 	void StatementList(std::shared_ptr<LuaAstNode> blockNode);
 
@@ -169,7 +169,7 @@ private:
 
 	void ThrowLuaError(std::string_view message, std::shared_ptr<LuaAstNode> parent);
 
-	void ThrowMatchError(std::string message, TextRange range);
+	void ThrowMatchError(std::string message, TextRange range, LuaTokenType token);
 
 	std::shared_ptr<LuaTokenParser> _tokenParser;
 

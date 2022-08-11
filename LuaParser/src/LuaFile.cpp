@@ -257,3 +257,23 @@ int LuaFile::GetLineRestCharacter(int offset)
 		return 0;
 	}
 }
+
+std::string_view LuaFile::GetIndentString(int offset)
+{
+	std::string_view source = GetSource();
+	auto line = GetLine(offset);
+	const auto start = GetOffsetFromPosition(line, 0);
+
+	auto index = start;
+	for (; index < offset; index++)
+	{
+		auto ch = source[index];
+		if (ch != '\t' && ch != ' ')
+		{
+			return source.substr(start, static_cast<std::size_t>(index - start));
+		}
+	}
+
+	return source.substr(start, static_cast<std::size_t>(index - start));
+}
+
