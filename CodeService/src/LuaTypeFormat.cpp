@@ -84,6 +84,8 @@ void LuaTypeFormat::AnalysisReturn(int line, int character)
 
 void LuaTypeFormat::CompleteMissToken(int line, int character, LuaError& luaError)
 {
+	LuaCodeStyleOptions temp = _options;
+	temp.insert_final_newline = true;
 	switch (luaError.MissToken)
 	{
 	case TK_END:
@@ -149,7 +151,7 @@ void LuaTypeFormat::CompleteMissToken(int line, int character, LuaError& luaErro
 			}
 
 			_hasResult = true;
-			SerializeContext ctx(_parser, _options);
+			SerializeContext ctx(_parser, temp);
 			if (nextBrace)
 			{
 				ctx.PrintLine(1);
