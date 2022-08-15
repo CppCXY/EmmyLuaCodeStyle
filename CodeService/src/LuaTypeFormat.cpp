@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "LuaParser/LuaTokenTypeDetail.h"
 #include "CodeService/FormatElement/SerializeContext.h"
+#include "Util/StringUtil.h"
 
 int FindTokenIndexBeforePosition(std::vector<LuaToken>& tokens, int offset)
 {
@@ -25,7 +26,6 @@ int FindTokenIndexBeforePosition(std::vector<LuaToken>& tokens, int offset)
 
 	return static_cast<int>(pos - tokens.begin()) - 1;
 }
-
 
 LuaTypeFormat::LuaTypeFormat(std::shared_ptr<LuaParser> luaParser, LuaCodeStyleOptions& options)
 	: _parser(luaParser),
@@ -199,7 +199,24 @@ void LuaTypeFormat::FormatLine(int line)
 	_result.Range.StartCharacter = 0;
 	_result.Range.EndLine = line - 1;
 	_result.Range.EndCharacter = 0;
-	_result.Text = formatter.GetRangeFormattedText(_result.Range);
+	auto formatText = formatter.GetRangeFormattedText(_result.Range);
+	while (!formatText.empty())
+	{
+		char ch = formatText.back();
+		if (ch == ' ')
+		{
+			formatText.pop_back();
+		}
+		else
+		{
+			break;
+		}
+	}
+	if(!formatText.empty() && formatText.back() != '\n')
+	{
+		formatText.push_back('\n');
+	}
+	_result.Text = formatText;
 	_result.Range.EndLine++;
 	_hasResult = true;
 }
