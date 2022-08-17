@@ -1,6 +1,5 @@
 ﻿#include "lua.hpp"
 #include "LuaCodeFormat.h"
-#include "CodeService/LuaTypeFormat.h"
 
 #ifdef _MSC_VER
 #define EXPORT    __declspec(dllexport)
