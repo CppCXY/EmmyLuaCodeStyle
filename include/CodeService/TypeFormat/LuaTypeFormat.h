@@ -1,7 +1,8 @@
 #pragma once
 
-#include "LuaFormatter.h"
-#include "LuaFormatRange.h"
+#include "CodeService/LuaFormatter.h"
+#include "CodeService/LuaFormatRange.h"
+#include "LuaTypeFormatOptions.h"
 
 class LuaTypeFormat
 {
@@ -14,7 +15,7 @@ public:
 	};
 
 
-	LuaTypeFormat(std::shared_ptr<LuaParser> luaParser, LuaCodeStyleOptions& options);
+	LuaTypeFormat(std::shared_ptr<LuaParser> luaParser, LuaCodeStyleOptions& options, LuaTypeFormatOptions& typeOptions);
 	~LuaTypeFormat() = default;
 
 	void Analysis(std::string_view trigger, int line, int character);
@@ -30,6 +31,7 @@ private:
 
 	std::shared_ptr<LuaParser> _parser;
 	LuaCodeStyleOptions& _options;
+	LuaTypeFormatOptions& _typeOptions;
 	bool _hasResult;
 	Result _result;
 };

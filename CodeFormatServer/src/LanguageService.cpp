@@ -13,7 +13,7 @@
 #include "CodeFormatServer/Service/CommandService.h"
 #include "CodeFormatServer/Service/ModuleService.h"
 #include "CodeFormatServer/Service/CompletionService.h"
-#include "CodeService/LuaTypeFormat.h"
+#include "CodeService/TypeFormat/LuaTypeFormat.h"
 #include "Util/Url.h"
 #include "Util/format.h"
 #include "LuaParser/LuaIdentify.h"
@@ -320,7 +320,8 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 	auto position = param->position;
 
 	auto result = std::make_shared<vscode::DocumentFormattingResult>();
-	LuaTypeFormat typeFormat(parser, *options);
+	LuaTypeFormatOptions typeOptions;
+	LuaTypeFormat typeFormat(parser, *options, typeOptions);
 	typeFormat.Analysis("\n", position.line, position.character);
 
 	if(!typeFormat.HasFormatResult())

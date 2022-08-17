@@ -1,4 +1,4 @@
-﻿#include "CodeService/LuaTypeFormat.h"
+﻿#include "CodeService/TypeFormat/LuaTypeFormat.h"
 #include <algorithm>
 #include "LuaParser/LuaTokenTypeDetail.h"
 #include "CodeService/FormatElement/SerializeContext.h"
@@ -27,9 +27,11 @@ int FindTokenIndexBeforePosition(std::vector<LuaToken>& tokens, int offset)
 	return static_cast<int>(pos - tokens.begin()) - 1;
 }
 
-LuaTypeFormat::LuaTypeFormat(std::shared_ptr<LuaParser> luaParser, LuaCodeStyleOptions& options)
+LuaTypeFormat::LuaTypeFormat(std::shared_ptr<LuaParser> luaParser, LuaCodeStyleOptions& options,
+                             LuaTypeFormatOptions& typeOptions)
 	: _parser(luaParser),
 	  _options(options),
+	  _typeOptions(typeOptions),
 	  _hasResult(false)
 {
 }
@@ -84,6 +86,11 @@ void LuaTypeFormat::AnalysisReturn(int line, int character)
 
 void LuaTypeFormat::CompleteMissToken(int line, int character, LuaError& luaError)
 {
+	if(!_typeOptions.auto_complete_end)
+	{
+		return;
+	}
+
 	LuaCodeStyleOptions temp = _options;
 	temp.insert_final_newline = true;
 	switch (luaError.MissToken)
@@ -190,6 +197,11 @@ void LuaTypeFormat::CompleteMissToken(int line, int character, LuaError& luaErro
 
 void LuaTypeFormat::FormatLine(int line)
 {
+	if(!_typeOptions.format_line)
+	{
+		return;
+	}
+
 	LuaCodeStyleOptions temp = _options;
 	temp.insert_final_newline = true;
 	temp.remove_expression_list_finish_comma = false;
@@ -213,7 +225,7 @@ void LuaTypeFormat::FormatLine(int line)
 			break;
 		}
 	}
-	if(!formatText.empty() && formatText.back() != '\n')
+	if (!formatText.empty() && formatText.back() != '\n')
 	{
 		formatText.push_back('\n');
 	}

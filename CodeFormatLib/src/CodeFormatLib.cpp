@@ -210,8 +210,26 @@ int type_format(lua_State* L)
 					lua_pop(L, 1);
 				}
 			}
+
+			LuaCodeFormat::ConfigMap stringTypeOptions;
+			if (top == 6 && lua_istable(L, 6))
+			{
+				lua_pushnil(L);
+				while (lua_next(L, -2) != 0)
+				{
+					auto key = luaToString(L, -2);
+					auto value = luaToString(L, -1);
+
+					if (key != "nil")
+					{
+						stringTypeOptions.insert({ key, value });
+					}
+
+					lua_pop(L, 1);
+				}
+			}
 			auto typeFormat = LuaCodeFormat::GetInstance().TypeFormat(filename, line, character, std::move(text),
-			                                                          configMap);
+			                                                          configMap, stringTypeOptions);
 
 			if (!typeFormat.HasFormatResult())
 			{

@@ -126,7 +126,7 @@ std::string LuaCodeFormat::RangeFormat(const std::string& uri, LuaFormatRange& r
 }
 
 LuaTypeFormat LuaCodeFormat::TypeFormat(const std::string& uri, int line, int character, std::string&& text,
-                                        ConfigMap& configMap)
+                                        ConfigMap& configMap, ConfigMap& stringTypeOptions)
 {
 	auto parser = LuaParser::LoadFromBuffer(std::move(text));
 	if (_customParser->IsSupportCustomTokens())
@@ -136,7 +136,8 @@ LuaTypeFormat LuaCodeFormat::TypeFormat(const std::string& uri, int line, int ch
 	parser->BuildAstWithComment();
 	auto options = GetOptions(uri);
 	auto tempOptions = CalculateOptions(uri, configMap);
-	LuaTypeFormat typeFormat(parser, tempOptions);
+	auto typeOptions = LuaTypeFormatOptions::ParseFrom(stringTypeOptions);
+	LuaTypeFormat typeFormat(parser, tempOptions, typeOptions);
 	typeFormat.Analysis("\n", line, character);
 
 	return typeFormat;

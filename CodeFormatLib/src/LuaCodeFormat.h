@@ -9,7 +9,7 @@
 #include "CodeService/LuaEditorConfig.h"
 #include "CodeService/LuaFormatRange.h"
 #include "CodeService/Spell/CodeSpellChecker.h"
-#include "CodeService/LuaTypeFormat.h"
+#include "CodeService/TypeFormat/LuaTypeFormat.h"
 
 class LuaCodeFormat
 {
@@ -32,7 +32,8 @@ public:
 
 	std::string RangeFormat(const std::string& uri, LuaFormatRange& range, std::string&& text, ConfigMap& configMap);
 
-	LuaTypeFormat TypeFormat(const std::string& uri, int line, int character, std::string&& text, ConfigMap& configMap);
+	LuaTypeFormat TypeFormat(const std::string& uri, int line, int character, std::string&& text,
+	                         ConfigMap& configMap, ConfigMap& stringTypeOptions);
 
 	std::pair<bool, std::vector<LuaDiagnosisInfo>> Diagnose(const std::string& uri, std::string&& text);
 
