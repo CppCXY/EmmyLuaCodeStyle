@@ -43,7 +43,8 @@ target_sources(CodeService
 	${CodeService_SOURCE_DIR}/src/FormatElement/StatementElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/TextElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/OperatorElement.cpp	
-	${CodeService_SOURCE_DIR}/src/FormatElement/KeyWordElement.cpp	
+	${CodeService_SOURCE_DIR}/src/FormatElement/KeyWordElement.cpp
+	${CodeService_SOURCE_DIR}/src/FormatElement/SepElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/SpaceElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/FormatElement.cpp	
 	${CodeService_SOURCE_DIR}/src/FormatElement/LineElement.cpp	

@@ -24,7 +24,7 @@ detect_end_of_line = false
 # this option decides when to chopdown the code
 max_line_length = 120
 
-# this will check text end with new line(format always end with new line)
+# this will check text end with new line
 insert_final_newline = true
 
 # [function]
@@ -42,6 +42,12 @@ remove_expression_list_finish_comma = true
 call_arg_parentheses = keep
 
 # [table]
+
+#optional none/comma/semicolon
+table_separator_style = none
+
+#optional keep/never/always/smart
+trailing_table_separator = keep
 
 # see document for detail
 continuous_assign_table_field_align_to_equal_sign = true

@@ -8,6 +8,7 @@ enum class FormatElementType
 	TextElement,
 	OperatorElement,
 	KeyWordElement,
+	SepElement,
 	ExpressionElement,
 	AlignmentLayoutElement,
 	KeepLayoutElement,

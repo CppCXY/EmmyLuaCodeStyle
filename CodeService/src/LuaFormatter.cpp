@@ -16,7 +16,7 @@
 #include "CodeService/FormatElement/NoIndentElement.h"
 #include "CodeService/FormatElement/SerializeContext.h"
 #include "CodeService/FormatElement/IndentOnLineBreakElement.h"
-#include "CodeService/FormatElement/PlaceholderElement.h"
+#include "CodeService/FormatElement/SepElement.h"
 #include "CodeService/FormatElement/AlignIfLayoutElement.h"
 #include "CodeService/FormatElement/MaxSpaceElement.h"
 #include "CodeService/FormatElement/StringLiteralElement.h"
@@ -245,6 +245,10 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNode(std::shared_ptr<LuaAstNo
 	case LuaAstNodeType::StringLiteralExpression:
 		{
 			return FormatStringLiteralExpression(node);
+		}
+	case LuaAstNodeType::TableFieldSep:
+		{
+			return FormatTableSep(node);
 		}
 	case LuaAstNodeType::LiteralExpression:
 	default:
@@ -1810,6 +1814,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatStringLiteralExpression(
 	return std::make_shared<StringLiteralElement>(stringLiteralExpression);
 }
 
+std::shared_ptr<FormatElement> LuaFormatter::FormatTableSep(std::shared_ptr<LuaAstNode> tableSep)
+{
+	return std::make_shared<SepElement>(tableSep);
+}
+
 void LuaFormatter::DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_ptr<FormatElement> envElement)
 {
 	envElement->AddChild(FormatNode(node));
@@ -1920,12 +1929,15 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 	{
 		canAlign = false;
 	}
+	std::shared_ptr<LuaAstNode> current = nullptr;
+	std::shared_ptr<LuaAstNode> nextSibling = nullptr;
 
 	for (; it != siblings.end(); ++it)
 	{
-		auto current = *it;
-		auto nextSibling = NextNode(it, siblings);
+		current = *it;
+		nextSibling = NextNode(it, siblings);
 
+		// unreachable
 		if (nextSibling == nullptr)
 		{
 			layout->AddChild(FormatNode(current));
@@ -1994,6 +2006,91 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 			break;
 		}
 	}
+
+	// table field finish
+	if (nextSibling != nullptr
+		&& nextSibling->GetTokenType() == '}'
+		&& _options.trailing_table_separator != TrailingTableSeparator::Keep)
+	{
+		// find table field
+		auto& layoutChildren = layout->GetChildren();
+		auto rIt = layoutChildren.rbegin();
+		for (; rIt != layoutChildren.rend(); rIt++)
+		{
+			auto child = *rIt;
+			// table field
+			if (child->Is(FormatElementType::ExpressionElement))
+			{
+				break;
+			}
+		}
+
+		// if founded
+		if (rIt != layoutChildren.rend())
+		{
+			std::shared_ptr<SepElement> sep = nullptr;
+			auto sepIt = rIt.base();
+
+			for (; sepIt != layoutChildren.end(); sepIt++)
+			{
+				auto child = *sepIt;
+				if (child->HasValidTextRange())
+				{
+					if (child->Is(FormatElementType::SepElement))
+					{
+						sep = std::dynamic_pointer_cast<SepElement>(child);
+					}
+					break;
+				}
+			}
+
+			switch (_options.trailing_table_separator)
+			{
+			case TrailingTableSeparator::Never:
+				{
+					if (sep)
+					{
+						sep->SetEmpty();
+					}
+					break;
+				}
+			case TrailingTableSeparator::Always:
+				{
+					if (!sep)
+					{
+						sep = std::make_shared<SepElement>();
+						layoutChildren.insert(rIt.base(), sep);
+					}
+
+					break;
+				}
+			case TrailingTableSeparator::Smart:
+				{
+					auto line = _parser->GetLine((*rIt)->GetTextRange().EndOffset);
+					if (line == leftBraceLine)
+					{
+						// 不要合并上去
+						if (sep)
+						{
+							sep->SetEmpty();
+						}
+					}
+					else if (!sep)
+					{
+						sep = std::make_shared<SepElement>();
+						layoutChildren.insert(rIt.base(), sep);
+					}
+
+					break;
+				}
+			default:
+				{
+					break;
+				}
+			}
+		}
+	}
+
 
 	if (canAlign && _options.continuous_assign_table_field_align_to_equal_sign && layout->GetChildren().size() > 1)
 	{

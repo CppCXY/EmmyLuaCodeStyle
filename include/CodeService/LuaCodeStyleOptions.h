@@ -34,6 +34,10 @@ public:
 
 	QuoteStyle quote_style = QuoteStyle::None;
 
+	TableSeparatorStyle table_separator_style = TableSeparatorStyle::None;
+
+	TrailingTableSeparator trailing_table_separator = TrailingTableSeparator::Keep;
+
 	CallArgParentheses call_arg_parentheses = CallArgParentheses::Keep;
 	/*
 	 * 延续行缩进
@@ -152,6 +156,4 @@ public:
 	std::shared_ptr<NameStyleRuleMatcher> module_name_define_style;
 	std::shared_ptr<NameStyleRuleMatcher> require_module_name_style;
 	std::shared_ptr<NameStyleRuleMatcher> class_name_define_style;
-
-
 };

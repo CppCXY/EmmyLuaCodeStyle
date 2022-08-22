@@ -99,6 +99,8 @@ protected:
 
 	std::shared_ptr<FormatElement> FormatStringLiteralExpression(std::shared_ptr<LuaAstNode> stringLiteralExpression);
 
+	std::shared_ptr<FormatElement> FormatTableSep(std::shared_ptr<LuaAstNode> tableSep);
+
 	void DefaultHandle(std::shared_ptr<LuaAstNode> node, std::shared_ptr<FormatElement> envElement);
 
 	// 以下是特殊格式化规则

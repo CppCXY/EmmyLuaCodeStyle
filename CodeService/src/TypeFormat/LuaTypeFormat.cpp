@@ -205,6 +205,7 @@ void LuaTypeFormat::FormatLine(int line)
 	LuaCodeStyleOptions temp = _options;
 	temp.insert_final_newline = true;
 	temp.remove_expression_list_finish_comma = false;
+	temp.trailing_table_separator = TrailingTableSeparator::Keep;
 	LuaFormatter formatter(_parser, temp);
 	formatter.BuildFormattedElement();
 

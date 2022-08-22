@@ -387,6 +387,45 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("space_before_open_square_bracket") == "true";
 	}
 
+	if(configMap.count("table_separator_style"))
+	{
+		auto style = configMap.at("table_separator_style");
+		if(style == "none")
+		{
+			options->table_separator_style = TableSeparatorStyle::None;
+		}
+		else if(style == "comma")
+		{
+			options->table_separator_style = TableSeparatorStyle::Comma;
+		}
+		else if(style == "semicolon")
+		{
+			options->table_separator_style = TableSeparatorStyle::Semicolon;
+		}
+	}
+
+	if(configMap.count("trailing_table_separator"))
+	{
+		auto action = configMap.at("trailing_table_separator");
+		if(action == "keep")
+		{
+			options->trailing_table_separator = TrailingTableSeparator::Keep;
+		}
+		else if(action == "never")
+		{
+			options->trailing_table_separator = TrailingTableSeparator::Never;
+		}
+		else if(action == "always")
+		{
+			options->trailing_table_separator = TrailingTableSeparator::Always;
+		}
+		else if(action == "smart")
+		{
+			options->trailing_table_separator = TrailingTableSeparator::Smart;
+		}
+	}
+
+
 	if (configMap.count("end_of_line"))
 	{
 		auto lineSeparatorSymbol = configMap.at("end_of_line");

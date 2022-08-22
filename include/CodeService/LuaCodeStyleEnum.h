@@ -29,3 +29,18 @@ enum class AlignCallArgs
 	OnlyAfterMoreIndentionStatement,
 	OnlyNotExistCrossExpression,
 };
+
+enum class TableSeparatorStyle
+{
+	None,
+	Comma,
+	Semicolon
+};
+
+enum class TrailingTableSeparator
+{
+	Keep,
+	Never,
+	Smart,
+	Always
+};

@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "FormatElement.h"
-// #include "TextDefineType.h"
 
 class TextElement : public FormatElement
 {
@@ -20,7 +19,7 @@ public:
 	 * 返回值可空
 	 */
 	std::shared_ptr<LuaAstNode> GetNode() const;
-private:
+protected:
 	std::shared_ptr<LuaAstNode> _node;
 	std::string_view _text;
 };

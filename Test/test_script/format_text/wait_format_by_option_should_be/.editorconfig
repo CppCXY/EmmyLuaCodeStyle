@@ -174,4 +174,14 @@ keep_line_after_repeat_statement = minLine:1
 keep_line_after_for_statement = minLine:1
 keep_line_after_local_or_assign_statement = minLine:1
 keep_line_after_function_define_statement = minLine:1
+[{table_separator_style-eq-comma.lua}]
+table_separator_style = comma
+[{table_separator_style-eq-semicolon.lua}]
+table_separator_style = semicolon
+[{trailing_table_separator-eq-never.lua}]
+trailing_table_separator = never
+[{trailing_table_separator-eq-always.lua}]
+trailing_table_separator = always
+[{trailing_table_separator-eq-smart.lua}]
+trailing_table_separator = smart
 
