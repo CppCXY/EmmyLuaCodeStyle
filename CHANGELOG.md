@@ -1,5 +1,51 @@
 # Change Log
 
+## 0.17.0
+
+`NEW` 支持配置table的分隔符风格是逗号还是分号还是不处理
+
+`NEW` 支持通过配置移除或者保留或者新增表的尾部分隔符
+
+## 0.16.1
+
+`FIX` 优化typeformat体验
+
+## 0.16.0
+
+`NEW` 开启typeformat后，键入'\n'时会自动补完缺失的end
+
+## 0.15.0
+
+`CHANGE` 改变代码风格检查时提示的文字
+
+## 0.14.1
+
+`FIX` 修复因为设置`insert_final_newline = false`和开启typeOnFormat特性导致回车无效得BUG
+
+## 0.14.0
+
+`CHANGE` 配置项`insert_final_newline`现在符合.editorconfig规定
+
+`CHANGE` 支持`break` 和 `goto` 语句后的分号
+
+`CHANGE` 格式化将移除空行分号，移除if语句，while语句，repeat语句后的分号
+
+`NEW` 支持通过注解部分屏蔽格式化，详细看[disable-format](https://github.com/CppCXY/EmmyLuaCodeStyle/blob/master/docs/disable_format.md)
+
+
+## 0.13.0
+
+`CHANGE` 放宽对齐调用表达式的限制
+
+`NEW` 支持扩展语法，允许 '`' 表达的字符串
+
+`NEW` 新增选项`space_before_function_open_parenthesis` 表示函数和其括号之间保持一个空格(包括函数定义，和函数调用，以及闭包表达式)
+
+`NEW` 新增选项`space_before_open_square_bracket` 表示在索引表达式中的中括号和左边符号相距一个空格
+
+`FIX` 修复因为支持`t[ [[1111]] .. 1 ]`的排版而错误将`t[t[1]]`格式化为`t[ t[1] ]`的问题
+
+
 ## 0.12.0
 
 `NEW` 当代码超过指定行宽时会自动折行，该行为可能会产生不如意的代码排版。这时候建议ctrl z之后手动排版再格式化。
