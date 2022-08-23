@@ -1,5 +1,13 @@
 #include "CodeService/FormatElement/SepElement.h"
 
+
+std::shared_ptr<SepElement> SepElement::After(std::shared_ptr<FormatElement> node)
+{
+	auto sep = std::make_shared<SepElement>();
+	sep->_textRange = TextRange(node->GetTextRange().EndOffset, node->GetTextRange().EndOffset);
+	return sep;
+}
+
 SepElement::SepElement()
 	: TextElement(""),
 	  _empty(false)

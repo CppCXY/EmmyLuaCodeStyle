@@ -81,12 +81,17 @@ void LuaTypeFormat::AnalysisReturn(int line, int character)
 		return;
 	}
 
-	FormatLine(line);
+	if (_typeOptions.format_line)
+	{
+		FormatLine(line);
+	}
+
+
 }
 
 void LuaTypeFormat::CompleteMissToken(int line, int character, LuaError& luaError)
 {
-	if(!_typeOptions.auto_complete_end)
+	if (!_typeOptions.auto_complete_end)
 	{
 		return;
 	}
@@ -197,15 +202,18 @@ void LuaTypeFormat::CompleteMissToken(int line, int character, LuaError& luaErro
 
 void LuaTypeFormat::FormatLine(int line)
 {
-	if(!_typeOptions.format_line)
-	{
-		return;
-	}
-
 	LuaCodeStyleOptions temp = _options;
 	temp.insert_final_newline = true;
 	temp.remove_expression_list_finish_comma = false;
-	temp.trailing_table_separator = TrailingTableSeparator::Keep;
+	if (_typeOptions.auto_complete_table_sep)
+	{
+		temp.trailing_table_separator = TrailingTableSeparator::Smart;
+	}
+	else
+	{
+		temp.trailing_table_separator = TrailingTableSeparator::Keep;
+	}
+
 	LuaFormatter formatter(_parser, temp);
 	formatter.BuildFormattedElement();
 

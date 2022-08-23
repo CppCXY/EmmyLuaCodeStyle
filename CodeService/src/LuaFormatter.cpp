@@ -2058,8 +2058,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 				{
 					if (!sep)
 					{
-						sep = std::make_shared<SepElement>();
-						layoutChildren.insert(rIt.base(), sep);
+						layoutChildren.insert(rIt.base(), SepElement::After((*rIt)));
 					}
 
 					break;
@@ -2077,8 +2076,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 					}
 					else if (!sep)
 					{
-						sep = std::make_shared<SepElement>();
-						layoutChildren.insert(rIt.base(), sep);
+						layoutChildren.insert(rIt.base(), SepElement::After((*rIt)));
 					}
 
 					break;

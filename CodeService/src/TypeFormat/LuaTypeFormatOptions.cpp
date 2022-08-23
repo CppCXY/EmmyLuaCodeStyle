@@ -14,5 +14,10 @@ LuaTypeFormatOptions LuaTypeFormatOptions::ParseFrom(std::map<std::string, std::
 		options.format_line = stringOptions["format_line"] == "true";
 	}
 
+	if(stringOptions.count("auto_complete_table_sep"))
+	{
+		options.auto_complete_table_sep = stringOptions["auto_complete_table_sep"] == "true";
+	}
+
 	return options;
 }

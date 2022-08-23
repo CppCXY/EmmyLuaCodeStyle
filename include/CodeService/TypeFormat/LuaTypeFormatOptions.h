@@ -10,4 +10,5 @@ public:
 
 	bool format_line = true;
 	bool auto_complete_end = true;
+	bool auto_complete_table_sep = true;
 };

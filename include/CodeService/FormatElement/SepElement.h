@@ -5,6 +5,8 @@
 class SepElement : public TextElement
 {
 public:
+	static std::shared_ptr<SepElement> After(std::shared_ptr<FormatElement> node);
+
 	SepElement();
 
 	explicit SepElement(std::shared_ptr<LuaAstNode> node);
