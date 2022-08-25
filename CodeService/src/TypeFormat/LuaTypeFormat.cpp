@@ -85,8 +85,6 @@ void LuaTypeFormat::AnalysisReturn(int line, int character)
 	{
 		FormatLine(line);
 	}
-
-
 }
 
 void LuaTypeFormat::CompleteMissToken(int line, int character, LuaError& luaError)

@@ -29,9 +29,9 @@ void RangeFormatContext::Print(std::string_view text, TextRange range)
 		auto& indentState = _indentStack.back();
 		if (indentState.Style == IndentStyle::Space)
 		{
-			if (_characterCount < indentState.SpaceIndent)
+			if (_characterCount == 0)
 			{
-				PrintIndent(indentState.SpaceIndent - _characterCount, indentState.Style);
+				PrintIndent(indentState.SpaceIndent, indentState.Style);
 			}
 		}
 		else
