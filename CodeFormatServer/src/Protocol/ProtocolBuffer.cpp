@@ -1,5 +1,6 @@
 #include "CodeFormatServer/Protocol/ProtocolBuffer.h"
 #include <cstring>
+#include <algorithm>
 
 ProtocolBuffer::ProtocolBuffer(std::size_t capacity)
 	: _writeIndex(0),
