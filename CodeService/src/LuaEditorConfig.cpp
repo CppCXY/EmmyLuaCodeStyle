@@ -399,6 +399,12 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("space_before_open_square_bracket") == "true";
 	}
 
+	if (configMap.count("space_inside_square_brackets"))
+	{
+		options->space_inside_square_brackets =
+			configMap.at("space_inside_square_brackets") == "true";
+	}
+
 	if(configMap.count("table_separator_style"))
 	{
 		auto style = configMap.at("table_separator_style");

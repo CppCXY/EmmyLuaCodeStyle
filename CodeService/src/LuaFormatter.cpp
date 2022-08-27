@@ -1766,8 +1766,13 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 						env->Add<KeepElement>(1);
 						continue;
 					}
+
+					env->Add<OperatorElement>(child);
+					env->Add<KeepElement>(_options.space_inside_square_brackets ? 1 : 0);
+					break;
 				}
-				else if (child->GetTokenType() == ']' && isIndexExprLongString)
+				else if (child->GetTokenType() == ']' && (isIndexExprLongString
+						|| _options.space_inside_square_brackets))
 				{
 					env->Add<KeepElement>(1);
 				}
@@ -2478,11 +2483,11 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 					}
 
 					env->Add<OperatorElement>(child);
-					env->Add<KeepElement>(0);
+					env->Add<KeepElement>(_options.space_inside_square_brackets ? 1 : 0);
 				}
 				else if (child->GetTokenType() == ']')
 				{
-					env->Add<KeepElement>(isIndexExprLongString ? 1 : 0);
+					env->Add<KeepElement>(isIndexExprLongString || _options.space_inside_square_brackets ? 1 : 0);
 					env->Add<OperatorElement>(child);
 					env->Add<KeepElement>(0);
 				}

@@ -84,6 +84,8 @@ public:
 
 	bool space_before_open_square_bracket = false;
 
+	bool space_inside_square_brackets = false;
+
 	/*
 	 * 标签无缩进
 	 */
