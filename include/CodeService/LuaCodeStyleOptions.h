@@ -80,6 +80,8 @@ public:
 
 	bool space_inside_function_call_parentheses = false;
 
+	bool space_inside_function_param_list_parentheses = false;
+
 	bool space_before_open_square_bracket = false;
 
 	/*

@@ -1476,12 +1476,18 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatParamList(std::shared_ptr<Lua
 					paramListLayoutEnv->Add<OperatorElement>(child);
 					paramListLayoutEnv->Add<KeepElement>(1);
 				}
+				else if (child->GetTokenType() == '(')
+				{
+					env->Add<OperatorElement>(child);
+					env->Add<KeepElement>(_options.space_inside_function_param_list_parentheses
+						&& children.size() > 2 ? 1 : 0);
+				}
 				else if (child->GetTokenType() == ')')
 				{
 					env->AddChild(paramListLayoutEnv);
 					if (!paramListLayoutEnv->GetChildren().empty())
 					{
-						env->Add<KeepElement>(0);
+						env->Add<KeepElement>(_options.space_inside_function_param_list_parentheses ? 1 : 0);
 					}
 
 					env->Add<OperatorElement>(child);
