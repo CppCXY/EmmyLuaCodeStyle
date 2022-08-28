@@ -381,6 +381,12 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 			configMap.at("space_before_function_open_parenthesis") == "true";
 	}
 
+	if(configMap.count("space_inside_function_call_parentheses"))
+	{
+		options->space_inside_function_call_parentheses =
+			configMap.at("space_inside_function_call_parentheses") == "true";
+	}
+
 	if (configMap.count("space_before_open_square_bracket"))
 	{
 		options->space_before_open_square_bracket =

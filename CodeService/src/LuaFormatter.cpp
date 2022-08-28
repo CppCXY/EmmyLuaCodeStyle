@@ -1350,14 +1350,25 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 				}
 
 				env->AddChild(FormatCallArgsExpressionList(child, layout));
-				env->Add<KeepElement>(0);
+				env->Add<KeepElement>(_options.space_inside_function_call_parentheses ? 1 : 0);
+
 				break;
 			}
 		case LuaAstNodeType::GeneralOperator:
 			{
-				env->Add<OperatorElement>(child);
-				env->Add<KeepElement>(0);
-				break;
+				if (child->GetTokenType() == '(')
+				{
+					env->Add<OperatorElement>(child);
+					env->Add<KeepElement>(_options.space_inside_function_call_parentheses
+						&& children.size() > 2 ? 1 : 0);
+					break;
+				}
+				else
+				{
+					env->Add<OperatorElement>(child);
+					env->Add<KeepElement>(0);
+					break;
+				}
 			}
 		case LuaAstNodeType::StringLiteralExpression:
 		case LuaAstNodeType::TableExpression:

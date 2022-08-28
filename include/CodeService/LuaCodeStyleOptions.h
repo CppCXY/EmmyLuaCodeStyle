@@ -78,6 +78,8 @@ public:
 
 	bool space_before_function_open_parenthesis = false;
 
+	bool space_inside_function_call_parentheses = false;
+
 	bool space_before_open_square_bracket = false;
 
 	/*
