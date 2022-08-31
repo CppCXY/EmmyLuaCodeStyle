@@ -99,7 +99,13 @@ remove_empty_header_and_footer_lines_in_function = true
 
 space_before_function_open_parenthesis = false
 
+space_inside_function_call_parentheses = false
+
+space_inside_function_param_list_parentheses = false
+
 space_before_open_square_bracket = false
+
+space_inside_square_brackets = false
 
 # if true, ormat like this "local t <const> = 1"
 keep_one_space_between_namedef_and_attribute = true
