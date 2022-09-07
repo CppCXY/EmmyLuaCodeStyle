@@ -330,15 +330,16 @@ std::shared_ptr<vscode::Serializable> LanguageService::OnTypeFormatting(
 		return result;
 	}
 
-	auto& formatResult = typeFormat.GetResult();
-	auto& formatRange = formatResult.Range;
+	for (auto& formatResult : typeFormat.GetResult()) {
+		auto& formatRange = formatResult.Range;
 
-	auto& edit = result->edits.emplace_back();
-	edit.newText = std::move(formatResult.Text);
-	edit.range = vscode::Range(
-		vscode::Position(formatRange.StartLine, formatRange.StartCharacter),
-		vscode::Position(formatRange.EndLine, formatRange.EndCharacter)
-	);
+		auto& edit = result->edits.emplace_back();
+		edit.newText = std::move(formatResult.Text);
+		edit.range = vscode::Range(
+			vscode::Position(formatRange.StartLine, formatRange.StartCharacter),
+			vscode::Position(formatRange.EndLine, formatRange.EndCharacter)
+		);
+	}
 	return result;
 }
 

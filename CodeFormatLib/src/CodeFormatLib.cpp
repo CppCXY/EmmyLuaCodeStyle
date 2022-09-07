@@ -238,53 +238,55 @@ int type_format(lua_State* L)
 			else
 			{
 				lua_pushboolean(L, true);
-				auto result = typeFormat.GetResult();
-
-				// 结果
-				lua_newtable(L);
-
-				//message
+				auto& results = typeFormat.GetResult();
+				if (!results.empty())
 				{
-					lua_pushstring(L, "newText");
-					lua_pushlstring(L, result.Text.c_str(), result.Text.size());
-					lua_rawset(L, -3);
+					auto& result = results.front();
+					// 结果
+					lua_newtable(L);
+
+					//message
+					{
+						lua_pushstring(L, "newText");
+						lua_pushlstring(L, result.Text.c_str(), result.Text.size());
+						lua_rawset(L, -3);
+					}
+
+					// range
+					{
+						lua_pushstring(L, "range");
+						//range table
+						lua_newtable(L);
+
+						lua_pushstring(L, "start");
+						// start table
+						lua_newtable(L);
+						lua_pushstring(L, "line");
+						lua_pushinteger(L, result.Range.StartLine);
+						lua_rawset(L, -3);
+
+						lua_pushstring(L, "character");
+						lua_pushinteger(L, result.Range.StartCharacter);
+						lua_rawset(L, -3);
+
+						lua_rawset(L, -3); // set start = {}
+
+						lua_pushstring(L, "end");
+						// end table
+						lua_newtable(L);
+						lua_pushstring(L, "line");
+						lua_pushinteger(L, result.Range.EndLine);
+						lua_rawset(L, -3);
+
+						lua_pushstring(L, "character");
+						lua_pushinteger(L, result.Range.EndCharacter);
+						lua_rawset(L, -3);
+
+						lua_rawset(L, -3); // set end = {}
+
+						lua_rawset(L, -3); // set range = {}
+					}
 				}
-
-				// range
-				{
-					lua_pushstring(L, "range");
-					//range table
-					lua_newtable(L);
-
-					lua_pushstring(L, "start");
-					// start table
-					lua_newtable(L);
-					lua_pushstring(L, "line");
-					lua_pushinteger(L, result.Range.StartLine);
-					lua_rawset(L, -3);
-
-					lua_pushstring(L, "character");
-					lua_pushinteger(L, result.Range.StartCharacter);
-					lua_rawset(L, -3);
-
-					lua_rawset(L, -3); // set start = {}
-
-					lua_pushstring(L, "end");
-					// end table
-					lua_newtable(L);
-					lua_pushstring(L, "line");
-					lua_pushinteger(L, result.Range.EndLine);
-					lua_rawset(L, -3);
-
-					lua_pushstring(L, "character");
-					lua_pushinteger(L, result.Range.EndCharacter);
-					lua_rawset(L, -3);
-
-					lua_rawset(L, -3); // set end = {}
-
-					lua_rawset(L, -3); // set range = {}
-				}
-
 				return 2;
 			}
 		}

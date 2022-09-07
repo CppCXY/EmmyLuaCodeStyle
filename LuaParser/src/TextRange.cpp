@@ -23,6 +23,11 @@ bool TextRange::Contain(TextRange& range) const
 	return this->StartOffset <= range.StartOffset && this->EndOffset >= range.EndOffset;
 }
 
+bool TextRange::ContainOffset(int offset) const
+{
+	return this->StartOffset <= offset && offset <= this->EndOffset;
+}
+
 bool TextRange::Between(TextRange& leftRange, TextRange& rightRange) const
 {
 	return this->StartOffset > leftRange.EndOffset && this->EndOffset < rightRange.StartOffset;

@@ -22,16 +22,19 @@ public:
 
 	bool HasFormatResult();
 
-	Result& GetResult();
+	std::vector<Result>& GetResult();
 
 private:
 	void AnalysisReturn(int line, int character);
 	void CompleteMissToken(int line, int character, LuaError& luaError);
 	void FormatLine(int line);
+	void FixIndent(int line, int character);
+
+	void FixEndIndent(int line, int character);
 
 	std::shared_ptr<LuaParser> _parser;
 	LuaCodeStyleOptions& _options;
 	LuaTypeFormatOptions& _typeOptions;
 	bool _hasResult;
-	Result _result;
+	std::vector<Result> _results;
 };

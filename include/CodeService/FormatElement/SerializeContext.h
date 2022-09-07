@@ -20,10 +20,10 @@ public:
 	virtual void PrintIndentOnly(int line  = -1);
 
 	void SetReadySize(std::size_t size);
-protected:
-	static void InnerPrintEndOfLine(std::string& buffer, EndOfLine endOfLine);
 
 	void PrintIndent(std::size_t indent, IndentStyle style);
+protected:
+	static void InnerPrintEndOfLine(std::string& buffer, EndOfLine endOfLine);
 	void InnerPrintText(std::string_view text, TextRange range);
 	void PrintEndOfLine();
 
