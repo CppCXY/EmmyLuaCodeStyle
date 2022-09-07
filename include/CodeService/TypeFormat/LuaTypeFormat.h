@@ -27,7 +27,7 @@ public:
 private:
 	void AnalysisReturn(int line, int character);
 	void CompleteMissToken(int line, int character, LuaError& luaError);
-	void FormatLine(int line);
+	void FormatLine(int line, int character);
 	void FixIndent(int line, int character);
 
 	void FixEndIndent(int line, int character);
@@ -38,3 +38,4 @@ private:
 	bool _hasResult;
 	std::vector<Result> _results;
 };
+ 

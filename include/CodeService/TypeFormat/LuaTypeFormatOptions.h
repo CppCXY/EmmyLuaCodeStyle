@@ -13,3 +13,4 @@ public:
 	bool auto_complete_table_sep = true;
 	bool fix_indent = true;
 };
+ 

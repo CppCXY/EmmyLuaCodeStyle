@@ -160,12 +160,12 @@ void LuaTypeFormat::AnalysisReturn(int line, int character)
 
 	if (_typeOptions.format_line)
 	{
-		FormatLine(line);
+		FormatLine(line, character);
 	}
 
-	if (_typeOptions.fix_indent) {
-		FixIndent(line, character);
-	}
+	// if (_typeOptions.fix_indent) {
+	// 	FixIndent(line, character);
+	// }
 }
 
 void LuaTypeFormat::CompleteMissToken(int line, int character, LuaError& luaError)
@@ -280,8 +280,21 @@ void LuaTypeFormat::CompleteMissToken(int line, int character, LuaError& luaErro
 	}
 }
 
-void LuaTypeFormat::FormatLine(int line)
+void LuaTypeFormat::FormatLine(int line, int character)
 {
+	auto luaFile = _parser->GetLuaFile();
+	auto offset = luaFile->GetOffsetFromPosition(line, character);
+	auto& tokens = _parser->GetTokenParser()->GetTokens();
+	auto tokenIndex = FindTokenIndexAfterPosition(tokens, offset);
+	if (tokenIndex != -1)
+	{
+		auto& token = tokens[tokenIndex];
+		if (token.TokenType == TK_STRING || token.TokenType == TK_LONG_COMMENT)
+		{
+			return;
+		}
+	}
+
 	LuaCodeStyleOptions temp = _options;
 	temp.insert_final_newline = true;
 	temp.remove_expression_list_finish_comma = false;
@@ -326,7 +339,7 @@ void LuaTypeFormat::FormatLine(int line)
 
 void LuaTypeFormat::FixIndent(int line, int character)
 {
-	// FixEndIndent(line, character);
+	FixEndIndent(line, character);
 
 	// auto root = _parser->GetAst();
 	// auto astNode = FindAstNodeBeforePosition(root, offset);
