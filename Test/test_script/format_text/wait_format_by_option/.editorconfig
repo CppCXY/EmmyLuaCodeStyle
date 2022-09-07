@@ -168,6 +168,12 @@ remove_expression_list_finish_comma = true
 [{space_option.lua}]
 space_before_function_open_parenthesis = true
 space_before_open_square_bracket = true
+[{space_inside_function_call_parentheses.lua}]
+space_inside_function_call_parentheses = true
+[{space_inside_function_param_list_parentheses.lua}]
+space_inside_function_param_list_parentheses = true
+[{space_inside_square_brackets.lua}]
+space_inside_square_brackets = true
 [{minLine-eq-1.lua}]
 keep_line_after_if_statement = minLine:1
 keep_line_after_do_statement = minLine:1
