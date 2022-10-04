@@ -38,7 +38,7 @@ void AlignToFirstElement::Serialize(SerializeContext& ctx, ChildIterator selfIt,
 				{
 					if (writeCount > indentState.TabIndent)
 					{
-						indentState.SpaceIndent += writeCount - indentState.TabIndent;
+						indentState.SpaceIndent = writeCount - indentState.TabIndent;
 					}
 					else
 					{

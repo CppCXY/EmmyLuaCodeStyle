@@ -779,7 +779,7 @@ void LuaParser::SimpleExpression(std::shared_ptr<LuaAstNode> expressionNode)
 	switch (_tokenParser->Current().TokenType)
 	{
 	case TK_FLT:
-	case TK_INT:
+	case TK_NUMBER:
 	case TK_NIL:
 	case TK_TRUE:
 	case TK_FALSE:

@@ -42,7 +42,7 @@ enum LuaTokenTypeDetail : int
 	TK_DBCOLON,
 	TK_EOS,
 	TK_FLT,
-	TK_INT,
+	TK_NUMBER,
 	TK_NAME,
 	TK_STRING,
 	// custom

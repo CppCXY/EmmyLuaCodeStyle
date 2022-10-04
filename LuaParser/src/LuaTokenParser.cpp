@@ -621,7 +621,7 @@ LuaTokenType LuaTokenParser::ReadNumeral()
 		{
 			if (CheckNext1('L') && CheckNext1('L'))
 			{
-				return TK_INT;
+				return TK_NUMBER;
 			}
 			else
 			{
@@ -634,9 +634,7 @@ LuaTokenType LuaTokenParser::ReadNumeral()
 		}
 	}
 
-	// todo error format check
-	// 实际上应该是TK_NUMBER
-	return TK_INT;
+	return TK_NUMBER;
 }
 
 /*
