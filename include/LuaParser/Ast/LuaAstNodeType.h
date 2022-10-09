@@ -2,8 +2,6 @@
 
 enum class LuaAstNodeType
 {
-	LuaAstNode = -1,
-
 	Chunk = 0,
 
 	Block,
@@ -109,9 +107,4 @@ enum class LuaAstNodeType
 	ShebangComment,
 
 	DocTagFormat,
-
 };
-
-
-#define LUA_AST(ASTClass)\
-    inline static constexpr LuaAstNodeType ASTIndex = LuaAstNodeType::ASTClass

@@ -2,20 +2,17 @@
 
 #include <string_view>
 #include "LuaTokenType.h"
-#include "TextRange.h"
-#include "LuaError.h"
+#include "LuaParser/Types/TextRange.h"
 
 class LuaToken
 {
 public:
-	LuaToken(LuaTokenType type, std::string_view text, TextRange range)
+	LuaToken(LuaTokenType type, TextRange range)
 		: TokenType(type),
-		  Text(text),
 		  Range(range)
 	{
 	}
 
 	LuaTokenType TokenType;
-	std::string_view Text;
 	TextRange Range;
 };

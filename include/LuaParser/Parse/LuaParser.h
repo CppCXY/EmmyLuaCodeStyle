@@ -1,11 +1,14 @@
 ﻿#pragma once
 
 #include <memory>
-#include "LuaTokenParser.h"
+#include <vector>
+#include "LuaParser/Lexer/LuaLexer.h"
 #include "LuaOperatorType.h"
 #include "LuaAttribute.h"
-#include "LuaDocTokenParser.h"
-#include "LuaAstNode/LuaAstNode.h"
+#include "LuaParseError.h"
+#include "LuaParser/Ast/LuaAstNode.h"
+#include "LuaParser/Ast/LuaAstTree.h"
+
 
 class LuaParser
 {
@@ -14,38 +17,26 @@ public:
 
 	static std::shared_ptr<LuaParser> LoadFromBuffer(std::string&& buffer);
 
-	LuaParser(std::shared_ptr<LuaTokenParser> tokenParser);
+	LuaParser(std::shared_ptr<LuaFile> luaFile, std::vector<LuaToken>&& tokens);
+
+    bool Parse();
 
 	void BuildAst();
 
 	void BuildAstWithComment();
 
-	std::shared_ptr<LuaAstNode> GetAst();
-
-	std::vector<LuaError>& GetErrors();
+	std::vector<LuaParseError>& GetErrors();
 
 	bool HasError() const;
 
-	std::vector<LuaToken>& GetAllComments();
-
-	int GetLine(int offset) const;
-
-	int GetColumn(int offset) const;
-
-	int GetTotalLine();
-
-	std::string_view GetSource();
-
-	bool IsEmptyLine(int line);
-
-	void SetFilename(std::string_view filename);
-
-	std::string_view GetFilename();
-
 	std::shared_ptr<LuaFile> GetLuaFile();
-
-	std::shared_ptr<LuaTokenParser> GetTokenParser();
 private:
+    void Next();
+
+    LuaTokenType LookAhead();
+
+    LuaTokenType Current();
+
 	bool BlockFollow(bool rightbrace = false);
 
 	void StatementList(std::shared_ptr<LuaAstNode> blockNode);
@@ -171,11 +162,7 @@ private:
 
 	void ThrowMatchError(std::string message, TextRange range, LuaTokenType token);
 
-	std::shared_ptr<LuaTokenParser> _tokenParser;
-
-	std::shared_ptr<LuaAstNode> _chunkAstNode;
-
-	std::vector<LuaError> _errors;
-
+    std::vector<LuaToken> _tokens;
+	std::vector<LuaParseError> _errors;
 	std::shared_ptr<LuaFile> _file;
 };

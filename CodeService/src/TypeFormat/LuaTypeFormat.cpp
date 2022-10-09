@@ -182,7 +182,7 @@ void LuaTypeFormat::CompleteMissToken(int line, int character, LuaError& luaErro
 	{
 	case TK_END:
 		{
-			auto tokenParser = _parser->GetTokenParser();
+			auto tokenParser = _parser->GetLuaLexer();
 			auto luaFile = tokenParser->GetFile();
 			auto& tokens = tokenParser->GetTokens();
 			auto offset = luaFile->GetOffsetFromPosition(line, character);
@@ -352,7 +352,7 @@ void LuaTypeFormat::FixEndIndent(int line, int character)
 	auto luaFile = _parser->GetLuaFile();
 	auto offset = luaFile->GetOffsetFromPosition(line, character);
 
-	auto& tokens = _parser->GetTokenParser()->GetTokens();
+	auto& tokens = _parser->GetLuaLexer()->GetTokens();
 	auto tokenIndex = FindTokenIndexAfterPosition(tokens, offset);
 	if (tokenIndex == -1)
 	{

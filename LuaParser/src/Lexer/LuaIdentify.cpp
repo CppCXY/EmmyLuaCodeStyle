@@ -1,4 +1,4 @@
-﻿#include "LuaParser/LuaIdentify.h"
+﻿#include "LuaParser/Lexer/LuaIdentify.h"
 #include "LuaDefine.h"
 
 std::array<unsigned char, UCHAR_MAX + 2> LuaIdentify::LuaCharType = {

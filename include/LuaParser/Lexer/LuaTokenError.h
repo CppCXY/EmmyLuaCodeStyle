@@ -1,19 +1,18 @@
 #pragma once
 
 #include <string>
-#include "TextRange.h"
+#include "LuaParser/Types/TextRange.h"
+#include "LuaTokenType.h"
 
-
-class LuaError
+class LuaTokenError
 {
 public:
-	LuaError(std::string_view errorMessage, TextRange range, LuaTokenType token)
+	LuaTokenError(std::string_view errorMessage, TextRange range, LuaTokenType token)
 		: ErrorMessage(errorMessage),
 		  ErrorRange(range),
 		  MissToken(token)
 	{
 	}
-
 
 	std::string ErrorMessage;
 	TextRange ErrorRange;

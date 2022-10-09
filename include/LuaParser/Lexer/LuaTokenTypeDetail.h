@@ -42,7 +42,7 @@ enum LuaTokenTypeDetail : int
 	TK_DBCOLON,
 	TK_EOS,
 	TK_FLT,
-	TK_INT,
+	TK_NUMBER,
 	TK_NAME,
 	TK_STRING,
 	// custom
@@ -50,7 +50,7 @@ enum LuaTokenTypeDetail : int
 	TK_DOC_COMMENT, // emmylua doc
 	TK_LONG_COMMENT, //长注释
 	TK_SHEBANG, //shebang
-
+    TK_EOF, // 文件末尾
 	// DOC
 	TK_DOC_TAG_FORMAT,
 	TK_DOC_DISABLE_NEXT,

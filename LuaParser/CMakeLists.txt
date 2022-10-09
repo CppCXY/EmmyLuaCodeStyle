@@ -12,27 +12,28 @@ target_include_directories(LuaParser PUBLIC
 )
 
 target_sources(LuaParser PUBLIC
-	#include
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaToken.h
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenType.h
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaTokenParser.h
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaParser.h
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaFile.h
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaAstNode/LuaAstNode.h
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/LuaAstNode/LuaAstNodeType.h
-	${LuaCodeStyle_SOURCE_DIR}/include/LuaParser/TextRange.h
 	#src
 	PRIVATE
-	${LuaParser_SOURCE_DIR}/src/LuaParser.cpp	
-	${LuaParser_SOURCE_DIR}/src/LuaTokenParser.cpp	
-	${LuaParser_SOURCE_DIR}/src/LuaParseException.cpp
-	${LuaParser_SOURCE_DIR}/src/LuaAstNode/LuaAstNode.cpp
-	${LuaParser_SOURCE_DIR}/src/TextRange.cpp
-	${LuaParser_SOURCE_DIR}/src/LuaAstVisitor.cpp
-	${LuaParser_SOURCE_DIR}/src/LuaFile.cpp
-	${LuaParser_SOURCE_DIR}/src/LuaIdentify.cpp
-	${LuaParser_SOURCE_DIR}/src/LuaCustomParser.cpp
-	${LuaParser_SOURCE_DIR}/src/LuaDocTokenParser.cpp
+	# parse
+	${LuaParser_SOURCE_DIR}/src/Parse/LuaParser.cpp	
+	
+	# lexer
+	${LuaParser_SOURCE_DIR}/src/Lexer/LuaLexer.cpp
+	${LuaParser_SOURCE_DIR}/src/Lexer/LuaIdentify.cpp
+	${LuaParser_SOURCE_DIR}/src/Lexer/TextReader.cpp
+	
+	# ast
+	${LuaParser_SOURCE_DIR}/src/Ast/LuaAstNode.cpp
+	${LuaParser_SOURCE_DIR}/src/Ast/LuaAstTree.cpp
+
+	# types
+	${LuaParser_SOURCE_DIR}/src/Types/TextRange.cpp
+
+	# file
+	${LuaParser_SOURCE_DIR}/src/File/LuaFile.cpp
+	
+	#exception
+	${LuaParser_SOURCE_DIR}/src/exception/LuaParseException.cpp
 )
 
 target_link_libraries(LuaParser Util)

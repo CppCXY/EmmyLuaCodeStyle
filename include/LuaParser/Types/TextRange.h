@@ -5,8 +5,6 @@
 class TextRange
 {
 public:
-	explicit TextRange(int startOffset = 0, int endOffset = -1);
-
 	TextRange(std::size_t startOffset, std::size_t endOffset);
 
 	bool IsEmpty() const;
@@ -17,6 +15,6 @@ public:
 
 	bool Between(TextRange& leftRange, TextRange& rightRange) const;
 
-	int StartOffset;
-	int EndOffset;
+	std::size_t StartOffset;
+	std::size_t EndOffset;
 };

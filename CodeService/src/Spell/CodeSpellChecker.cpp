@@ -21,7 +21,7 @@ void CodeSpellChecker::LoadDictionaryFromBuffer(std::string_view buffer)
 void CodeSpellChecker::Analysis(DiagnosisContext& ctx, const CustomDictionary& customDict)
 {
 	auto parser = ctx.GetParser();
-	auto tokenParser = parser->GetTokenParser();
+	auto tokenParser = parser->GetLuaLexer();
 	auto& tokens = tokenParser->GetTokens();
 
 	for (auto& token : tokens)
