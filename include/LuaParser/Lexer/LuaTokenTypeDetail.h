@@ -40,7 +40,6 @@ enum LuaTokenTypeDetail : int
 	TK_SHL,
 	TK_SHR,
 	TK_DBCOLON,
-	TK_EOS,
 	TK_FLT,
 	TK_NUMBER,
 	TK_NAME,

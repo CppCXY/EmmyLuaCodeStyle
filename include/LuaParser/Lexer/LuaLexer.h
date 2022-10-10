@@ -23,12 +23,6 @@ public:
 
     bool Parse();
 
-	void Next();
-
-	LuaTokenType LookAhead();
-
-	LuaTokenType Current();
-
 	std::vector<LuaTokenError>& GetErrors();
 
 	bool HasError() const;
@@ -59,10 +53,9 @@ private:
 
 	bool IsReserved(std::string_view text);
 
-	void PushLuaError(std::string_view message, TextRange range);
+	void TokenError(std::string_view message, TextRange range);
 
 	int _linenumber;
-	std::size_t _currentIndex;
     TextReader _reader;
 	std::vector<LuaToken> _tokens;
 	std::vector<LuaTokenError> _errors;

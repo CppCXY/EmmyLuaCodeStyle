@@ -8,7 +8,7 @@
 #include "LuaParseError.h"
 #include "LuaParser/Ast/LuaAstNode.h"
 #include "LuaParser/Ast/LuaAstTree.h"
-
+#include "Mark.h"
 
 class LuaParser
 {
@@ -21,15 +21,16 @@ public:
 
     bool Parse();
 
-	void BuildAst();
-
-	void BuildAstWithComment();
+    std::vector<MarkEvent>& GetEvents();
 
 	std::vector<LuaParseError>& GetErrors();
 
 	bool HasError() const;
 
 	std::shared_ptr<LuaFile> GetLuaFile();
+
+    Marker Mark();
+
 private:
     void Next();
 
@@ -37,99 +38,91 @@ private:
 
     LuaTokenType Current();
 
+    void SkipComment();
+
 	bool BlockFollow(bool rightbrace = false);
 
-	void StatementList(std::shared_ptr<LuaAstNode> blockNode);
+	void StatementList();
 
-	void Statement(std::shared_ptr<LuaAstNode> blockNode);
+	void Statement();
 
-	void IfStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void IfStatement();
 
-	void WhileStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void WhileStatement();
 
-	void DoStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void DoStatement();
 
-	void ForStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void ForStatement();
 
-	void RepeatStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void RepeatStatement();
 
-	void FunctionStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void FunctionStatement();
 
-	void LocalFunctionStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void LocalFunctionStatement();
 
-	void LocalStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void LocalStatement();
 
-	void LabelStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void LabelStatement();
 
-	void ReturnStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void ReturnStatement();
 
-	void BreakStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void BreakStatement();
 
-	void GotoStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void GotoStatement();
 
-	void ExpressionStatement(std::shared_ptr<LuaAstNode> blockNode);
+	void ExpressionStatement();
 
-	void AssignStatement(std::shared_ptr<LuaAstNode> expressionListNode, std::shared_ptr<LuaAstNode> assignStatementNode);
+	void ForNumber();
 
-	void Comment(std::shared_ptr<LuaAstNode> block);
+	void ForList();
 
-	void DocStatement(std::shared_ptr<LuaAstNode> blockNode, LuaToken& docComment);
+	void ForBody();
 
-	void DocTagFormatStatement(std::shared_ptr<LuaAstNode> blockNode, LuaDocTokenParser& docTokenParser);
+	void Condition();
 
-	void ForNumber(std::shared_ptr<LuaAstNode> forStatement);
+	void TestThenBlock();
 
-	void ForList(std::shared_ptr<LuaAstNode> forStatement);
+    void NameDefList();
 
-	void ForBody(std::shared_ptr<LuaAstNode> forNode);
+	void Block();
 
-	void Condition(std::shared_ptr<LuaAstNode> parent);
+	void ExpressionList( LuaTokenType stopToken = 0);
 
-	void TestThenBlock(std::shared_ptr<LuaAstNode> ifNode);
+	void Expression();
 
-	void Block(std::shared_ptr<LuaAstNode> parent);
+	void Subexpression(int limit);
 
-	void CheckMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent,
-	                LuaAstNodeType addType = LuaAstNodeType::KeyWord);
+    CompleteMarker SimpleExpression();
 
-	void ExpressionList(std::shared_ptr<LuaAstNode> parent, LuaTokenType stopToken = 0);
+    CompleteMarker TableConstructor();
 
-	void Expression(std::shared_ptr<LuaAstNode> parent);
+	void Field();
 
-	void Subexpression(std::shared_ptr<LuaAstNode> expressionNode, int limit);
+	void ListField();
 
-	void SimpleExpression(std::shared_ptr<LuaAstNode> expressionNode);
+	void RectField();
 
-	void TableConstructor(std::shared_ptr<LuaAstNode> expressionNode);
+	void FunctionBody();
 
-	void Field(std::shared_ptr<LuaAstNode> tableExpressionNode);
+	void ParamList();
 
-	void ListField(std::shared_ptr<LuaAstNode> tableFieldNode);
+    CompleteMarker SuffixedExpression();
 
-	void RectField(std::shared_ptr<LuaAstNode> tableFieldNode);
+	void FunctionCallArgs();
 
-	void FunctionBody(std::shared_ptr<LuaAstNode> closureExpression);
+	void FieldSel();
 
-	void ParamList(std::shared_ptr<LuaAstNode> functionBodyNode);
+	void YIndex();
 
-	void SuffixedExpression(std::shared_ptr<LuaAstNode> expressionNode);
+	void FunctionName();
 
-	void FunctionCallArgs(std::shared_ptr<LuaAstNode>& expressionNode);
+	std::string_view CheckName();
 
-	// 该函数会改变入参
-	void FieldSel(std::shared_ptr<LuaAstNode>& expressionNode);
-
-	void YIndex(std::shared_ptr<LuaAstNode> expressionNode);
-
-	void FunctionName(std::shared_ptr<LuaAstNode> functionNode);
-
-	std::string_view CheckName(std::shared_ptr<LuaAstNode> parent);
-
-	LuaAttribute GetLocalAttribute(std::shared_ptr<LuaAstNode> nameDefList);
+	void LocalAttribute();
 
 	void Check(LuaTokenType c);
 
-	void PrimaryExpression(std::shared_ptr<LuaAstNode> primaryExpression);
+    void PrimaryExpression();
 
 	UnOpr GetUnaryOperator(LuaTokenType op);
 
@@ -140,29 +133,24 @@ private:
 	 * 如果是就跳过当前,
 	 * 否则会生成错误
 	 */
-	void CheckAndNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent,
-	                  LuaAstNodeType addType = LuaAstNodeType::KeyWord);
+	void CheckAndNext(LuaTokenType c);
 
 	/*
 	 * 他是检查当前token的type是否与c相同
 	 * 如果是就跳过当前，并返回true
 	 * 否则返回false
 	 */
-	bool TestNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType = LuaAstNodeType::KeyWord);
+	bool TestAndNext(LuaTokenType c);
 
-	void CodeName(std::shared_ptr<LuaAstNode> parent);
+	void ThrowLuaError(std::string_view message);
 
-	std::shared_ptr<LuaAstNode> CreateAstNode(LuaAstNodeType type);
-
-	std::shared_ptr<LuaAstNode> CreateAstNodeFromToken(LuaAstNodeType type, LuaToken& token);
-
-	std::shared_ptr<LuaAstNode> CreateAstNodeFromCurrentToken(LuaAstNodeType type);
-
-	void ThrowLuaError(std::string_view message, std::shared_ptr<LuaAstNode> parent);
-
-	void ThrowMatchError(std::string message, TextRange range, LuaTokenType token);
+	void ThrowMatchError(std::string message);
 
     std::vector<LuaToken> _tokens;
+    std::size_t _tokenIndex;
 	std::vector<LuaParseError> _errors;
 	std::shared_ptr<LuaFile> _file;
+    std::vector<MarkEvent> _events;
+    bool _invalid;
+    LuaTokenType _current;
 };

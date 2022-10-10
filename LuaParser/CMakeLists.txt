@@ -15,9 +15,10 @@ target_sources(LuaParser PUBLIC
 	#src
 	PRIVATE
 	# parse
-	${LuaParser_SOURCE_DIR}/src/Parse/LuaParser.cpp	
-	
-	# lexer
+	${LuaParser_SOURCE_DIR}/src/Parse/LuaParser.cpp
+	${LuaParser_SOURCE_DIR}/src/Parse/Mark.cpp
+
+		# lexer
 	${LuaParser_SOURCE_DIR}/src/Lexer/LuaLexer.cpp
 	${LuaParser_SOURCE_DIR}/src/Lexer/LuaIdentify.cpp
 	${LuaParser_SOURCE_DIR}/src/Lexer/TextReader.cpp

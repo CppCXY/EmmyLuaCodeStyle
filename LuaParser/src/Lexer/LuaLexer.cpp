@@ -46,7 +46,6 @@ std::map<std::string, LuaTokenType, std::less<>> LuaLexer::LuaReserved = {
 LuaLexer::LuaLexer(std::shared_ptr<LuaFile> file)
         :
         _linenumber(0),
-        _currentIndex(0),
         _reader(file->GetSource()),
         _file(file) {
 }
@@ -68,30 +67,6 @@ bool LuaLexer::Parse() {
     return true;
 }
 
-void LuaLexer::Next() {
-    if (_currentIndex < _tokens.size()) {
-        _currentIndex++;
-    }
-}
-
-LuaTokenType LuaLexer::LookAhead() {
-    std::size_t nextIndex = _currentIndex + 1;
-
-    if (nextIndex < _tokens.size()) {
-        return _tokens[nextIndex].TokenType;
-    }
-
-    return TK_EOF;
-}
-
-LuaTokenType LuaLexer::Current() {
-    if (_currentIndex < _tokens.size()) {
-        return _tokens[_currentIndex].TokenType;
-    }
-
-    return TK_EOF;
-}
-
 std::vector<LuaTokenError> &LuaLexer::GetErrors() {
     return _errors;
 }
@@ -102,10 +77,6 @@ bool LuaLexer::HasError() const {
 
 std::shared_ptr<LuaFile> LuaLexer::GetFile() {
     return _file;
-}
-
-bool LuaLexer::ConsumeAllTokens() {
-    return Current() == TK_EOF;
 }
 
 std::vector<LuaToken> &LuaLexer::GetTokens() {
@@ -163,8 +134,8 @@ LuaTokenType LuaLexer::Lex() {
                     ReadLongString(sep);
                     return TK_STRING;
                 } else if (sep == 0) {
-                    PushLuaError("invalid long string delimiter",
-                                 TextRange(_reader.GetPos(), _reader.GetPos()));
+                    TokenError("invalid long string delimiter",
+                               TextRange(_reader.GetPos(), _reader.GetPos()));
                     return TK_STRING;
                 }
                 return '[';
@@ -376,7 +347,7 @@ void LuaLexer::ReadLongString(std::size_t sep) {
     for (;;) {
         switch (_reader.GetCurrentChar()) {
             case EOZ: {
-                PushLuaError("unfinished long string starting", TextRange(_reader.GetPos(), _reader.GetPos()));
+                TokenError("unfinished long string starting", TextRange(_reader.GetPos(), _reader.GetPos()));
                 return;
             }
             case ']': {
@@ -406,7 +377,7 @@ void LuaLexer::ReadString(int del) {
             case EOZ:
             case '\n':
             case '\r': {
-                PushLuaError("unfinished string", TextRange(_reader.GetPos(), _reader.GetPos()));
+                TokenError("unfinished string", TextRange(_reader.GetPos(), _reader.GetPos()));
                 return;
             }
             case '\\': {
@@ -414,7 +385,7 @@ void LuaLexer::ReadString(int del) {
 
                 switch (_reader.GetCurrentChar()) {
                     case EOZ:
-                        PushLuaError("unfinished string", TextRange(_reader.GetPos(), _reader.GetPos()));
+                        TokenError("unfinished string", TextRange(_reader.GetPos(), _reader.GetPos()));
                         return;
                     case 'z': {
                         _reader.SaveAndNext();
@@ -476,6 +447,6 @@ bool LuaLexer::IsReserved(std::string_view text) {
     return LuaReserved.find(text) != LuaReserved.end();
 }
 
-void LuaLexer::PushLuaError(std::string_view message, TextRange range) {
+void LuaLexer::TokenError(std::string_view message, TextRange range) {
     _errors.emplace_back(message, range, 0);
 }

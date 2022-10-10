@@ -1,19 +1,11 @@
 ﻿#include "LuaParser/Parse/LuaParser.h"
 #include <fstream>
-#include <sstream>
 #include "Lexer/LuaDefine.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "LuaParser/Parse/LuaOperatorType.h"
 #include "Util/format.h"
 #include "LuaParser/exception/LuaParseException.h"
 #include "LuaParser/File/LuaFile.h"
-
-#ifndef NOT_SUPPORT_FILE_SYSTEM
-
-#include <filesystem>
-
-using namespace std::filesystem;
-#endif
 
 std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename) {
     std::string realPath(filename);
@@ -31,14 +23,23 @@ std::shared_ptr<LuaParser> LuaParser::LoadFromFile(std::string_view filename) {
 
 std::shared_ptr<LuaParser> LuaParser::LoadFromBuffer(std::string &&buffer) {
     auto file = std::make_shared<LuaFile>(std::move(buffer));
-    LuaLexer luaLexer (file);
+    LuaLexer luaLexer(file);
     luaLexer.Parse();
     return std::make_shared<LuaParser>(file, std::move(luaLexer.GetTokens()));
 }
 
 LuaParser::LuaParser(std::shared_ptr<LuaFile> luaFile, std::vector<LuaToken> &&tokens)
-        : _file(luaFile),
-          _tokens(tokens) {
+        :
+        _tokens(tokens),
+        _tokenIndex(0),
+        _file(luaFile),
+        _events(),
+        _invalid(true),
+        _current(TK_EOF) {
+}
+
+std::vector<MarkEvent> &LuaParser::GetEvents() {
+    return _events;
 }
 
 std::vector<LuaParseError> &LuaParser::GetErrors() {
@@ -46,74 +47,133 @@ std::vector<LuaParseError> &LuaParser::GetErrors() {
 }
 
 bool LuaParser::HasError() const {
-    return !_errors.empty() || !_tokenParser->ConsumeAllTokens();
+    return !_errors.empty();
 }
 
 std::shared_ptr<LuaFile> LuaParser::GetLuaFile() {
     return _file;
 }
 
-void LuaParser::BuildAstWithComment() {
-    BuildAst();
-
-    auto &chunkChildren = _chunkAstNode->GetChildren();
-    auto &comments = _tokenParser->GetComments();
-    if (chunkChildren.empty()) {
-        if (comments.empty()) {
-            return;
-        }
-        auto block = CreateAstNode(LuaAstNodeType::Block);
-        chunkChildren.push_back(block);
-    }
-
-    auto blockNode = chunkChildren.front();
-
-
-    // 将注释注入AST中
-    if (!comments.empty()) {
-        for (auto &comment: comments) {
-            std::shared_ptr<LuaAstNode> commentAst = CreateAstNode(LuaAstNodeType::Comment);
-            switch (comment.TokenType) {
-                case TK_SHORT_COMMENT: {
-                    commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::ShortComment, comment));
-                    break;
-                }
-                case TK_LONG_COMMENT: {
-                    commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::LongComment, comment));
-                    break;
-                }
-                case TK_SHEBANG: {
-                    commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::ShebangComment, comment));
-                    break;
-                }
-                case TK_DOC_COMMENT: {
-                    auto shortComment = CreateAstNodeFromToken(LuaAstNodeType::ShortComment, comment);
-                    DocStatement(shortComment, comment);
-                    commentAst->AddChild(shortComment);
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-
-            blockNode->AddComment(commentAst);
-        }
-    }
+//
+//void LuaParser::BuildAstWithComment() {
+//    BuildAst();
+//
+//    auto &chunkChildren = _chunkAstNode->GetChildren();
+//    auto &comments = _tokenParser->GetComments();
+//    if (chunkChildren.empty()) {
+//        if (comments.empty()) {
+//            return;
+//        }
+//        auto block = CreateAstNode(LuaAstNodeType::Block);
+//        chunkChildren.push_back(block);
+//    }
+//
+//    auto blockNode = chunkChildren.front();
+//
+//
+//    // 将注释注入AST中
+//    if (!comments.empty()) {
+//        for (auto &comment: comments) {
+//            std::shared_ptr<LuaAstNode> commentAst = CreateAstNode(LuaAstNodeType::Comment);
+//            switch (comment.TokenType) {
+//                case TK_SHORT_COMMENT: {
+//                    commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::ShortComment, comment));
+//                    break;
+//                }
+//                case TK_LONG_COMMENT: {
+//                    commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::LongComment, comment));
+//                    break;
+//                }
+//                case TK_SHEBANG: {
+//                    commentAst->AddChild(CreateAstNodeFromToken(LuaAstNodeType::ShebangComment, comment));
+//                    break;
+//                }
+//                case TK_DOC_COMMENT: {
+//                    auto shortComment = CreateAstNodeFromToken(LuaAstNodeType::ShortComment, comment);
+//                    DocStatement(shortComment, comment);
+//                    commentAst->AddChild(shortComment);
+//                    break;
+//                }
+//                default: {
+//                    break;
+//                }
+//            }
+//
+//            blockNode->AddComment(commentAst);
+//        }
+//    }
+//}
+Marker LuaParser::Mark() {
+    auto pos = _events.size();
+    _events.emplace_back();
+    return Marker(pos);
 }
 
-LuaParser::LuaParser(std::shared_ptr<LuaTokenParser> luaLexer)
-        : _tokenParser(luaLexer),
-          _chunkAstNode(nullptr),
-          _file(luaLexer->GetFile()) {
+void LuaParser::Next() {
+    auto tk = Current();
+    auto me = MarkEvent(MarkEventType::EatToken);
+    me.U.Token.Kind = tk;
+    me.U.Token.Index = _tokenIndex;
+    _events.push_back(me);
+    _tokenIndex++;
+    _invalid = true;
+}
+
+LuaTokenType LuaParser::LookAhead() {
+    std::size_t nextIndex = _tokenIndex + 1;
+
+    while (nextIndex < _tokens.size()) {
+        auto tk = _tokens[nextIndex].TokenType;
+        switch (tk) {
+            case TK_SHORT_COMMENT:
+            case TK_LONG_COMMENT:
+            case TK_SHEBANG: {
+                nextIndex++;
+            }
+            default: {
+                return tk;
+            }
+        }
+    }
+
+    return TK_EOF;
+}
+
+LuaTokenType LuaParser::Current() {
+    if (_invalid) {
+        _invalid = false;
+        SkipComment();
+        if (_tokenIndex < _tokens.size()) {
+            _current = _tokens[_tokenIndex].TokenType;
+        } else {
+            _current = TK_EOF;
+        }
+    }
+
+    return _current;
+}
+
+void LuaParser::SkipComment() {
+    for (; _tokenIndex < _tokens.size(); _tokenIndex++) {
+        switch (_tokens[_tokenIndex].TokenType) {
+            case TK_SHORT_COMMENT:
+            case TK_LONG_COMMENT:
+            case TK_SHEBANG: {
+                // ignore
+            }
+            default: {
+                return;
+            }
+        }
+    }
 }
 
 bool LuaParser::BlockFollow(bool rightbrace) {
-    switch (_tokenParser->Current().TokenType) {
+    switch (Current()) {
         case TK_ELSE:
         case TK_ELSEIF:
         case TK_END:
-        case TK_EOS:
+        case TK_EOF:
         case TK_UNTIL:
             return true;
         case ')':
@@ -123,258 +183,307 @@ bool LuaParser::BlockFollow(bool rightbrace) {
     }
 }
 
-void LuaParser::StatementList(std::shared_ptr<LuaAstNode> blockNode) {
+void LuaParser::StatementList() {
     while (!BlockFollow(true)) {
-        Statement(blockNode);
+        Statement();
     }
 }
 
-void LuaParser::Statement(std::shared_ptr<LuaAstNode> blockNode) {
-    switch (_tokenParser->Current().TokenType) {
+void LuaParser::Statement() {
+    switch (Current()) {
         case ';': {
-            auto emptyStatement = CreateAstNodeFromCurrentToken(LuaAstNodeType::EmptyStatement);
-            blockNode->AddChild(emptyStatement);
-            _tokenParser->Next();
+            auto m = Mark();
+            Next();
+            m.Complete(*this, LuaAstNodeType::EmptyStatement);
             break;
         }
         case TK_IF: {
-            IfStatement(blockNode);
+            IfStatement();
             break;
         }
         case TK_WHILE: {
-            WhileStatement(blockNode);
+            WhileStatement();
             break;
         }
         case TK_DO: {
-            DoStatement(blockNode);
+            DoStatement();
             break;
         }
         case TK_FOR: {
-            ForStatement(blockNode);
+            ForStatement();
             break;
         }
         case TK_REPEAT: {
-            RepeatStatement(blockNode);
+            RepeatStatement();
             break;
         }
         case TK_FUNCTION: {
-            FunctionStatement(blockNode);
+            FunctionStatement();
             break;
         }
         case TK_LOCAL: {
-            if (_tokenParser->LookAhead().TokenType == TK_FUNCTION) {
-                LocalFunctionStatement(blockNode);
+            if (LookAhead() == TK_FUNCTION) {
+                LocalFunctionStatement();
             } else {
-                LocalStatement(blockNode);
+                LocalStatement();
             }
             break;
         }
         case TK_DBCOLON: {
-            LabelStatement(blockNode);
+            LabelStatement();
             break;
         }
         case TK_RETURN: {
-            ReturnStatement(blockNode);
+            ReturnStatement();
             break;
         }
         case TK_BREAK: {
-            BreakStatement(blockNode);
+            BreakStatement();
             break;
         }
         case TK_GOTO: {
-            GotoStatement(blockNode);
+            GotoStatement();
             break;
         }
         default: {
-            ExpressionStatement(blockNode);
+            ExpressionStatement();
             break;
         }
     }
 }
 
 /* ifstat -> IF cond THEN block {ELSEIF cond THEN block} [ELSE block] END */
-void LuaParser::IfStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto ifNode = CreateAstNode(LuaAstNodeType::IfStatement);
+void LuaParser::IfStatement() {
+    auto m = Mark();
 
-    TestThenBlock(ifNode);
-    while (_tokenParser->Current().TokenType == TK_ELSEIF) {
-        TestThenBlock(ifNode);
+    TestThenBlock();
+    while (Current() == TK_ELSEIF) {
+        TestThenBlock();
     }
-    if (TestNext(TK_ELSE, ifNode)) {
-        Block(ifNode);
+    if (TestAndNext(TK_ELSE)) {
+        Block();
     }
-    CheckMatch(TK_END, TK_IF, ifNode);
+    CheckAndNext(TK_END);
 
-    blockNode->AddChild(ifNode);
+    m.Complete(*this, LuaAstNodeType::IfStatement);
 }
 
 /* whilestat -> WHILE cond DO block END */
-void LuaParser::WhileStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto whileStatement = CreateAstNode(LuaAstNodeType::WhileStatement);
+void LuaParser::WhileStatement() {
+    auto m = Mark();
 
-    CheckAndNext(TK_WHILE, whileStatement);
+    CheckAndNext(TK_WHILE);
 
-    Condition(whileStatement);
+    Condition();
 
-    CheckAndNext(TK_DO, whileStatement);
+    CheckAndNext(TK_DO);
 
-    Block(whileStatement);
+    Block();
 
-    CheckMatch(TK_END, TK_WHILE, whileStatement);
+    CheckAndNext(TK_END);
 
-    blockNode->AddChild(whileStatement);
+    m.Complete(*this, LuaAstNodeType::WhileStatement);
 }
 
-void LuaParser::DoStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto doStatement = CreateAstNode(LuaAstNodeType::DoStatement);
+void LuaParser::DoStatement() {
+    auto m = Mark();
 
-    CheckAndNext(TK_DO, doStatement);
+    CheckAndNext(TK_DO);
 
-    Block(doStatement);
+    Block();
 
-    CheckMatch(TK_END, TK_DO, doStatement);
+    CheckAndNext(TK_END);
 
-    blockNode->AddChild(doStatement);
+    m.Complete(*this, LuaAstNodeType::DoStatement);
 }
 
 /* forstat -> FOR (fornum | forlist) END */
-void LuaParser::ForStatement(std::shared_ptr<LuaAstNode> blockNode) {
+void LuaParser::ForStatement() {
     // forstatement 只有一个 for 的token 节点 加上 forNumber或者forList 节点
-    auto forStatement = CreateAstNode(LuaAstNodeType::ForStatement);
+    auto m = Mark();
 
-    CheckAndNext(TK_FOR, forStatement);
+    CheckAndNext(TK_FOR);
 
     Check(TK_NAME);
 
-    switch (_tokenParser->LookAhead().TokenType) {
+    switch (LookAhead()) {
         case '=': {
-            ForNumber(forStatement);
+            ForNumber();
             break;
         }
         case ',':
         case TK_IN: {
-            ForList(forStatement);
+            ForList();
             break;
         }
         default: {
-            ThrowLuaError("'=' or 'in' expected", forStatement);
+            ThrowLuaError("'=' or 'in' expected");
         }
     }
 
-    blockNode->AddChild(forStatement);
+    m.Complete(*this, LuaAstNodeType::ForStatement);
+}
+
+void LuaParser::ForNumber() {
+    auto m = Mark();
+
+    CheckName();
+
+    CheckAndNext('=');
+
+    Expression();
+
+    CheckAndNext(',');
+
+    Expression();
+
+    if (TestAndNext(',')) // optional step
+    {
+        Expression();
+    }
+
+    ForBody();
+
+    m.Complete(*this, LuaAstNodeType::ForNumber);
+}
+
+/* forlist -> NAME {,NAME} IN explist forbody */
+void LuaParser::ForList() {
+    auto m = Mark();
+
+    NameDefList();
+
+    CheckAndNext(TK_IN);
+
+    ExpressionList();
+
+    ForBody();
+
+    m.Complete(*this, LuaAstNodeType::ForList);
+}
+
+void LuaParser::ForBody() {
+    auto m = Mark();
+
+    CheckAndNext(TK_DO);
+
+    Block();
+
+    CheckAndNext(TK_END);
+
+    m.Complete(*this, LuaAstNodeType::ForBody);
 }
 
 /* repeatstat -> REPEAT block UNTIL cond */
-void LuaParser::RepeatStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto repeatStatement = CreateAstNode(LuaAstNodeType::RepeatStatement);
+void LuaParser::RepeatStatement() {
+    auto m = Mark();
 
-    CheckAndNext(TK_REPEAT, repeatStatement);
+    CheckAndNext(TK_REPEAT);
 
-    Block(repeatStatement);
+    Block();
 
-    CheckMatch(TK_UNTIL, TK_REPEAT, repeatStatement);
+    CheckAndNext(TK_UNTIL);
 
-    Condition(repeatStatement);
+    Condition();
 
-    blockNode->AddChild(repeatStatement);
+    m.Complete(*this, LuaAstNodeType::RepeatStatement);
 }
 
-void LuaParser::FunctionStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto functionStatement = CreateAstNode(LuaAstNodeType::FunctionStatement);
+void LuaParser::FunctionStatement() {
+    auto m = Mark();
 
-    CheckAndNext(TK_FUNCTION, functionStatement);
+    CheckAndNext(TK_FUNCTION);
 
-    FunctionName(functionStatement);
+    FunctionName();
 
-    FunctionBody(functionStatement);
+    FunctionBody();
 
-    blockNode->AddChild(functionStatement);
+    m.Complete(*this, LuaAstNodeType::FunctionStatement);
 }
 
-void LuaParser::LocalFunctionStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto localFunctionStatement = CreateAstNode(LuaAstNodeType::LocalFunctionStatement);
+void LuaParser::LocalFunctionStatement() {
+    auto m = Mark();
 
-    CheckAndNext(TK_LOCAL, localFunctionStatement);
+    CheckAndNext(TK_LOCAL);
 
-    CheckAndNext(TK_FUNCTION, localFunctionStatement);
+    CheckAndNext(TK_FUNCTION);
 
-    CheckName(localFunctionStatement);
+    CheckName();
 
-    FunctionBody(localFunctionStatement);
+    FunctionBody();
 
-    blockNode->AddChild(localFunctionStatement);
+    m.Complete(*this, LuaAstNodeType::LocalFunctionStatement);
 }
 
 /* stat -> LOCAL ATTRIB NAME {',' ATTRIB NAME} ['=' explist] */
-void LuaParser::LocalStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto localStatement = CreateAstNode(LuaAstNodeType::LocalStatement);
+void LuaParser::LocalStatement() {
+    auto m = Mark();
 
-    CheckAndNext(TK_LOCAL, localStatement);
+    CheckAndNext(TK_LOCAL);
 
-    auto nameDefList = CreateAstNode(LuaAstNodeType::NameDefList);
-
+    auto nm = Mark();
     do {
-        CheckName(nameDefList);
-        GetLocalAttribute(nameDefList);
-    } while (TestNext(',', nameDefList, LuaAstNodeType::GeneralOperator));
+        CheckName();
+        LocalAttribute();
+    } while (TestAndNext(','));
+    nm.Complete(*this, LuaAstNodeType::NameDefList);
 
-    localStatement->AddChild(nameDefList);
-
-    if (TestNext('=', localStatement, LuaAstNodeType::GeneralOperator)) {
-        ExpressionList(localStatement);
+    if (TestAndNext('=')) {
+        ExpressionList();
     }
     // 如果有一个分号则加入到localstatement
-    TestNext(';', localStatement, LuaAstNodeType::GeneralOperator);
+    TestAndNext(';');
 
-    blockNode->AddChild(localStatement);
+    m.Complete(*this, LuaAstNodeType::LocalStatement);
 }
 
-void LuaParser::LabelStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto labelStatement = CreateAstNode(LuaAstNodeType::LabelStatement);
+void LuaParser::LabelStatement() {
+    auto m = Mark();
 
-    CheckAndNext(TK_DBCOLON, labelStatement);
+    CheckAndNext(TK_DBCOLON);
 
-    CheckName(labelStatement);
+    CheckName();
 
-    CheckAndNext(TK_DBCOLON, labelStatement);
+    CheckAndNext(TK_DBCOLON);
 
-    //认为label是单独的语句
-    blockNode->AddChild(labelStatement);
+    m.Complete(*this, LuaAstNodeType::LabelStatement);
 }
 
-void LuaParser::ReturnStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto returnStatement = CreateAstNode(LuaAstNodeType::ReturnStatement);
+void LuaParser::ReturnStatement() {
+    auto m = Mark();
 
-    CheckAndNext(TK_RETURN, returnStatement);
+    CheckAndNext(TK_RETURN);
 
-    if (!(BlockFollow() || _tokenParser->Current().TokenType == ';')) {
-        ExpressionList(returnStatement);
+    if (!(BlockFollow() || Current() == ';')) {
+        ExpressionList();
     }
 
-    TestNext(';', returnStatement, LuaAstNodeType::GeneralOperator);
+    TestAndNext(';');
 
-    blockNode->AddChild(returnStatement);
+    m.Complete(*this, LuaAstNodeType::ReturnStatement);
 }
 
 
-void LuaParser::BreakStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto breakStatement = CreateAstNode(LuaAstNodeType::BreakStatement);
+void LuaParser::BreakStatement() {
+    auto m = Mark();
 
-    CheckAndNext(TK_BREAK, breakStatement);
+    CheckAndNext(TK_BREAK);
 
-    TestNext(';', breakStatement, LuaAstNodeType::GeneralOperator);
-    blockNode->AddChild(breakStatement);
+    TestAndNext(';');
+
+    m.Complete(*this, LuaAstNodeType::BreakStatement);
 }
 
-void LuaParser::GotoStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto gotoStatement = CreateAstNode(LuaAstNodeType::GotoStatement);
+void LuaParser::GotoStatement() {
+    auto m = Mark();
 
-    CheckAndNext(TK_GOTO, gotoStatement);
+    CheckAndNext(TK_GOTO);
 
-    CheckName(gotoStatement);
+    CheckName();
 
-    TestNext(';', gotoStatement, LuaAstNodeType::GeneralOperator);
-    blockNode->AddChild(gotoStatement);
+    TestAndNext(';');
+
+    m.Complete(*this, LuaAstNodeType::GotoStatement);
 }
 
 /* stat -> func | assignment */
@@ -384,259 +493,168 @@ void LuaParser::GotoStatement(std::shared_ptr<LuaAstNode> blockNode) {
  * exprstat -> func
  * assignment -> exprList '=' exprList
  */
-void LuaParser::ExpressionStatement(std::shared_ptr<LuaAstNode> blockNode) {
-    auto expression = CreateAstNode(LuaAstNodeType::Expression);
-    SuffixedExpression(expression);
-    if (_tokenParser->Current().TokenType == '=' || _tokenParser->Current().TokenType == ',') {
-        auto expressionList = CreateAstNode(LuaAstNodeType::ExpressionList);
+void LuaParser::ExpressionStatement() {
+    auto m = Mark();
+    SuffixedExpression();
+    if (Current() == '=' || Current() == ',') {
+        while (TestAndNext(',')) {
+            SuffixedExpression();
+        }
+        auto cm = m.Complete(*this, LuaAstNodeType::VarList);
+        m = cm.Precede(*this);
 
-        expressionList->AddChild(expression);
+        CheckAndNext('=');
 
-        auto assignStatementNode = CreateAstNode(LuaAstNodeType::AssignStatement);
-
-        AssignStatement(expressionList, assignStatementNode);
+        ExpressionList();
 
         // 如果发现一个分号，会认为分号为该语句的结尾
-        TestNext(';', assignStatementNode, LuaAstNodeType::GeneralOperator);
-
-        blockNode->AddChild(assignStatementNode);
+        TestAndNext(';');
+        m.Complete(*this, LuaAstNodeType::AssignStatement);
     } else {
-        auto expressionStatement = CreateAstNode(LuaAstNodeType::ExpressionStatement);
-
-        expressionStatement->AddChild(expression);
-
-        TestNext(';', expressionStatement, LuaAstNodeType::GeneralOperator);
-
-        blockNode->AddChild(expressionStatement);
+        TestAndNext(';');
+        m.Complete(*this, LuaAstNodeType::ExpressionStatement);
     }
 }
 
-/*
-** Parse and compile a multiple assignment. The first "variable"
-** (a 'suffixedexp') was already read by the caller.
-**
-** assignment -> suffixedexp restassign
-** restassign -> ',' suffixedexp restassign | '=' explist
-*/
-void LuaParser::AssignStatement(std::shared_ptr<LuaAstNode> expressionListNode,
-                                std::shared_ptr<LuaAstNode> assignStatementNode) {
-    if (TestNext(',', expressionListNode, LuaAstNodeType::GeneralOperator)) {
-        auto expression = CreateAstNode(LuaAstNodeType::Expression);
-        SuffixedExpression(expression);
+//
+//void LuaParser::DocStatement(std::shared_ptr<LuaAstNode> comment, LuaToken &docComment) {
+//    LuaDocTokenParser docTokenParser(docComment.Text, docComment.Range);
+//    docTokenParser.Next();
+//
+//    switch (docTokenParser.Current().TokenType) {
+//        case TK_DOC_TAG_FORMAT: {
+//            DocTagFormatStatement(comment, docTokenParser);
+//            break;
+//        }
+//        default: {
+//            break;
+//        }
+//    }
+//}
+//
+//void LuaParser::DocTagFormatStatement(std::shared_ptr<LuaAstNode> comment, LuaDocTokenParser &docTokenParser) {
+//    auto docFormat = CreateAstNodeFromToken(LuaAstNodeType::DocTagFormat, docTokenParser.Current());
+//
+//    docTokenParser.Next();
+//    switch (docTokenParser.Current().TokenType) {
+//        case TK_DOC_DISABLE:
+//        case TK_DOC_DISABLE_NEXT: {
+//            docFormat->AddChild(CreateAstNodeFromToken(LuaAstNodeType::KeyWord, docTokenParser.Current()));
+//            break;
+//        }
+//        default: {
+//            return;
+//        }
+//    }
+//
+//    comment->AddChild(docFormat);
+//}
 
-        expressionListNode->AddChild(expression);
-
-        AssignStatement(expressionListNode, assignStatementNode);
-    } else {
-        assignStatementNode->AddChild(expressionListNode);
-        CheckAndNext('=', assignStatementNode, LuaAstNodeType::GeneralOperator);
-        ExpressionList(assignStatementNode);
-    }
+void LuaParser::Condition() {
+    Expression();
 }
-
-void LuaParser::Comment(std::shared_ptr<LuaAstNode> block) {
-    std::shared_ptr<LuaAstNode> commentAst = CreateAstNode(LuaAstNodeType::Comment);
-    if (_tokenParser->Current().TokenType == TK_SHORT_COMMENT) {
-        commentAst->AddChild(CreateAstNodeFromCurrentToken(LuaAstNodeType::ShortComment));
-    } else if (_tokenParser->Current().TokenType == TK_LONG_COMMENT) {
-        commentAst->AddChild(CreateAstNodeFromCurrentToken(LuaAstNodeType::LongComment));
-    } else {
-        commentAst->AddChild(CreateAstNodeFromCurrentToken(LuaAstNodeType::ShebangComment));
-    }
-    _tokenParser->Next();
-
-    block->AddChild(commentAst);
-}
-
-void LuaParser::DocStatement(std::shared_ptr<LuaAstNode> comment, LuaToken &docComment) {
-    LuaDocTokenParser docTokenParser(docComment.Text, docComment.Range);
-    docTokenParser.Next();
-
-    switch (docTokenParser.Current().TokenType) {
-        case TK_DOC_TAG_FORMAT: {
-            DocTagFormatStatement(comment, docTokenParser);
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-}
-
-void LuaParser::DocTagFormatStatement(std::shared_ptr<LuaAstNode> comment, LuaDocTokenParser &docTokenParser) {
-    auto docFormat = CreateAstNodeFromToken(LuaAstNodeType::DocTagFormat, docTokenParser.Current());
-
-    docTokenParser.Next();
-    switch (docTokenParser.Current().TokenType) {
-        case TK_DOC_DISABLE:
-        case TK_DOC_DISABLE_NEXT: {
-            docFormat->AddChild(CreateAstNodeFromToken(LuaAstNodeType::KeyWord, docTokenParser.Current()));
-            break;
-        }
-        default: {
-            return;
-        }
-    }
-
-    comment->AddChild(docFormat);
-}
-
-void LuaParser::Condition(std::shared_ptr<LuaAstNode> parent) {
-    Expression(parent);
-}
-
 
 /* test_then_block -> [IF | ELSEIF] cond THEN block */
-void LuaParser::TestThenBlock(std::shared_ptr<LuaAstNode> ifNode) {
-    auto ifOrElseifKeyNode = CreateAstNodeFromToken(LuaAstNodeType::KeyWord, _tokenParser->Current());
-    ifNode->AddChild(ifOrElseifKeyNode);
-
-    _tokenParser->Next(); /*skip if or elseif*/
-    Expression(ifNode);
-    CheckAndNext(TK_THEN, ifNode);
-    Block(ifNode);
-}
-
-
-void LuaParser::Block(std::shared_ptr<LuaAstNode> parent) {
-    auto blockNode = CreateAstNode(LuaAstNodeType::Block);
-
-    StatementList(blockNode);
-
-    parent->AddChild(blockNode);
-}
-
-void LuaParser::CheckMatch(LuaTokenType what, LuaTokenType who, std::shared_ptr<LuaAstNode> parent,
-                           LuaAstNodeType addType) {
-    if (!TestNext(what, parent, addType)) {
-        auto range = parent->GetTextRange();
-        ThrowMatchError(Util::format("token {} expected ,(to close {} at", what, who),
-                        TextRange(range.StartOffset, range.EndOffset), what);
+void LuaParser::TestThenBlock() {
+    if (Current() == TK_IF || Current() == TK_ELSEIF) {
+        Next();
     }
+    Expression();
+    CheckAndNext(TK_THEN);
+    Block();
+}
+
+void LuaParser::Block() {
+    auto m = Mark();
+
+    StatementList();
+
+    m.Complete(*this, LuaAstNodeType::Block);
 }
 
 /* explist -> expr { ',' expr } */
-void LuaParser::ExpressionList(std::shared_ptr<LuaAstNode> parent, LuaTokenType stopToken) {
-    auto expressionListNode = CreateAstNode(LuaAstNodeType::ExpressionList);
-    Expression(expressionListNode);
-    while (TestNext(',', expressionListNode, LuaAstNodeType::GeneralOperator)) {
-        if (_tokenParser->Current().TokenType == stopToken) {
+void LuaParser::ExpressionList(LuaTokenType stopToken) {
+    auto m = Mark();
+
+    Expression();
+    while (TestAndNext(',')) {
+        if (Current() == stopToken) {
             break;
         }
 
-        Expression(expressionListNode);
+        Expression();
     }
 
-    parent->AddChild(expressionListNode);
+    m.Complete(*this, LuaAstNodeType::ExpressionList);
 }
 
-void LuaParser::Expression(std::shared_ptr<LuaAstNode> parent) {
-    // 所有具体表达式树都在表达式节点下
-    // 例如 单一元表达式 作为 表达式节点的一个child
-    // 复杂表达式的顶层也作为表达式节点的child
-    auto expressionNode = CreateAstNode(LuaAstNodeType::Expression);
-    Subexpression(expressionNode, 0);
-
-    parent->AddChild(expressionNode);
+void LuaParser::Expression() {
+    Subexpression(0);
 }
 
 /*
 * subexpr -> (simpleexp | unop subexpr) { binop subexpr }
 */
-void LuaParser::Subexpression(std::shared_ptr<LuaAstNode> expressionNode, int limit) {
-    // 假设都是二元表达式
-    auto binaryExpression = CreateAstNode(LuaAstNodeType::BinaryExpression);
-
-    UnOpr uop = GetUnaryOperator(_tokenParser->Current().TokenType);
+void LuaParser::Subexpression(int limit) {
+    CompleteMarker cm;
+    UnOpr uop = GetUnaryOperator(Current());
     if (uop != UnOpr::OPR_NOUNOPR) /* prefix (unary) operator? */
     {
-        auto unaryExpression = CreateAstNode(LuaAstNodeType::UnaryExpression);
-
-        auto unaryTokenNode = CreateAstNodeFromToken(LuaAstNodeType::UnaryOperator, _tokenParser->Current());
-        unaryExpression->AddChild(unaryTokenNode);
-
-        _tokenParser->Next();
-        Subexpression(unaryExpression, UNARY_PRIORITY);
-
-        binaryExpression->AddChild(unaryExpression);
+        auto m = Mark();
+        Next();
+        Subexpression(UNARY_PRIORITY);
+        cm = m.Complete(*this, LuaAstNodeType::UnaryExpression);
     } else {
-        SimpleExpression(binaryExpression);
+        cm = SimpleExpression();
     }
 
-
-    bool isBinary = false;
-
-    auto op = GetBinaryOperator(_tokenParser->Current().TokenType);
+    auto op = GetBinaryOperator(Current());
     /* expand while operators have priorities higher than 'limit' */
     while (op != BinOpr::OPR_NOBINOPR && priority[static_cast<int>(op)].left > limit) {
-        if (isBinary) {
-            auto topBinaryExpression = CreateAstNode(LuaAstNodeType::BinaryExpression);
-            topBinaryExpression->AddChild(binaryExpression);
-            binaryExpression = topBinaryExpression;
-        } else {
-            isBinary = true;
-        }
+        auto m = cm.Precede(*this);
 
-        auto binaryOperator = CreateAstNodeFromToken(LuaAstNodeType::BinaryOperator, _tokenParser->Current());
-        binaryExpression->AddChild(binaryOperator);
+        Next();
 
-        _tokenParser->Next();
-        Subexpression(binaryExpression, priority[static_cast<int>(op)].right);
+        Subexpression(priority[static_cast<int>(op)].right);
 
+        cm = m.Complete(*this, LuaAstNodeType::BinaryExpression);
         // next op
-        op = GetBinaryOperator(_tokenParser->Current().TokenType);
-    }
-
-
-    if (isBinary) {
-        expressionNode->AddChild(binaryExpression);
-    } else {
-        auto children = binaryExpression->GetChildren();
-        for (auto child: children) {
-            expressionNode->AddChild(child);
-        }
+        op = GetBinaryOperator(Current());
     }
 }
 
 /* simpleexp -> FLT | INT | STRING | NIL | TRUE | FALSE | ... |
 				constructor | FUNCTION body | suffixedexp */
-void LuaParser::SimpleExpression(std::shared_ptr<LuaAstNode> expressionNode) {
-    switch (_tokenParser->Current().TokenType) {
+CompleteMarker LuaParser::SimpleExpression() {
+    switch (Current()) {
         case TK_FLT:
-        case TK_INT:
+        case TK_NUMBER:
         case TK_NIL:
         case TK_TRUE:
         case TK_FALSE:
         case TK_DOTS: {
-            auto tokenNode = CreateAstNodeFromCurrentToken(LuaAstNodeType::LiteralExpression);
-            expressionNode->AddChild(tokenNode);
-            _tokenParser->Next();
-            break;
+            auto m = Mark();
+            Next();
+            return m.Complete(*this, LuaAstNodeType::LiteralExpression);
         }
         case TK_STRING: {
-            auto tokenNode = CreateAstNodeFromCurrentToken(LuaAstNodeType::StringLiteralExpression);
-            expressionNode->AddChild(tokenNode);
-            _tokenParser->Next();
-            break;
+            auto m = Mark();
+            Next();
+            return m.Complete(*this, LuaAstNodeType::StringLiteralExpression);
         }
         case '{': {
-            TableConstructor(expressionNode);
-            break;
+            return TableConstructor();
         }
         case TK_FUNCTION: {
-            auto closureNode = CreateAstNode(LuaAstNodeType::ClosureExpression);
-            auto functionKeyWordNode = CreateAstNodeFromToken(LuaAstNodeType::KeyWord, _tokenParser->Current());
-            closureNode->AddChild(functionKeyWordNode);
+            auto m = Mark();
 
-            _tokenParser->Next();
-            FunctionBody(closureNode);
+            Next();
+            FunctionBody();
 
-            expressionNode->AddChild(closureNode);
-            break;
+            return m.Complete(*this, LuaAstNodeType::ClosureExpression);
         }
         default: {
-            SuffixedExpression(expressionNode);
-            return;
+            return SuffixedExpression();
         }
     }
 }
@@ -644,304 +662,265 @@ void LuaParser::SimpleExpression(std::shared_ptr<LuaAstNode> expressionNode) {
 /* constructor -> '{' [ field { sep field } [sep] ] '}'
    sep -> ',' | ';'
 */
-void LuaParser::TableConstructor(std::shared_ptr<LuaAstNode> expressionNode) {
-    auto tableExpression = CreateAstNode(LuaAstNodeType::TableExpression);
-    CheckAndNext('{', tableExpression, LuaAstNodeType::GeneralOperator);
+CompleteMarker LuaParser::TableConstructor() {
+    auto m = Mark();
+    CheckAndNext('{');
 
     do {
-        if (_tokenParser->Current().TokenType == '}') {
+        if (Current() == '}') {
             break;
         }
-        Field(tableExpression);
-    } while (TestNext(',', tableExpression, LuaAstNodeType::TableFieldSep)
-             || TestNext(';', tableExpression, LuaAstNodeType::TableFieldSep));
+        Field();
+    } while (TestAndNext(',')
+             || TestAndNext(';'));
 
-    CheckMatch('}', '{', tableExpression, LuaAstNodeType::GeneralOperator);
+    CheckAndNext('}');
 
-    expressionNode->AddChild(tableExpression);
+    return m.Complete(*this, LuaAstNodeType::TableExpression);
 }
 
 /* field -> listfield | recfield */
-void LuaParser::Field(std::shared_ptr<LuaAstNode> tableExpressionNode) {
-    auto tableFieldNode = CreateAstNode(LuaAstNodeType::TableField);
-    switch (_tokenParser->Current().TokenType) {
+void LuaParser::Field() {
+    auto m = Mark();
+
+    switch (Current()) {
         case TK_NAME: {
-            if (_tokenParser->LookAhead().TokenType != '=') {
-                ListField(tableFieldNode);
+            if (LookAhead() != '=') {
+                ListField();
             } else {
-                RectField(tableFieldNode);
+                RectField();
             }
             break;
         }
         case '[': {
-            RectField(tableFieldNode);
+            RectField();
             break;
         }
         default: {
-            ListField(tableFieldNode);
+            ListField();
             break;
         }
     }
 
-    tableExpressionNode->AddChild(tableFieldNode);
+    m.Complete(*this, LuaAstNodeType::TableField);
 }
 
-void LuaParser::ListField(std::shared_ptr<LuaAstNode> tableFieldNode) {
-    Expression(tableFieldNode);
+void LuaParser::ListField() {
+    Expression();
 }
 
 /* recfield -> (NAME | '['exp']') = exp */
-void LuaParser::RectField(std::shared_ptr<LuaAstNode> tableFieldNode) {
-    if (_tokenParser->Current().TokenType == TK_NAME) {
-        CodeName(tableFieldNode);
+void LuaParser::RectField() {
+    if (Current() == TK_NAME) {
+        Next();
     } else {
-        YIndex(tableFieldNode);
+        YIndex();
     }
 
-    CheckAndNext('=', tableFieldNode, LuaAstNodeType::GeneralOperator);
+    CheckAndNext('=');
 
-    Expression(tableFieldNode);
+    Expression();
 }
 
 /* body ->  '(' parlist ')' block END */
-void LuaParser::FunctionBody(std::shared_ptr<LuaAstNode> closureExpression) {
-    auto functionBodyNode = CreateAstNode(LuaAstNodeType::FunctionBody);
+void LuaParser::FunctionBody() {
+    auto m = Mark();
 
-    ParamList(functionBodyNode);
+    ParamList();
 
-    if (_tokenParser->Current().TokenType != ')') {
-        Block(functionBodyNode);
-    }
+    Block();
 
-    CheckMatch(TK_END, TK_FUNCTION, functionBodyNode);
+    CheckAndNext(TK_END);
 
-    closureExpression->AddChild(functionBodyNode);
+    m.Complete(*this, LuaAstNodeType::FunctionBody);
 }
 
-void LuaParser::ParamList(std::shared_ptr<LuaAstNode> functionBodyNode) {
-    auto paramList = CreateAstNode(LuaAstNodeType::ParamList);
+void LuaParser::ParamList() {
+    auto m = Mark();
 
-    CheckAndNext('(', paramList, LuaAstNodeType::GeneralOperator);
+    CheckAndNext('(');
 
     bool isVararg = false;
-    if (_tokenParser->Current().TokenType != ')') {
+    if (Current() != ')') {
         do {
-            switch (_tokenParser->Current().TokenType) {
+            switch (Current()) {
                 case TK_NAME: {
-                    auto paramNode = CreateAstNodeFromToken(LuaAstNodeType::Param, _tokenParser->Current());
-                    paramList->AddChild(paramNode);
-                    _tokenParser->Next();
+                    Next();
                     break;
                 }
                 case TK_DOTS: {
                     isVararg = true;
-                    auto paramNode = CreateAstNodeFromToken(LuaAstNodeType::Param, _tokenParser->Current());
-                    paramList->AddChild(paramNode);
-                    _tokenParser->Next();
+                    Next();
                     break;
                 }
                 case ')': {
                     break;
                 }
                 default: {
-                    ThrowLuaError("<name> or '...' expected", paramList);
+                    ThrowLuaError("<name> or '...' expected");
                 }
             }
-        } while (!isVararg && TestNext(',', paramList, LuaAstNodeType::GeneralOperator));
+        } while (!isVararg && TestAndNext(','));
     }
 
-    CheckAndNext(')', paramList, LuaAstNodeType::GeneralOperator);
+    CheckAndNext(')');
 
-    functionBodyNode->AddChild(paramList);
+    m.Complete(*this, LuaAstNodeType::ParamList);
 }
-
 
 /* suffixedexp ->
 	 primaryexp { '.' NAME | '[' exp ']' | ':' NAME funcargs | funcargs } */
-/* 以上是lua原始定义
- * 下面是修改定义
- * suffixedexp -> indexexpr | callexpr | primaryexp
- * indexexpr -> primaryexp { '.' NAME | '[' exp ']' | ':' NAME  }
- * callexpr -> primaryexp funcargs | indexexpr funcargs
- */
-void LuaParser::SuffixedExpression(std::shared_ptr<LuaAstNode> expressionNode) {
-    auto subExpression = CreateAstNode(LuaAstNodeType::PrimaryExpression);
-
-    PrimaryExpression(subExpression);
+CompleteMarker LuaParser::SuffixedExpression() {
+    auto m = Mark();
+    PrimaryExpression();
     for (;;) {
-        switch (_tokenParser->Current().TokenType) {
+        switch (Current()) {
             case '.': {
-                FieldSel(subExpression);
+                FieldSel();
                 break;
             }
             case '[': {
-                auto indexExpr = CreateAstNode(LuaAstNodeType::IndexExpression);
-                indexExpr->AddChild(subExpression);
-                YIndex(indexExpr);
-                subExpression = indexExpr;
+                YIndex();
                 break;
             }
             case ':': {
-                FieldSel(subExpression);
-                FunctionCallArgs(subExpression);
+                FieldSel();
+                FunctionCallArgs();
                 break;
             }
             case '(':
             case TK_STRING:
             case '{': {
-                FunctionCallArgs(subExpression);
+                FunctionCallArgs();
                 break;
             }
             default:
-                expressionNode->AddChild(subExpression);
-                return;
+                goto endLoop;
         }
     }
+    endLoop:
+
+    return m.Complete(*this, LuaAstNodeType::SuffixedExpression);
 }
 
-void LuaParser::FunctionCallArgs(std::shared_ptr<LuaAstNode> &expressionNode) {
-    auto callExpression = CreateAstNode(LuaAstNodeType::CallExpression);
+void LuaParser::FunctionCallArgs() {
+    auto m = Mark();
 
-    callExpression->AddChild(expressionNode);
-
-    auto callArgsNode = CreateAstNode(LuaAstNodeType::CallArgList);
-    switch (_tokenParser->Current().TokenType) {
+    switch (Current()) {
         case '(': {
-            auto tokenNode = CreateAstNodeFromCurrentToken(LuaAstNodeType::GeneralOperator);
-            callArgsNode->AddChild(tokenNode);
-            _tokenParser->Next();
-            if (_tokenParser->Current().TokenType != ')') {
+            Next();
+            if (Current() != ')') {
                 // extend grammar, allow pcall(1,2,)
-                ExpressionList(callArgsNode, ')');
+                ExpressionList();
             }
 
-            CheckMatch(')', '(', callArgsNode, LuaAstNodeType::GeneralOperator);
+            CheckAndNext(')');
             break;
         }
         case '{': {
-            TableConstructor(callArgsNode);
+            TableConstructor();
             break;
         }
         case TK_STRING: {
-            auto stringNode = CreateAstNodeFromCurrentToken(LuaAstNodeType::StringLiteralExpression);
-            callArgsNode->AddChild(stringNode);
-            _tokenParser->Next();
+            auto sm = Mark();
+            Next();
+            sm.Complete(*this, LuaAstNodeType::StringLiteralExpression);
             break;
         }
         default: {
-            ThrowLuaError("function arguments expected", callArgsNode);
+            ThrowLuaError("function arguments expected");
         }
     }
 
-    callExpression->AddChild(callArgsNode);
-
-    expressionNode = callExpression;
+    m.Complete(*this, LuaAstNodeType::CallExpression);
 }
 
 /* fieldsel -> ['.' | ':'] NAME */
-void LuaParser::FieldSel(std::shared_ptr<LuaAstNode> &expressionNode) {
-    auto indexExpression = CreateAstNode(LuaAstNodeType::IndexExpression);
+void LuaParser::FieldSel() {
+    auto m = Mark();
 
-    indexExpression->AddChild(expressionNode);
+    Next();
+    CheckAndNext(TK_NAME);
 
-    auto tokenNode = CreateAstNodeFromCurrentToken(LuaAstNodeType::IndexOperator);
-    indexExpression->AddChild(tokenNode);
-
-    _tokenParser->Next();
-    CodeName(indexExpression);
-
-    expressionNode = indexExpression;
+    m.Complete(*this, LuaAstNodeType::IndexExpression);
 }
 
 /* index -> '[' expr ']' */
-void LuaParser::YIndex(std::shared_ptr<LuaAstNode> expressionNode) {
-    CheckAndNext('[', expressionNode, LuaAstNodeType::IndexOperator);
+void LuaParser::YIndex() {
+    auto m = Mark();
 
-    Expression(expressionNode);
-    CheckAndNext(']', expressionNode, LuaAstNodeType::IndexOperator);
+    CheckAndNext('[');
+    Expression();
+    CheckAndNext(']');
+
+    m.Complete(*this, LuaAstNodeType::IndexExpression);
 }
 
-void LuaParser::FunctionName(std::shared_ptr<LuaAstNode> functionNode) {
-    auto expression = CreateAstNode(LuaAstNodeType::PrimaryExpression);
+void LuaParser::FunctionName() {
+    auto m = Mark();
 
-    CheckName(expression);
+    CheckAndNext(TK_NAME);
 
-    while (_tokenParser->Current().TokenType == '.') {
-        FieldSel(expression);
-    }
-    if (_tokenParser->Current().TokenType == ':') {
-        FieldSel(expression);
+    while (Current() == '.') {
+        FieldSel();
     }
 
-    auto nameExpr = CreateAstNode(LuaAstNodeType::NameExpression);
+    if (Current() == ':') {
+        FieldSel();
+    }
 
-    nameExpr->AddChild(expression);
-
-    functionNode->AddChild(nameExpr);
+    m.Complete(*this, LuaAstNodeType::FunctionNameExpression);
 }
 
-std::string_view LuaParser::CheckName(std::shared_ptr<LuaAstNode> parent) {
+std::string_view LuaParser::CheckName() {
     Check(TK_NAME);
 
-    auto identify = CreateAstNodeFromCurrentToken(LuaAstNodeType::Identify);
+//    auto identify = CreateAstNodeFromCurrentToken(LuaAstNodeType::Identify);
+//
+//    parent->AddChild(identify);
+//
+//    _tokenParser->Next();
 
-    parent->AddChild(identify);
-
-    _tokenParser->Next();
-
-    return identify->GetText();
+//    return identify->GetText();
 }
 
 /* ATTRIB -> ['<' Name '>'] */
-LuaAttribute LuaParser::GetLocalAttribute(std::shared_ptr<LuaAstNode> nameDefList) {
-    auto attribute = CreateAstNode(LuaAstNodeType::Attribute);
-
-    if (TestNext('<', attribute, LuaAstNodeType::GeneralOperator)) {
-        auto attributeName = CheckName(attribute);
-        CheckAndNext('>', attribute, LuaAstNodeType::GeneralOperator);
-
-        nameDefList->AddChild(attribute);
-
-        if (attributeName == "const") {
-            return LuaAttribute::Const;
-        } else if (attributeName == "close") {
-            return LuaAttribute::Close;
+void LuaParser::LocalAttribute() {
+    if (TestAndNext('<')) {
+        auto m = Mark();
+        auto attributeName = CheckName();
+        CheckAndNext('>');
+        if (attributeName != "const" && attributeName != "close") {
+            ThrowMatchError(Util::format("unknown attribute {}", attributeName));
         }
-
-        ThrowMatchError(Util::format("unknown attribute {}", attributeName), attribute->GetTextRange(), 0);
+        m.Complete(*this, LuaAstNodeType::Attribute);
     }
-
-    return LuaAttribute::NoAttribute;
 }
 
 void LuaParser::Check(LuaTokenType c) {
-    if (_tokenParser->Current().TokenType != c) {
-        ThrowMatchError(Util::format("{} expected", c), _tokenParser->Current().Range, c);
+    if (Current() != c) {
+        ThrowMatchError(Util::format("{} expected"));
     }
 }
 
-
 /* primaryexp -> NAME | '(' expr ')' */
-void LuaParser::PrimaryExpression(std::shared_ptr<LuaAstNode> primaryExpression) {
-    switch (_tokenParser->Current().TokenType) {
+void LuaParser::PrimaryExpression() {
+    auto m = Mark();
+    switch (Current()) {
         case '(': {
-            auto leftBreaketToken = CreateAstNodeFromCurrentToken(LuaAstNodeType::GeneralOperator);
-            primaryExpression->AddChild(leftBreaketToken);
-            _tokenParser->Next();
-
-            Expression(primaryExpression);
-            CheckMatch(')', '(', primaryExpression);
-            return;
+            Next();
+            Expression();
+            CheckAndNext(')');
+            m.Complete(*this, LuaAstNodeType::ParExpression);
+            break;
         }
         case TK_NAME: {
-            auto identify = CreateAstNodeFromCurrentToken(LuaAstNodeType::NameIdentify);
-            primaryExpression->AddChild(identify);
-            _tokenParser->Next();
-            // CodeName(primaryExpression);
-            return;
+            Next();
+            m.Complete(*this, LuaAstNodeType::NameExpression);
+            break;
         }
         default:
-            ThrowLuaError("unexpected symbol", primaryExpression);
+            ThrowLuaError("unexpected symbol");
     }
 }
 
@@ -1014,124 +993,57 @@ BinOpr LuaParser::GetBinaryOperator(LuaTokenType op) {
     }
 }
 
-void LuaParser::CheckAndNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType) {
-    if (_tokenParser->Current().TokenType != c) {
-        ThrowLuaError(Util::format("token type {} expected", c), parent);
+void LuaParser::CheckAndNext(LuaTokenType c) {
+    if (Current() != c) {
+        ThrowLuaError(Util::format("token type {} expected", c));
         return;
     }
 
-    parent->AddChild(CreateAstNodeFromCurrentToken(addType));
-
-    _tokenParser->Next();
+    Next();
 }
 
-bool LuaParser::TestNext(LuaTokenType c, std::shared_ptr<LuaAstNode> parent, LuaAstNodeType addType) {
-    if (_tokenParser->Current().TokenType == c) {
-        parent->AddChild(CreateAstNodeFromToken(addType, _tokenParser->Current()));
-        _tokenParser->Next();
+bool LuaParser::TestAndNext(LuaTokenType c) {
+    if (Current() == c) {
+        Next();
         return true;
     }
     return false;
 }
 
-void LuaParser::CodeName(std::shared_ptr<LuaAstNode> parent) {
-    if (_tokenParser->Current().TokenType == TK_NAME) {
-        auto identify = CreateAstNodeFromToken(LuaAstNodeType::Identify, _tokenParser->Current());
-        parent->AddChild(identify);
-        _tokenParser->Next();
-    }
+void LuaParser::ThrowLuaError(std::string_view message) {
+//    if (Current() != TK_EOF) {
+//        Next();
+//        _errors.emplace_back(message, 0);
+//    } else {
+//        auto offset = _tokenParser->LastValidOffset();
+//        if (offset != 0) {
+//            _errors.emplace_back(message, TextRange(offset, offset), 0);
+//        }
+//    }
+//    throw LuaParseException(message);
 }
 
-
-std::shared_ptr<LuaAstNode> LuaParser::CreateAstNode(LuaAstNodeType type) {
-    return std::make_shared<LuaAstNode>(type, std::string_view(GetSource().data(), 0), TextRange());
+void LuaParser::ThrowMatchError(std::string message) {
+//    _errors.emplace_back(message, range, token);
+//    throw LuaParseException(message);
 }
 
-std::shared_ptr<LuaAstNode> LuaParser::CreateAstNodeFromToken(LuaAstNodeType type, LuaToken &token) {
-    return std::make_shared<LuaAstNode>(type, token);
-}
+void LuaParser::NameDefList() {
+    auto m = Mark();
 
-std::shared_ptr<LuaAstNode> LuaParser::CreateAstNodeFromCurrentToken(LuaAstNodeType type) {
-    return CreateAstNodeFromToken(type, _tokenParser->Current());
-}
-
-void LuaParser::ThrowLuaError(std::string_view message, std::shared_ptr<LuaAstNode> parent) {
-    if (_tokenParser->Current().TokenType != TK_EOS) {
-        auto tokenNode = CreateAstNodeFromCurrentToken(LuaAstNodeType::Error);
-        parent->AddChild(tokenNode);
-        _tokenParser->Next();
-        _errors.emplace_back(message, tokenNode->GetTextRange(), 0);
-    } else {
-        auto offset = _tokenParser->LastValidOffset();
-        if (offset != 0) {
-            _errors.emplace_back(message, TextRange(offset, offset), 0);
-        }
-    }
-    throw LuaParseException(message);
-}
-
-void LuaParser::ThrowMatchError(std::string message, TextRange range, LuaTokenType token) {
-    _errors.emplace_back(message, range, token);
-    throw LuaParseException(message);
-}
-
-void LuaParser::ForNumber(std::shared_ptr<LuaAstNode> forStatement) {
-    auto forNumberNode = CreateAstNode(LuaAstNodeType::ForNumber);
-
-    CheckName(forNumberNode);
-
-    CheckAndNext('=', forNumberNode, LuaAstNodeType::GeneralOperator);
-
-    Expression(forNumberNode);
-
-    CheckAndNext(',', forNumberNode, LuaAstNodeType::GeneralOperator);
-
-    Expression(forNumberNode);
-
-    if (TestNext(',', forNumberNode, LuaAstNodeType::GeneralOperator)) // optional step
-    {
-        Expression(forNumberNode);
+    CheckAndNext(TK_NAME);
+    while (TestAndNext(',')) {
+        CheckAndNext(TK_NAME);
     }
 
-    ForBody(forNumberNode);
-
-    forStatement->AddChild(forNumberNode);
+    m.Complete(*this, LuaAstNodeType::NameDefList);
 }
 
-/* forlist -> NAME {,NAME} IN explist forbody */
-void LuaParser::ForList(std::shared_ptr<LuaAstNode> forStatement) {
-    auto forListNode = CreateAstNode(LuaAstNodeType::ForList);
 
-    auto nameDefList = CreateAstNode(LuaAstNodeType::NameDefList);
 
-    CheckName(nameDefList);
 
-    while (TestNext(',', nameDefList, LuaAstNodeType::GeneralOperator)) {
-        CheckName(nameDefList);
-    }
 
-    forListNode->AddChild(nameDefList);
 
-    CheckAndNext(TK_IN, forListNode);
-
-    ExpressionList(forListNode);
-
-    ForBody(forListNode);
-
-    forStatement->AddChild(forListNode);
-}
-
-void LuaParser::ForBody(std::shared_ptr<LuaAstNode> forNode) {
-    auto forBodyNode = CreateAstNode(LuaAstNodeType::ForBody);
-
-    CheckAndNext(TK_DO, forBodyNode);
-
-    Block(forBodyNode);
-
-    CheckMatch(TK_END, TK_FOR, forBodyNode);
-
-    forNode->AddChild(forBodyNode);
-}
 
 
 

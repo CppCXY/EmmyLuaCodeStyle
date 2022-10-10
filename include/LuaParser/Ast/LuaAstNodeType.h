@@ -2,15 +2,9 @@
 
 enum class LuaAstNodeType
 {
-	Chunk = 0,
+    None = 0,
 
 	Block,
-
-	Identify,
-
-	NameIdentify,
-
-	KeyWord,
 
 	EmptyStatement,
 
@@ -42,9 +36,9 @@ enum class LuaAstNodeType
 
 	AssignStatement,
 
-	Expression,
+    SuffixedExpression,
 
-	PrimaryExpression,
+    ParExpression,
 
 	LiteralExpression,
 
@@ -64,17 +58,11 @@ enum class LuaAstNodeType
 
 	NameExpression,
 
-	UnaryOperator,
+    FunctionNameExpression,
 
-	BinaryOperator,
-
-	IndexOperator,
-
-	GeneralOperator,
+    VarList,
 
 	TableField,
-
-	TableFieldSep,
 
 	FunctionBody,
 
@@ -83,10 +71,6 @@ enum class LuaAstNodeType
 	NameDefList,
 
 	Attribute,
-
-	Param,
-
-	CallArgList,
 
 	ExpressionList,
 
