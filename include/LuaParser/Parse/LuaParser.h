@@ -23,6 +23,8 @@ public:
 
     std::vector<MarkEvent>& GetEvents();
 
+    std::vector<LuaToken>& GetTokens();
+
 	std::vector<LuaParseError>& GetErrors();
 
 	bool HasError() const;

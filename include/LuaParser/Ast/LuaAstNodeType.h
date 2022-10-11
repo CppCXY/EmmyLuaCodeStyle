@@ -4,6 +4,8 @@ enum class LuaAstNodeType
 {
     None = 0,
 
+    File,
+
 	Block,
 
 	EmptyStatement,

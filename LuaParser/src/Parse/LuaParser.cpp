@@ -1039,6 +1039,10 @@ void LuaParser::NameDefList() {
     m.Complete(*this, LuaAstNodeType::NameDefList);
 }
 
+std::vector<LuaToken> &LuaParser::GetTokens() {
+    return _tokens;
+}
+
 
 
 
