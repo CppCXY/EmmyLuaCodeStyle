@@ -8,7 +8,7 @@
 #include "Util/format.h"
 #include "Util/CommandLine.h"
 #include "Util/StringUtil.h"
-#include "CodeService/LuaEditorConfig.h"
+#include "CodeService/Config/LuaEditorConfig.h"
 
 using namespace std::chrono;
 
@@ -23,7 +23,7 @@ bool TestFormatted(std::string input, const std::string& shouldBe, std::shared_p
 
 	auto formattedText = formatter.GetFormattedText();
 
-	return StringUtil::TrimSpace(formattedText) == StringUtil::TrimSpace(shouldBe);
+	return string_util::TrimSpace(formattedText) == string_util::TrimSpace(shouldBe);
 }
 
 uint64_t TestPerformance(std::string input, std::shared_ptr<LuaCodeStyleOptions> options)
@@ -51,9 +51,9 @@ bool TestGrammar(std::string input)
 	{
 		for (auto& error : parser->GetErrors())
 			std::cout << Util::format("error: {}, from [{},{}] to [{},{}]", error.ErrorMessage,
-			                    parser->GetLine(error.ErrorRange.StartOffset),
+                                      parser->GetStartLine(error.ErrorRange.StartOffset),
 			                    parser->GetColumn(error.ErrorRange.StartOffset),
-			                    parser->GetLine(error.ErrorRange.EndOffset),
+                                      parser->GetStartLine(error.ErrorRange.EndOffset),
 			                    parser->GetColumn(error.ErrorRange.EndOffset)
 			) << std::endl;
 		return result;
@@ -75,9 +75,9 @@ bool TestGrammar(std::string input)
 	{
 		for (auto& error : formattedParser->GetErrors())
 			std::cout << Util::format("error after formatted: {}, from [{},{}] to [{},{}]", error.ErrorMessage,
-			                    formattedParser->GetLine(error.ErrorRange.StartOffset),
+                                      formattedParser->GetStartLine(error.ErrorRange.StartOffset),
 			                    formattedParser->GetColumn(error.ErrorRange.StartOffset),
-			                    formattedParser->GetLine(error.ErrorRange.EndOffset),
+                                      formattedParser->GetStartLine(error.ErrorRange.EndOffset),
 			                    formattedParser->GetColumn(error.ErrorRange.EndOffset)
 			) << std::endl;
 	}

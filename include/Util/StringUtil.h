@@ -6,9 +6,8 @@
 
 /*
  * 字符串处理函数
- * @remark 命名空间之所以大写是因为他本该是静态类
  */
-namespace StringUtil
+namespace string_util
 {
 	std::vector<std::string_view> Split(std::string_view source, std::string_view separator);
 

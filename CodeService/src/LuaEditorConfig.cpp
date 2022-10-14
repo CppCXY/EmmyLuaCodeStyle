@@ -1,4 +1,4 @@
-﻿#include "CodeService/LuaEditorConfig.h"
+﻿#include "CodeService/Config/LuaEditorConfig.h"
 #include <sstream>
 #include <fstream>
 #include <vector>
@@ -47,7 +47,7 @@ LuaEditorConfig::LuaEditorConfig(std::string&& source)
 
 void LuaEditorConfig::Parse()
 {
-	auto lines = StringUtil::Split(_source, "\n");
+	auto lines = string_util::Split(_source, "\n");
 
 	bool luaSectionFounded = false;
 	std::regex comment = std::regex(R"(^\s*(;|#))");
@@ -78,7 +78,7 @@ void LuaEditorConfig::Parse()
 		{
 			if (std::regex_search(line, m, valueRegex))
 			{
-				currentSection->ConfigMap.insert({m.str(1), std::string(StringUtil::TrimSpace(m.str(2)))});
+				currentSection->ConfigMap.insert({m.str(1), std::string(string_util::TrimSpace(m.str(2)))});
 			}
 		}
 	}
@@ -96,19 +96,19 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 	for (auto& [sectionPattern, section] : _sectionMap)
 	{
 		// [*] [*.lua] [*.{lua,js,ts}]
-		if (sectionPattern == "*" || sectionPattern == "*.lua" || StringUtil::StartWith(sectionPattern, "*.{"))
+		if (sectionPattern == "*" || sectionPattern == "*.lua" || string_util::StartWith(sectionPattern, "*.{"))
 		{
 			patternKey.append("#").append(sectionPattern);
 			luaSections.push_back(section);
 		}
 			// [{test.lua,lib.lua}]
-		else if (StringUtil::StartWith(sectionPattern, "{") && StringUtil::EndWith(sectionPattern, "}"))
+		else if (string_util::StartWith(sectionPattern, "{") && string_util::EndWith(sectionPattern, "}"))
 		{
 			auto fileListText = sectionPattern.substr(1, sectionPattern.size() - 2);
-			auto fileList = StringUtil::Split(fileListText, ",");
+			auto fileList = string_util::Split(fileListText, ",");
 			for (auto fileMatchUri : fileList)
 			{
-				if (StringUtil::EndWith(fileUri, StringUtil::TrimSpace(fileMatchUri)))
+				if (string_util::EndWith(fileUri, string_util::TrimSpace(fileMatchUri)))
 				{
 					patternKey.append("#").append(sectionPattern);
 					luaSections.push_back(section);
@@ -118,7 +118,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 		}
 #ifndef NOT_SUPPORT_FILE_SYSTEM
 			// [lib/**.lua]
-		else if (StringUtil::EndWith(sectionPattern, "**.lua"))
+		else if (string_util::EndWith(sectionPattern, "**.lua"))
 		{
 			std::string prefix = sectionPattern.substr(0, sectionPattern.size() - 6);
 			std::filesystem::path workspace(_workspace);
@@ -127,7 +127,7 @@ std::shared_ptr<LuaCodeStyleOptions> LuaEditorConfig::Generate(std::string_view 
 			std::filesystem::path file(fileUri);
 			auto dirNormal = dirname.lexically_normal();
 			auto fileNormal = file.lexically_normal();
-			if (StringUtil::StartWith(fileNormal.string(), dirNormal.string()))
+			if (string_util::StartWith(fileNormal.string(), dirNormal.string()))
 			{
 				patternKey.append("#").append(sectionPattern);
 				luaSections.push_back(section);

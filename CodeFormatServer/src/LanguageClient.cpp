@@ -1,7 +1,7 @@
 #include "CodeFormatServer/LanguageClient.h"
 #include <iterator>
 #include <fstream>
-#include "CodeService/LuaEditorConfig.h"
+#include "CodeService/Config/LuaEditorConfig.h"
 #include "CodeService/LuaFormatter.h"
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"

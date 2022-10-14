@@ -1,214 +1,63 @@
-﻿#include "LuaParser/LuaAstNode/LuaAstNode.h"
-#include "LuaParser/LuaAstVisitor.h"
+﻿#include "LuaParser/Ast/LuaAstNode.h"
+#include "LuaParser/Ast/LuaAstTree.h"
 
-LuaAstNode::LuaAstNode(LuaAstNodeType type, std::string_view text, TextRange range, LuaTokenType tokenType)
-	: _type(type),
-	  _tokenType(tokenType),
-	  _text(text),
-	  _textRange(range)
+LuaAstNode::LuaAstNode(std::size_t index)
+        : _index(index) {
 
-{
 }
 
-LuaAstNode::LuaAstNode(LuaAstNodeType type, LuaToken& token)
-	: LuaAstNode(type, token.Text, token.Range, token.TokenType)
-{
+TextRange LuaAstNode::GetTextRange(const LuaAstTree &t) const {
+    return TextRange(t.GetStartOffset(_index), t.GetEndOffset(_index));
 }
 
-LuaAstNode::~LuaAstNode()
-{
+std::size_t LuaAstNode::GetStartLine(const LuaAstTree &t) const {
+    return t.GetFile().GetLine(t.GetStartOffset(_index));
 }
 
-std::shared_ptr<LuaAstNode> LuaAstNode::Copy()
-{
-	auto copyNode = std::make_shared<LuaAstNode>(GetType(), _text, _textRange);
-	copyNode->_children = _children;
-	copyNode->_parent = _parent;
-	return copyNode;
+std::size_t LuaAstNode::GetStartCol(const LuaAstTree &t) const {
+    return t.GetFile().GetColumn(t.GetStartOffset(_index));
 }
 
-std::shared_ptr<LuaAstNode> LuaAstNode::FindFirstOf(LuaAstNodeType type)
-{
-	for (auto& child : _children)
-	{
-		if (child->GetType() == type)
-		{
-			return child;
-		}
-	}
-
-	return nullptr;
+std::size_t LuaAstNode::GetEndLine(const LuaAstTree &t) const {
+    return t.GetFile().GetLine(t.GetEndOffset(_index));
 }
 
-void LuaAstNode::AcceptChildren(LuaAstVisitor& visitor)
-{
-	for (auto& child : _children)
-	{
-		visitor.Visit(child);
-	}
+std::size_t LuaAstNode::GetEndCol(const LuaAstTree &t) const {
+    return t.GetFile().GetColumn(t.GetEndOffset(_index));
 }
 
-void LuaAstNode::Accept(LuaAstVisitor& visitor)
-{
-	visitor.Visit(shared_from_this());
+std::string_view LuaAstNode::GetText(const LuaAstTree &t) const {
+    return t.GetFile().Slice(t.GetStartOffset(_index), t.GetEndOffset(_index));
 }
 
-TextRange LuaAstNode::GetTextRange() const
-{
-	return _textRange;
+bool LuaAstNode::IsNode(const LuaAstTree &t) const {
+    return t.IsNode(_index);
 }
 
-std::string_view LuaAstNode::GetText() const
-{
-	return _text;
+LuaAstNodeType LuaAstNode::GetType(const LuaAstTree &t) const {
+    return t.GetNodeType(_index);
 }
 
-LuaAstNode::ChildrenContainer& LuaAstNode::GetChildren()
-{
-	return _children;
+LuaTokenType LuaAstNode::GetTokenType(const LuaAstTree &t) const {
+    return t.GetTokenType(_index);
 }
 
-void LuaAstNode::AddChild(std::shared_ptr<LuaAstNode> child)
-{
-	if (child == nullptr)
-	{
-		return;
-	}
-
-	if (child->_textRange.IsEmpty())
-	{
-		return;
-	}
-
-	const auto source = GetSource();
-	if (child->GetSource() != source)
-	{
-		return;
-	}
-
-	if (_textRange.IsEmpty())
-	{
-		_textRange = child->_textRange;
-	}
-	else
-	{
-		if (_textRange.StartOffset > child->_textRange.StartOffset)
-		{
-			_textRange.StartOffset = child->_textRange.StartOffset;
-		}
-
-		if (_textRange.EndOffset < child->_textRange.EndOffset)
-		{
-			_textRange.EndOffset = child->_textRange.EndOffset;
-		}
-	}
-
-	_children.push_back(child);
-	child->_parent = weak_from_this();
-	_text = std::string_view(source + _textRange.StartOffset, _textRange.EndOffset - _textRange.StartOffset + 1);
+LuaAstNode LuaAstNode::GetParent(const LuaAstTree &t) const {
+    return LuaAstNode(0);
 }
 
-LuaAstNodeType LuaAstNode::GetType() const
-{
-	return _type;
+LuaAstNode LuaAstNode::GetSibling(const LuaAstTree &t) const {
+    return LuaAstNode(t.GetSibling(_index));
 }
 
-LuaTokenType LuaAstNode::GetTokenType() const
-{
-	return _tokenType;
+LuaAstNode LuaAstNode::GetFirstChild(const LuaAstTree &t) const {
+    return LuaAstNode(t.GetFirstChild(_index));
 }
 
-void LuaAstNode::AddComment(std::shared_ptr<LuaAstNode> comment)
-{
-	auto childTextRange = comment->GetTextRange();
-
-	// 防止无限递归
-	if (_textRange.StartOffset == childTextRange.StartOffset && _textRange.EndOffset == childTextRange.EndOffset)
-	{
-		return;
-	}
-
-	if (_children.empty())
-	{
-		return AddChild(comment);
-	}
-
-	for (auto it = _children.rbegin(); it != _children.rend(); ++it)
-	{
-		auto currentChild = *it;
-		auto currentChildTextRange = currentChild->GetTextRange();
-
-		if (currentChildTextRange.Contain(childTextRange))
-		{
-			return currentChild->AddComment(comment);
-		}
-		else if (childTextRange.StartOffset > currentChildTextRange.EndOffset)
-		{
-			return AddChildBefore(it.base(), comment);
-		}
-		else if (currentChild == *_children.begin())
-		{
-			return AddChildBefore(_children.begin(), comment);
-		}
-	}
+void LuaAstNode::ToNext(const LuaAstTree &t) {
+    _index = t.GetSibling(_index);
 }
 
-std::shared_ptr<LuaAstNode> LuaAstNode::GetParent()
-{
-	if (!_parent.expired())
-	{
-		return _parent.lock();
-	}
-	return nullptr;
-}
-
-const char* LuaAstNode::GetSource()
-{
-	if (_text.data() != nullptr)
-	{
-		return _text.data() - _textRange.StartOffset;
-	}
-	return nullptr;
-}
-
-void LuaAstNode::AddChildBefore(ChildIterator it, std::shared_ptr<LuaAstNode> child)
-{
-	if (it == _children.begin())
-	{
-		if (child->_textRange.IsEmpty())
-		{
-			return;
-		}
-
-		const auto source = GetSource();
-		if (child->GetSource() != source)
-		{
-			return;
-		}
-
-		if (_textRange.IsEmpty())
-		{
-			_textRange = child->_textRange;
-		}
-		else
-		{
-			if (_textRange.StartOffset > child->_textRange.StartOffset)
-			{
-				_textRange.StartOffset = child->_textRange.StartOffset;
-			}
-
-			if (_textRange.EndOffset < child->_textRange.EndOffset)
-			{
-				_textRange.EndOffset = child->_textRange.EndOffset;
-			}
-		}
-		_text = std::string_view(source + _textRange.StartOffset,
-		                         _textRange.EndOffset - _textRange.StartOffset + 1);
-	}
-	else if (it == _children.end())
-	{
-		return AddChild(child);
-	}
-
-	_children.insert(it, child);
+bool LuaAstNode::IsNull(const LuaAstTree &t) const {
+    return _index == 0;
 }

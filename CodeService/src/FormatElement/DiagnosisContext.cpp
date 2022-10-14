@@ -1,5 +1,5 @@
 ﻿#include "CodeService/FormatElement/DiagnosisContext.h"
-#include "CodeService/LanguageTranslator.h"
+#include "CodeService/Config/LanguageTranslator.h"
 #include "Util/format.h"
 
 DiagnosisContext::DiagnosisContext(std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options)

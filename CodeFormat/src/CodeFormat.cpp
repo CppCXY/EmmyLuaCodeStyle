@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "LuaFormat.h"
-#include "CodeService/LuaEditorConfig.h"
+#include "CodeService/Config/LuaEditorConfig.h"
 #include "LuaParser/LuaParser.h"
 #include "Util/format.h"
 #include "CodeService/LuaFormatter.h"
@@ -169,10 +169,10 @@ int main(int argc, char** argv)
 		if (cmd.HasOption("ignores"))
 		{
 			auto ignores = cmd.Get<std::string>("ignores");
-			auto patterns = StringUtil::Split(ignores, ";");
+			auto patterns = string_util::Split(ignores, ";");
 			for (auto pattern : patterns)
 			{
-				auto patternNoSpace = StringUtil::TrimSpace(pattern);
+				auto patternNoSpace = string_util::TrimSpace(pattern);
 				if (!patternNoSpace.empty())
 				{
 					workspaceFormat.AddIgnores(patternNoSpace);

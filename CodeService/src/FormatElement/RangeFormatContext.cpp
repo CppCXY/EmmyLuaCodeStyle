@@ -14,8 +14,8 @@ RangeFormatContext::RangeFormatContext(std::shared_ptr<LuaParser> parser, LuaCod
 void RangeFormatContext::Print(std::string_view text, TextRange range)
 {
 	int startOffset = range.StartOffset;
-	int startLine = _parser->GetLine(startOffset);
-	int endLine = _parser->GetLine(range.EndOffset);
+	int startLine = _parser->GetStartLine(startOffset);
+	int endLine = _parser->GetStartLine(range.EndOffset);
 	if (startLine > _validRange.EndLine || endLine < _validRange.StartLine)
 	{
 		_inValidRange = false;
@@ -64,8 +64,8 @@ void RangeFormatContext::Print(std::string_view text, TextRange range)
 
 void RangeFormatContext::Print(char ch, int offset)
 {
-	int startLine = _parser->GetLine(offset);
-	int endLine = _parser->GetLine(offset);
+	int startLine = _parser->GetStartLine(offset);
+	int endLine = _parser->GetStartLine(offset);
 	if (startLine > _validRange.EndLine || endLine < _validRange.StartLine)
 	{
 		_inValidRange = false;

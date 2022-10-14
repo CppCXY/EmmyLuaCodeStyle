@@ -360,7 +360,7 @@ void LuaTypeFormat::FixEndIndent(int line, int character)
 	}
 
 	auto token = tokens[tokenIndex];
-	if (token.TokenType == TK_END && luaFile->GetLine(token.Range.StartOffset) == line)
+	if (token.TokenType == TK_END && luaFile->GetStartLine(token.Range.StartOffset) == line)
 	{
 		_hasResult = true;
 		auto indentString = luaFile->GetIndentString(token.Range.StartOffset);
@@ -382,7 +382,7 @@ void LuaTypeFormat::FixEndIndent(int line, int character)
 			ctx2.Print(indentString);
 			ctx2.Print("e");
 			result.Text = ctx2.GetText();
-			result.Range.StartLine = luaFile->GetLine(token.Range.StartOffset);
+			result.Range.StartLine = luaFile->GetStartLine(token.Range.StartOffset);
 			result.Range.StartCharacter = luaFile->GetColumn(token.Range.StartOffset);
 			result.Range.EndLine = result.Range.StartLine;
 			result.Range.EndCharacter = result.Range.StartCharacter + 1;

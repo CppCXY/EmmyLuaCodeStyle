@@ -5,10 +5,10 @@
 #include <string_view>
 #include <map>
 #include "LuaParser/LuaParser.h"
-#include "CodeService/LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaCodeStyleOptions.h"
 #include "CodeFormatServer/VSCode.h"
 #include "Service.h"
-#include "CodeService/LuaFormatRange.h"
+#include "CodeService/RangeFormat/LuaFormatRange.h"
 #include "CodeService/Spell/CodeSpellChecker.h"
 
 class CodeFormatService : public Service

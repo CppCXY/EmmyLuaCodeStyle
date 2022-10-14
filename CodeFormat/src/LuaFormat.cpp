@@ -5,7 +5,7 @@
 #include "Util/format.h"
 #include <iostream>
 
-#include "CodeService/LuaEditorConfig.h"
+#include "CodeService/Config/LuaEditorConfig.h"
 #include "CodeService/LuaFormatter.h"
 #include "CodeService/NameStyle/NameStyleChecker.h"
 #include "Util/StringUtil.h"
@@ -149,7 +149,7 @@ bool LuaFormat::Check(std::string_view workspace, std::shared_ptr<CodeSpellCheck
 	std::string_view inputFile = _inputFile;
 	if (!workspace.empty())
 	{
-		inputFile = StringUtil::GetFileRelativePath(workspace, inputFile);
+		inputFile = string_util::GetFileRelativePath(workspace, inputFile);
 	}
 	if (_parser->HasError())
 	{
@@ -217,9 +217,9 @@ void LuaFormat::DiagnosisInspection(std::string_view message, TextRange range, s
                                     std::string_view path)
 {
 	std::string_view source = file->GetSource();
-	auto startLine = file->GetLine(range.StartOffset);
+	auto startLine = file->GetStartLine(range.StartOffset);
 	auto startChar = file->GetColumn(range.StartOffset);
-	auto endLine = file->GetLine(range.EndOffset);
+	auto endLine = file->GetStartLine(range.EndOffset);
 	auto endChar = file->GetColumn(range.EndOffset);
 	std::cout << Util::format("\t{}({}:{} to {}:{}): {}", path, startLine + 1, startChar, endLine + 1, endChar,
 	                    message) << std::endl;

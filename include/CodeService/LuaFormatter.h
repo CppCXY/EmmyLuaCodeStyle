@@ -2,9 +2,9 @@
 #include <memory>
 #include <sstream>
 #include "LuaParser/LuaParser.h"
-#include "LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaCodeStyleOptions.h"
 #include "FormatElement/FormatElement.h"
-#include "LuaFormatRange.h"
+#include "CodeService/RangeFormat/LuaFormatRange.h"
 #include <functional>
 
 class LuaFormatter

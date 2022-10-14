@@ -5,7 +5,7 @@
 #include <memory>
 #include "CheckElement.h"
 #include "CodeService/FormatElement/DiagnosisContext.h"
-#include "LuaParser/LuaTokenParser.h"
+#include "LuaParser/Lexer/"
 
 class NameStyleRuleMatcher
 {

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <string>
-#include "DiagnosisType.h"
+#include "DiagnosticType.h"
 
-class LuaDiagnosisPosition
+class DiagnosisPosition
 {
 public:
-	LuaDiagnosisPosition(int line, int character)
+	DiagnosisPosition(std::s line, int character)
 		: Line(line),
 		  Character(character)
 	{

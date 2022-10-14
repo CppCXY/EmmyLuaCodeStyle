@@ -67,7 +67,7 @@ void FormatContext::RecoverIndent()
 
 int FormatContext::GetLine(int offset)
 {
-	return _parser->GetLine(offset);
+	return _parser->GetStartLine(offset);
 }
 
 int FormatContext::GetColumn(int offset)
@@ -79,7 +79,7 @@ FormatContext::IndentState FormatContext::CalculateIndentState(int offset)
 {
 	auto file = _parser->GetLuaFile();
 	auto source = file->GetSource();
-	auto line = file->GetLine(offset);
+	auto line = file->GetStartLine(offset);
 	auto start = file->GetOffsetFromPosition(line, 0);
 
 

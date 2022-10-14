@@ -4,10 +4,10 @@
 #include <string>
 #include <string_view>
 
-#include "CodeService/LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaCodeStyleOptions.h"
 #include "CodeService/Diagnosis/LuaDiagnosisInfo.h"
-#include "CodeService/LuaEditorConfig.h"
-#include "CodeService/LuaFormatRange.h"
+#include "CodeService/Config/LuaEditorConfig.h"
+#include "CodeService/RangeFormat/LuaFormatRange.h"
 #include "CodeService/Spell/CodeSpellChecker.h"
 #include "CodeService/TypeFormat/LuaTypeFormat.h"
 

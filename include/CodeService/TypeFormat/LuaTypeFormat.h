@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CodeService/LuaFormatter.h"
-#include "CodeService/LuaFormatRange.h"
+#include "CodeService/RangeFormat/LuaFormatRange.h"
 #include "LuaTypeFormatOptions.h"
 
 class LuaTypeFormat

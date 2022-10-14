@@ -11,7 +11,7 @@
 class CodeSpellChecker
 {
 public:
-	using CustomDictionary = std::set<std::string, StringUtil::CaseInsensitiveLess>;
+	using CustomDictionary = std::set<std::string, string_util::CaseInsensitiveLess>;
 
 	CodeSpellChecker();
 

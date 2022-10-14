@@ -3,7 +3,7 @@
 #include <map>
 #include <set>
 
-#include "CodeService/LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaCodeStyleOptions.h"
 #include "LuaParser/LuaParser.h"
 #include "LuaParser/LuaAstVisitor.h"
 

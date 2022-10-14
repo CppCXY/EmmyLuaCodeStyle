@@ -4,8 +4,8 @@
 #include <string_view>
 #include <filesystem>
 #include "LuaFormat.h"
-#include "CodeService/LuaCodeStyleOptions.h"
-#include "CodeService/LuaEditorConfig.h"
+#include "CodeService/Config/LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaEditorConfig.h"
 
 class LuaWorkspaceFormat
 {

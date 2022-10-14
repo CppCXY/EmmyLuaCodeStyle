@@ -10,21 +10,23 @@ class LuaFile
 public:
 	explicit LuaFile(std::string&& fileText);
 
-	std::size_t GetLine(std::size_t offset);
+	std::size_t GetLine(std::size_t offset) const;
 
-	std::size_t GetColumn(std::size_t offset);
+	std::size_t GetColumn(std::size_t offset) const;
 
-	std::size_t GetOffsetFromPosition(std::size_t line, std::size_t character);
+	std::size_t GetOffset(std::size_t line, std::size_t character) const;
 
-	std::size_t GetTotalLine();
+	std::size_t GetTotalLine() const;
 
-	bool IsEmptyLine(std::size_t line);
+	bool IsEmptyLine(std::size_t line) const;
 
 	void PushLine(std::size_t offset);
 
 	bool OnlyEmptyCharBefore(std::size_t offset);
 
 	std::string_view GetSource() const;
+
+    std::string_view Slice(std::size_t startOffset, std::size_t endOffset) const;
 
 	void SetTotalLine(std::size_t line);
 

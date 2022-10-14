@@ -1,7 +1,7 @@
 ﻿#include "CodeService/NameStyle/NameStyleChecker.h"
 #include <algorithm>
 #include "Util/format.h"
-#include "CodeService/LanguageTranslator.h"
+#include "CodeService/Config/LanguageTranslator.h"
 #include "CodeService/NameStyle/NameStyleRuleMatcher.h"
 
 std::set<std::string, std::less<>> NameStyleChecker::TableFieldSpecialName = {

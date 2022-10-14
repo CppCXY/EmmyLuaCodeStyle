@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SerializeContext.h"
-#include "CodeService/LuaFormatRange.h"
+#include "CodeService/RangeFormat/LuaFormatRange.h"
 
 class RangeFormatContext : public SerializeContext
 {

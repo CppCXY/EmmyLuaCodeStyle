@@ -149,3 +149,35 @@ void LuaAstTree::BuildToken(LuaToken &token) {
     }
 }
 
+const LuaFile &LuaAstTree::GetFile() const {
+    return *_file;
+}
+
+std::size_t LuaAstTree::GetStartOffset(std::size_t index) const {
+    return 0;
+}
+
+std::size_t LuaAstTree::GetEndOffset(std::size_t index) const {
+    return 0;
+}
+
+std::size_t LuaAstTree::GetSibling(std::size_t index) const {
+    return 0;
+}
+
+std::size_t LuaAstTree::GetFirstChild(std::size_t index) const {
+    return 0;
+}
+
+LuaAstNodeType LuaAstTree::GetNodeType(std::size_t index) const {
+    return LuaAstNodeType::ExpressionStatement;
+}
+
+LuaTokenType LuaAstTree::GetTokenType(std::size_t index) const {
+    return 0;
+}
+
+bool LuaAstTree::IsNode(std::size_t index) const {
+    return false;
+}
+

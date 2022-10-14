@@ -6,7 +6,7 @@
 #include <map>
 #include "LuaParser/LuaParser.h"
 #include "CodeFormatServer/VSCode.h"
-#include "CodeService/LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaCodeStyleOptions.h"
 #include "Service.h"
 #include "Indexs/ModuleIndex.h"
 

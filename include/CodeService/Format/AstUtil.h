@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "LuaParser/LuaAstNode/LuaAstNode.h"
-#include "LuaCodeStyleEnum.h"
+#include "CodeService/Config/LuaCodeStyleEnum.h"
 
 namespace ast_util
 {

@@ -4,8 +4,8 @@
 
 #include "asio/io_context.hpp"
 #include "Session/IOSession.h"
-#include "CodeService/LuaCodeStyleOptions.h"
-#include "CodeService/LuaEditorConfig.h"
+#include "CodeService/Config/LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaEditorConfig.h"
 #include "LuaParser/LuaParser.h"
 #include "Service/ServiceType.h"
 #include "VirtualFile/VirtualFile.h"

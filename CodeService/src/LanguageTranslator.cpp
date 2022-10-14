@@ -1,4 +1,4 @@
-#include "CodeService/LanguageTranslator.h"
+#include "CodeService/Config/LanguageTranslator.h"
 
 LanguageTranslator& LanguageTranslator::GetInstance()
 {

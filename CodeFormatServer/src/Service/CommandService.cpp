@@ -2,7 +2,7 @@
 
 #include "CodeFormatServer/Service/CodeFormatService.h"
 #include "CodeFormatServer/Service/ModuleService.h"
-#include "CodeService/LuaFormatRange.h"
+#include "CodeService/RangeFormat/LuaFormatRange.h"
 #include "Util/format.h"
 #include "Util/Url.h"
 

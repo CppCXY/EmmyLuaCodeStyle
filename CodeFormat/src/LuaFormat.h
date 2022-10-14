@@ -6,7 +6,7 @@
 #include <cstring>
 
 #include "LuaParser/LuaParser.h"
-#include "CodeService/LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaCodeStyleOptions.h"
 #include "CodeService/Diagnosis/LuaDiagnosisInfo.h"
 #include "CodeService/Spell/CodeSpellChecker.h"
 

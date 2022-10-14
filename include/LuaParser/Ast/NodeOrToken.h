@@ -2,6 +2,7 @@
 
 #include "LuaAstNodeType.h"
 #include "LuaParser/Lexer/LuaTokenType.h"
+#include "LuaParser/Lexer/LuaToken.h"
 
 enum class NodeOrTokenType {
     Node,

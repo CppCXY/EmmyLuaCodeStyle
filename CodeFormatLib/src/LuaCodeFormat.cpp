@@ -1,6 +1,6 @@
 #include "LuaCodeFormat.h"
 
-#include "CodeService/LuaEditorConfig.h"
+#include "CodeService/Config/LuaEditorConfig.h"
 #include "CodeService/LuaFormatter.h"
 #include "CodeService/NameStyle/NameStyleChecker.h"
 #include "LuaParser/LuaParser.h"

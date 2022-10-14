@@ -37,8 +37,8 @@ void LuaWorkspaceFormat::AddIgnoresByFile(std::string_view gitIgnoreFile)
 		while (!fin.eof())
 		{
 			std::getline(fin, line);
-			auto newLine = StringUtil::TrimSpace(line);
-			if (!StringUtil::StartWith(newLine, "#"))
+			auto newLine = string_util::TrimSpace(line);
+			if (!string_util::StartWith(newLine, "#"))
 			{
 				_ignorePattern.push_back(std::string(newLine));
 			}

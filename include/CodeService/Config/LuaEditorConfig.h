@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 #include <memory>
-#include "CodeService/LuaCodeStyleOptions.h"
+#include "LuaCodeStyleOptions.h"
 
 class LuaEditorConfig
 {

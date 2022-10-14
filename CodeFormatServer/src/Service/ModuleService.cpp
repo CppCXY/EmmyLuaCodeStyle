@@ -28,18 +28,18 @@ std::vector<vscode::Diagnostic> ModuleService::Diagnose(std::string_view filePat
 		auto undefinedModuleName = undefinedModule->GetText();
 		for (auto& luaModule : luaModules)
 		{
-			if (StringUtil::IsStringEqualIgnoreCase(undefinedModuleName, luaModule->MatchName))
+			if (string_util::IsStringEqualIgnoreCase(undefinedModuleName, luaModule->MatchName))
 			{
 				auto& diagnostic = result.emplace_back();
 				diagnostic.message = Util::format("import module '{}'", luaModule->ModuleName);
 				auto textRange = undefinedModule->GetTextRange();
 				auto range = vscode::Range(
 					vscode::Position(
-						parser->GetLine(textRange.StartOffset),
+                            parser->GetStartLine(textRange.StartOffset),
 						parser->GetColumn(textRange.StartOffset)
 					),
 					vscode::Position(
-						parser->GetLine(textRange.EndOffset),
+                            parser->GetStartLine(textRange.EndOffset),
 						parser->GetColumn(textRange.EndOffset)
 					)
 				);
@@ -163,17 +163,17 @@ vscode::Range ModuleService::FindRequireRange(std::shared_ptr<LuaParser> parser,
 			}
 		}
 
-		if (parser->GetLine(statement->GetTextRange().StartOffset) - lastLine > 2)
+		if (parser->GetStartLine(statement->GetTextRange().StartOffset) - lastLine > 2)
 		{
 			goto endLoop;
 		}
 		lastNode = statement;
-		lastLine = parser->GetLine(lastNode->GetTextRange().EndOffset);
+		lastLine = parser->GetStartLine(lastNode->GetTextRange().EndOffset);
 	}
 endLoop:
 	if (lastNode)
 	{
-		vscode::Position insertPosition(parser->GetLine(lastNode->GetTextRange().EndOffset) + 1, 0);
+		vscode::Position insertPosition(parser->GetStartLine(lastNode->GetTextRange().EndOffset) + 1, 0);
 		range.start = insertPosition;
 		range.end = insertPosition;
 	}

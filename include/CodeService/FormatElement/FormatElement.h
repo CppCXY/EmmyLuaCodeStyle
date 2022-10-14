@@ -4,8 +4,8 @@
 #include "FormatElementType.h"
 #include "SerializeContext.h"
 #include "DiagnosisContext.h"
-#include "CodeService/LanguageTranslator.h"
-#include "CodeService/LuaFormatRange.h"
+#include "CodeService/Config/LanguageTranslator.h"
+#include "CodeService/RangeFormat/LuaFormatRange.h"
 
 
 class FormatElement : public std::enable_shared_from_this<FormatElement>

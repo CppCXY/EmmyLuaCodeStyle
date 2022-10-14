@@ -3,7 +3,7 @@
 #include <stack>
 #include "FormatContext.h"
 #include "CodeService/Diagnosis/LuaDiagnosisInfo.h"
-#include "CodeService/LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaCodeStyleOptions.h"
 #include "LuaParser/LuaParser.h"
 
 class DiagnosisContext: public FormatContext

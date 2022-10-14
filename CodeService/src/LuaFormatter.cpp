@@ -22,7 +22,7 @@
 #include "CodeService/FormatElement/StringLiteralElement.h"
 #include "CodeService/FormatElement/CallArgsListLayoutElement.h"
 #include "Util/StringUtil.h"
-#include "CodeService/AstUtil.h"
+#include "CodeService/Format/AstUtil.h"
 #include "CodeService/FormatElement/KeyWordElement.h"
 #include "CodeService/FormatElement/OperatorElement.h"
 #include "LuaParser/LuaTokenTypeDetail.h"
@@ -342,8 +342,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlock(std::shared_ptr<LuaAstN
 		case LuaAstNodeType::Comment:
 			{
 				auto last = indentEnv->LastValidElement();
-				if (last && _parser->GetLine(last->GetTextRange().EndOffset)
-					== _parser->GetLine(statement->GetTextRange().StartOffset))
+				if (last && _parser->GetStartLine(last->GetTextRange().EndOffset)
+					== _parser->GetStartLine(statement->GetTextRange().StartOffset))
 				{
 					if (!last->GetChildren().empty() && last->GetChildren().back()->HasValidTextRange())
 					{
@@ -458,8 +458,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatLocalStatement(std::shared_pt
 					{
 						if (expression->GetType() == LuaAstNodeType::Expression)
 						{
-							auto startLine = _parser->GetLine(expression->GetTextRange().StartOffset);
-							auto endLine = _parser->GetLine(expression->GetTextRange().EndOffset);
+							auto startLine = _parser->GetStartLine(expression->GetTextRange().StartOffset);
+							auto endLine = _parser->GetStartLine(expression->GetTextRange().EndOffset);
 
 							if (startLine != endLine)
 							{
@@ -525,8 +525,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAssignment(std::shared_ptr<Lu
 						{
 							if (expression->GetType() == LuaAstNodeType::Expression)
 							{
-								auto startLine = _parser->GetLine(expression->GetTextRange().StartOffset);
-								auto endLine = _parser->GetLine(expression->GetTextRange().EndOffset);
+								auto startLine = _parser->GetStartLine(expression->GetTextRange().StartOffset);
+								auto endLine = _parser->GetStartLine(expression->GetTextRange().EndOffset);
 
 								if (startLine != endLine)
 								{
@@ -1311,8 +1311,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatCallArgList(std::shared_ptr<L
 					{
 						if (expression->GetType() == LuaAstNodeType::Expression)
 						{
-							auto startLine = _parser->GetLine(expression->GetTextRange().StartOffset);
-							auto endLine = _parser->GetLine(expression->GetTextRange().EndOffset);
+							auto startLine = _parser->GetStartLine(expression->GetTextRange().StartOffset);
+							auto endLine = _parser->GetStartLine(expression->GetTextRange().EndOffset);
 
 							if (startLine != endLine)
 							{
@@ -1661,11 +1661,12 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 				if (child->GetTokenType() == '{')
 				{
 					env->Add<OperatorElement>(child);
-					leftBraceLine = _parser->GetLine(child->GetTextRange().EndOffset);
+					leftBraceLine = _parser->GetStartLine(child->GetTextRange().EndOffset);
 					auto next = NextNode(it, children);
 					if (next && next->GetTokenType() != '}')
 					{
-						forceChopDownEndBracket = leftBraceLine != _parser->GetLine(next->GetTextRange().StartOffset);
+						forceChopDownEndBracket = leftBraceLine !=
+                                _parser->GetStartLine(next->GetTextRange().StartOffset);
 					}
 				}
 				else if (child->GetTokenType() == '}')
@@ -1681,8 +1682,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableExpression(std::shared_p
 
 						if (forceChopDownEndBracket)
 						{
-							if (_parser->GetLine(tableFieldLayout->GetTextRange().EndOffset) != _parser->GetLine(
-								child->GetTextRange().StartOffset))
+							if (_parser->GetStartLine(tableFieldLayout->GetTextRange().EndOffset) != _parser->GetStartLine(
+                                    child->GetTextRange().StartOffset))
 							{
 								env->Add<KeepElement>(1);
 							}
@@ -1802,8 +1803,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableField(std::shared_ptr<Lu
 					{
 						if (expression->GetType() == LuaAstNodeType::Expression)
 						{
-							auto startLine = _parser->GetLine(expression->GetTextRange().StartOffset);
-							auto endLine = _parser->GetLine(expression->GetTextRange().EndOffset);
+							auto startLine = _parser->GetStartLine(expression->GetTextRange().StartOffset);
+							auto endLine = _parser->GetStartLine(expression->GetTextRange().EndOffset);
 
 							if (startLine != endLine)
 							{
@@ -1872,8 +1873,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignStatement(LuaAstNode::Ch
 		|| nextChild->GetType() == LuaAstNodeType::Comment)
 	{
 		auto currentChild = *it;
-		int currentLine = _parser->GetLine(currentChild->GetTextRange().EndOffset);
-		int nextLine = _parser->GetLine(nextChild->GetTextRange().StartOffset);
+		int currentLine = _parser->GetStartLine(currentChild->GetTextRange().EndOffset);
+		int nextLine = _parser->GetStartLine(nextChild->GetTextRange().StartOffset);
 		// 这个规则是下一个连续的赋值/local/注释语句如果和上一个赋值/local/注释语句 间距2行以上，则不认为是连续
 		if (nextLine - currentLine > _options.max_continuous_line_distance)
 		{
@@ -1947,7 +1948,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 {
 	bool canAlign = true;
 	std::shared_ptr<FormatElement> layout = std::make_shared<ExpressionElement>();
-	if (leftBraceLine == _parser->GetLine((*it)->GetTextRange().StartOffset))
+	if (leftBraceLine == _parser->GetStartLine((*it)->GetTextRange().StartOffset))
 	{
 		canAlign = false;
 	}
@@ -1970,8 +1971,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 			|| nextSibling->GetType() == LuaAstNodeType::TableFieldSep
 			|| nextSibling->GetType() == LuaAstNodeType::Comment)
 		{
-			int currentLine = _parser->GetLine(current->GetTextRange().EndOffset);
-			int nextLine = _parser->GetLine(nextSibling->GetTextRange().StartOffset);
+			int currentLine = _parser->GetStartLine(current->GetTextRange().EndOffset);
+			int nextLine = _parser->GetStartLine(nextSibling->GetTextRange().StartOffset);
 
 			if (nextLine == currentLine)
 			{
@@ -2087,7 +2088,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatAlignTableField(LuaAstNode::C
 				}
 			case TrailingTableSeparator::Smart:
 				{
-					auto line = _parser->GetLine((*rIt)->GetTextRange().EndOffset);
+					auto line = _parser->GetStartLine((*rIt)->GetTextRange().EndOffset);
 					if (line == leftBraceLine)
 					{
 						// 不要合并上去
@@ -2134,8 +2135,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 	if (NextMatch(it, LuaAstNodeType::Comment, children))
 	{
 		auto comment = NextNode(it, children);
-		int currentLine = _parser->GetLine(keyNode->GetTextRange().EndOffset);
-		int nextLine = _parser->GetLine(comment->GetTextRange().StartOffset);
+		int currentLine = _parser->GetStartLine(keyNode->GetTextRange().EndOffset);
+		int nextLine = _parser->GetStartLine(comment->GetTextRange().StartOffset);
 
 		// 认为是内联注释
 		if (nextLine == currentLine)
@@ -2152,7 +2153,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatNodeAndBlockOrEnd(LuaAstNode:
 	if (!block->GetChildren().empty())
 	{
 		blockExist = true;
-		if (_parser->GetLine(keyNode->GetTextRange().StartOffset) != _parser->GetLine(block->GetTextRange().EndOffset))
+		if (_parser->GetStartLine(keyNode->GetTextRange().StartOffset) !=
+            _parser->GetStartLine(block->GetTextRange().EndOffset))
 		{
 			if (_options.remove_empty_header_and_footer_lines_in_function
 				&& parentNode && parentNode->GetType() == LuaAstNodeType::FunctionBody)
@@ -2223,8 +2225,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatBlockFromParent(LuaAstNode::C
 			auto next = NextNode(it, siblings);
 			if (block)
 			{
-				if (_parser->GetLine(block->GetTextRange().EndOffset) != _parser->GetLine(
-					next->GetTextRange().StartOffset))
+				if (_parser->GetStartLine(block->GetTextRange().EndOffset) != _parser->GetStartLine(
+                        next->GetTextRange().StartOffset))
 				{
 					afterBlockComments.push_back(next);
 					continue;
@@ -2523,7 +2525,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 				if (_options.table_append_expression_no_space && expressionAfterIndexOperator)
 				{
 					auto text = child->GetText();
-					if (StringUtil::StartWith(text, "#"))
+					if (string_util::StartWith(text, "#"))
 					{
 						env->AddChild(FormatTableAppendExpression(child));
 						continue;
@@ -2542,7 +2544,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatIndexExpression(std::shared_p
 					&& nextNode != nullptr
 					&& nextNode->GetType() == LuaAstNodeType::IndexOperator
 					&& nextNode->GetTokenType() == '['
-					&& !StringUtil::EndWith(child->GetText(), "]"))
+					&& !string_util::EndWith(child->GetText(), "]"))
 				{
 					env->Add<KeepElement>(1);
 				}
@@ -2690,7 +2692,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 // 					|| statement->GetType() == LuaAstNodeType::LocalStatement
 // 					|| statement->GetType() == LuaAstNodeType::Comment)
 // 				{
-// 					auto lastLine = _parser->GetLine(textRange.EndOffset);
+// 					auto lastLine = _parser->GetStartLine(textRange.EndOffset);
 // 					auto newIt = it;
 // 					while (NextMatch(newIt, LuaAstNodeType::AssignStatement, statements)
 // 						|| NextMatch(newIt, LuaAstNodeType::LocalStatement, statements)
@@ -2699,7 +2701,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 // 						auto next = NextNode(newIt, statements);
 // 						auto nextTextRange = next->GetTextRange();
 //
-// 						auto nextTextLine = _parser->GetLine(nextTextRange.StartOffset);
+// 						auto nextTextLine = _parser->GetStartLine(nextTextRange.StartOffset);
 //
 // 						if (nextTextLine - lastLine > 2)
 // 						{
@@ -2708,7 +2710,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 // 						textRange.EndOffset = nextTextRange.EndOffset;
 // 						++newIt;
 // 					}
-// 					auto statementEndLine = _parser->GetLine(textRange.EndOffset);
+// 					auto statementEndLine = _parser->GetStartLine(textRange.EndOffset);
 //
 // 					if (statementEndLine >= validRange.StartLine)
 // 					{
@@ -2723,7 +2725,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 // 				}
 // 				else
 // 				{
-// 					auto statementEndLine = _parser->GetLine(textRange.EndOffset);
+// 					auto statementEndLine = _parser->GetStartLine(textRange.EndOffset);
 //
 // 					if (statementEndLine >= validRange.StartLine)
 // 					{
@@ -2739,7 +2741,7 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 // 			}
 // 		case State::Contain:
 // 			{
-// 				auto statementStartLine = _parser->GetLine(statement->GetTextRange().StartOffset);
+// 				auto statementStartLine = _parser->GetStartLine(statement->GetTextRange().StartOffset);
 // 				if (statementStartLine > validRange.EndLine)
 // 				{
 // 					goto endLoop;
@@ -2818,8 +2820,8 @@ std::shared_ptr<FormatElement> LuaFormatter::FormatTableAppendExpression(std::sh
 // 				if (NextMatch(it, LuaAstNodeType::Comment, statements))
 // 				{
 // 					auto next = NextNode(it, statements);
-// 					int currentLine = _parser->GetLine(statement->GetTextRange().EndOffset);
-// 					int nextLine = _parser->GetLine(next->GetTextRange().StartOffset);
+// 					int currentLine = _parser->GetStartLine(statement->GetTextRange().EndOffset);
+// 					int nextLine = _parser->GetStartLine(next->GetTextRange().StartOffset);
 //
 // 					if (currentLine == nextLine)
 // 					{

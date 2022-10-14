@@ -5,7 +5,7 @@
 #include "nlohmann/json.hpp"
 #include "asio.hpp"
 #include "CodeFormatServer/VSCode.h"
-#include "CodeService/LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaCodeStyleOptions.h"
 #include "CodeService/LuaFormatter.h"
 #include "CodeFormatServer/LanguageClient.h"
 #include "CodeFormatServer/Service/CodeActionService.h"

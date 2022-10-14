@@ -4,7 +4,7 @@
 #include <vector>
 #include <stack>
 #include <map>
-#include "CodeService/LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaCodeStyleOptions.h"
 #include "LuaParser/LuaParser.h"
 
 class FormatContext

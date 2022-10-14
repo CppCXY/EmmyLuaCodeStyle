@@ -1,6 +1,6 @@
 #pragma once
 
-enum class DiagnosisType : int
+enum class DiagnosticType : int
 {
 	MaxLineWidth = 0,
 	StatementLineSpace,
