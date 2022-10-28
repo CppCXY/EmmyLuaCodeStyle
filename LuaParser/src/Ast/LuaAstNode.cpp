@@ -34,7 +34,7 @@ bool LuaAstNode::IsNode(const LuaAstTree &t) const {
     return t.IsNode(_index);
 }
 
-LuaAstNodeType LuaAstNode::GetType(const LuaAstTree &t) const {
+LuaNodeType LuaAstNode::GetType(const LuaAstTree &t) const {
     return t.GetNodeType(_index);
 }
 
@@ -43,7 +43,7 @@ LuaTokenType LuaAstNode::GetTokenType(const LuaAstTree &t) const {
 }
 
 LuaAstNode LuaAstNode::GetParent(const LuaAstTree &t) const {
-    return LuaAstNode(0);
+    return LuaAstNode(t.GetParent(_index));
 }
 
 LuaAstNode LuaAstNode::GetSibling(const LuaAstTree &t) const {
@@ -61,3 +61,28 @@ void LuaAstNode::ToNext(const LuaAstTree &t) {
 bool LuaAstNode::IsNull(const LuaAstTree &t) const {
     return _index == 0;
 }
+
+std::vector<LuaAstNode> LuaAstNode::GetDescendants(const LuaAstTree &t) {
+    std::vector<LuaAstNode> results;
+    if (t.GetFirstChild(_index) == 0) {
+        return results;
+    }
+
+    int accessIndex = -1;
+    LuaAstNode node = *this;
+    do {
+        if (node.IsNode(t)) {
+            for (auto child = node.GetFirstChild(t); !child.IsNull(t); child.ToNext(t)) {
+                results.emplace_back(child);
+            }
+        }
+        accessIndex++;
+    } while (accessIndex < static_cast<int>(results.size()));
+    return results;
+}
+
+bool LuaAstNode::IsToken(const LuaAstTree &t) const {
+    return !IsNode(t);
+}
+
+

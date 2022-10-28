@@ -12,7 +12,7 @@ Marker::Marker(std::size_t pos)
 
 }
 
-CompleteMarker Marker::Complete(LuaParser &p, LuaAstNodeType kind) {
+CompleteMarker Marker::Complete(LuaParser &p, LuaNodeType kind) {
     auto &events = p.GetEvents();
     if (Pos < events.size()) {
         events[Pos].U.Start.Kind = kind;
@@ -21,17 +21,17 @@ CompleteMarker Marker::Complete(LuaParser &p, LuaAstNodeType kind) {
 
         return CompleteMarker(Pos, finish, kind);
     }
-    return CompleteMarker(0, 0, LuaAstNodeType::None);
+    return CompleteMarker(0, 0, LuaNodeType::None);
 }
 
 CompleteMarker::CompleteMarker()
         : Start(0),
           Finish(0),
-          Kind(LuaAstNodeType::None) {
+          Kind(LuaNodeType::None) {
 
 }
 
-CompleteMarker::CompleteMarker(std::size_t start, std::size_t finish, LuaAstNodeType kind)
+CompleteMarker::CompleteMarker(std::size_t start, std::size_t finish, LuaNodeType kind)
         : Start(start),
           Finish(finish),
           Kind(kind) {

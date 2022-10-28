@@ -16,10 +16,10 @@ void CompletionService::Start()
 	                       std::bind(&ModuleService::GetModuleCompletions, GetService<ModuleService>().get(),
 	                                 _1, _2, _3, _4));
 	// AddCompleteContributor({
-	// 	                       LuaAstNodeType::LiteralExpression,
-	// 	                       LuaAstNodeType::Expression,
-	// 	                       LuaAstNodeType::CallArgList,
-	// 	                       LuaAstNodeType::CallExpression,
+	// 	                       LuaNodeType::LiteralExpression,
+	// 	                       LuaNodeType::Expression,
+	// 	                       LuaNodeType::CallArgList,
+	// 	                       LuaNodeType::CallExpression,
 	//
 	//
 	//                        },

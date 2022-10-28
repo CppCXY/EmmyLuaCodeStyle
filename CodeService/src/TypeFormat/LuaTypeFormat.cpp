@@ -336,7 +336,7 @@ void LuaTypeFormat::FixIndent(int line, int character)
 	// }
 
 	// auto block = astNode->GetParent();
-	// if (block && block->GetType() == LuaAstNodeType::Block)
+	// if (block && block->GetType() == LuaNodeType::Block)
 	// {
 	// 	auto statement = block->GetParent();
 	// 	if(statement->is)

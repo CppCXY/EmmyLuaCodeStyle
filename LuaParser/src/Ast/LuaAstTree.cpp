@@ -9,15 +9,15 @@ LuaAstTree::LuaAstTree()
 
 void LuaAstTree::BuildTree(LuaParser &p) {
     _file = p.GetLuaFile();
-    StartNode(LuaAstNodeType::File, p);
+    StartNode(LuaNodeType::File, p);
 
     auto &events = p.GetEvents();
-    std::vector<LuaAstNodeType> parents;
+    std::vector<LuaNodeType> parents;
     for (auto i = 0ull; i != events.size(); i++) {
         switch (events[i].Type) {
             case MarkEventType::NodeStart: {
                 auto e = events[i];
-                if (e.U.Start.Kind == LuaAstNodeType::None) {
+                if (e.U.Start.Kind == LuaNodeType::None) {
                     continue;
                 }
 
@@ -28,7 +28,7 @@ void LuaAstTree::BuildTree(LuaParser &p) {
                         auto &pe = events[parentPos];
                         parents.push_back(pe.U.Start.Kind);
                         parentPos = pe.U.Start.Parent;
-                        pe.U.Start.Kind = LuaAstNodeType::None;
+                        pe.U.Start.Kind = LuaNodeType::None;
                     } else {
                         break;
                     }
@@ -51,8 +51,8 @@ void LuaAstTree::BuildTree(LuaParser &p) {
     FinishNode(p);
 }
 
-void LuaAstTree::StartNode(LuaAstNodeType kind, LuaParser &p) {
-    if (kind != LuaAstNodeType::Block) {
+void LuaAstTree::StartNode(LuaNodeType kind, LuaParser &p) {
+    if (kind != LuaNodeType::Block) {
         EatComments(p);
         BuildNode(kind);
     } else {
@@ -87,7 +87,7 @@ void LuaAstTree::FinishNode(LuaParser &p) {
     if (!_nodePosStack.empty()) {
         auto nodePos = _nodePosStack.top();
         auto &node = _nodes[nodePos];
-        if (node.Type == NodeOrTokenType::Node && node.Data.NodeKind == LuaAstNodeType::Block) {
+        if (node.Type == NodeOrTokenType::Node && node.Data.NodeKind == LuaNodeType::Block) {
             EatComments(p);
         } else {
             if (_tokenIndex < p.GetTokens().size() && _tokenIndex > 0) {
@@ -114,7 +114,7 @@ void LuaAstTree::FinishNode(LuaParser &p) {
     }
 }
 
-void LuaAstTree::BuildNode(LuaAstNodeType kind) {
+void LuaAstTree::BuildNode(LuaNodeType kind) {
     auto currentPos = _nodes.size();
     auto &currentNode = _nodes.emplace_back(kind);
     if (!_nodePosStack.empty()) {
@@ -141,11 +141,13 @@ void LuaAstTree::BuildToken(LuaToken &token) {
         if (parentNode.FirstChild == 0) {
             parentNode.FirstChild = currentPos;
             parentNode.LastChild = currentPos;
+
         } else {
             auto &lastNode = _nodes[parentNode.LastChild];
             lastNode.Sibling = currentPos;
             parentNode.LastChild = currentPos;
         }
+        currentNode.Parent = parentIndex;
     }
 }
 
@@ -169,8 +171,8 @@ std::size_t LuaAstTree::GetFirstChild(std::size_t index) const {
     return 0;
 }
 
-LuaAstNodeType LuaAstTree::GetNodeType(std::size_t index) const {
-    return LuaAstNodeType::ExpressionStatement;
+LuaNodeType LuaAstTree::GetNodeType(std::size_t index) const {
+    return LuaNodeType::ExpressionStatement;
 }
 
 LuaTokenType LuaAstTree::GetTokenType(std::size_t index) const {
@@ -179,5 +181,9 @@ LuaTokenType LuaAstTree::GetTokenType(std::size_t index) const {
 
 bool LuaAstTree::IsNode(std::size_t index) const {
     return false;
+}
+
+std::size_t LuaAstTree::GetParent(std::size_t index) const {
+    return 0;
 }
 

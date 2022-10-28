@@ -24,13 +24,16 @@ public:
 
     std::size_t GetFirstChild(std::size_t index) const;
 
-    LuaAstNodeType GetNodeType(std::size_t index) const;
+    std::size_t GetParent(std::size_t index) const;
+
+    LuaNodeType GetNodeType(std::size_t index) const;
 
     LuaTokenType GetTokenType(std::size_t index) const;
 
     bool IsNode(std::size_t index) const;
+
 private:
-    void StartNode(LuaAstNodeType kind, LuaParser &p);
+    void StartNode(LuaNodeType kind, LuaParser &p);
 
     void EatComments(LuaParser &p);
 
@@ -38,7 +41,7 @@ private:
 
     void FinishNode(LuaParser &p);
 
-    void BuildNode(LuaAstNodeType kind);
+    void BuildNode(LuaNodeType kind);
 
     void BuildToken(LuaToken &token);
 
