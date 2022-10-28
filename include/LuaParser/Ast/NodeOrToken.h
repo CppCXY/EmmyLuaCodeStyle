@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LuaAstNodeType.h"
+#include "LuaNodeType.h"
 #include "LuaParser/Lexer/LuaTokenType.h"
 #include "LuaParser/Lexer/LuaToken.h"
 
@@ -16,7 +16,7 @@ struct IncrementalToken {
 };
 
 struct NodeOrToken {
-    explicit NodeOrToken(LuaAstNodeType nodeKind)
+    explicit NodeOrToken(LuaNodeType nodeKind)
             : Type(NodeOrTokenType::Node),
               Sibling(0),
               FirstChild(0),
@@ -26,6 +26,7 @@ struct NodeOrToken {
 
     explicit NodeOrToken(LuaToken &token)
             : Type(NodeOrTokenType::Token),
+              Parent(0),
               Sibling(0),
               FirstChild(0),
               LastChild(0) {
@@ -35,11 +36,12 @@ struct NodeOrToken {
     }
 
     NodeOrTokenType Type;
+    std::size_t Parent;
     std::size_t Sibling;
     std::size_t FirstChild;
     std::size_t LastChild;
     union {
-        LuaAstNodeType NodeKind;
+        LuaNodeType NodeKind;
         IncrementalToken Token;
     } Data;
 };

@@ -15,6 +15,9 @@ target_sources(CodeService
         PRIVATE
         # format
         ${CodeService_SOURCE_DIR}/src/Format/FormatBuilder.cpp
+        ${CodeService_SOURCE_DIR}/src/Format/Analyzer/FormatAnalyzer.cpp
+        ${CodeService_SOURCE_DIR}/src/Format/Analyzer/SpaceAnalyzer.cpp
+        ${CodeService_SOURCE_DIR}/src/Format/Analyzer/IntentionAnalyzer.cpp
         # typeFormat
         ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormat.cpp
         ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp
