@@ -3,7 +3,7 @@
 #include "LuaParser/Parse/LuaParser.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
 #include "CodeService/Format/FormatBuilder.h"
-#include "ReflectionEnum.h"
+
 
 int main() {
     std::string buffer = R"(local t = 123)";
