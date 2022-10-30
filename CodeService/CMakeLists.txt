@@ -19,8 +19,8 @@ target_sources(CodeService
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/SpaceAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/IntentionAnalyzer.cpp
         # typeFormat
-        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormat.cpp
-        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp
+#        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormat.cpp
+#        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp
 
 #        ${CodeService_SOURCE_DIR}/src/FormatElement/IndentElement.cpp
 #        ${CodeService_SOURCE_DIR}/src/FormatElement/KeepLineElement.cpp
@@ -52,18 +52,18 @@ target_sources(CodeService
 #        ${CodeService_SOURCE_DIR}/src/FormatElement/CallArgsListLayoutElement.cpp
 #        ${CodeService_SOURCE_DIR}/src/FormatElement/DiagnosisContext.cpp
 #        ${CodeService_SOURCE_DIR}/src/FormatElement/RangeFormatContext.cpp
-        ${CodeService_SOURCE_DIR}/src/LuaCodeStyleOptions.cpp
-        ${CodeService_SOURCE_DIR}/src/LuaEditorConfig.cpp
-        ${CodeService_SOURCE_DIR}/src/LanguageTranslator.cpp
-        # nameStyle
-        ${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleChecker.cpp
-        ${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleRuleMatcher.cpp
-        ${CodeService_SOURCE_DIR}/src/NameStyle/CheckElement.cpp
-        # spell
-        ${CodeService_SOURCE_DIR}/src/Spell/CodeSpellChecker.cpp
-        ${CodeService_SOURCE_DIR}/src/Spell/IdentifyParser.cpp
-        ${CodeService_SOURCE_DIR}/src/Spell/TextParser.cpp
-        ${CodeService_SOURCE_DIR}/src/AstUtil.cpp
+#        ${CodeService_SOURCE_DIR}/src/LuaStyle.cpp
+#        ${CodeService_SOURCE_DIR}/src/LuaEditorConfig.cpp
+#        ${CodeService_SOURCE_DIR}/src/LanguageTranslator.cpp
+#        # nameStyle
+#        ${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleChecker.cpp
+#        ${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleRuleMatcher.cpp
+#        ${CodeService_SOURCE_DIR}/src/NameStyle/CheckElement.cpp
+#        # spell
+#        ${CodeService_SOURCE_DIR}/src/Spell/CodeSpellChecker.cpp
+#        ${CodeService_SOURCE_DIR}/src/Spell/IdentifyParser.cpp
+#        ${CodeService_SOURCE_DIR}/src/Spell/TextParser.cpp
+#        ${CodeService_SOURCE_DIR}/src/AstUtil.cpp
         )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

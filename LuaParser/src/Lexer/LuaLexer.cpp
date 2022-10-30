@@ -8,7 +8,7 @@
 #include "Util/Utf8.h"
 #include "LuaParser/File/LuaFile.h"
 
-std::map<std::string, LuaTokenType, std::less<>> LuaLexer::LuaReserved = {
+std::map<std::string, LuaTokenKind, std::less<>> LuaLexer::LuaReserved = {
         {"and",      TK_AND},
         {"break",    TK_BREAK},
         {"do",       TK_DO},
@@ -54,8 +54,11 @@ bool LuaLexer::Parse() {
     _file->Reset();
     while (true) {
         auto type = Lex();
-        _tokens.emplace_back(type, _reader.GetTokenRange());
+        if (type == TK_EOF) {
+            break;
+        }
 
+        _tokens.emplace_back(type, _reader.GetTokenRange());
         if (!_errors.empty()) {
             _file->SetTotalLine(_linenumber);
             _file->UpdateLineInfo(_linenumber);
@@ -83,7 +86,7 @@ std::vector<LuaToken> &LuaLexer::GetTokens() {
     return _tokens;
 }
 
-LuaTokenType LuaLexer::Lex() {
+LuaTokenKind LuaLexer::Lex() {
     _reader.ResetBuffer();
 
     for (;;) {
@@ -109,7 +112,7 @@ LuaTokenType LuaLexer::Lex() {
                 // is comment
                 _reader.SaveAndNext();
 
-                LuaTokenType type = TK_SHORT_COMMENT;
+                LuaTokenKind type = TK_SHORT_COMMENT;
                 if (_reader.GetCurrentChar() == '[') {
                     std::size_t sep = SkipSep();
                     if (sep >= 2) {
@@ -280,7 +283,7 @@ LuaTokenType LuaLexer::Lex() {
 **
 ** The caller might have already read an initial dot.
 */
-LuaTokenType LuaLexer::ReadNumeral() {
+LuaTokenKind LuaLexer::ReadNumeral() {
     int first = _reader.GetCurrentChar();
     const char *expo = "Ee";
     _reader.SaveAndNext();

@@ -8,7 +8,7 @@
 #include <set>
 
 #include "LuaToken.h"
-#include "LuaTokenType.h"
+#include "LuaTokenKind.h"
 #include "LuaParser/File/LuaFile.h"
 #include "TextReader.h"
 #include "LuaTokenError.h"
@@ -35,11 +35,11 @@ public:
 
 //	void SetCustomParser(std::shared_ptr<LuaCustomParser> parser);
 private:
-	static std::map<std::string, LuaTokenType, std::less<>> LuaReserved;
+	static std::map<std::string, LuaTokenKind, std::less<>> LuaReserved;
 
-	LuaTokenType Lex();
+	LuaTokenKind Lex();
 
-	LuaTokenType ReadNumeral();
+	LuaTokenKind ReadNumeral();
 
 	std::size_t SkipSep();
 

@@ -1,18 +1,18 @@
 #pragma once
 
 #include <string_view>
-#include "LuaTokenType.h"
+#include "LuaTokenKind.h"
 #include "LuaParser/Types/TextRange.h"
 
 class LuaToken
 {
 public:
-	LuaToken(LuaTokenType type, TextRange range)
+	LuaToken(LuaTokenKind type, TextRange range)
 		: TokenType(type),
 		  Range(range)
 	{
 	}
 
-	LuaTokenType TokenType;
+	LuaTokenKind TokenType;
 	TextRange Range;
 };

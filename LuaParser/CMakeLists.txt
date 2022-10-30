@@ -11,7 +11,7 @@ target_include_directories(LuaParser PUBLIC
 	src
 )
 
-target_sources(LuaParser PUBLIC
+target_sources(LuaParser
 	#src
 	PRIVATE
 	# parse
@@ -24,8 +24,8 @@ target_sources(LuaParser PUBLIC
 	${LuaParser_SOURCE_DIR}/src/Lexer/TextReader.cpp
 	
 	# ast
-	${LuaParser_SOURCE_DIR}/src/Ast/LuaAstNode.cpp
-	${LuaParser_SOURCE_DIR}/src/Ast/LuaAstTree.cpp
+	${LuaParser_SOURCE_DIR}/src/Ast/LuaSyntaxNode.cpp
+	${LuaParser_SOURCE_DIR}/src/Ast/LuaSyntaxTree.cpp
 
 	# types
 	${LuaParser_SOURCE_DIR}/src/Types/TextRange.cpp

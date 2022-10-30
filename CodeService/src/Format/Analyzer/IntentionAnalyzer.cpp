@@ -1,16 +1,20 @@
-#include "IntentionAnalyzer.h"
+#include "IndentationAnalyzer.h"
+#include "CodeService/Format/FormatBuilder.h"
 
-void IntentionAnalyzer::Analyze(FormatBuilder &f, std::vector<LuaAstNode> &nodes, const LuaAstTree &t) {
-    for (auto &astNode: nodes) {
-        if (astNode.IsNode(t)) {
-            switch (astNode.GetType(t)) {
-                case LuaNodeType::Block: {
-                    f.Intenter(astNode);
+IndentationAnalyzer::IndentationAnalyzer() {
+}
+
+void IndentationAnalyzer::Analyze(FormatBuilder &f, std::vector<LuaSyntaxNode> &nodes, const LuaSyntaxTree &t) {
+    for (auto &syntaxNode: nodes) {
+        if (syntaxNode.IsNode(t)) {
+            switch (syntaxNode.GetSyntaxKind(t)) {
+                case LuaSyntaxNodeKind::Block: {
+                    f.Indenter(syntaxNode);
                     break;
                 }
-                case LuaNodeType::LocalStatement:
-                case LuaNodeType::AssignStatement: {
-                    f.NewLineIntenter(astNode);
+                case LuaSyntaxNodeKind::LocalStatement:
+                case LuaSyntaxNodeKind::AssignStatement: {
+//                    f.NewLineIntenter(syntaxNode);
                     break;
                 }
                 default: {
@@ -20,3 +24,4 @@ void IntentionAnalyzer::Analyze(FormatBuilder &f, std::vector<LuaAstNode> &nodes
         }
     }
 }
+

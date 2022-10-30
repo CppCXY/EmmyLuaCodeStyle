@@ -2,12 +2,12 @@
 
 #include <string>
 #include "LuaParser/Types/TextRange.h"
-#include "LuaTokenType.h"
+#include "LuaTokenKind.h"
 
 class LuaTokenError
 {
 public:
-	LuaTokenError(std::string_view errorMessage, TextRange range, LuaTokenType token)
+	LuaTokenError(std::string_view errorMessage, TextRange range, LuaTokenKind token)
 		: ErrorMessage(errorMessage),
 		  ErrorRange(range),
 		  MissToken(token)
@@ -16,5 +16,5 @@ public:
 
 	std::string ErrorMessage;
 	TextRange ErrorRange;
-	LuaTokenType MissToken;
+	LuaTokenKind MissToken;
 };

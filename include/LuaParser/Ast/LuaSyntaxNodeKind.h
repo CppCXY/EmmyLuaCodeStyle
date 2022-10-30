@@ -1,6 +1,6 @@
 #pragma once
 
-enum class LuaNodeType
+enum class LuaSyntaxNodeKind
 {
     None = 0,
 

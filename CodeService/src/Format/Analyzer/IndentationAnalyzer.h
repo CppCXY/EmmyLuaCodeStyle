@@ -2,15 +2,14 @@
 
 #include "CodeService/Format/Analyzer/FormatAnalyzer.h"
 
-class SpaceAnalyzer : public FormatAnalyzer {
+class IndentationAnalyzer : public FormatAnalyzer {
 public:
-    SpaceAnalyzer();
+    IndentationAnalyzer();
 
     void Analyze(FormatBuilder &f, std::vector<LuaSyntaxNode> &nodes, const LuaSyntaxTree &t) override;
 
     void Process(FormatBuilder &f, std::vector<LuaSyntaxNode> &nodes, const LuaSyntaxTree &t) override;
-
-private:
-
-
 };
+
+
+

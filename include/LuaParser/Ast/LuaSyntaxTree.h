@@ -7,10 +7,11 @@
 #include "LuaParser/Parse/Mark.h"
 #include "LuaParser/Lexer/LuaToken.h"
 #include "NodeOrToken.h"
+#include "LuaSyntaxNode.h"
 
-class LuaAstTree {
+class LuaSyntaxTree {
 public:
-    LuaAstTree();
+    LuaSyntaxTree();
 
     void BuildTree(LuaParser &p);
 
@@ -24,16 +25,22 @@ public:
 
     std::size_t GetFirstChild(std::size_t index) const;
 
+    std::size_t GetLastChild(std::size_t index) const;
+
     std::size_t GetParent(std::size_t index) const;
 
-    LuaNodeType GetNodeType(std::size_t index) const;
+    LuaSyntaxNodeKind GetNodeKind(std::size_t index) const;
 
-    LuaTokenType GetTokenType(std::size_t index) const;
+    LuaTokenKind GetTokenKind(std::size_t index) const;
 
     bool IsNode(std::size_t index) const;
 
+    bool IsToken(std::size_t index) const;
+
+    std::vector<LuaSyntaxNode> GetSyntaxNodes() const;
+
 private:
-    void StartNode(LuaNodeType kind, LuaParser &p);
+    void StartNode(LuaSyntaxNodeKind kind, LuaParser &p);
 
     void EatComments(LuaParser &p);
 
@@ -41,7 +48,7 @@ private:
 
     void FinishNode(LuaParser &p);
 
-    void BuildNode(LuaNodeType kind);
+    void BuildNode(LuaSyntaxNodeKind kind);
 
     void BuildToken(LuaToken &token);
 

@@ -1,5 +1,7 @@
 #include "LuaParser/Parse/Mark.h"
+#include <cstring>
 #include "LuaParser/Parse/LuaParser.h"
+
 
 MarkEvent::MarkEvent(MarkEventType type)
         : Type(type) {
@@ -12,7 +14,7 @@ Marker::Marker(std::size_t pos)
 
 }
 
-CompleteMarker Marker::Complete(LuaParser &p, LuaNodeType kind) {
+CompleteMarker Marker::Complete(LuaParser &p, LuaSyntaxNodeKind kind) {
     auto &events = p.GetEvents();
     if (Pos < events.size()) {
         events[Pos].U.Start.Kind = kind;
@@ -21,17 +23,17 @@ CompleteMarker Marker::Complete(LuaParser &p, LuaNodeType kind) {
 
         return CompleteMarker(Pos, finish, kind);
     }
-    return CompleteMarker(0, 0, LuaNodeType::None);
+    return CompleteMarker(0, 0, LuaSyntaxNodeKind::None);
 }
 
 CompleteMarker::CompleteMarker()
         : Start(0),
           Finish(0),
-          Kind(LuaNodeType::None) {
+          Kind(LuaSyntaxNodeKind::None) {
 
 }
 
-CompleteMarker::CompleteMarker(std::size_t start, std::size_t finish, LuaNodeType kind)
+CompleteMarker::CompleteMarker(std::size_t start, std::size_t finish, LuaSyntaxNodeKind kind)
         : Start(start),
           Finish(finish),
           Kind(kind) {

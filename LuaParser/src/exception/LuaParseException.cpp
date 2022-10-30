@@ -1,4 +1,4 @@
-#include "LuaParser/LuaParseException.h"
+#include "LuaParser/exception/LuaParseException.h"
 #include <string>
 
 

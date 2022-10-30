@@ -8,7 +8,7 @@
 class LuaEditorConfig
 {
 public:
-	class Section
+/*	class Section
 	{
 	public:
 		std::map<std::string, std::string, std::less<>> ConfigMap;
@@ -33,5 +33,5 @@ private:
 	std::string _rootWorkspace;
 	std::string _source;
 	std::map<std::string, std::shared_ptr<Section>, std::less<>> _sectionMap;
-	std::map<std::string, std::shared_ptr<LuaCodeStyleOptions>> _optionPatternMap;
+	std::map<std::string, std::shared_ptr<LuaCodeStyleOptions>> _optionPatternMap;*/
 };

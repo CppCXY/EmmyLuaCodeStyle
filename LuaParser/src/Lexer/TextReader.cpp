@@ -6,7 +6,8 @@ TextReader::TextReader(std::string_view text)
         : _text(text),
           _hasSaveText(false),
           _buffStart(0), _buffIndex(0),
-          _hasEoz(false) {
+          _hasEoz(false),
+          _currentIndex(0) {
 }
 
 int TextReader::NextChar() {
@@ -78,7 +79,7 @@ void TextReader::ResetBuffer() {
 
 std::string_view TextReader::GetSaveText() const {
     if(_hasSaveText) {
-        return _text.substr(_buffStart, _buffIndex);
+        return _text.substr(_buffStart, _buffIndex - _buffStart + 1);
     }
     return _text.substr(_buffStart, 0);
 }

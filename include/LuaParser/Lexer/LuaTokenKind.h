@@ -2,4 +2,4 @@
 
 #include <cstdint>
 
-using LuaTokenType = int;
+using LuaTokenKind = int;

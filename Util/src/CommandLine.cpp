@@ -88,8 +88,8 @@ bool CommandLine::Parse(int argc, char** argv)
 		_argvs.emplace_back(argv[i]);
 	}
 
-	// index = 0 µÄ²ÎÊýÊÇ³ÌÐòÃû
-	// index = 1 µÄ²ÎÊýÊ±target
+	// index = 0 ï¿½Ä²ï¿½ï¿½ï¿½ï¿½Ç³ï¿½ï¿½ï¿½ï¿½ï¿½
+	// index = 1 ï¿½Ä²ï¿½ï¿½ï¿½Ê±target
 	for (int index = 2; index < argc; index++)
 	{
 		std::string_view current = _argvs[index];
@@ -113,7 +113,7 @@ bool CommandLine::Parse(int argc, char** argv)
 			{
 				if (!_options->_enableRestArgs)
 				{
-					_errors.emplace_back(Util::format("Unknown option {} ,please enable key=value options", current));
+					_errors.emplace_back(util::format("Unknown option {} ,please enable key=value options", current));
 					return false;
 				}
 				std::string_view value = option.substr(eqPos + 1);
@@ -133,7 +133,7 @@ bool CommandLine::Parse(int argc, char** argv)
 
 			if (_options->_shortMap.count(shortOption) == 0)
 			{
-				_errors.emplace_back(Util::format("Unknown Option {}", current));
+				_errors.emplace_back(util::format("Unknown Option {}", current));
 				return false;
 			}
 			option = _options->_shortMap.find(shortOption)->second;
@@ -154,7 +154,7 @@ bool CommandLine::Parse(int argc, char** argv)
 					commandOption.HasOption = true;
 					continue;
 				}
-				_errors.emplace_back(Util::format("Option {} has not value", current));
+				_errors.emplace_back(util::format("Option {} has not value", current));
 				return false;
 			}
 
@@ -193,7 +193,7 @@ void CommandLine::PrintUsage()
 	std::cerr << _usage << std::endl;
 	for (auto& target : _targets)
 	{
-		std::cerr << Util::format("{}:", target.first) << std::endl;
+		std::cerr << util::format("{}:", target.first) << std::endl;
 		auto& options = target.second;
 		for (auto& it : options._shortMap)
 		{
@@ -201,7 +201,7 @@ void CommandLine::PrintUsage()
 			auto& name = it.second;
 			auto& option = options._args[name];
 
-			std::cerr << Util::format("\t-{} --{}\n\t\t{}",
+			std::cerr << util::format("\t-{} --{}\n\t\t{}",
 				shortName, name, option.Description) << std::endl;
 			std::cerr << std::endl;
 		}

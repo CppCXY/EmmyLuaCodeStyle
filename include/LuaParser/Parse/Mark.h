@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vector>
-#include "LuaParser/Ast/LuaNodeType.h"
-#include "LuaParser/Lexer/LuaTokenType.h"
+#include "LuaParser/Ast/LuaSyntaxNodeKind.h"
+#include "LuaParser/Lexer/LuaTokenKind.h"
 
 class LuaParser;
 
@@ -19,11 +19,11 @@ struct MarkEvent {
     union {
         struct {
             std::size_t Parent;
-            LuaNodeType Kind;
+            LuaSyntaxNodeKind Kind;
         } Start;
         struct {
             std::size_t Index;
-            LuaTokenType Kind;
+            LuaTokenKind Kind;
         } Token;
     } U;
 };
@@ -32,17 +32,17 @@ struct CompleteMarker;
 
 struct Marker {
     explicit Marker(std::size_t pos);
-    CompleteMarker Complete(LuaParser& p, LuaNodeType kind);
+    CompleteMarker Complete(LuaParser& p, LuaSyntaxNodeKind kind);
     std::size_t Pos;
 };
 
 struct CompleteMarker {
     CompleteMarker();
-    CompleteMarker(std::size_t start, std::size_t finish, LuaNodeType kind);
+    CompleteMarker(std::size_t start, std::size_t finish, LuaSyntaxNodeKind kind);
 
     Marker Precede(LuaParser& p);
 
     std::size_t Start;
     std::size_t Finish;
-    LuaNodeType Kind;
+    LuaSyntaxNodeKind Kind;
 };
