@@ -46,6 +46,11 @@ public:
 
     std::vector<LuaSyntaxNode> GetDescendants(const LuaSyntaxTree &t);
 
+    std::size_t GetIndex() const;
+
+    LuaSyntaxNode ChildSyntaxNode(LuaSyntaxNodeKind kind) const;
+
+    LuaSyntaxNode ChildToken(LuaTokenKind kind) const;
 private:
     std::size_t _index;
 };

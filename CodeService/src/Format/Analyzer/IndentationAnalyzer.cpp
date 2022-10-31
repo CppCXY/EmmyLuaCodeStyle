@@ -14,7 +14,15 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, std::vector<LuaSyntaxNode> &
                 }
                 case LuaSyntaxNodeKind::LocalStatement:
                 case LuaSyntaxNodeKind::AssignStatement: {
-//                    f.NewLineIntenter(syntaxNode);
+                    auto exprList = syntaxNode.ChildNodeBy()
+                }
+                case LuaSyntaxNodeKind::BreakStatement:
+                case LuaSyntaxNodeKind::DoStatement:
+                case LuaSyntaxNodeKind::WhileStatement:
+                case LuaSyntaxNodeKind::IfStatement:
+                case LuaSyntaxNodeKind::LocalFunctionStatement:
+                case LuaSyntaxNodeKind::ExpressionStatement: {
+
                     break;
                 }
                 default: {

@@ -13,24 +13,29 @@ void FormatBuilder::FormatAnalyze(const LuaSyntaxTree &t) {
 
 
     auto syntaxNodes = t.GetSyntaxNodes();
-    for(auto analyzer: _analyzers){
+    for(const auto& analyzer: _analyzers){
         analyzer->Analyze(*this, syntaxNodes, t);
     }
 
-    for(auto analyzer: _analyzers){
+    for(const auto& analyzer: _analyzers){
         analyzer->Process(*this, syntaxNodes, t);
     }
 
 }
 
 void FormatBuilder::SpaceAround(LuaSyntaxNode &n, std::size_t space) {
-
+    SpaceLeft(n, space);
+    SpaceRight(n, space);
 }
 
 void FormatBuilder::SpaceLeft(LuaSyntaxNode &n, std::size_t space) {
-
+    _leftSpaces[n.GetIndex()] = space;
 }
 
 void FormatBuilder::SpaceRight(LuaSyntaxNode &n, std::size_t space) {
+    _rightSpaces[n.GetIndex()] = space;
+}
 
+void FormatBuilder::Indenter(LuaSyntaxNode &n) {
+    _indentStates[n.GetIndex()] = IndentState();
 }

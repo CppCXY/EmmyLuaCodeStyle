@@ -85,4 +85,16 @@ bool LuaSyntaxNode::IsToken(const LuaSyntaxTree &t) const {
     return t.IsToken(_index);
 }
 
+std::size_t LuaSyntaxNode::GetIndex() const{
+    return _index;
+}
+
+std::size_t LuaSyntaxNode::ChildSyntaxNode(LuaSyntaxNodeKind kind) const {
+    return _index;
+}
+
+std::size_t LuaSyntaxNode::ChildToken(LuaTokenKind kind) const {
+    return _index;
+}
+
 
