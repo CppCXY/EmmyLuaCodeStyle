@@ -21,7 +21,9 @@ public:
 
     std::size_t GetEndOffset(std::size_t index) const;
 
-    std::size_t GetSibling(std::size_t index) const;
+    std::size_t GetNextSibling(std::size_t index) const;
+
+    std::size_t GetPrevSibling(std::size_t index) const;
 
     std::size_t GetFirstChild(std::size_t index) const;
 
@@ -38,7 +40,6 @@ public:
     bool IsToken(std::size_t index) const;
 
     std::vector<LuaSyntaxNode> GetSyntaxNodes() const;
-
 private:
     void StartNode(LuaSyntaxNodeKind kind, LuaParser &p);
 

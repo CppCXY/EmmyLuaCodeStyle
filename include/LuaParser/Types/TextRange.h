@@ -11,7 +11,7 @@ public:
 
 	bool Contain(TextRange& range) const;
 
-	bool ContainOffset(int offset) const;
+	bool ContainOffset(std::size_t offset) const;
 
 	bool Between(TextRange& leftRange, TextRange& rightRange) const;
 

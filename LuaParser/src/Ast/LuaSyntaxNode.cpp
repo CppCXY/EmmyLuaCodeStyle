@@ -46,8 +46,12 @@ LuaSyntaxNode LuaSyntaxNode::GetParent(const LuaSyntaxTree &t) const {
     return LuaSyntaxNode(t.GetParent(_index));
 }
 
-LuaSyntaxNode LuaSyntaxNode::GetSibling(const LuaSyntaxTree &t) const {
-    return LuaSyntaxNode(t.GetSibling(_index));
+LuaSyntaxNode LuaSyntaxNode::GetNextSibling(const LuaSyntaxTree &t) const {
+    return LuaSyntaxNode(t.GetNextSibling(_index));
+}
+
+LuaSyntaxNode LuaSyntaxNode::GetPrevSibling(const LuaSyntaxTree &t) const {
+    return LuaSyntaxNode(t.GetPrevSibling(_index));
 }
 
 LuaSyntaxNode LuaSyntaxNode::GetFirstChild(const LuaSyntaxTree &t) const {
@@ -55,14 +59,14 @@ LuaSyntaxNode LuaSyntaxNode::GetFirstChild(const LuaSyntaxTree &t) const {
 }
 
 void LuaSyntaxNode::ToNext(const LuaSyntaxTree &t) {
-    _index = t.GetSibling(_index);
+    _index = t.GetNextSibling(_index);
 }
 
 bool LuaSyntaxNode::IsNull(const LuaSyntaxTree &t) const {
     return _index == 0;
 }
 
-std::vector<LuaSyntaxNode> LuaSyntaxNode::GetDescendants(const LuaSyntaxTree &t) {
+std::vector<LuaSyntaxNode> LuaSyntaxNode::GetDescendants(const LuaSyntaxTree &t) const {
     std::vector<LuaSyntaxNode> results;
     if (t.GetFirstChild(_index) == 0) {
         return results;
@@ -81,20 +85,88 @@ std::vector<LuaSyntaxNode> LuaSyntaxNode::GetDescendants(const LuaSyntaxTree &t)
     return results;
 }
 
+std::vector<LuaSyntaxNode> LuaSyntaxNode::GetChildren(const LuaSyntaxTree &t) const {
+    std::vector<LuaSyntaxNode> results;
+    for (auto child = GetFirstChild(t); !child.IsNull(t); child.ToNext(t)) {
+        results.push_back(child);
+    }
+    return results;
+}
+
 bool LuaSyntaxNode::IsToken(const LuaSyntaxTree &t) const {
     return t.IsToken(_index);
 }
 
-std::size_t LuaSyntaxNode::GetIndex() const{
+std::size_t LuaSyntaxNode::GetIndex() const {
     return _index;
 }
 
-std::size_t LuaSyntaxNode::ChildSyntaxNode(LuaSyntaxNodeKind kind) const {
-    return _index;
+LuaSyntaxNode LuaSyntaxNode::GetChildSyntaxNode(LuaSyntaxNodeKind kind, const LuaSyntaxTree &t) const {
+    auto child = GetFirstChild(t);
+    for (; !child.IsNull(t); child.ToNext(t)) {
+        if (child.GetSyntaxKind(t) == kind) {
+            break;
+        }
+    }
+    return child;
 }
 
-std::size_t LuaSyntaxNode::ChildToken(LuaTokenKind kind) const {
-    return _index;
+LuaSyntaxNode LuaSyntaxNode::GetChildSyntaxNode(LuaSyntaxMultiKind kind, const LuaSyntaxTree &t) const {
+    auto child = GetFirstChild(t);
+    for (; !child.IsNull(t); child.ToNext(t)) {
+        if (detail::multi_match::Match(kind, child.GetSyntaxKind(t))) {
+            break;
+        }
+    }
+    return child;
 }
+
+LuaSyntaxNode LuaSyntaxNode::GetChildToken(LuaTokenKind kind, const LuaSyntaxTree &t) const {
+    auto child = GetFirstChild(t);
+    for (; !child.IsNull(t); child.ToNext(t)) {
+        if (child.GetTokenKind(t) == kind) {
+            break;
+        }
+    }
+    return child;
+}
+
+std::vector<LuaSyntaxNode> LuaSyntaxNode::GetChildSyntaxNodes(LuaSyntaxNodeKind kind, const LuaSyntaxTree &t) const {
+    std::vector<LuaSyntaxNode> results;
+    auto child = GetFirstChild(t);
+    for (; !child.IsNull(t); child.ToNext(t)) {
+        if (child.GetSyntaxKind(t) == kind) {
+            results.push_back(child);
+        }
+    }
+    return results;
+}
+
+std::vector<LuaSyntaxNode> LuaSyntaxNode::GetChildSyntaxNodes(LuaSyntaxMultiKind kind, const LuaSyntaxTree &t) const {
+    std::vector<LuaSyntaxNode> results;
+    auto child = GetFirstChild(t);
+    for (; !child.IsNull(t); child.ToNext(t)) {
+        if (detail::multi_match::Match(kind, child.GetSyntaxKind(t))) {
+            results.push_back(child);
+        }
+    }
+    return results;
+}
+
+std::vector<LuaSyntaxNode> LuaSyntaxNode::GetChildTokens(LuaTokenKind kind, const LuaSyntaxTree &t) const {
+    std::vector<LuaSyntaxNode> results;
+    auto child = GetFirstChild(t);
+    for (; !child.IsNull(t); child.ToNext(t)) {
+        if (child.GetTokenKind(t) == kind) {
+            results.push_back(child);
+        }
+    }
+    return results;
+}
+
+
+
+
+
 
 

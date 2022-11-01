@@ -11,15 +11,15 @@ void FormatBuilder::FormatAnalyze(const LuaSyntaxTree &t) {
     AddAnalyzer<SpaceAnalyzer>();
     AddAnalyzer<IndentationAnalyzer>();
 
-
     auto syntaxNodes = t.GetSyntaxNodes();
-    for(const auto& analyzer: _analyzers){
+    for (const auto &analyzer: _analyzers) {
         analyzer->Analyze(*this, syntaxNodes, t);
     }
 
-    for(const auto& analyzer: _analyzers){
+    for (const auto &analyzer: _analyzers) {
         analyzer->Process(*this, syntaxNodes, t);
     }
+
 
 }
 
@@ -38,4 +38,24 @@ void FormatBuilder::SpaceRight(LuaSyntaxNode &n, std::size_t space) {
 
 void FormatBuilder::Indenter(LuaSyntaxNode &n) {
     _indentStates[n.GetIndex()] = IndentState();
+}
+
+std::optional<std::size_t> FormatBuilder::GetLeftSpace(LuaSyntaxNode &n) {
+    auto it = _leftSpaces.find(n.GetIndex());
+    if(it != _leftSpaces.end()){
+        return it->second;
+    }
+    return {};
+}
+
+std::optional<std::size_t> FormatBuilder::GetRightSpace(LuaSyntaxNode &n) {
+    auto it = _rightSpaces.find(n.GetIndex());
+    if(it != _rightSpaces.end()){
+        return it->second;
+    }
+    return {};
+}
+
+void FormatBuilder::PushChange(FormatChange&& change) {
+    _changes.emplace_back(change);
 }

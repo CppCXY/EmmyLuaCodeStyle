@@ -6,7 +6,11 @@
 
 
 int main() {
-    std::string buffer = R"(local t = 123)";
+    std::string buffer = R"(
+local t=   123
+print("hello world")
+okok=123
+)";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
     LuaLexer luaLexer(file);
@@ -17,10 +21,7 @@ int main() {
 
     LuaSyntaxTree t;
     t.BuildTree(p);
-    auto syntaxs = t.GetSyntaxNodes();
-    for (auto n: syntaxs) {
-        std::cout << (int)n.GetSyntaxKind(t) << "   " << n.GetText(t) << std::endl;
-    }
-
+    FormatBuilder b;
+    b.FormatAnalyze(t);
     return 0;
 }

@@ -7,6 +7,7 @@
 #include "LuaSyntaxNodeKind.h"
 #include "LuaParser/Types/TextRange.h"
 #include "LuaParser/Lexer/LuaTokenKind.h"
+#include "LuaSyntaxMultiKind.h"
 
 class LuaSyntaxTree;
 
@@ -36,7 +37,9 @@ public:
 
     LuaSyntaxNode GetParent(const LuaSyntaxTree &t) const;
 
-    LuaSyntaxNode GetSibling(const LuaSyntaxTree &t) const;
+    LuaSyntaxNode GetNextSibling(const LuaSyntaxTree &t) const;
+
+    LuaSyntaxNode GetPrevSibling(const LuaSyntaxTree &t) const;
 
     LuaSyntaxNode GetFirstChild(const LuaSyntaxTree &t) const;
 
@@ -44,13 +47,23 @@ public:
 
     bool IsNull(const LuaSyntaxTree &t) const;
 
-    std::vector<LuaSyntaxNode> GetDescendants(const LuaSyntaxTree &t);
+    std::vector<LuaSyntaxNode> GetDescendants(const LuaSyntaxTree &t) const;
+
+    std::vector<LuaSyntaxNode> GetChildren(const LuaSyntaxTree &t) const;
 
     std::size_t GetIndex() const;
 
-    LuaSyntaxNode ChildSyntaxNode(LuaSyntaxNodeKind kind) const;
+    LuaSyntaxNode GetChildSyntaxNode(LuaSyntaxNodeKind kind, const LuaSyntaxTree &t) const;
 
-    LuaSyntaxNode ChildToken(LuaTokenKind kind) const;
+    LuaSyntaxNode GetChildSyntaxNode(LuaSyntaxMultiKind kind, const LuaSyntaxTree &t) const;
+
+    LuaSyntaxNode GetChildToken(LuaTokenKind kind, const LuaSyntaxTree &t) const;
+
+    std::vector<LuaSyntaxNode> GetChildSyntaxNodes(LuaSyntaxNodeKind kind, const LuaSyntaxTree &t) const;
+
+    std::vector<LuaSyntaxNode> GetChildSyntaxNodes(LuaSyntaxMultiKind kind, const LuaSyntaxTree &t) const;
+
+    std::vector<LuaSyntaxNode> GetChildTokens(LuaTokenKind kind, const LuaSyntaxTree &t) const;
 private:
     std::size_t _index;
 };

@@ -94,3 +94,4 @@ enum class LuaSyntaxNodeKind
 
 	DocTagFormat,
 };
+

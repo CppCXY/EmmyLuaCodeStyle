@@ -19,7 +19,8 @@ struct NodeOrToken {
     explicit NodeOrToken(LuaSyntaxNodeKind nodeKind)
             : Type(NodeOrTokenType::Node),
               Parent(0),
-              Sibling(0),
+              NextSibling(0),
+              PrevSibling(0),
               FirstChild(0),
               LastChild(0) {
         Data.NodeKind = nodeKind;
@@ -28,7 +29,8 @@ struct NodeOrToken {
     explicit NodeOrToken(LuaToken &token)
             : Type(NodeOrTokenType::Token),
               Parent(0),
-              Sibling(0),
+              NextSibling(0),
+              PrevSibling(0),
               FirstChild(0),
               LastChild(0) {
         Data.Token.Kind = token.TokenType;
@@ -38,7 +40,8 @@ struct NodeOrToken {
 
     NodeOrTokenType Type;
     std::size_t Parent;
-    std::size_t Sibling;
+    std::size_t NextSibling;
+    std::size_t PrevSibling;
     std::size_t FirstChild;
     std::size_t LastChild;
     union {

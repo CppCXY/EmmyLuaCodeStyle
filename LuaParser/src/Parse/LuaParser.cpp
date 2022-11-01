@@ -661,7 +661,11 @@ void LuaParser::RectField() {
 void LuaParser::FunctionBody() {
     auto m = Mark();
 
+    CheckAndNext('(');
+
     ParamList();
+
+    CheckAndNext(')');
 
     Block();
 
@@ -672,8 +676,6 @@ void LuaParser::FunctionBody() {
 
 void LuaParser::ParamList() {
     auto m = Mark();
-
-    CheckAndNext('(');
 
     bool isVararg = false;
     if (Current() != ')') {
@@ -697,8 +699,6 @@ void LuaParser::ParamList() {
             }
         } while (!isVararg && TestAndNext(','));
     }
-
-    CheckAndNext(')');
 
     m.Complete(*this, LuaSyntaxNodeKind::ParamList);
 }

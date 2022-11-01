@@ -26,7 +26,7 @@ target_sources(LuaParser
 	# ast
 	${LuaParser_SOURCE_DIR}/src/Ast/LuaSyntaxNode.cpp
 	${LuaParser_SOURCE_DIR}/src/Ast/LuaSyntaxTree.cpp
-
+	${LuaParser_SOURCE_DIR}/src/Ast/LuaSyntaxMultiKind.cpp
 	# types
 	${LuaParser_SOURCE_DIR}/src/Types/TextRange.cpp
 
