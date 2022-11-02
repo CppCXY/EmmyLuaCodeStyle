@@ -6,60 +6,88 @@
 using NodeKind = LuaSyntaxNodeKind;
 using MultiKind = LuaSyntaxMultiKind;
 
-IndentationAnalyzer::IndentationAnalyzer() {
+IndentationAnalyzer::IndentationAnalyzer()
+        : _style(IndentStyle::Space) {
 }
 
-void IndentationAnalyzer::Analyze(FormatBuilder &f, std::vector<LuaSyntaxNode> &nodes, const LuaSyntaxTree &t) {
-    for (auto &syntaxNode: nodes) {
-        if (syntaxNode.IsNode(t)) {
-            switch (syntaxNode.GetSyntaxKind(t)) {
-                case LuaSyntaxNodeKind::Block:
-                case LuaSyntaxNodeKind::ParamList: {
-                    f.Indenter(syntaxNode);
-                    break;
+void IndentationAnalyzer::Analyze(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    if (syntaxNode.IsNode(t)) {
+        switch (syntaxNode.GetSyntaxKind(t)) {
+            case LuaSyntaxNodeKind::Block: {
+                if (syntaxNode.GetIndex() == 1) {
+                    Indenter(syntaxNode, IndentStyle::Space, 0);
+                } else {
+                    Indenter(syntaxNode);
                 }
-                case LuaSyntaxNodeKind::CallExpression: {
-                    if (syntaxNode.GetChildToken('(', t).IsToken(t)) {
-                        auto exprList = syntaxNode.GetChildSyntaxNode(NodeKind::ExpressionList, t);
-                        if (exprList.IsNode(t)) {
-                            f.Indenter(exprList);
-                        }
-                    }
-                    break;
-                }
-                case LuaSyntaxNodeKind::LocalStatement:
-                case LuaSyntaxNodeKind::AssignStatement:
-                case LuaSyntaxNodeKind::ReturnStatement: {
+
+                break;
+            }
+            case LuaSyntaxNodeKind::ParamList: {
+                Indenter(syntaxNode);
+                break;
+            }
+            case LuaSyntaxNodeKind::CallExpression: {
+                if (syntaxNode.GetChildToken('(', t).IsToken(t)) {
                     auto exprList = syntaxNode.GetChildSyntaxNode(NodeKind::ExpressionList, t);
                     if (exprList.IsNode(t)) {
-                        AnalyzeExprList(f, exprList, t);
+                        Indenter(exprList);
                     }
-                    break;
                 }
-                case LuaSyntaxNodeKind::WhileStatement:
-                case LuaSyntaxNodeKind::RepeatStatement: {
-                    auto expr = syntaxNode.GetChildSyntaxNode(MultiKind::Expression, t);
-                    if (expr.IsNode(t)) {
-                        f.Indenter(expr);
-                    }
-                    break;
+                break;
+            }
+            case LuaSyntaxNodeKind::LocalStatement:
+            case LuaSyntaxNodeKind::AssignStatement:
+            case LuaSyntaxNodeKind::ReturnStatement: {
+                auto exprList = syntaxNode.GetChildSyntaxNode(NodeKind::ExpressionList, t);
+                if (exprList.IsNode(t)) {
+                    AnalyzeExprList(f, exprList, t);
                 }
-                case LuaSyntaxNodeKind::IfStatement: {
-                    auto exprs = syntaxNode.GetChildSyntaxNodes(MultiKind::Expression, t);
-                    for (auto expr: exprs) {
-                        f.Indenter(expr);
-                    }
-                    break;
+                break;
+            }
+            case LuaSyntaxNodeKind::WhileStatement:
+            case LuaSyntaxNodeKind::RepeatStatement: {
+                auto expr = syntaxNode.GetChildSyntaxNode(MultiKind::Expression, t);
+                if (expr.IsNode(t)) {
+                    Indenter(expr);
                 }
-                case LuaSyntaxNodeKind::ExpressionStatement: {
-                    break;
+                break;
+            }
+            case LuaSyntaxNodeKind::IfStatement: {
+                auto exprs = syntaxNode.GetChildSyntaxNodes(MultiKind::Expression, t);
+                for (auto expr: exprs) {
+                    Indenter(expr);
                 }
-                default: {
-                    break;
-                }
+                break;
+            }
+            case LuaSyntaxNodeKind::ExpressionStatement: {
+                break;
+            }
+            default: {
+                break;
             }
         }
     }
+}
+
+void IndentationAnalyzer::Indenter(LuaSyntaxNode &n) {
+    // come from config
+    auto is = IndentState(IndentStyle::Space);
+    is.Size = 4;
+    _indentStates[n.GetIndex()] = is;
+}
+
+void IndentationAnalyzer::Indenter(LuaSyntaxNode &n, IndentStyle style, std::size_t size) {
+    auto is = IndentState(IndentStyle::Space);
+    is.Size = size;
+    _indentStates[n.GetIndex()] = is;
+}
+
+std::optional<IndentState> IndentationAnalyzer::GetIndentState(LuaSyntaxNode &n) const {
+    auto it = _indentStates.find(n.GetIndex());
+    if (it != _indentStates.end()) {
+        return it->second;
+    }
+    return {};
 }
 
 void IndentationAnalyzer::AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t) {
@@ -72,11 +100,22 @@ void IndentationAnalyzer::AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode &exprL
             return;
         }
     }
-    f.Indenter(exprList);
+    Indenter(exprList);
 }
 
-void IndentationAnalyzer::Process(FormatBuilder &f, std::vector<LuaSyntaxNode> &nodes, const LuaSyntaxTree &t) {
-
+void IndentationAnalyzer::Process(FormatBuilder &f, LuaSyntaxNode &nodes, const LuaSyntaxTree &t) {
+//    for (auto syntaxNode: nodes) {
+//        if (!syntaxNode.GetFirstChild(t).IsNull(t)) {
+//            auto indentState = GetIndentState(syntaxNode);
+//            if (indentState.has_value()) {
+//                AddIndent(indentState);
+//                auto children = syntaxNode.GetChildren(t);
+//                for (auto child: children) {
+//                    ProcessIndent(child);
+//                }
+//            }
+//        }
+//    }
 }
 
 

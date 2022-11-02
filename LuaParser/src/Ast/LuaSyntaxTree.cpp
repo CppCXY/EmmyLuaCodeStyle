@@ -1,5 +1,5 @@
-#include <cassert>
 #include "LuaParser/Ast/LuaSyntaxTree.h"
+#include <algorithm>
 #include "LuaParser/Parse/LuaParser.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 
@@ -266,6 +266,27 @@ std::vector<LuaSyntaxNode> LuaSyntaxTree::GetSyntaxNodes() const {
     for (auto i = 0; i != _nodes.size() - 1; i++) {
         results.emplace_back(i + 1);
     }
+
+    return results;
+}
+
+std::vector<LuaSyntaxNode> LuaSyntaxTree::GetTokens() const {
+    std::vector<LuaSyntaxNode> results;
+    if (_nodes.empty()) {
+        return results;
+    }
+
+    results.reserve(_nodes.size() - 1);
+    for (auto i = 0; i != _nodes.size() - 1; i++) {
+        LuaSyntaxNode syntaxNode(i + 1);
+        if (syntaxNode.IsToken(*this)) {
+            results.push_back(syntaxNode);
+        }
+    }
+
+    std::sort(results.begin(), results.end(), [this](LuaSyntaxNode &l, LuaSyntaxNode &r) {
+        return GetStartOffset(l.GetIndex()) < GetStartOffset(r.GetIndex());
+    });
 
     return results;
 }

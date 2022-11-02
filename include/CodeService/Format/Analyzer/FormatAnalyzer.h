@@ -11,7 +11,7 @@ public:
 
     ~FormatAnalyzer();
 
-    virtual void Analyze(FormatBuilder &f, std::vector<LuaSyntaxNode> &nodes, const LuaSyntaxTree &t) = 0;
+    virtual void Analyze(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) = 0;
 
-    virtual void Process(FormatBuilder &f, std::vector<LuaSyntaxNode> &nodes, const LuaSyntaxTree &t) = 0;
+    virtual void Process(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) = 0;
 };

@@ -4,8 +4,8 @@
 #include "LuaParser/Types/TextRange.h"
 
 struct IndentState {
-    IndentState()
-            : Style(IndentStyle::Space),
+    IndentState(IndentStyle style = IndentStyle::Space)
+            : Style(style),
               Size(0) {}
 
     IndentStyle Style;

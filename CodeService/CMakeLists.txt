@@ -18,6 +18,7 @@ target_sources(CodeService
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/FormatAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/SpaceAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/IndentationAnalyzer.cpp
+        ${CodeService_SOURCE_DIR}/src/Format/Analyzer/LineBreakAnalyzer.cpp
         # typeFormat
 #        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormat.cpp
 #        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp
