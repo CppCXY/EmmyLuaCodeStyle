@@ -39,9 +39,11 @@ public:
 
     bool IsToken(std::size_t index) const;
 
-    std::vector<LuaSyntaxNode> GetSyntaxNodes() const;
+    const std::vector<LuaSyntaxNode>& GetSyntaxNodes() const;
 
     std::vector<LuaSyntaxNode> GetTokens() const;
+
+    LuaSyntaxNode GetRootNode() const;
 private:
     void StartNode(LuaSyntaxNodeKind kind, LuaParser &p);
 
@@ -56,7 +58,8 @@ private:
     void BuildToken(LuaToken &token);
 
     std::shared_ptr<LuaFile> _file;
-    std::vector<NodeOrToken> _nodes;
+    std::vector<NodeOrToken> _nodeOrTokens;
+    std::vector<LuaSyntaxNode> _syntaxNodes;
     std::stack<std::size_t> _nodePosStack;
     std::size_t _tokenIndex;
 };

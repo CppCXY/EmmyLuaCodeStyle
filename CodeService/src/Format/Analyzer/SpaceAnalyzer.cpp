@@ -1,4 +1,4 @@
-#include "SpaceAnalyzer.h"
+#include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/FormatBuilder.h"
 
@@ -7,85 +7,87 @@ SpaceAnalyzer::SpaceAnalyzer() {
 
 }
 
-void SpaceAnalyzer::Analyze(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
-    if (syntaxNode.IsToken(t)) {
-        switch (syntaxNode.GetTokenKind(t)) {
-            case '+':
-            case '*':
-            case '/':
-            case '%':
-            case '=':
-            case '&':
-            case '^':
-            case TK_AND:
-            case TK_OR:
-            case TK_SHL:
-            case TK_SHR:
-            case TK_GE:
-            case TK_LE:
-            case TK_NE:
-            case TK_EQ:
-            case TK_IDIV:
-            case TK_CONCAT:
-            case TK_IN: {
-                SpaceAround(syntaxNode);
-                break;
-            }
-            case TK_NOT: {
-                SpaceRight(syntaxNode);
-                break;
-            }
-            case '(': {
-                SpaceRight(syntaxNode, 0);
-                break;
-            }
-            case '-':
-            case '~': {
-                auto p = syntaxNode.GetParent(t);
-                if (p.IsNode(t) && p.GetSyntaxKind(t) == LuaSyntaxNodeKind::BinaryExpression) {
+void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
+    for (auto syntaxNode: t.GetSyntaxNodes()) {
+        if (syntaxNode.IsToken(t)) {
+            switch (syntaxNode.GetTokenKind(t)) {
+                case '+':
+                case '*':
+                case '/':
+                case '%':
+                case '=':
+                case '&':
+                case '^':
+                case TK_AND:
+                case TK_OR:
+                case TK_SHL:
+                case TK_SHR:
+                case TK_GE:
+                case TK_LE:
+                case TK_NE:
+                case TK_EQ:
+                case TK_IDIV:
+                case TK_CONCAT:
+                case TK_IN: {
                     SpaceAround(syntaxNode);
-                } else {
+                    break;
+                }
+                case TK_NOT: {
                     SpaceRight(syntaxNode);
+                    break;
                 }
-                break;
-            }
-            case ')': {
-                SpaceLeft(syntaxNode, 0);
-                break;
-            }
-            case '<':
-            case '>': {
-                auto p = syntaxNode.GetParent(t);
-                if (p.GetSyntaxKind(t) == LuaSyntaxNodeKind::BinaryExpression) {
-                    SpaceAround(syntaxNode);
-                } else if (syntaxNode.GetTokenKind(t) == '<') {
+                case '(': {
                     SpaceRight(syntaxNode, 0);
-                } else {
-                    SpaceLeft(syntaxNode, 0);
+                    break;
                 }
-                break;
-            }
-            case ',':
-            case ';': {
-                SpaceLeft(syntaxNode, 0);
-                SpaceRight(syntaxNode, 1);
-                break;
-            }
-            case TK_IF:
-            case TK_LOCAL:
-            case TK_ELSEIF:
-            case TK_RETURN:
-            case TK_GOTO:
-            case TK_FOR: {
-                SpaceRight(syntaxNode);
-                break;
-            }
-            case TK_THEN: {
-                SpaceLeft(syntaxNode);
-                break;
-            }
-            default: {
-                break;
+                case '-':
+                case '~': {
+                    auto p = syntaxNode.GetParent(t);
+                    if (p.IsNode(t) && p.GetSyntaxKind(t) == LuaSyntaxNodeKind::BinaryExpression) {
+                        SpaceAround(syntaxNode);
+                    } else {
+                        SpaceRight(syntaxNode);
+                    }
+                    break;
+                }
+                case ')': {
+                    SpaceLeft(syntaxNode, 0);
+                    break;
+                }
+                case '<':
+                case '>': {
+                    auto p = syntaxNode.GetParent(t);
+                    if (p.GetSyntaxKind(t) == LuaSyntaxNodeKind::BinaryExpression) {
+                        SpaceAround(syntaxNode);
+                    } else if (syntaxNode.GetTokenKind(t) == '<') {
+                        SpaceRight(syntaxNode, 0);
+                    } else {
+                        SpaceLeft(syntaxNode, 0);
+                    }
+                    break;
+                }
+                case ',':
+                case ';': {
+                    SpaceLeft(syntaxNode, 0);
+                    SpaceRight(syntaxNode, 1);
+                    break;
+                }
+                case TK_IF:
+                case TK_LOCAL:
+                case TK_ELSEIF:
+                case TK_RETURN:
+                case TK_GOTO:
+                case TK_FOR: {
+                    SpaceRight(syntaxNode);
+                    break;
+                }
+                case TK_THEN: {
+                    SpaceLeft(syntaxNode);
+                    break;
+                }
+                default: {
+                    break;
+                }
             }
         }
     }

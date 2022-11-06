@@ -15,7 +15,7 @@ class IndentationAnalyzer : public FormatAnalyzer {
 public:
     IndentationAnalyzer();
 
-    void Analyze(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) override;
+    void Analyze(FormatBuilder &f, const LuaSyntaxTree &t) override;
 
     void Process(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) override;
 private:

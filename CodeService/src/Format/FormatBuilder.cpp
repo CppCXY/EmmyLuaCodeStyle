@@ -1,35 +1,59 @@
 #include "CodeService/Format/FormatBuilder.h"
-#include "Analyzer/SpaceAnalyzer.h"
-#include "Analyzer/IndentationAnalyzer.h"
-#include "Analyzer/LineBreakAnalyzer.h"
+
+#
+
 
 FormatBuilder::FormatBuilder() {
 
 }
 
 void FormatBuilder::FormatAnalyze(const LuaSyntaxTree &t) {
-    AddAnalyzer<SpaceAnalyzer>();
-    AddAnalyzer<IndentationAnalyzer>();
-    AddAnalyzer<LineBreakAnalyzer>();
-
-    auto syntaxNodes = t.GetSyntaxNodes();
-    for (const auto &analyzer: _analyzers) {
-        for (auto syntaxNode: syntaxNodes) {
-            analyzer->Analyze(*this, syntaxNode, t);
-        }
-    }
+    _spaceAnalyzer.Analyze(*this, t);
+    _indentationAnalyzer.Analyze(*this, t);
+    _lineBreakAnalyzer.Analyze(*this, t);
 }
 
 std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
-    std::string result;
-    auto tokens = t.GetTokens();
-    for (auto token: tokens) {
-        for(auto& analyzer: _analyzers){
-            analyzer->Process(*this, token, t);
+    enum class TraverseEvent {
+        Enter,
+        Exit
+    };
+
+    struct Traverse {
+        Traverse(LuaSyntaxNode n, TraverseEvent e)
+                : Node(n), Event(e) {}
+
+        LuaSyntaxNode Node;
+        TraverseEvent Event;
+    };
+
+    auto root = t.GetRootNode();
+    std::vector<Traverse> traverseStack;
+    traverseStack.emplace_back(root, TraverseEvent::Enter);
+    // 非递归深度优先遍历
+    while (!traverseStack.empty()) {
+        Traverse traverse = traverseStack.back();
+
+        if (traverse.Event == TraverseEvent::Enter) {
+            traverseStack.back().Event = TraverseEvent::Exit;
         }
-        result.append(token.GetText(t));
+        else{
+            traverseStack.pop_back();
+            continue;
+        }
+
+        auto children = traverse.Node.GetChildren(t);
+        // 不采用 <range>
+        for (auto rIt = children.rbegin(); rIt != children.rend(); rIt++) {
+            traverseStack.emplace_back(*rIt, TraverseEvent::Enter);
+        }
+
     }
 
-    return result;
+    return _formattedText;
+}
+
+FormatResolve FormatBuilder::Resolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t) {
+    return FormatResolve();
 }
 

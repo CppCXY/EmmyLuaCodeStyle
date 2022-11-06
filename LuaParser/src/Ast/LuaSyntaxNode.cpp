@@ -164,6 +164,10 @@ std::vector<LuaSyntaxNode> LuaSyntaxNode::GetChildTokens(LuaTokenKind kind, cons
     return results;
 }
 
+bool LuaSyntaxNode::IsSingleLineNode(const LuaSyntaxTree &t) const {
+    return GetStartLine(t) == GetEndLine(t);
+}
+
 
 
 

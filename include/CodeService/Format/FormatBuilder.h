@@ -7,6 +7,10 @@
 #include "LuaParser/Ast/LuaSyntaxNode.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
 #include "Analyzer/FormatAnalyzer.h"
+#include "Analyzer/SpaceAnalyzer.h"
+#include "Analyzer/IndentationAnalyzer.h"
+#include "Analyzer/LineBreakAnalyzer.h"
+#include "Analyzer/FormatResolve.h"
 #include "Types.h"
 
 class FormatBuilder {
@@ -17,11 +21,12 @@ public:
 
     std::string GetFormatResult(const LuaSyntaxTree &t);
 
-    template<class T>
-    void AddAnalyzer() {
-        _analyzers.push_back(std::make_shared<T>());
-    }
-
 private:
-    std::vector<std::shared_ptr<FormatAnalyzer>> _analyzers;
+    FormatResolve Resolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t);
+
+    SpaceAnalyzer _spaceAnalyzer;
+    IndentationAnalyzer _indentationAnalyzer;
+    LineBreakAnalyzer _lineBreakAnalyzer;
+
+    std::string _formattedText;
 };

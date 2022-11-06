@@ -7,7 +7,7 @@ class SpaceAnalyzer : public FormatAnalyzer {
 public:
     SpaceAnalyzer();
 
-    void Analyze(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) override;
+    void Analyze(FormatBuilder &f, const LuaSyntaxTree &t) override;
 
     void Process(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) override;
 

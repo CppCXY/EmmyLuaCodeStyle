@@ -64,6 +64,8 @@ public:
     std::vector<LuaSyntaxNode> GetChildSyntaxNodes(LuaSyntaxMultiKind kind, const LuaSyntaxTree &t) const;
 
     std::vector<LuaSyntaxNode> GetChildTokens(LuaTokenKind kind, const LuaSyntaxTree &t) const;
+
+    bool IsSingleLineNode(const LuaSyntaxTree &t) const;
 private:
     std::size_t _index;
 };
