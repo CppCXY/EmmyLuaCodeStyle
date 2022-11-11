@@ -17,7 +17,7 @@ public:
 
     void Analyze(FormatBuilder &f, const LuaSyntaxTree &t) override;
 
-    void Process(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) override;
+    void Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) override;
 private:
     void Indenter(LuaSyntaxNode &n);
 

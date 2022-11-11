@@ -93,7 +93,7 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
     }
 }
 
-void SpaceAnalyzer::Process(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+void SpaceAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) {
 //    std::vector<LuaSyntaxNode> tokens;
 //    for (auto syntaxNode: nodes) {
 //        if (syntaxNode.IsToken(t)) {
@@ -170,3 +170,4 @@ void SpaceAnalyzer::ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSy
         }
     }
 }
+

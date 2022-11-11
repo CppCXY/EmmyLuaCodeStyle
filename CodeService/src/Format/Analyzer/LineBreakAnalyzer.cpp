@@ -12,7 +12,7 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
             switch (syntaxNode.GetSyntaxKind(t)) {
                 case LuaSyntaxNodeKind::Block: {
                     if (syntaxNode.IsSingleLineNode(t)) {
-                        if(syntaxNode.GetChildren(t).size() > 1){
+                        if (syntaxNode.GetChildren(t).size() > 1) {
                             BreakTo(syntaxNode, LineBreakStrategy::MultiLine);
                         }
                     }
@@ -36,6 +36,7 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
     }
 }
 
-void LineBreakAnalyzer::Process(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+void
+LineBreakAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
 
 }

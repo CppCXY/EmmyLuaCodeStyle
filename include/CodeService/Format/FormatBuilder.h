@@ -21,12 +21,20 @@ public:
 
     std::string GetFormatResult(const LuaSyntaxTree &t);
 
+    template<class T>
+    void AddAnalyzer() {
+        _analyzers.push_back(std::make_shared<T>());
+    }
+
 private:
-    FormatResolve Resolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t);
+    void DoResolve(LuaSyntaxNode& syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve);
 
-    SpaceAnalyzer _spaceAnalyzer;
-    IndentationAnalyzer _indentationAnalyzer;
-    LineBreakAnalyzer _lineBreakAnalyzer;
+    void WriteSyntaxNode(LuaSyntaxNode& syntaxNode, const LuaSyntaxTree &t);
 
+    void WriteSpace(std::size_t space);
+
+    void WriteLine(std::size_t line);
+
+    std::vector<std::shared_ptr<FormatAnalyzer>> _analyzers;
     std::string _formattedText;
 };

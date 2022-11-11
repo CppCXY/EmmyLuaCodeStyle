@@ -105,7 +105,7 @@ void IndentationAnalyzer::AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode &exprL
     Indenter(exprList);
 }
 
-void IndentationAnalyzer::Process(FormatBuilder &f, LuaSyntaxNode &nodes, const LuaSyntaxTree &t) {
+void IndentationAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &nodes, const LuaSyntaxTree &t, FormatResolve& resolve) {
 //    for (auto syntaxNode: nodes) {
 //        if (!syntaxNode.GetFirstChild(t).IsNull(t)) {
 //            auto indentState = GetIndentState(syntaxNode);

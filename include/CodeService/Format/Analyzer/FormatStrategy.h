@@ -1,9 +1,24 @@
 #pragma once
 
-enum class FormatStrategy {
+enum class SpaceStrategy {
+    None,
     Space,
     LineBreak,
-    Indent
+};
+
+enum class TokenStrategy {
+    Origin,
+    Remove,
+    StringSingleQuote,
+    StringDoubleQuote,
+    RemoveCommentTrailSpace
+};
+
+enum IndentStrategy {
+    None,
+    Space,
+    Tab,
+    Mix
 };
 
 enum class LineBreakStrategy {
