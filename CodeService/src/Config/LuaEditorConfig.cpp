@@ -1,17 +1,15 @@
 ﻿#include "CodeService/Config/LuaEditorConfig.h"
-#include <sstream>
-#include <fstream>
-#include <vector>
-#include <regex>
-#ifndef NOT_SUPPORT_FILE_SYSTEM
-#include <filesystem>
-#endif
-#include "Util/StringUtil.h"
-#include "CodeService/FormatElement/KeepElement.h"
-#include "CodeService/FormatElement/KeepLineElement.h"
-#include "CodeService/FormatElement/MinLineElement.h"
-#include "CodeService/FormatElement/MaxLineElement.h"
-#include "CodeService/NameStyle/NameStyleRuleMatcher.h"
+//#include <sstream>
+//#include <fstream>
+//#include <vector>
+//#include <regex>
+//
+//#include "Util/StringUtil.h"
+//#include "CodeService/FormatElement/KeepElement.h"
+//#include "CodeService/FormatElement/KeepLineElement.h"
+//#include "CodeService/FormatElement/MinLineElement.h"
+//#include "CodeService/FormatElement/MaxLineElement.h"
+//#include "CodeService/NameStyle/NameStyleRuleMatcher.h"
 //
 //bool IsNumber(std::string_view source)
 //{

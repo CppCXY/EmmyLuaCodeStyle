@@ -11,11 +11,12 @@
 #include "Analyzer/IndentationAnalyzer.h"
 #include "Analyzer/LineBreakAnalyzer.h"
 #include "Analyzer/FormatResolve.h"
+#include "CodeService/Config/LuaStyle.h"
 #include "Types.h"
 
 class FormatBuilder {
 public:
-    FormatBuilder();
+    explicit FormatBuilder(LuaStyle& style);
 
     void FormatAnalyze(const LuaSyntaxTree &t);
 
@@ -26,7 +27,13 @@ public:
         _analyzers.push_back(std::make_shared<T>());
     }
 
+    const LuaStyle& GetStyle() const;
+
 private:
+    void AddIndent(LuaSyntaxNode& syntaxNoe);
+
+    void RecoverIndent();
+
     void DoResolve(LuaSyntaxNode& syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve);
 
     void WriteSyntaxNode(LuaSyntaxNode& syntaxNode, const LuaSyntaxTree &t);
@@ -35,6 +42,10 @@ private:
 
     void WriteLine(std::size_t line);
 
+    void WriteIndent();
+
+    LuaStyle _style;
+    std::stack<IndentState> _indentStack;
     std::vector<std::shared_ptr<FormatAnalyzer>> _analyzers;
     std::string _formattedText;
 };

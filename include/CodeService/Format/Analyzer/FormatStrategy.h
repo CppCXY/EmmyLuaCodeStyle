@@ -4,6 +4,7 @@ enum class SpaceStrategy {
     None,
     Space,
     LineBreak,
+    Indent
 };
 
 enum class TokenStrategy {
@@ -14,7 +15,7 @@ enum class TokenStrategy {
     RemoveCommentTrailSpace
 };
 
-enum IndentStrategy {
+enum class IndentStrategy {
     None,
     Space,
     Tab,

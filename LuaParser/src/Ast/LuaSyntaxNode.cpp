@@ -168,9 +168,20 @@ bool LuaSyntaxNode::IsSingleLineNode(const LuaSyntaxTree &t) const {
     return GetStartLine(t) == GetEndLine(t);
 }
 
+LuaSyntaxNode LuaSyntaxNode::GetNextToken(const LuaSyntaxTree &t) const {
+    auto p = *this;
+    auto next = p.GetNextSibling(t);
+    while (next.IsNull(t) && !p.IsNull(t)) {
+        p = p.GetParent(t);
+    }
 
+    if (!next.IsNull(t)) {
+        return next.GetFirstToken(t);
+    }
+    return next;
+}
 
-
-
-
+LuaSyntaxNode LuaSyntaxNode::GetFirstToken(const LuaSyntaxTree &t) const {
+    return LuaSyntaxNode(t.GetFirstToken(_index));
+}
 

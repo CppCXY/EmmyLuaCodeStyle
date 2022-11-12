@@ -8,8 +8,6 @@
 int main() {
     std::string buffer = R"(
 local t=   123
-print("hello world")
-okok=123
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -21,7 +19,9 @@ okok=123
 
     LuaSyntaxTree t;
     t.BuildTree(p);
-    FormatBuilder b;
+    LuaStyle s;
+    FormatBuilder b(s);
     b.FormatAnalyze(t);
+    auto text = b.GetFormatResult(t);
     return 0;
 }

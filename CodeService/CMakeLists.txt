@@ -13,6 +13,10 @@ target_include_directories(CodeService PUBLIC
 
 target_sources(CodeService
         PRIVATE
+        # config
+        ${CodeService_SOURCE_DIR}/src/Config/LuaStyle.cpp
+        ${CodeService_SOURCE_DIR}/src/Config/LuaEditorConfig.cpp
+
         # format
         ${CodeService_SOURCE_DIR}/src/Format/FormatBuilder.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/FormatAnalyzer.cpp

@@ -16,7 +16,7 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
             switch (syntaxNode.GetSyntaxKind(t)) {
                 case LuaSyntaxNodeKind::Block: {
                     if (syntaxNode.GetIndex() == 1) {
-                        Indenter(syntaxNode, IndentStyle::Space, 0);
+//                        Indenter(syntaxNode, IndentStyle::Space, 0);
                     } else {
                         Indenter(syntaxNode);
                     }
@@ -72,23 +72,14 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
 }
 
 void IndentationAnalyzer::Indenter(LuaSyntaxNode &n) {
-    // come from config
-    auto is = IndentState(IndentStyle::Space);
-    is.Size = 4;
-    _indentStates[n.GetIndex()] = is;
-}
-
-void IndentationAnalyzer::Indenter(LuaSyntaxNode &n, IndentStyle style, std::size_t size) {
-    auto is = IndentState(IndentStyle::Space);
-    is.Size = size;
-    _indentStates[n.GetIndex()] = is;
+//    _indentMark.insert(n);
 }
 
 std::optional<IndentState> IndentationAnalyzer::GetIndentState(LuaSyntaxNode &n) const {
-    auto it = _indentStates.find(n.GetIndex());
-    if (it != _indentStates.end()) {
-        return it->second;
-    }
+//    auto it = _indentMark.find(n.GetIndex());
+//    if (it != _indentMark.end()) {
+//        return it->second;
+//    }
     return {};
 }
 

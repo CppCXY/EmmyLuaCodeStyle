@@ -66,6 +66,10 @@ public:
     std::vector<LuaSyntaxNode> GetChildTokens(LuaTokenKind kind, const LuaSyntaxTree &t) const;
 
     bool IsSingleLineNode(const LuaSyntaxTree &t) const;
+
+    LuaSyntaxNode GetNextToken(const LuaSyntaxTree &t) const;
+
+    LuaSyntaxNode GetFirstToken(const LuaSyntaxTree &t) const;
 private:
     std::size_t _index;
 };

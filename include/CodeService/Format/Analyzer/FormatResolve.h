@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FormatStrategy.h"
+#include <cinttypes>
 
 class FormatResolve {
 public:
@@ -18,6 +19,7 @@ public:
 
     TokenStrategy GetTokenStrategy() const;
 
+    void Reset();
 private:
     SpaceStrategy _spaceStrategy;
     TokenStrategy _tokenStrategy;

@@ -2,6 +2,7 @@
 
 #include <stack>
 #include <optional>
+#include <unordered_set>
 #include "CodeService/Format/Analyzer/FormatAnalyzer.h"
 #include "CodeService/Config/LuaStyleEnum.h"
 #include "CodeService/Format/Types.h"
@@ -21,14 +22,12 @@ public:
 private:
     void Indenter(LuaSyntaxNode &n);
 
-    void Indenter(LuaSyntaxNode &n, IndentStyle style, std::size_t size);
-
     std::optional<IndentState> GetIndentState(LuaSyntaxNode& n) const;
 
     void AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
 
     IndentStyle _style;
-    std::unordered_map<std::size_t, IndentState> _indentStates;
+    std::unordered_set<std::size_t> _indentMark;
     std::stack<IndentSize> _indentSize;
 };
 

@@ -93,26 +93,12 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
     }
 }
 
-void SpaceAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) {
-//    std::vector<LuaSyntaxNode> tokens;
-//    for (auto syntaxNode: nodes) {
-//        if (syntaxNode.IsToken(t)) {
-//            tokens.push_back(syntaxNode);
-//        }
-//    }
-//
-//    for (std::size_t i = 1; i != tokens.size(); i++) {
-//        auto token = tokens[i];
-//        if (i == 1) {
-//            auto prevToken = tokens[i - 1];
-//            ProcessSpace(f, t, prevToken, token);
-//        }
-//        if (i + 1 < tokens.size()) {
-//            auto nextToken = tokens[i + 1];
-//            ProcessSpace(f, t, token, nextToken);
-//        }
-//    }
-
+void SpaceAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+    if (syntaxNode.IsToken(t)) {
+        auto nextToken = syntaxNode.GetNextToken(t);
+        auto space = ProcessSpace(f, t, syntaxNode, nextToken);
+        resolve.SetNextSpace(space);
+    }
 }
 
 
@@ -145,7 +131,8 @@ std::optional<std::size_t> SpaceAnalyzer::GetRightSpace(LuaSyntaxNode &n) const 
     return {};
 }
 
-void SpaceAnalyzer::ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSyntaxNode &left, LuaSyntaxNode &right) {
+std::size_t
+SpaceAnalyzer::ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSyntaxNode &left, LuaSyntaxNode &right) {
     auto rightSpaceOfLeftToken = GetRightSpace(left);
     auto leftSpaceOfRightToken = GetLeftSpace(right);
     std::optional<std::size_t> distance;
@@ -156,18 +143,9 @@ void SpaceAnalyzer::ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSy
     } else {
         distance = leftSpaceOfRightToken;
     }
-
-    if (distance.has_value() && left.GetEndLine(t) == right.GetStartLine(t)) {
-        auto distanceValue = distance.value();
-        auto leftEndOffset = t.GetEndOffset(left.GetIndex());
-        auto rightStartOffset = t.GetStartOffset(right.GetIndex());
-        if (rightStartOffset - leftEndOffset != distanceValue + 1) {
-            FormatChange change;
-            change.Start = leftEndOffset + 1;
-            change.Length = rightStartOffset - leftEndOffset - 1;
-            change.NewString.resize(distanceValue, ' ');
-            f.PushChange(std::move(change));
-        }
+    if (distance.has_value()) {
+        return distance.value();
     }
+    return t.GetStartOffset(right.GetIndex()) - t.GetEndOffset(left.GetIndex()) - 1;
 }
 

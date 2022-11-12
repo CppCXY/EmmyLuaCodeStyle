@@ -4,19 +4,35 @@
 #include "LuaParser/Types/TextRange.h"
 
 struct IndentState {
-    IndentState(IndentStyle style = IndentStyle::Space)
-            : Style(style),
-              Size(0) {}
+    IndentState(LuaSyntaxNode node, std::size_t space, std::size_t tab)
+            :
+            SyntaxNode(node),
+            SpaceSize(space),
+            TabSize(tab) {}
 
-    IndentStyle Style;
-    std::size_t Size;
+    LuaSyntaxNode SyntaxNode;
+    std::size_t SpaceSize;
+    std::size_t TabSize;
 };
 
 struct FormatChange {
     FormatChange()
-            :  Start(0), Length(0) {}
+            : Start(0), Length(0) {}
 
     std::size_t Start;
     std::size_t Length;
     std::string NewString;
+};
+
+enum class TraverseEvent {
+    Enter,
+    Exit
+};
+
+struct Traverse {
+    Traverse(LuaSyntaxNode n, TraverseEvent e)
+            : Node(n), Event(e) {}
+
+    LuaSyntaxNode Node;
+    TraverseEvent Event;
 };

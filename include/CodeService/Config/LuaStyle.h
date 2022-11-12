@@ -4,37 +4,37 @@
 #include <string_view>
 #include <memory>
 #include <vector>
-//#include "LuaCodeStyleEnum.h"
-//#include "LuaParser/EndOfLineType.h"
+#include "LuaStyleEnum.h"
+#include "LuaParser/Types/EndOfLineType.h"
 
-//class FormatElement;
-//class NameStyleRuleMatcher;
+class LuaStyle {
+public:
+    LuaStyle() = default;
 
-//std::string GetIndentStyleName(IndentStyle style);
+    /*
+     * 缩进风格
+     */
+    IndentStyle indent_style = IndentStyle::Space;
 
-class LuaCodeStyleOptions
-{
-//public:
-//	LuaCodeStyleOptions();
-//
-//	/*
-//	 * 缩进风格
-//	 */
-//	IndentStyle indent_style = IndentStyle::Space;
-//
-//	/*
-//	 * 缩进的空白数
-//	 */
-//	int indent_size = 4;
-//
-//	/*
-//	 * tab的width
-//	 */
-//	int tab_width = 4;
-//
-//	QuoteStyle quote_style = QuoteStyle::None;
-//
-//	TableSeparatorStyle table_separator_style = TableSeparatorStyle::None;
+    /*
+     * 缩进的空白数
+     */
+    std::size_t indent_size = 4;
+
+    /*
+     * tab的width
+     */
+    std::size_t tab_width = 4;
+
+    QuoteStyle quote_style = QuoteStyle::None;
+
+    TableSeparatorStyle table_separator_style = TableSeparatorStyle::None;
+
+#ifndef _WINDOWS
+    EndOfLine end_of_line = EndOfLine::LF;
+#else
+    EndOfLine end_of_line = EndOfLine::CRLF;
+#endif
 //
 //	TrailingTableSeparator trailing_table_separator = TrailingTableSeparator::Keep;
 //
@@ -125,11 +125,7 @@ class LuaCodeStyleOptions
 //	bool remove_expression_list_finish_comma = false;
 //
 //	bool remove_empty_header_and_footer_lines_in_function = false;
-//#ifndef _WINDOWS
-//	EndOfLine end_of_line = EndOfLine::LF;
-//#else
-//	EndOfLine end_of_line = EndOfLine::CRLF;
-//#endif
+
 //	bool detect_end_of_line = false;
 //
 //	bool insert_final_newline = true;
