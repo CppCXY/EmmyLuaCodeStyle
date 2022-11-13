@@ -173,6 +173,7 @@ LuaSyntaxNode LuaSyntaxNode::GetNextToken(const LuaSyntaxTree &t) const {
     auto next = p.GetNextSibling(t);
     while (next.IsNull(t) && !p.IsNull(t)) {
         p = p.GetParent(t);
+        next = p.GetNextSibling(t);
     }
 
     if (!next.IsNull(t)) {

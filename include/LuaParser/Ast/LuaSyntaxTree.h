@@ -46,6 +46,8 @@ public:
     std::vector<LuaSyntaxNode> GetTokens() const;
 
     LuaSyntaxNode GetRootNode() const;
+
+    std::string GetDebugView();
 private:
     void StartNode(LuaSyntaxNodeKind kind, LuaParser &p);
 

@@ -835,7 +835,7 @@ void LuaParser::LocalAttribute() {
 
 void LuaParser::Check(LuaTokenKind c) {
     if (Current() != c) {
-        ThrowMatchError(util::format("{} expected"));
+        ThrowMatchError(util::format("{} expected", c));
     }
 }
 

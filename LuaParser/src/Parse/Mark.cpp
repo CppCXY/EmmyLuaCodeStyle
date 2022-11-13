@@ -42,7 +42,7 @@ CompleteMarker::CompleteMarker(std::size_t start, std::size_t finish, LuaSyntaxN
 
 Marker CompleteMarker::Precede(LuaParser &p) {
     auto m = p.Mark();
-    auto event = p.GetEvents().at(Start);
+    auto& event = p.GetEvents().at(Start);
     if (event.Type == MarkEventType::NodeStart) {
         event.U.Start.Parent = m.Pos;
     }

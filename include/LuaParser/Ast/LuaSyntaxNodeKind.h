@@ -1,97 +1,102 @@
 #pragma once
+#include <string_view>
 
-enum class LuaSyntaxNodeKind
-{
+enum class LuaSyntaxNodeKind {
     None = 0,
 
     File,
 
-	Block,
+    Block,
 
-	EmptyStatement,
+    EmptyStatement,
 
-	LocalStatement,
+    LocalStatement,
 
-	LocalFunctionStatement,
+    LocalFunctionStatement,
 
-	IfStatement,
+    IfStatement,
 
-	WhileStatement,
+    WhileStatement,
 
-	DoStatement,
+    DoStatement,
 
-	ForStatement,
+    ForStatement,
 
-	RepeatStatement,
+    RepeatStatement,
 
-	FunctionStatement,
+    FunctionStatement,
 
-	LabelStatement,
+    LabelStatement,
 
-	BreakStatement,
+    BreakStatement,
 
-	ReturnStatement,
+    ReturnStatement,
 
-	GotoStatement,
+    GotoStatement,
 
-	ExpressionStatement,
+    ExpressionStatement,
 
-	AssignStatement,
+    AssignStatement,
 
     SuffixedExpression,
 
     ParExpression,
 
-	LiteralExpression,
+    LiteralExpression,
 
-	StringLiteralExpression,
+    StringLiteralExpression,
 
-	ClosureExpression,
+    ClosureExpression,
 
-	UnaryExpression,
+    UnaryExpression,
 
-	BinaryExpression,
+    BinaryExpression,
 
-	TableExpression,
+    TableExpression,
 
-	CallExpression,
+    CallExpression,
 
-	IndexExpression,
+    IndexExpression,
 
-	NameExpression,
+    NameExpression,
 
     FunctionNameExpression,
 
     VarList,
 
-	TableField,
+    TableField,
 
-	FunctionBody,
+    FunctionBody,
 
-	ParamList,
+    ParamList,
 
-	NameDefList,
+    NameDefList,
 
-	Attribute,
+    Attribute,
 
-	ExpressionList,
+    ExpressionList,
 
-	ForNumber,
+    ForNumber,
 
-	ForList,
+    ForList,
 
-	ForBody,
+    ForBody,
 
-	Error,
+    Error,
 
-	Comment,
+    Comment,
 
-	ShortComment,
+    ShortComment,
 
-	LongComment,
+    LongComment,
 
-	ShebangComment,
+    ShebangComment,
 
-	DocTagFormat,
+    DocTagFormat,
 };
 
+namespace detail {
+    namespace debug {
+        std::string_view GetSyntaxKindDebugName(LuaSyntaxNodeKind kind);
+    }
+}

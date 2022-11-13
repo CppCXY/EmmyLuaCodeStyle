@@ -146,6 +146,9 @@ SpaceAnalyzer::ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSyntaxN
     if (distance.has_value()) {
         return distance.value();
     }
-    return t.GetStartOffset(right.GetIndex()) - t.GetEndOffset(left.GetIndex()) - 1;
+    if(!right.IsNull(t)) {
+        return t.GetStartOffset(right.GetIndex()) - t.GetEndOffset(left.GetIndex()) - 1;
+    }
+    return 0;
 }
 

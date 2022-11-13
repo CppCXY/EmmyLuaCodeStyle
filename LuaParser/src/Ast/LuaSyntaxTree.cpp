@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "LuaParser/Parse/LuaParser.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
+#include "Util/format.h"
 
 LuaSyntaxTree::LuaSyntaxTree()
         : _file(),
@@ -304,4 +305,40 @@ std::vector<LuaSyntaxNode> LuaSyntaxTree::GetTokens() const {
 
 LuaSyntaxNode LuaSyntaxTree::GetRootNode() const {
     return LuaSyntaxNode(1);
+}
+
+std::string LuaSyntaxTree::GetDebugView() {
+    std::string debugView;
+    debugView.append("{ Lua Syntax Tree, filename }\n");
+
+    auto root = GetRootNode();
+    std::stack<LuaSyntaxNode> traverseStack;
+    std::size_t indent = 1;
+    traverseStack.push(root);
+    // 非递归深度优先遍历
+    while (!traverseStack.empty()) {
+        LuaSyntaxNode node = traverseStack.top();
+        if (node.IsNode(*this)) {
+            traverseStack.top() = LuaSyntaxNode(0);
+            auto children = node.GetChildren(*this);
+            for (auto rIt = children.rbegin(); rIt != children.rend(); rIt++) {
+                traverseStack.push(*rIt);
+            }
+            debugView.resize(debugView.size() + indent, '\t');
+            debugView.append(util::format("{{ Lua Syntax Node, index: {} ,Kind: {} }}\n",
+                                          node.GetIndex(),
+                                          detail::debug::GetSyntaxKindDebugName(node.GetSyntaxKind(*this))));
+            indent++;
+        } else if (node.IsToken(*this)) {
+            traverseStack.pop();
+            debugView.resize(debugView.size() + indent, '\t');
+            debugView.append(util::format("{{ Lua Syntax Token, index: {} , Token: {} }}\n",
+                                          node.GetIndex(),
+                                          node.GetText(*this)));
+        } else {
+            traverseStack.pop();
+            indent--;
+        }
+    }
+    return debugView;
 }
