@@ -13,7 +13,11 @@ public:
     void Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) override;
 
     void BreakTo(LuaSyntaxNode n, LineBreakStrategy strategy);
+
+    void BreakAfter(LuaSyntaxNode n, std::size_t line = 1);
 private:
+    void BreakAnalyze(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t length);
+
     void AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
 
     void AnalyzeTableFieldList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
@@ -21,6 +25,10 @@ private:
     void AnalyzeCallList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
 
     void AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
+
+    void AnalyzeConditionExpr(FormatBuilder &f, LuaSyntaxNode& expr, const LuaSyntaxTree &t);
+
+    void AnalyzeNameList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
 
     std::unordered_set<std::size_t> _mark;
 };

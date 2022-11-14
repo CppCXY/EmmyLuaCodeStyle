@@ -7,7 +7,9 @@
 
 int main() {
     std::string buffer = R"(
-local t= -  1414+789
+aaa.bbbb.cccc:dddd(1,2,3)
+eeee(1,2,3)
+aaaa [[12313]]
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -23,6 +25,6 @@ local t= -  1414+789
     FormatBuilder b(s);
     b.FormatAnalyze(t);
     std::cout<<t.GetDebugView()<<std::endl;
-    auto text = b.GetFormatResult(t);
+//    auto text = b.GetFormatResult(t);
     return 0;
 }
