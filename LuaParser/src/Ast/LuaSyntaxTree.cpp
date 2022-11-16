@@ -243,6 +243,22 @@ std::size_t LuaSyntaxTree::GetFirstToken(std::size_t index) const {
     return 0;
 }
 
+std::size_t LuaSyntaxTree::GetLastToken(std::size_t index) const {
+    if (index < _nodeOrTokens.size()) {
+        auto &n = _nodeOrTokens[index];
+        if (n.Type == NodeOrTokenType::Node) {
+            auto child = n.LastChild;
+            while (IsNode(child)) {
+                child = GetLastChild(child);
+            }
+            return child;
+        } else {
+            return index;
+        }
+    }
+    return 0;
+}
+
 std::size_t LuaSyntaxTree::GetParent(std::size_t index) const {
     if (index < _nodeOrTokens.size()) {
         return _nodeOrTokens[index].Parent;
@@ -342,3 +358,4 @@ std::string LuaSyntaxTree::GetDebugView() {
     }
     return debugView;
 }
+

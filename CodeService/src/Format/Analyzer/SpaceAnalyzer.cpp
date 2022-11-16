@@ -29,47 +29,47 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                 case TK_IDIV:
                 case TK_CONCAT:
                 case TK_IN: {
-                    SpaceAround(syntaxNode);
+                    SpaceAround(syntaxNode, t);
                     break;
                 }
                 case TK_NOT: {
-                    SpaceRight(syntaxNode);
+                    SpaceRight(syntaxNode, t);
                     break;
                 }
                 case '(': {
-                    SpaceRight(syntaxNode, 0);
+                    SpaceRight(syntaxNode, t, 0);
                     break;
                 }
                 case '-':
                 case '~': {
                     auto p = syntaxNode.GetParent(t);
                     if (p.IsNode(t) && p.GetSyntaxKind(t) == LuaSyntaxNodeKind::BinaryExpression) {
-                        SpaceAround(syntaxNode);
+                        SpaceAround(syntaxNode, t);
                     } else {
-                        SpaceRight(syntaxNode);
+                        SpaceLeft(syntaxNode, t);
                     }
                     break;
                 }
                 case ')': {
-                    SpaceLeft(syntaxNode, 0);
+                    SpaceLeft(syntaxNode, t, 0);
                     break;
                 }
                 case '<':
                 case '>': {
                     auto p = syntaxNode.GetParent(t);
                     if (p.GetSyntaxKind(t) == LuaSyntaxNodeKind::BinaryExpression) {
-                        SpaceAround(syntaxNode);
+                        SpaceAround(syntaxNode, t);
                     } else if (syntaxNode.GetTokenKind(t) == '<') {
-                        SpaceRight(syntaxNode, 0);
+                        SpaceRight(syntaxNode, t, 0);
                     } else {
-                        SpaceLeft(syntaxNode, 0);
+                        SpaceLeft(syntaxNode, t, 0);
                     }
                     break;
                 }
                 case ',':
                 case ';': {
-                    SpaceLeft(syntaxNode, 0);
-                    SpaceRight(syntaxNode, 1);
+                    SpaceLeft(syntaxNode, t, 0);
+                    SpaceRight(syntaxNode, t, 1);
                     break;
                 }
                 case TK_IF:
@@ -78,11 +78,11 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                 case TK_RETURN:
                 case TK_GOTO:
                 case TK_FOR: {
-                    SpaceRight(syntaxNode);
+                    SpaceRight(syntaxNode, t);
                     break;
                 }
                 case TK_THEN: {
-                    SpaceLeft(syntaxNode);
+                    SpaceLeft(syntaxNode, t);
                     break;
                 }
                 default: {
@@ -102,17 +102,19 @@ void SpaceAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const Lua
 }
 
 
-void SpaceAnalyzer::SpaceAround(LuaSyntaxNode &n, std::size_t space) {
-    SpaceLeft(n, space);
-    SpaceRight(n, space);
+void SpaceAnalyzer::SpaceAround(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space) {
+    SpaceLeft(n, t, space);
+    SpaceRight(n, t, space);
 }
 
-void SpaceAnalyzer::SpaceLeft(LuaSyntaxNode &n, std::size_t space) {
-    _leftSpaces[n.GetIndex()] = space;
+void SpaceAnalyzer::SpaceLeft(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space) {
+    auto token = n.GetFirstToken(t);
+    _leftSpaces[token.GetIndex()] = space;
 }
 
-void SpaceAnalyzer::SpaceRight(LuaSyntaxNode &n, std::size_t space) {
-    _rightSpaces[n.GetIndex()] = space;
+void SpaceAnalyzer::SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space) {
+    auto token = n.GetLastToken(t);
+    _rightSpaces[token.GetIndex()] = space;
 }
 
 std::optional<std::size_t> SpaceAnalyzer::GetLeftSpace(LuaSyntaxNode &n) const {
@@ -146,7 +148,7 @@ SpaceAnalyzer::ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSyntaxN
     if (distance.has_value()) {
         return distance.value();
     }
-    if(!right.IsNull(t)) {
+    if (!right.IsNull(t)) {
         return t.GetStartOffset(right.GetIndex()) - t.GetEndOffset(left.GetIndex()) - 1;
     }
     return 0;

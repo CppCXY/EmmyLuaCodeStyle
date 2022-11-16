@@ -16,7 +16,7 @@
 
 class FormatBuilder {
 public:
-    explicit FormatBuilder(LuaStyle& style);
+    explicit FormatBuilder(LuaStyle &style);
 
     void FormatAnalyze(const LuaSyntaxTree &t);
 
@@ -27,16 +27,29 @@ public:
         _analyzers.push_back(std::make_shared<T>());
     }
 
-    const LuaStyle& GetStyle() const;
+    template<class T>
+    std::shared_ptr<T> GetAnalyzer() {
+        for(auto a: _analyzers) {
+            if(a->GetType() == T::Type){
+                return std::dynamic_pointer_cast<T>(a);
+            }
+        }
+        return nullptr;
+    }
 
+    const LuaStyle &GetStyle() const;
+
+    std::size_t CurrentLineLength() const;
 private:
-    void AddIndent(LuaSyntaxNode& syntaxNoe);
+    void AddIndent(LuaSyntaxNode &syntaxNoe);
 
     void RecoverIndent();
 
-    void DoResolve(LuaSyntaxNode& syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve);
+    void DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
 
-    void WriteSyntaxNode(LuaSyntaxNode& syntaxNode, const LuaSyntaxTree &t);
+    void ExitResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
+
+    void WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
     void WriteSpace(std::size_t space);
 

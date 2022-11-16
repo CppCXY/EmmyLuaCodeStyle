@@ -1,6 +1,14 @@
 #include <cstdlib>
 #include "CodeService/Format/Analyzer/FormatResolve.h"
 
+FormatResolve::FormatResolve()
+        : _spaceStrategy(SpaceStrategy::None),
+          _tokenStrategy(TokenStrategy::Origin),
+          _indentStrategy(IndentStrategy::None),
+          _spaceData() {
+
+}
+
 SpaceStrategy FormatResolve::GetSpaceStrategy() const {
     return _spaceStrategy;
 }
@@ -24,14 +32,11 @@ std::size_t FormatResolve::GetNextSpace() {
     return _spaceData.Space;
 }
 
-FormatResolve::FormatResolve()
-        : _spaceStrategy(SpaceStrategy::None),
-          _tokenStrategy(TokenStrategy::Origin),
-          _indentStrategy(IndentStrategy::None),
-          _spaceData(){
-
+std::size_t FormatResolve::GetNextLine() {
+    return _spaceData.Line;
 }
 
-std::size_t FormatResolve::GetNextLine() {
-    return 0;
+void FormatResolve::SetNextLineBreak(std::size_t line) {
+    _spaceStrategy = SpaceStrategy::LineBreak;
+    _spaceData.Line = line;
 }

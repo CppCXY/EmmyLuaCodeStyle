@@ -70,6 +70,8 @@ public:
     LuaSyntaxNode GetNextToken(const LuaSyntaxTree &t) const;
 
     LuaSyntaxNode GetFirstToken(const LuaSyntaxTree &t) const;
+
+    LuaSyntaxNode GetLastToken(const LuaSyntaxTree &t) const;
 private:
     std::size_t _index;
 };

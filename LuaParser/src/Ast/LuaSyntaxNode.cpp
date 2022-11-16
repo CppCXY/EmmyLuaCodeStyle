@@ -186,3 +186,7 @@ LuaSyntaxNode LuaSyntaxNode::GetFirstToken(const LuaSyntaxTree &t) const {
     return LuaSyntaxNode(t.GetFirstToken(_index));
 }
 
+LuaSyntaxNode LuaSyntaxNode::GetLastToken(const LuaSyntaxTree &t) const {
+    return LuaSyntaxNode(t.GetLastToken(_index));
+}
+

@@ -5,22 +5,24 @@
 
 class SpaceAnalyzer : public FormatAnalyzer {
 public:
+    DECLARE_FORMAT_ANALYZER(SpaceAnalyzer)
+
     SpaceAnalyzer();
 
     void Analyze(FormatBuilder &f, const LuaSyntaxTree &t) override;
 
-    void Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) override;
+    void Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
+
+    void SpaceAround(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1);
+
+    void SpaceLeft(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1);
+
+    void SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1);
 
 private:
-    void SpaceAround(LuaSyntaxNode &n, std::size_t space = 1);
+    std::optional<std::size_t> GetLeftSpace(LuaSyntaxNode &n) const;
 
-    void SpaceLeft(LuaSyntaxNode &n, std::size_t space = 1);
-
-    void SpaceRight(LuaSyntaxNode &n, std::size_t space = 1);
-
-    std::optional<std::size_t> GetLeftSpace(LuaSyntaxNode& n) const;
-
-    std::optional<std::size_t> GetRightSpace(LuaSyntaxNode& n) const;
+    std::optional<std::size_t> GetRightSpace(LuaSyntaxNode &n) const;
 
     std::size_t ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSyntaxNode &left, LuaSyntaxNode &right);
 

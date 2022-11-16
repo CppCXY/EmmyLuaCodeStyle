@@ -22,7 +22,7 @@ enum class IndentStrategy {
     Mix
 };
 
-enum class LineBreakStrategy {
-    MultiLine,
+enum class LazyLineBreakStrategy {
+    BreakWhenMayExceed,
 
 };

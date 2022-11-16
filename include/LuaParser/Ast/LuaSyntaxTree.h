@@ -31,6 +31,8 @@ public:
 
     std::size_t GetFirstToken(std::size_t index) const;
 
+    std::size_t GetLastToken(std::size_t index) const;
+
     std::size_t GetParent(std::size_t index) const;
 
     LuaSyntaxNodeKind GetNodeKind(std::size_t index) const;

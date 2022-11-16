@@ -7,9 +7,8 @@
 
 int main() {
     std::string buffer = R"(
-aaa.bbbb.cccc:dddd(1,2,3)
-eeee(1,2,3)
-aaaa [[12313]]
+local t = 1,
+    2
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -22,9 +21,11 @@ aaaa [[12313]]
     LuaSyntaxTree t;
     t.BuildTree(p);
     LuaStyle s;
+    s.end_of_line = EndOfLine::LF;
     FormatBuilder b(s);
     b.FormatAnalyze(t);
     std::cout<<t.GetDebugView()<<std::endl;
-//    auto text = b.GetFormatResult(t);
+    auto text = b.GetFormatResult(t);
+    std::cout<< text << std::endl;
     return 0;
 }

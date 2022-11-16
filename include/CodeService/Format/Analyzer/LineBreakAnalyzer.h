@@ -6,29 +6,37 @@
 
 class LineBreakAnalyzer: public FormatAnalyzer {
 public:
+    DECLARE_FORMAT_ANALYZER(LineBreakAnalyzer)
+
     LineBreakAnalyzer();
 
     void Analyze(FormatBuilder &f, const LuaSyntaxTree &t) override;
 
     void Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) override;
 
-    void BreakTo(LuaSyntaxNode n, LineBreakStrategy strategy);
+    void BreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t line = 1);
 
-    void BreakAfter(LuaSyntaxNode n, std::size_t line = 1);
+    void BreakBefore(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t line = 1);
+
+    void MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, LazyLineBreakStrategy strategy);
 private:
-    void BreakAnalyze(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t length);
-
-    void AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
-
-    void AnalyzeTableFieldList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
-
-    void AnalyzeCallList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
+//    void BreakAnalyze(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t length);
+//
+//    void AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
+//
+//    void AnalyzeTableFieldList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
+//
+//    void AnalyzeCallList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
 
     void AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
 
+    void AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode& expr, const LuaSyntaxTree &t);
+
     void AnalyzeConditionExpr(FormatBuilder &f, LuaSyntaxNode& expr, const LuaSyntaxTree &t);
 
-    void AnalyzeNameList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
+    void AnalyzeNameList(FormatBuilder &f, LuaSyntaxNode& nameList, const LuaSyntaxTree &t);
 
-    std::unordered_set<std::size_t> _mark;
+    void AnalyzeSuffixedExpr(FormatBuilder &f, LuaSyntaxNode& expr, const LuaSyntaxTree &t);
+
+    std::unordered_map<std::size_t, std::size_t> _rightLines;
 };

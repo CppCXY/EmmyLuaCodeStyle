@@ -40,6 +40,11 @@ std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
             DoResolve(traverse.Node, t, resolve);
         } else {
             traverseStack.pop_back();
+            for (auto &analyzer: _analyzers) {
+                analyzer->ExitQuery(*this, traverse.Node, t, resolve);
+            }
+            ExitResolve(traverse.Node, t, resolve);
+
             if (!_indentStack.empty()
                 && _indentStack.top().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
                 RecoverIndent();
@@ -206,6 +211,10 @@ void FormatBuilder::WriteIndent() {
 
 const LuaStyle &FormatBuilder::GetStyle() const {
     return _style;
+}
+
+void FormatBuilder::ExitResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+
 }
 
 

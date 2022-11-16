@@ -30,6 +30,7 @@ public:
 
     TableSeparatorStyle table_separator_style = TableSeparatorStyle::None;
 
+    std::size_t max_line_length = 120;
 #ifndef _WINDOWS
     EndOfLine end_of_line = EndOfLine::LF;
 #else

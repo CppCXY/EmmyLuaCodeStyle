@@ -14,6 +14,8 @@ struct IndentSize {
 
 class IndentationAnalyzer : public FormatAnalyzer {
 public:
+    DECLARE_FORMAT_ANALYZER(IndentationAnalyzer)
+
     IndentationAnalyzer();
 
     void Analyze(FormatBuilder &f, const LuaSyntaxTree &t) override;
