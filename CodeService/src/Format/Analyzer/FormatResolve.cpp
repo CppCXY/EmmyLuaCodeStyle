@@ -40,3 +40,12 @@ void FormatResolve::SetNextLineBreak(std::size_t line) {
     _spaceStrategy = SpaceStrategy::LineBreak;
     _spaceData.Line = line;
 }
+
+IndentStrategy FormatResolve::GetIndentStrategy() const {
+    return _indentStrategy;
+}
+
+void FormatResolve::SetIndent(IndentStrategy strategy) {
+    _spaceStrategy = SpaceStrategy::Indent;
+    _indentStrategy = strategy;
+}

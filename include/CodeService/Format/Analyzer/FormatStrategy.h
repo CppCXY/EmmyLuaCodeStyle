@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdlib>
 
 enum class SpaceStrategy {
     None,
@@ -17,12 +18,16 @@ enum class TokenStrategy {
 
 enum class IndentStrategy {
     None,
-    Space,
-    Tab,
-    Mix
+    Standard,
+    WhenLineBreak,
+    WhenPrevIndent
+};
+
+struct IndentData {
+    IndentStrategy Strategy = IndentStrategy::Standard;
+    std::size_t Data = 0;
 };
 
 enum class LazyLineBreakStrategy {
     BreakWhenMayExceed,
-
 };

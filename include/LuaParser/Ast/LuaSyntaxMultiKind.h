@@ -4,7 +4,7 @@
 
 enum class LuaSyntaxMultiKind {
     Expression,
-    Statement
+    Statement,
 };
 
 // try detail::multi_match

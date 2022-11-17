@@ -704,7 +704,7 @@ void LuaParser::ParamList() {
 }
 
 /* suffixedexp ->
-	 primaryexp { '.' NAME | '[' exp ']' | ':' NAME funcargs | funcargs } */
+	 primaryexp { '.' NAME | '[' exp ']' | ':' NAME funcargs | funcargs }+ */
 CompleteMarker LuaParser::SuffixedExpression() {
     auto m = Mark();
     PrimaryExpression();

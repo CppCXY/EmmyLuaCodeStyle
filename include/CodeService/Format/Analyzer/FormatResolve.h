@@ -13,11 +13,15 @@ public:
 
     void SetNextLineBreak(std::size_t line);
 
+    void SetIndent(IndentStrategy strategy);
+
     std::size_t GetNextSpace();
 
     std::size_t GetNextLine();
 
     TokenStrategy GetTokenStrategy() const;
+
+    IndentStrategy GetIndentStrategy() const;
 
     void Reset();
 private:

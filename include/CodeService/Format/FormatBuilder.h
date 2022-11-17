@@ -40,6 +40,8 @@ public:
     const LuaStyle &GetStyle() const;
 
     std::size_t CurrentLineLength() const;
+
+    bool ShouldMeetIndent() const;
 private:
     void AddIndent(LuaSyntaxNode &syntaxNoe);
 

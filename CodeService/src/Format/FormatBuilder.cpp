@@ -217,4 +217,11 @@ void FormatBuilder::ExitResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &
 
 }
 
+bool FormatBuilder::ShouldMeetIndent() const {
+    if(_formattedText.empty()){
+        return _formattedText.back() == '\n' || _formattedText.back() == '\r';
+    }
+    return false;
+}
+
 
