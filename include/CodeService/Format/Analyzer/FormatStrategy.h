@@ -1,4 +1,5 @@
 #pragma once
+
 #include <cstdlib>
 
 enum class SpaceStrategy {
@@ -24,8 +25,11 @@ enum class IndentStrategy {
 };
 
 struct IndentData {
-    IndentStrategy Strategy = IndentStrategy::Standard;
-    std::size_t Data = 0;
+    IndentData(IndentStrategy strategy = IndentStrategy::Standard, std::size_t size = 0)
+            : Strategy(strategy), Data(size) {}
+
+    IndentStrategy Strategy;
+    std::size_t Data;
 };
 
 enum class LazyLineBreakStrategy {

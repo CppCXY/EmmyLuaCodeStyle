@@ -95,6 +95,7 @@ void LuaParser::SkipComment() {
             case TK_LONG_COMMENT:
             case TK_SHEBANG: {
                 // ignore
+                break;
             }
             default: {
                 return;

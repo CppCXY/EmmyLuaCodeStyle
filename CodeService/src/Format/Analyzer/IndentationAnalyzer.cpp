@@ -25,7 +25,9 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     if (syntaxNode.GetChildToken('(', t).IsToken(t)) {
                         auto exprList = syntaxNode.GetChildSyntaxNode(NodeKind::ExpressionList, t);
                         if (exprList.IsNode(t)) {
-                            Indenter(exprList, t);
+                            for (auto expr: exprList.GetChildren(t)) {
+                                Indenter(expr, t, IndentData(IndentStrategy::WhenLineBreak));
+                            }
                         }
                     }
                     break;
@@ -60,9 +62,13 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                         if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::IndexExpression) {
                             Indenter(expr, t);
                         } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::CallExpression) {
-
+                            Indenter(expr, t, IndentData(IndentStrategy::WhenPrevIndent));
                         }
                     }
+                    break;
+                }
+                case LuaSyntaxNodeKind::TableExpression: {
+//                    auto tableField = syntaxNode.GetChildSyntaxNode()
                     break;
                 }
                 default: {
@@ -73,21 +79,14 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
     }
 }
 
-std::optional<IndentState> IndentationAnalyzer::GetIndentState(LuaSyntaxNode &n) const {
-//    auto it = _indentMark.find(n.GetIndex());
-//    if (it != _indentMark.end()) {
-//        return it->second;
-//    }
-    return {};
-}
-
 void IndentationAnalyzer::AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t) {
     auto exprs = exprList.GetChildSyntaxNodes(MultiKind::Expression, t);
     if (exprs.size() == 1) {
         auto expr = exprs.front();
         auto syntaxKind = expr.GetSyntaxKind(t);
         if (syntaxKind == LuaSyntaxNodeKind::ClosureExpression
-            || syntaxKind == LuaSyntaxNodeKind::TableExpression) {
+            || syntaxKind == LuaSyntaxNodeKind::TableExpression
+            || syntaxKind == LuaSyntaxNodeKind::StringLiteralExpression) {
             return;
         }
     }
@@ -105,14 +104,18 @@ IndentationAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &n, const LuaSyntaxTr
                 break;
             }
             case IndentStrategy::WhenLineBreak: {
-                if(f.ShouldMeetIndent()){
+                if (f.ShouldMeetIndent()) {
                     indentData.Strategy = IndentStrategy::Standard;
                     resolve.SetIndent(IndentStrategy::Standard);
                 }
+                break;
             }
             case IndentStrategy::WhenPrevIndent: {
                 auto prev = n.GetPrevSibling(t);
-
+                if (_indentMark.contains(prev.GetIndex())) {
+                    resolve.SetIndent(IndentStrategy::Standard);
+                }
+                break;
             }
             default: {
                 break;
@@ -123,4 +126,15 @@ IndentationAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &n, const LuaSyntaxTr
 
 void IndentationAnalyzer::Indenter(LuaSyntaxNode &n, const LuaSyntaxTree &t, IndentData indentData) {
     _indent[n.GetIndex()] = indentData;
+}
+
+void IndentationAnalyzer::MarkIndent(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    _indentMark.insert(n.GetIndex());
+    auto p = n.GetParent(t);
+    while (p.GetSyntaxKind(t) != LuaSyntaxNodeKind::Block
+           && !detail::multi_match::StatementMatch(p.GetSyntaxKind(t))
+           && !p.IsNull(t)) {
+        _indentMark.insert(p.GetIndex());
+        p = p.GetParent(t);
+    }
 }

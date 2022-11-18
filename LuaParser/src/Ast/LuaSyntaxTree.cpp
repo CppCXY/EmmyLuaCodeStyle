@@ -140,6 +140,7 @@ void LuaSyntaxTree::BuildNode(LuaSyntaxNodeKind kind) {
             currentNode.PrevSibling = parentNode.LastChild;
             parentNode.LastChild = currentPos;
         }
+        currentNode.Parent = parentIndex;
     }
     _nodePosStack.push(currentPos);
 }
@@ -325,7 +326,7 @@ LuaSyntaxNode LuaSyntaxTree::GetRootNode() const {
 
 std::string LuaSyntaxTree::GetDebugView() {
     std::string debugView;
-    debugView.append("{ Lua Syntax Tree, filename }\n");
+    debugView.append("{ Lua Syntax Tree }\n");
 
     auto root = GetRootNode();
     std::stack<LuaSyntaxNode> traverseStack;
@@ -341,14 +342,14 @@ std::string LuaSyntaxTree::GetDebugView() {
                 traverseStack.push(*rIt);
             }
             debugView.resize(debugView.size() + indent, '\t');
-            debugView.append(util::format("{{ Lua Syntax Node, index: {} ,Kind: {} }}\n",
+            debugView.append(util::format("{{ Node, index: {}, SyntaxKind: {} }}\n",
                                           node.GetIndex(),
                                           detail::debug::GetSyntaxKindDebugName(node.GetSyntaxKind(*this))));
             indent++;
         } else if (node.IsToken(*this)) {
             traverseStack.pop();
             debugView.resize(debugView.size() + indent, '\t');
-            debugView.append(util::format("{{ Lua Syntax Token, index: {} , Token: {} }}\n",
+            debugView.append(util::format("{{ Token, index: {}, TokenKind: {} }}\n",
                                           node.GetIndex(),
                                           node.GetText(*this)));
         } else {

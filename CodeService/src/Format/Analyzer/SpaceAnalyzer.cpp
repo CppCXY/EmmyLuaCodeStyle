@@ -40,6 +40,10 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     SpaceRight(syntaxNode, t, 0);
                     break;
                 }
+                case ')': {
+                    SpaceLeft(syntaxNode, t, 0);
+                    break;
+                }
                 case '-':
                 case '~': {
                     auto p = syntaxNode.GetParent(t);
@@ -48,10 +52,6 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     } else {
                         SpaceLeft(syntaxNode, t);
                     }
-                    break;
-                }
-                case ')': {
-                    SpaceLeft(syntaxNode, t, 0);
                     break;
                 }
                 case '<':
@@ -77,12 +77,55 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                 case TK_ELSEIF:
                 case TK_RETURN:
                 case TK_GOTO:
-                case TK_FOR: {
+                case TK_FOR:
+                case TK_FUNCTION: {
                     SpaceRight(syntaxNode, t);
                     break;
                 }
                 case TK_THEN: {
                     SpaceLeft(syntaxNode, t);
+                    break;
+                }
+                case '.':
+                case ':':
+                case '[':
+                case ']': {
+                    SpaceAround(syntaxNode, t, 0);
+                    break;
+                }
+                case TK_LONG_COMMENT: {
+                    SpaceLeft(syntaxNode, t, 1);
+                    break;
+                }
+                case TK_SHORT_COMMENT: {
+                    SpaceLeft(syntaxNode, t, 1);
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+        } else {
+            switch (syntaxNode.GetSyntaxKind(t)) {
+                case LuaSyntaxNodeKind::CallExpression: {
+                    if (syntaxNode.GetChildToken('(', t).IsToken(t)) {
+                        SpaceLeft(syntaxNode, t, 0);
+                    } else {
+                        SpaceLeft(syntaxNode, t, 1);
+                    }
+                    break;
+                }
+                case LuaSyntaxNodeKind::TableExpression: {
+                    auto leftCurly = syntaxNode.GetChildToken('{', t);
+                    if (leftCurly.GetNextToken(t).GetTokenKind(t) == '}') {
+                        SpaceRight(leftCurly, t, 0);
+                        auto rightCurly = syntaxNode.GetChildToken('}', t);
+                        SpaceLeft(rightCurly, t, 0);
+                    } else {
+                        SpaceRight(leftCurly, t, 1);
+                        auto rightCurly = syntaxNode.GetChildToken('}', t);
+                        SpaceLeft(rightCurly, t, 1);
+                    }
                     break;
                 }
                 default: {

@@ -85,14 +85,15 @@ void FormatBuilder::RecoverIndent() {
 }
 
 void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
-    if (!_formattedText.empty()) {
-        auto lastChar = _formattedText.back();
-        if (lastChar == '\n' || lastChar == '\r') {
-            WriteIndent();
-        }
-    }
-
     if (syntaxNode.IsToken(t)) {
+        if (!_formattedText.empty()) {
+            auto lastChar = _formattedText.back();
+            if (lastChar == '\n' || lastChar == '\r') {
+                WriteIndent();
+                auto indentAnalyzer = GetAnalyzer<IndentationAnalyzer>();
+                indentAnalyzer->MarkIndent(syntaxNode, t);
+            }
+        }
         switch (resolve.GetTokenStrategy()) {
             case TokenStrategy::Origin: {
                 WriteSyntaxNode(syntaxNode, t);
@@ -218,7 +219,7 @@ void FormatBuilder::ExitResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &
 }
 
 bool FormatBuilder::ShouldMeetIndent() const {
-    if(_formattedText.empty()){
+    if (!_formattedText.empty()) {
         return _formattedText.back() == '\n' || _formattedText.back() == '\r';
     }
     return false;

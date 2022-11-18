@@ -7,13 +7,9 @@
 
 int main() {
     std::string buffer = R"(
-aaaaaaaaaaaaaa
-    .ffffffffff(
-{
-
-}
+ddd(
+a
 )
-
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
