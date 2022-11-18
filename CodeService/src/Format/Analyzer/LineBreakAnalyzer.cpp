@@ -78,6 +78,15 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                 }
             }
         }
+        else {
+            switch (syntaxNode.GetTokenKind(t)) {
+                case TK_SHEBANG:
+                case TK_SHORT_COMMENT: {
+                    BreakAfter(syntaxNode, t);
+                    break;
+                }
+            }
+        }
     }
 }
 
@@ -160,6 +169,13 @@ void LineBreakAnalyzer::MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, L
 
 }
 
-void LineBreakAnalyzer::AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t) {
-
+void LineBreakAnalyzer::AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
+    switch (expr.GetSyntaxKind(t)) {
+        case LuaSyntaxNodeKind::BinaryExpression: {
+            break;
+        }
+        default: {
+            break;
+        }
+    }
 }

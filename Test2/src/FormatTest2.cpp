@@ -7,12 +7,8 @@
 
 int main() {
     std::string buffer = R"(
-local cc = --hello world
-[[
-wgojwogw
-]]
---local a = function ( --[[hello world]]) --hell
---end
+function F() --hell
+end
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));

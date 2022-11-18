@@ -47,6 +47,7 @@ void LuaSyntaxTree::BuildTree(LuaParser &p) {
             case MarkEventType::EatToken: {
                 EatComments(p);
                 EatToken(p);
+                EatComments(p);
                 break;
             }
             case MarkEventType::NodeEnd: {
