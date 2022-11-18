@@ -948,19 +948,16 @@ bool LuaParser::TestAndNext(LuaTokenKind c) {
 }
 
 void LuaParser::ThrowLuaError(std::string_view message) {
-//    if (Current() != TK_EOF) {
-//        Next();
+    if (Current() != TK_EOF) {
+        Next();
 //        _errors.emplace_back(message, 0);
-//    } else {
-//        auto offset = _tokenParser->LastValidOffset();
-//        if (offset != 0) {
-//            _errors.emplace_back(message, TextRange(offset, offset), 0);
-//        }
-//    }
+    }
 //    throw LuaParseException(message);
 }
 
 void LuaParser::ThrowMatchError(std::string message) {
+    Next();
+//    _errors.emplace_back(message, 0);
 //    _errors.emplace_back(message, range, token);
 //    throw LuaParseException(message);
 }

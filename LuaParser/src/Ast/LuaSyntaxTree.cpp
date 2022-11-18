@@ -36,9 +36,11 @@ void LuaSyntaxTree::BuildTree(LuaParser &p) {
                         break;
                     }
                 }
+                // When debug here will throw error
                 for (auto rIt = parents.rbegin(); rIt != parents.rend(); rIt++) {
                     StartNode(*rIt, p);
                 }
+
                 parents.clear();
                 break;
             }
@@ -73,8 +75,8 @@ void LuaSyntaxTree::StartNode(LuaSyntaxNodeKind kind, LuaParser &p) {
 
 void LuaSyntaxTree::EatComments(LuaParser &p) {
     auto &tokens = p.GetTokens();
-    for (; _tokenIndex < tokens.size(); _tokenIndex++) {
-        switch (tokens[_tokenIndex].TokenType) {
+    for (auto index = _tokenIndex; index < tokens.size(); index++) {
+        switch (tokens[index].TokenType) {
             case TK_SHORT_COMMENT:
             case TK_LONG_COMMENT:
             case TK_SHEBANG: {
