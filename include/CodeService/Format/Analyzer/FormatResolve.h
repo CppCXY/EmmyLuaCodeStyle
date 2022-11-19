@@ -7,13 +7,13 @@ class FormatResolve {
 public:
     FormatResolve();
 
-    SpaceStrategy GetSpaceStrategy() const;
+    NextSpaceStrategy GetNextSpaceStrategy() const;
 
     void SetNextSpace(std::size_t space);
 
     void SetNextLineBreak(std::size_t line);
 
-    void SetIndent(IndentStrategy strategy);
+    void SetIndent(std::size_t indent = 0);
 
     std::size_t GetNextSpace();
 
@@ -21,15 +21,15 @@ public:
 
     TokenStrategy GetTokenStrategy() const;
 
-    IndentStrategy GetIndentStrategy() const;
+    std::size_t GetIndent() const;
 
     void Reset();
 private:
-    SpaceStrategy _spaceStrategy;
+    NextSpaceStrategy _spaceStrategy;
     TokenStrategy _tokenStrategy;
-    IndentStrategy _indentStrategy;
-    union {
+    union Data {
         std::size_t Space;
         std::size_t Line;
-    } _spaceData;
+        std::size_t Indent;
+    } _data;
 };

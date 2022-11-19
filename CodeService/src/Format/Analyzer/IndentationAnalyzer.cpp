@@ -100,20 +100,20 @@ IndentationAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &n, const LuaSyntaxTr
         auto &indentData = it->second;
         switch (indentData.Strategy) {
             case IndentStrategy::Standard: {
-                resolve.SetIndent(IndentStrategy::Standard);
+                resolve.SetIndent();
                 break;
             }
             case IndentStrategy::WhenLineBreak: {
                 if (f.ShouldMeetIndent()) {
                     indentData.Strategy = IndentStrategy::Standard;
-                    resolve.SetIndent(IndentStrategy::Standard);
+                    resolve.SetIndent();
                 }
                 break;
             }
             case IndentStrategy::WhenPrevIndent: {
                 auto prev = n.GetPrevSibling(t);
                 if (_indentMark.contains(prev.GetIndex())) {
-                    resolve.SetIndent(IndentStrategy::Standard);
+                    resolve.SetIndent();
                 }
                 break;
             }

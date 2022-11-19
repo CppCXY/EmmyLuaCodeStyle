@@ -18,7 +18,7 @@ public:
 
     void BreakBefore(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t line = 1);
 
-    void MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, LazyLineBreakStrategy strategy);
+    void MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, LineBreakStrategy strategy);
 private:
 //    void BreakAnalyze(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t length);
 //
@@ -38,5 +38,5 @@ private:
 
     void AnalyzeSuffixedExpr(FormatBuilder &f, LuaSyntaxNode& expr, const LuaSyntaxTree &t);
 
-    std::unordered_map<std::size_t, std::size_t> _rightLines;
+    std::unordered_map<std::size_t, LineBreakData> _lineBreaks;
 };

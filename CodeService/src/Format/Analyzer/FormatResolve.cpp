@@ -1,15 +1,15 @@
 #include <cstdlib>
+#include <optional>
 #include "CodeService/Format/Analyzer/FormatResolve.h"
 
 FormatResolve::FormatResolve()
-        : _spaceStrategy(SpaceStrategy::None),
+        : _spaceStrategy(NextSpaceStrategy::None),
           _tokenStrategy(TokenStrategy::Origin),
-          _indentStrategy(IndentStrategy::None),
-          _spaceData() {
+          _data() {
 
 }
 
-SpaceStrategy FormatResolve::GetSpaceStrategy() const {
+NextSpaceStrategy FormatResolve::GetNextSpaceStrategy() const {
     return _spaceStrategy;
 }
 
@@ -19,33 +19,33 @@ TokenStrategy FormatResolve::GetTokenStrategy() const {
 
 void FormatResolve::Reset() {
     _tokenStrategy = TokenStrategy::Origin;
-    _spaceStrategy = SpaceStrategy::None;
-    _spaceData.Space = 0;
+    _spaceStrategy = NextSpaceStrategy::None;
+    _data.Space = 0;
 }
 
 void FormatResolve::SetNextSpace(std::size_t space) {
-    _spaceStrategy = SpaceStrategy::Space;
-    _spaceData.Space = space;
+    _spaceStrategy = NextSpaceStrategy::Space;
+    _data.Space = space;
 }
 
 std::size_t FormatResolve::GetNextSpace() {
-    return _spaceData.Space;
+    return _data.Space;
 }
 
 std::size_t FormatResolve::GetNextLine() {
-    return _spaceData.Line;
+    return _data.Line;
 }
 
 void FormatResolve::SetNextLineBreak(std::size_t line) {
-    _spaceStrategy = SpaceStrategy::LineBreak;
-    _spaceData.Line = line;
+    _spaceStrategy = NextSpaceStrategy::LineBreak;
+    _data.Line = line;
 }
 
-IndentStrategy FormatResolve::GetIndentStrategy() const {
-    return _indentStrategy;
+std::size_t FormatResolve::GetIndent() const {
+    return _data.Indent;
 }
 
-void FormatResolve::SetIndent(IndentStrategy strategy) {
-    _spaceStrategy = SpaceStrategy::Indent;
-    _indentStrategy = strategy;
+void FormatResolve::SetIndent(std::size_t indent) {
+    _spaceStrategy = NextSpaceStrategy::Indent;
+    _data.Indent = indent;
 }

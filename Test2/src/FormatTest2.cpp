@@ -7,8 +7,7 @@
 
 int main() {
     std::string buffer = R"(
-function F() --hell
-end
+local t = aaaaaaaa + bbbbbbb +ccccccccccccccc + p.aaaaaaaaaaaaaaaaaaaaaaaa.ddddddddddddddddddd.ddddddd.eee(aaaaaaaaaaa,bbbbbbbbbbbbbbb,ccccccccccccccc,dddddddddddd,eeeeeee)
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));

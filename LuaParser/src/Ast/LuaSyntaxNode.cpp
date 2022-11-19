@@ -1,5 +1,6 @@
 ﻿#include "LuaParser/Ast/LuaSyntaxNode.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
+#include "Util/Utf8.h"
 
 LuaSyntaxNode::LuaSyntaxNode(std::size_t index)
         : _index(index) {
@@ -182,11 +183,30 @@ LuaSyntaxNode LuaSyntaxNode::GetNextToken(const LuaSyntaxTree &t) const {
     return next;
 }
 
+LuaSyntaxNode LuaSyntaxNode::GetPrevToken(const LuaSyntaxTree &t) const {
+    auto p = *this;
+    auto prev = p.GetPrevSibling(t);
+    while (prev.IsNull(t) && !p.IsNull(t)) {
+        p = p.GetParent(t);
+        prev = p.GetPrevSibling(t);
+    }
+
+    if (!prev.IsNull(t)) {
+        return prev.GetLastToken(t);
+    }
+    return prev;
+}
+
 LuaSyntaxNode LuaSyntaxNode::GetFirstToken(const LuaSyntaxTree &t) const {
     return LuaSyntaxNode(t.GetFirstToken(_index));
 }
 
 LuaSyntaxNode LuaSyntaxNode::GetLastToken(const LuaSyntaxTree &t) const {
     return LuaSyntaxNode(t.GetLastToken(_index));
+}
+
+std::size_t LuaSyntaxNode::GetFirstLineWidth(const LuaSyntaxTree &t) const {
+    auto text = GetText(t);
+    return utf8::Utf8nLenAtFirstLine(text.data(), text.size());
 }
 

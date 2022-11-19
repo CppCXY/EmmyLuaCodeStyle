@@ -39,11 +39,11 @@ public:
 
     const LuaStyle &GetStyle() const;
 
-    std::size_t CurrentLineLength() const;
-
     bool ShouldMeetIndent() const;
+
+    std::size_t GetCurrentWidth() const;
 private:
-    void AddIndent(LuaSyntaxNode &syntaxNoe);
+    void AddIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
 
     void RecoverIndent();
 
@@ -61,6 +61,7 @@ private:
 
     LuaStyle _style;
     std::stack<IndentState> _indentStack;
+    std::size_t _writeLineWidth;
     std::vector<std::shared_ptr<FormatAnalyzer>> _analyzers;
     std::string _formattedText;
 };

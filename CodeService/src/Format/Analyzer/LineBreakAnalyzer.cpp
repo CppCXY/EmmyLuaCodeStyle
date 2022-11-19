@@ -77,8 +77,7 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     }
                 }
             }
-        }
-        else {
+        } else {
             switch (syntaxNode.GetTokenKind(t)) {
                 case TK_SHEBANG:
                 case TK_SHORT_COMMENT: {
@@ -92,15 +91,31 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
 
 void
 LineBreakAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
-
-    if (syntaxNode.IsToken(t)) {
-        auto it = _rightLines.find(syntaxNode.GetIndex());
-        if (it != _rightLines.end()) {
-            resolve.SetNextLineBreak(it->second);
-            return;
+    auto it = _lineBreaks.find(syntaxNode.GetIndex());
+    if (it != _lineBreaks.end()) {
+        auto &lineBreakData = it->second;
+        switch (lineBreakData.Strategy) {
+            case LineBreakStrategy::Standard: {
+                resolve.SetNextLineBreak(lineBreakData.Data.Line);
+                break;
+            }
+            case LineBreakStrategy::WhenMayExceed: {
+                auto lineWidth = f.GetCurrentWidth();
+                auto &style = f.GetStyle();
+                auto relationNode = LuaSyntaxNode(lineBreakData.Data.Index);
+                auto guessLineWidth = lineWidth + syntaxNode.GetFirstLineWidth(t) + relationNode.GetFirstLineWidth(t);
+                if (guessLineWidth > style.max_line_length) {
+                    resolve.SetNextLineBreak(1);
+                }
+                break;
+            }
         }
-        if (resolve.GetSpaceStrategy() == SpaceStrategy::None
-            || resolve.GetSpaceStrategy() == SpaceStrategy::Space) {
+
+        return;
+    }
+    if (syntaxNode.IsToken(t)) {
+        if (resolve.GetNextSpaceStrategy() == NextSpaceStrategy::None
+            || resolve.GetNextSpaceStrategy() == NextSpaceStrategy::Space) {
             auto nextToken = syntaxNode.GetNextToken(t);
             if (nextToken.IsToken(t)) {
                 auto currentLine = syntaxNode.GetEndLine(t);
@@ -116,7 +131,7 @@ LineBreakAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaS
 void LineBreakAnalyzer::BreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t line) {
     auto token = n.GetLastToken(t);
     if (token.IsToken(t)) {
-        _rightLines[token.GetIndex()] = line;
+        _lineBreaks[token.GetIndex()] = LineBreakData(line);
     }
 }
 
@@ -137,7 +152,7 @@ void LineBreakAnalyzer::AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode &exprLis
         AnalyzeExpr(f, expr, t);
     } else {
         for (auto expr: exprs) {
-            MarkLazyBreak(expr, t, LazyLineBreakStrategy::BreakWhenMayExceed);
+            MarkLazyBreak(expr, t, LineBreakStrategy::WhenMayExceed);
             AnalyzeExpr(f, expr, t);
         }
     }
@@ -157,21 +172,65 @@ void LineBreakAnalyzer::AnalyzeConditionExpr(FormatBuilder &f, LuaSyntaxNode &ex
 void LineBreakAnalyzer::AnalyzeNameList(FormatBuilder &f, LuaSyntaxNode &nameList, const LuaSyntaxTree &t) {
     auto names = nameList.GetChildTokens(TK_NAME, t);
     for (auto name: names) {
-        MarkLazyBreak(name, t, LazyLineBreakStrategy::BreakWhenMayExceed);
+        MarkLazyBreak(name, t, LineBreakStrategy::WhenMayExceed);
     }
 }
 
 void LineBreakAnalyzer::AnalyzeSuffixedExpr(FormatBuilder &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
-
+    auto children = expr.GetChildren(t);
+    for (auto child: children) {
+        AnalyzeExpr(f, child, t);
+    }
 }
 
-void LineBreakAnalyzer::MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, LazyLineBreakStrategy strategy) {
-
+void LineBreakAnalyzer::MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, LineBreakStrategy strategy) {
+    auto prevToken = n.GetPrevToken(t);
+    if (prevToken.IsToken(t) && !_lineBreaks.contains(prevToken.GetIndex())) {
+        _lineBreaks[prevToken.GetIndex()] = LineBreakData(strategy, n.GetIndex());
+    }
 }
 
 void LineBreakAnalyzer::AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
     switch (expr.GetSyntaxKind(t)) {
         case LuaSyntaxNodeKind::BinaryExpression: {
+            auto exprs = expr.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
+            if (exprs.size() == 2) {
+                AnalyzeExpr(f, exprs[0], t);
+                MarkLazyBreak(exprs[1], t, LineBreakStrategy::WhenMayExceed);
+                return AnalyzeExpr(f, exprs[1], t);
+            }
+            break;
+        }
+        case LuaSyntaxNodeKind::ClosureExpression: {
+            auto paramList = expr.GetChildSyntaxNode(LuaSyntaxNodeKind::ParamList, t);
+            AnalyzeNameList(f, paramList, t);
+            break;
+        }
+        case LuaSyntaxNodeKind::UnaryExpression: {
+            auto subExpr = expr.GetChildSyntaxNode(LuaSyntaxMultiKind::Expression, t);
+            AnalyzeExpr(f, subExpr, t);
+            break;
+        }
+        case LuaSyntaxNodeKind::TableExpression: {
+            auto fields = expr.GetChildSyntaxNodes(LuaSyntaxNodeKind::TableField, t);
+            for (auto field: fields) {
+                MarkLazyBreak(field, t, LineBreakStrategy::WhenMayExceed);
+            }
+            break;
+        }
+        case LuaSyntaxNodeKind::CallExpression: {
+            auto exprList = expr.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+            AnalyzeExprList(f, exprList, t);
+            break;
+        }
+        case LuaSyntaxNodeKind::StringLiteralExpression:
+        case LuaSyntaxNodeKind::NameExpression:
+        case LuaSyntaxNodeKind::IndexExpression: {
+            MarkLazyBreak(expr, t, LineBreakStrategy::WhenMayExceed);
+            break;
+        }
+        case LuaSyntaxNodeKind::SuffixedExpression: {
+            AnalyzeSuffixedExpr(f, expr, t);
             break;
         }
         default: {
