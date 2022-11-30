@@ -16,7 +16,7 @@ void LuaSyntaxTree::BuildTree(LuaParser &p) {
 
     auto &events = p.GetEvents();
     std::vector<LuaSyntaxNodeKind> parents;
-    for (auto i = 0ull; i != events.size(); i++) {
+    for (std::size_t i = 0; i != events.size(); i++) {
         switch (events[i].Type) {
             case MarkEventType::NodeStart: {
                 auto e = events[i];
@@ -47,7 +47,7 @@ void LuaSyntaxTree::BuildTree(LuaParser &p) {
             case MarkEventType::EatToken: {
                 EatComments(p);
                 EatToken(p);
-                EatComments(p);
+                EatInlineComment(p);
                 break;
             }
             case MarkEventType::NodeEnd: {
@@ -66,7 +66,7 @@ void LuaSyntaxTree::BuildTree(LuaParser &p) {
 }
 
 void LuaSyntaxTree::StartNode(LuaSyntaxNodeKind kind, LuaParser &p) {
-    if (kind != LuaSyntaxNodeKind::Block) {
+    if (!IsEatAllComment(kind)) {
         EatComments(p);
         BuildNode(kind);
     } else {
@@ -91,6 +91,28 @@ void LuaSyntaxTree::EatComments(LuaParser &p) {
     }
 }
 
+void LuaSyntaxTree::EatInlineComment(LuaParser &p) {
+    auto &tokens = p.GetTokens();
+    if (_tokenIndex > 0 && _tokenIndex < tokens.size()) {
+        auto index = _tokenIndex;
+        switch (tokens[index].TokenType) {
+            case TK_SHORT_COMMENT:
+            case TK_LONG_COMMENT:
+            case TK_SHEBANG: {
+                auto prevToken = tokens[index - 1];
+                if (_file->GetLine(prevToken.Range.EndOffset)
+                    == _file->GetLine(tokens[index].Range.StartOffset)) {
+                    EatToken(p);
+                }
+                break;
+            }
+            default: {
+                return;
+            }
+        }
+    }
+}
+
 void LuaSyntaxTree::EatToken(LuaParser &p) {
     auto &token = p.GetTokens()[_tokenIndex];
     _tokenIndex++;
@@ -101,26 +123,12 @@ void LuaSyntaxTree::FinishNode(LuaParser &p) {
     if (!_nodePosStack.empty()) {
         auto nodePos = _nodePosStack.top();
         auto &node = _nodeOrTokens[nodePos];
-        if (node.Type == NodeOrTokenType::Node && node.Data.NodeKind == LuaSyntaxNodeKind::Block) {
+        if (node.Type == NodeOrTokenType::Node &&
+                IsEatAllComment(node.Data.NodeKind)) {
             EatComments(p);
         } else {
             if (_tokenIndex < p.GetTokens().size() && _tokenIndex > 0) {
-                auto nextToken = p.GetTokens()[_tokenIndex];
-                switch (nextToken.TokenType) {
-                    case TK_SHORT_COMMENT:
-                    case TK_LONG_COMMENT: {
-                        auto nextLine = _file->GetLine(nextToken.Range.StartOffset);
-                        auto currentLine = _file->GetLine(p.GetTokens()[_tokenIndex - 1].Range.EndOffset);
-                        // inline comment
-                        if (currentLine == nextLine) {
-                            EatToken(p);
-                        }
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
-                }
+                EatInlineComment(p);
             }
         }
 
@@ -362,4 +370,10 @@ std::string LuaSyntaxTree::GetDebugView() {
     }
     return debugView;
 }
+
+bool LuaSyntaxTree::IsEatAllComment(LuaSyntaxNodeKind kind) const {
+    return kind == LuaSyntaxNodeKind::Block || kind == LuaSyntaxNodeKind::TableFieldList;
+}
+
+
 

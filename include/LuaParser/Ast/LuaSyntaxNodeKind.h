@@ -64,6 +64,8 @@ enum class LuaSyntaxNodeKind {
 
     VarList,
 
+    TableFieldList,
+
     TableField,
 
     FunctionBody,

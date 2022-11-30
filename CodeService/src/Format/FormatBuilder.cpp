@@ -1,5 +1,6 @@
 #include "CodeService/Format/FormatBuilder.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
+#include "CodeService/Format/Analyzer/AlignAnalyzer.h"
 
 FormatBuilder::FormatBuilder(LuaStyle &style)
         : _style(style),
@@ -11,9 +12,12 @@ void FormatBuilder::FormatAnalyze(const LuaSyntaxTree &t) {
     AddAnalyzer<SpaceAnalyzer>();
     AddAnalyzer<IndentationAnalyzer>();
     AddAnalyzer<LineBreakAnalyzer>();
+    AddAnalyzer<AlignAnalyzer>();
 
     for (const auto &analyzer: _analyzers) {
-        analyzer->Analyze(*this, t);
+        if (analyzer) {
+            analyzer->Analyze(*this, t);
+        }
     }
 }
 
@@ -90,15 +94,54 @@ void FormatBuilder::RecoverIndent() {
 }
 
 void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+    if (resolve.HasIndent()) {
+        auto indent = resolve.GetIndent();
+        if (indent == 0) {
+            if (_style.indent_style == IndentStyle::Space) {
+                indent = _style.indent_size;
+            } else {
+                indent = _style.tab_width;
+            }
+        }
+        AddIndent(syntaxNode, indent);
+    }
+
     if (syntaxNode.IsToken(t)) {
         if (!_formattedText.empty()) {
             auto lastChar = _formattedText.back();
             if (lastChar == '\n' || lastChar == '\r') {
                 WriteIndent();
                 auto indentAnalyzer = GetAnalyzer<IndentationAnalyzer>();
-                indentAnalyzer->MarkIndent(syntaxNode, t);
+                if (indentAnalyzer) {
+                    indentAnalyzer->MarkIndent(syntaxNode, t);
+                }
             }
         }
+
+        switch (resolve.GetPrevSpaceStrategy()) {
+            case PrevSpaceStrategy::AlignPos: {
+                auto pos = resolve.GetAlign();
+                if (pos > _writeLineWidth) {
+                    auto space = pos - _writeLineWidth;
+                    WriteSpace(space);
+                }
+                break;
+            }
+            case PrevSpaceStrategy::AlignRelativeIndent: {
+                auto relativePos = resolve.GetAlign();
+                auto &indentState = _indentStack.top();
+                auto pos = relativePos + indentState.SpaceSize + indentState.TabSize * _style.tab_width;
+                if (pos > _writeLineWidth) {
+                    auto space = pos - _writeLineWidth;
+                    WriteSpace(space);
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
         switch (resolve.GetTokenStrategy()) {
             case TokenStrategy::Origin: {
                 WriteSyntaxNode(syntaxNode, t);
@@ -117,30 +160,19 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 break;
             }
         }
-    }
-    switch (resolve.GetNextSpaceStrategy()) {
-        case NextSpaceStrategy::Space: {
-            WriteSpace(resolve.GetNextSpace());
-            break;
-        }
-        case NextSpaceStrategy::LineBreak: {
-            WriteLine(resolve.GetNextLine());
-            break;
-        }
-        case NextSpaceStrategy::Indent: {
-            auto indent = resolve.GetIndent();
-            if (indent == 0) {
-                if (_style.indent_style == IndentStyle::Space) {
-                    indent = _style.indent_size;
-                } else {
-                    indent = _style.tab_width;
-                }
+
+        switch (resolve.GetNextSpaceStrategy()) {
+            case NextSpaceStrategy::Space: {
+                WriteSpace(resolve.GetNextSpace());
+                break;
             }
-            AddIndent(syntaxNode, indent);
-            break;
-        }
-        default: {
-            break;
+            case NextSpaceStrategy::LineBreak: {
+                WriteLine(resolve.GetNextLine());
+                break;
+            }
+            default: {
+                break;
+            }
         }
     }
 }

@@ -1,11 +1,12 @@
 #pragma once
 
 enum class FormatAnalyzerType {
-    SpaceAnalyzer,
+    SpaceAnalyzer = 0,
     LineBreakAnalyzer,
     IndentationAnalyzer,
+    AlignAnalyzer,
 
-    PluginAnalyzer
+    Count,
 };
 
 #define DECLARE_FORMAT_ANALYZER(CLASS) \

@@ -94,6 +94,8 @@ private:
 
     CompleteMarker TableConstructor();
 
+    void FieldList();
+
 	void Field();
 
 	void ListField();

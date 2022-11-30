@@ -3,14 +3,22 @@
 #include "CodeService/Format/Analyzer/FormatResolve.h"
 
 FormatResolve::FormatResolve()
-        : _spaceStrategy(NextSpaceStrategy::None),
+        : _nextSpaceStrategy(NextSpaceStrategy::None),
+          _prevSpaceStrategy(PrevSpaceStrategy::None),
           _tokenStrategy(TokenStrategy::Origin),
-          _data() {
+          _nextSpaceData(),
+          _prevSpaceData(),
+          _hasIndent(false),
+          _indent(0) {
 
 }
 
 NextSpaceStrategy FormatResolve::GetNextSpaceStrategy() const {
-    return _spaceStrategy;
+    return _nextSpaceStrategy;
+}
+
+PrevSpaceStrategy FormatResolve::GetPrevSpaceStrategy() const {
+    return _prevSpaceStrategy;
 }
 
 TokenStrategy FormatResolve::GetTokenStrategy() const {
@@ -19,33 +27,54 @@ TokenStrategy FormatResolve::GetTokenStrategy() const {
 
 void FormatResolve::Reset() {
     _tokenStrategy = TokenStrategy::Origin;
-    _spaceStrategy = NextSpaceStrategy::None;
-    _data.Space = 0;
+    _nextSpaceStrategy = NextSpaceStrategy::None;
+    _prevSpaceStrategy = PrevSpaceStrategy::None;
+    _nextSpaceData.Space = 0;
+    _hasIndent = false;
+    _indent = 0;
 }
 
 void FormatResolve::SetNextSpace(std::size_t space) {
-    _spaceStrategy = NextSpaceStrategy::Space;
-    _data.Space = space;
+    _nextSpaceStrategy = NextSpaceStrategy::Space;
+    _nextSpaceData.Space = space;
 }
 
 std::size_t FormatResolve::GetNextSpace() {
-    return _data.Space;
+    return _nextSpaceData.Space;
 }
 
 std::size_t FormatResolve::GetNextLine() {
-    return _data.Line;
+    return _nextSpaceData.Line;
 }
 
 void FormatResolve::SetNextLineBreak(std::size_t line) {
-    _spaceStrategy = NextSpaceStrategy::LineBreak;
-    _data.Line = line;
+    _nextSpaceStrategy = NextSpaceStrategy::LineBreak;
+    _nextSpaceData.Line = line;
 }
 
 std::size_t FormatResolve::GetIndent() const {
-    return _data.Indent;
+    return _indent;
 }
 
 void FormatResolve::SetIndent(std::size_t indent) {
-    _spaceStrategy = NextSpaceStrategy::Indent;
-    _data.Indent = indent;
+    _hasIndent = true;
+    _indent = indent;
+}
+
+void FormatResolve::SetAlign(std::size_t alignPos) {
+    _prevSpaceStrategy = PrevSpaceStrategy::AlignPos;
+    _prevSpaceData.Align = alignPos;
+}
+
+std::size_t FormatResolve::GetAlign() const {
+    return _prevSpaceData.Align;
+}
+
+bool FormatResolve::HasIndent() const {
+    return _hasIndent;
+}
+
+void FormatResolve::SetRelativeIndentAlign(std::size_t align) {
+    _prevSpaceStrategy = PrevSpaceStrategy::AlignRelativeIndent;
+    _prevSpaceData.Align = align;
 }

@@ -399,7 +399,6 @@ void LuaParser::ReturnStatement() {
     m.Complete(*this, LuaSyntaxNodeKind::ReturnStatement);
 }
 
-
 void LuaParser::BreakStatement() {
     auto m = Mark();
 
@@ -427,7 +426,7 @@ void LuaParser::GotoStatement() {
  * 以上是lua定义
  * 以下是修改定义
  * exprstat -> func
- * assignment -> exprList '=' exprList
+ * assignment -> varList '=' exprList
  */
 void LuaParser::ExpressionStatement() {
     auto m = Mark();
@@ -602,6 +601,15 @@ CompleteMarker LuaParser::TableConstructor() {
     auto m = Mark();
     CheckAndNext('{');
 
+    FieldList();
+
+    CheckAndNext('}');
+
+    return m.Complete(*this, LuaSyntaxNodeKind::TableExpression);
+}
+
+void LuaParser::FieldList() {
+    auto m = Mark();
     do {
         if (Current() == '}') {
             break;
@@ -609,10 +617,7 @@ CompleteMarker LuaParser::TableConstructor() {
         Field();
     } while (TestAndNext(',')
              || TestAndNext(';'));
-
-    CheckAndNext('}');
-
-    return m.Complete(*this, LuaSyntaxNodeKind::TableExpression);
+    m.Complete(*this, LuaSyntaxNodeKind::TableFieldList);
 }
 
 /* field -> listfield | recfield */
@@ -976,6 +981,8 @@ void LuaParser::NameDefList() {
 std::vector<LuaToken> &LuaParser::GetTokens() {
     return _tokens;
 }
+
+
 
 
 

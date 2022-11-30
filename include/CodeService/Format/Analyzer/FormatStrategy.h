@@ -1,16 +1,18 @@
 #pragma once
 
 #include <cstdlib>
+#include <vector>
 
 enum class NextSpaceStrategy {
     None,
     Space,
-    LineBreak,
-    Indent
+    LineBreak
 };
 
 enum class PrevSpaceStrategy {
     None,
+    AlignPos,
+    AlignRelativeIndent,
     LineBreak
 };
 
@@ -63,5 +65,20 @@ struct LineBreakData {
         std::size_t Line;
         std::size_t Index;
     } Data;
+};
+
+enum class AlignStrategy {
+    AlignToEq,
+    AlignToFirst
+};
+
+struct AlignGroup {
+    AlignGroup(AlignStrategy strategy, std::vector<std::size_t> &group)
+            : Strategy(strategy), SyntaxGroup(group), Resolve(false), AlignPos(0) {}
+
+    AlignStrategy Strategy;
+    std::vector<std::size_t> SyntaxGroup;
+    bool Resolve;
+    std::size_t AlignPos;
 };
 

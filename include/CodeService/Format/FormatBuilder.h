@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <array>
 #include <memory>
 #include <unordered_map>
 #include <optional>
@@ -24,15 +25,14 @@ public:
 
     template<class T>
     void AddAnalyzer() {
-        _analyzers.push_back(std::make_shared<T>());
+        _analyzers[static_cast<std::size_t>(T::Type)] = std::make_unique<T>();
     }
 
     template<class T>
-    std::shared_ptr<T> GetAnalyzer() {
-        for(auto a: _analyzers) {
-            if(a->GetType() == T::Type){
-                return std::dynamic_pointer_cast<T>(a);
-            }
+    T *GetAnalyzer() {
+        auto &ptr = _analyzers[static_cast<std::size_t>(T::Type)];
+        if (ptr) {
+            return dynamic_cast<T *>(ptr.get());
         }
         return nullptr;
     }
@@ -42,6 +42,7 @@ public:
     bool ShouldMeetIndent() const;
 
     std::size_t GetCurrentWidth() const;
+
 private:
     void AddIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
 
@@ -62,6 +63,6 @@ private:
     LuaStyle _style;
     std::stack<IndentState> _indentStack;
     std::size_t _writeLineWidth;
-    std::vector<std::shared_ptr<FormatAnalyzer>> _analyzers;
+    std::array<std::unique_ptr<FormatAnalyzer>, static_cast<std::size_t>(FormatAnalyzerType::Count)> _analyzers;
     std::string _formattedText;
 };

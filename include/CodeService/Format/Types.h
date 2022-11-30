@@ -15,15 +15,6 @@ struct IndentState {
     std::size_t TabSize;
 };
 
-struct FormatChange {
-    FormatChange()
-            : Start(0), Length(0) {}
-
-    std::size_t Start;
-    std::size_t Length;
-    std::string NewString;
-};
-
 enum class TraverseEvent {
     Enter,
     Exit

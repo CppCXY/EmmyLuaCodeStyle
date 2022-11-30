@@ -55,7 +55,11 @@ private:
 
     void EatComments(LuaParser &p);
 
+    void EatInlineComment(LuaParser &p);
+
     void EatToken(LuaParser &p);
+
+    bool IsEatAllComment(LuaSyntaxNodeKind kind) const;
 
     void FinishNode(LuaParser &p);
 

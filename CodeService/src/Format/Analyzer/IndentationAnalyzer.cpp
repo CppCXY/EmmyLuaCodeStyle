@@ -68,7 +68,11 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case LuaSyntaxNodeKind::TableExpression: {
-//                    auto tableField = syntaxNode.GetChildSyntaxNode()
+                    auto tableFieldList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldList, t);
+                    for (auto field: tableFieldList.GetChildren(t)) {
+                        Indenter(field, t, IndentData(IndentStrategy::WhenLineBreak));
+                    }
+
                     break;
                 }
                 default: {

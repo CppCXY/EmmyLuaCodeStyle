@@ -65,6 +65,8 @@ std::string_view detail::debug::GetSyntaxKindDebugName(LuaSyntaxNodeKind kind) {
             return "FunctionNameExpression";
         case LuaSyntaxNodeKind::VarList:
             return "VarList";
+        case LuaSyntaxNodeKind::TableFieldList:
+            return "TableFieldList";
         case LuaSyntaxNodeKind::TableField:
             return "TableField";
         case LuaSyntaxNodeKind::FunctionBody:

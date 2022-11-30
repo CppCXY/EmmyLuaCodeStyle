@@ -91,13 +91,30 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
 
 void
 LineBreakAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+    if (syntaxNode.IsToken(t)) {
+        if (resolve.GetNextSpaceStrategy() == NextSpaceStrategy::None
+            || resolve.GetNextSpaceStrategy() == NextSpaceStrategy::Space) {
+            auto nextToken = syntaxNode.GetNextToken(t);
+            if (nextToken.IsToken(t)) {
+                auto currentLine = syntaxNode.GetEndLine(t);
+                auto nextLine = nextToken.GetStartLine(t);
+                // 既然已经打断那就算了
+                if (nextLine > currentLine) {
+                    resolve.SetNextLineBreak(nextLine - currentLine);
+                    return;
+                }
+            }
+        }
+    }
+
+    // force break
     auto it = _lineBreaks.find(syntaxNode.GetIndex());
     if (it != _lineBreaks.end()) {
         auto &lineBreakData = it->second;
         switch (lineBreakData.Strategy) {
             case LineBreakStrategy::Standard: {
                 resolve.SetNextLineBreak(lineBreakData.Data.Line);
-                break;
+                return;
             }
             case LineBreakStrategy::WhenMayExceed: {
                 auto lineWidth = f.GetCurrentWidth();
@@ -106,23 +123,9 @@ LineBreakAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaS
                 auto guessLineWidth = lineWidth + syntaxNode.GetFirstLineWidth(t) + relationNode.GetFirstLineWidth(t);
                 if (guessLineWidth > style.max_line_length) {
                     resolve.SetNextLineBreak(1);
+                    return;
                 }
                 break;
-            }
-        }
-
-        return;
-    }
-    if (syntaxNode.IsToken(t)) {
-        if (resolve.GetNextSpaceStrategy() == NextSpaceStrategy::None
-            || resolve.GetNextSpaceStrategy() == NextSpaceStrategy::Space) {
-            auto nextToken = syntaxNode.GetNextToken(t);
-            if (nextToken.IsToken(t)) {
-                auto currentLine = syntaxNode.GetEndLine(t);
-                auto nextLine = nextToken.GetStartLine(t);
-                if (nextLine > currentLine) {
-                    resolve.SetNextLineBreak(nextLine - currentLine);
-                }
             }
         }
     }
