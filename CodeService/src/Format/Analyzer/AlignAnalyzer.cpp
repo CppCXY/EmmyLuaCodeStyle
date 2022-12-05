@@ -71,7 +71,6 @@ void AlignAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const Lua
                 break;
             }
         }
-
     }
 }
 

@@ -572,6 +572,7 @@ CompleteMarker LuaParser::SimpleExpression() {
             Next();
             return m.Complete(*this, LuaSyntaxNodeKind::LiteralExpression);
         }
+        case TK_LONG_STRING:
         case TK_STRING: {
             auto m = Mark();
             Next();
@@ -610,13 +611,14 @@ CompleteMarker LuaParser::TableConstructor() {
 
 void LuaParser::FieldList() {
     auto m = Mark();
-    do {
-        if (Current() == '}') {
+
+    while (Current() != '}') {
+        Field();
+        if (Current() == TK_EOF) {
             break;
         }
-        Field();
-    } while (TestAndNext(',')
-             || TestAndNext(';'));
+    }
+
     m.Complete(*this, LuaSyntaxNodeKind::TableFieldList);
 }
 
@@ -641,6 +643,10 @@ void LuaParser::Field() {
             ListField();
             break;
         }
+    }
+
+    if (Current() == ',' || Current() == ';') {
+        Next();
     }
 
     m.Complete(*this, LuaSyntaxNodeKind::TableField);
@@ -730,6 +736,7 @@ CompleteMarker LuaParser::SuffixedExpression() {
                 break;
             }
             case '(':
+            case TK_LONG_STRING:
             case TK_STRING:
             case '{': {
                 FunctionCallArgs();
@@ -762,6 +769,7 @@ void LuaParser::FunctionCallArgs() {
             TableConstructor();
             break;
         }
+        case TK_LONG_STRING:
         case TK_STRING: {
             auto sm = Mark();
             Next();

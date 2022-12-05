@@ -1,4 +1,5 @@
 #include "CodeService/Format/Analyzer/LineBreakAnalyzer.h"
+#include <algorithm>
 #include "CodeService/Format/FormatBuilder.h"
 #include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
@@ -215,9 +216,24 @@ void LineBreakAnalyzer::AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode &expr, const
             break;
         }
         case LuaSyntaxNodeKind::TableExpression: {
-            auto fields = expr.GetChildSyntaxNodes(LuaSyntaxNodeKind::TableField, t);
-            for (auto field: fields) {
-                MarkLazyBreak(field, t, LineBreakStrategy::WhenMayExceed);
+            auto tableFieldList = expr.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldList, t);
+            auto fields = tableFieldList.GetChildSyntaxNodes(LuaSyntaxNodeKind::TableField, t);
+            auto forceBreak =
+                    tableFieldList.GetStartLine(t) != tableFieldList.GetEndLine(t)
+                    && std::any_of(fields.begin(), fields.end(),
+                                   [&](LuaSyntaxNode &node) {
+                                       return node.GetChildToken('=', t).IsToken(t);
+                                   });
+
+            if (forceBreak) {
+                BreakAfter(expr.GetChildToken('{', t), t);
+                for (auto field: fields) {
+                    BreakAfter(field, t);
+                }
+            } else {
+                for (auto field: fields) {
+                    MarkLazyBreak(field, t, LineBreakStrategy::WhenMayExceed);
+                }
             }
             break;
         }

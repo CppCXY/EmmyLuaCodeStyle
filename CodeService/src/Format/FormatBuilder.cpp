@@ -68,19 +68,19 @@ void FormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTr
 
 void FormatBuilder::AddIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
     if (_indentStack.empty()) {
-        _indentStack.push(IndentState(syntaxNoe, 0, 0));
+        _indentStack.emplace(syntaxNoe, 0, 0);
         return;
     }
     auto top = _indentStack.top();
     switch (_style.indent_style) {
         case IndentStyle::Space: {
-            _indentStack.push(IndentState(syntaxNoe, top.SpaceSize + indent, top.TabSize));
+            _indentStack.emplace(syntaxNoe, top.SpaceSize + indent, top.TabSize);
             break;
         }
         case IndentStyle::Tab: {
             auto tabIndent = indent / _style.tab_width;
             auto spaceIndent = indent % _style.tab_width;
-            _indentStack.push(IndentState(syntaxNoe, top.SpaceSize + spaceIndent, top.TabSize + tabIndent));
+            _indentStack.emplace(syntaxNoe, top.SpaceSize + spaceIndent, top.TabSize + tabIndent);
             break;
         }
     }

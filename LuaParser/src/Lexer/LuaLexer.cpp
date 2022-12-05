@@ -135,11 +135,11 @@ LuaTokenKind LuaLexer::Lex() {
                 std::size_t sep = SkipSep();
                 if (sep >= 2) {
                     ReadLongString(sep);
-                    return TK_STRING;
+                    return TK_LONG_STRING;
                 } else if (sep == 0) {
                     TokenError("invalid long string delimiter",
                                TextRange(_reader.GetPos(), _reader.GetPos()));
-                    return TK_STRING;
+                    return TK_LONG_STRING;
                 }
                 return '[';
             }

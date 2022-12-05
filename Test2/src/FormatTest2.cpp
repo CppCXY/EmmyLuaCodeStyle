@@ -4,24 +4,12 @@
 #include "LuaParser/Ast/LuaSyntaxTree.h"
 #include "CodeService/Format/FormatBuilder.h"
 
-
 int main() {
     std::string buffer = R"(
-function f()
-local t = 12313
-dd    ={
-    aaaa = 123,
-bbbb=1233,
-ddddd   =12313, --hello world
---yest
-
-
-aaa=123,
-
-[12313] =123,
-[gwg]   =123,
+local t = {
+    [ [[哎哟你干嘛啊]] .. 1 --[[afafa]] ] = 123
 }
-end
+
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));

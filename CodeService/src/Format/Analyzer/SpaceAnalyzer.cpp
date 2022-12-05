@@ -87,9 +87,7 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case '.':
-                case ':':
-                case '[':
-                case ']': {
+                case ':': {
                     SpaceAround(syntaxNode, t, 0);
                     break;
                 }
@@ -126,6 +124,29 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                         auto rightCurly = syntaxNode.GetChildToken('}', t);
                         SpaceLeft(rightCurly, t, 1);
                     }
+                    break;
+                }
+                case LuaSyntaxNodeKind::IndexExpression: {
+                    auto leftSquareBracket = syntaxNode.GetChildToken('[', t);
+                    auto rightSquareBracket = syntaxNode.GetChildToken(']', t);
+                    if (leftSquareBracket.IsToken(t) && rightSquareBracket.IsToken(t)) {
+                        auto tokenKindAfterSquareBracket = leftSquareBracket.GetNextToken(t).GetTokenKind(t);
+                        auto tokenKindBeforeSquareBracket = rightSquareBracket.GetPrevToken(t).GetTokenKind(t);
+                        if (tokenKindAfterSquareBracket == TK_LONG_STRING
+                            || tokenKindAfterSquareBracket == TK_LONG_COMMENT
+                            || tokenKindBeforeSquareBracket == TK_LONG_COMMENT
+                            || tokenKindBeforeSquareBracket == TK_LONG_STRING) {
+                            SpaceLeft(leftSquareBracket, t, 0);
+                            SpaceRight(leftSquareBracket, t, 1);
+
+                            SpaceLeft(rightSquareBracket, t, 1);
+                            SpaceRight(rightSquareBracket, t, 0);
+                        } else {
+                            SpaceAround(leftSquareBracket, t, 0);
+                            SpaceAround(rightSquareBracket, t, 0);
+                        }
+                    }
+
                     break;
                 }
                 default: {
