@@ -1,6 +1,7 @@
 #include "CodeService/Format/FormatBuilder.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/Analyzer/AlignAnalyzer.h"
+#include "CodeService/Format/Analyzer/TokenAnalyzer.h"
 
 FormatBuilder::FormatBuilder(LuaStyle &style)
         : _style(style),
@@ -13,6 +14,7 @@ void FormatBuilder::FormatAnalyze(const LuaSyntaxTree &t) {
     AddAnalyzer<IndentationAnalyzer>();
     AddAnalyzer<LineBreakAnalyzer>();
     AddAnalyzer<AlignAnalyzer>();
+    AddAnalyzer<TokenAnalyzer>();
 
     for (const auto &analyzer: _analyzers) {
         if (analyzer) {
@@ -62,8 +64,19 @@ std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
 
 void FormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
     auto text = syntaxNode.GetText(t);
-    _writeLineWidth += text.size();
-    _formattedText.append(syntaxNode.GetText(t));
+
+    switch (syntaxNode.GetTokenKind(t)) {
+        case TK_STRING:
+        case TK_LONG_STRING:
+        case TK_LONG_COMMENT: {
+            WriteText(text);
+            break;
+        }
+        default: {
+            _writeLineWidth += text.size();
+            _formattedText.append(syntaxNode.GetText(t));
+        }
+    }
 }
 
 void FormatBuilder::AddIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
@@ -91,6 +104,21 @@ void FormatBuilder::RecoverIndent() {
         return;
     }
     _indentStack.pop();
+}
+
+bool ExistDel(char del, std::string_view text) {
+    text = text.substr(1, text.size() - 2);
+    char ch = '\0';
+    for (std::size_t i = 0; i < text.size(); ++i) {
+        ch = text[i];
+        if (ch == del) {
+            return true;
+        } else if (ch == '\\') {
+            ++i;
+        }
+    }
+
+    return false;
 }
 
 void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
@@ -152,9 +180,47 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
             }
             case TokenStrategy::StringSingleQuote: {
                 if (syntaxNode.GetTokenKind(t) == TK_STRING) {
-
+                    auto text = syntaxNode.GetText(t);
+                    auto del = '\'';
+                    if (text.size() >= 2
+                        && text.front() == '\"'
+                        && !ExistDel(del, text)) {
+                        WriteChar(del);
+                        WriteText(text.substr(1, text.size() - 2));
+                        WriteChar(del);
+                    }
                 }
                 break;
+            }
+            case TokenStrategy::StringDoubleQuote: {
+                if (syntaxNode.GetTokenKind(t) == TK_STRING) {
+                    auto text = syntaxNode.GetText(t);
+                    auto del = '\"';
+                    if (text.size() >= 2
+                        && text.front() == '\''
+                        && !ExistDel(del, text)) {
+                        WriteChar(del);
+                        WriteText(text.substr(1, text.size() - 2));
+                        WriteChar(del);
+                    }
+                }
+                break;
+            }
+            case TokenStrategy::TableSepComma: {
+                WriteChar(',');
+                break;
+            }
+            case TokenStrategy::TableSepSemicolon: {
+                WriteChar(';');
+                break;
+            }
+            case TokenStrategy::TableAddSep: {
+                WriteSyntaxNode(syntaxNode, t);
+                if (_style.table_separator_style == TableSeparatorStyle::Semicolon) {
+                    WriteChar(';');
+                } else {
+                    WriteChar(',');
+                }
             }
             default: {
                 break;
@@ -275,4 +341,37 @@ bool FormatBuilder::ShouldMeetIndent() const {
 
 std::size_t FormatBuilder::GetCurrentWidth() const {
     return _writeLineWidth;
+}
+
+void FormatBuilder::WriteChar(char ch) {
+    _writeLineWidth++;
+    _formattedText.push_back(ch);
+}
+
+void FormatBuilder::WriteText(std::string_view text) {
+    std::size_t last = 0;
+    for (std::size_t i = 0; i != text.size(); i++) {
+        char ch = text[i];
+        if (ch == '\n' || ch == '\r') {
+            if (last < i) {
+                _formattedText.append(text.substr(last, i - last));
+            }
+            WriteLine(1);
+            if (ch == '\r'
+                && (i + 1 < text.size())
+                && (text[i + 1] == '\n')) {
+                i++;
+            }
+            last = i + 1;
+        }
+    }
+
+    if (text.size() > last) {
+        _writeLineWidth += text.size() - last;
+        if (last != 0) {
+            _formattedText.append(text.substr(last));
+        } else {
+            _formattedText.append(text);
+        }
+    }
 }

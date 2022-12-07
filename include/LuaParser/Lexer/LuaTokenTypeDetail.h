@@ -45,7 +45,6 @@ enum LuaTokenTypeDetail : int
 	TK_NAME,
 	TK_STRING,
     TK_LONG_STRING,
-	// custom
 	TK_SHORT_COMMENT,// 短注释
 	TK_DOC_COMMENT, // emmylua doc
 	TK_LONG_COMMENT, //长注释

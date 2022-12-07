@@ -1,5 +1,6 @@
 #include "CodeService/Format/Analyzer/IndentationAnalyzer.h"
 #include "CodeService/Format/FormatBuilder.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 
 // 但是我不能这样做
 //using enum LuaSyntaxNodeKind;
@@ -15,6 +16,38 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
             switch (syntaxNode.GetSyntaxKind(t)) {
                 case LuaSyntaxNodeKind::Block: {
                     Indenter(syntaxNode, t);
+                    if (f.GetStyle().never_indent_comment_on_if_branch) {
+                        auto ifStmt = syntaxNode.GetParent(t);
+                        if (ifStmt.GetSyntaxKind(t) == LuaSyntaxNodeKind::IfStatement) {
+                            auto ifBranch = syntaxNode.GetNextToken(t);
+                            if (ifBranch.GetTokenKind(t) == TK_ELSEIF
+                                || ifBranch.GetTokenKind(t) == TK_ELSE) {
+                                auto bodyChildren = syntaxNode.GetChildren(t);
+                                bool isCommentOnly = true;
+                                for (auto bodyChild: bodyChildren) {
+                                    if (bodyChild.IsNode(t)) {
+                                        isCommentOnly = false;
+                                        break;
+                                    }
+                                }
+                                if (isCommentOnly) {
+                                    break;
+                                }
+                                std::size_t siblingLine = ifBranch.GetStartLine(t);
+                                for (auto it = bodyChildren.rbegin(); it != bodyChildren.rend(); it++) {
+                                    auto n = *it;
+                                    if (n.GetTokenKind(t) != TK_SHORT_COMMENT) {
+                                        break;
+                                    }
+                                    auto commentLine = n.GetStartLine(t);
+                                    if (commentLine + 1 == siblingLine) {
+                                        Indenter(n, t, IndentData(IndentStrategy::InvertIndentation));
+                                        siblingLine = commentLine;
+                                    }
+                                }
+                            }
+                        }
+                    }
                     break;
                 }
                 case LuaSyntaxNodeKind::ParamList: {
@@ -50,9 +83,11 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case LuaSyntaxNodeKind::IfStatement: {
-                    auto exprs = syntaxNode.GetChildSyntaxNodes(MultiKind::Expression, t);
-                    for (auto expr: exprs) {
-                        Indenter(expr, t);
+                    if (!f.GetStyle().never_indent_before_if_condition) {
+                        auto exprs = syntaxNode.GetChildSyntaxNodes(MultiKind::Expression, t);
+                        for (auto expr: exprs) {
+                            Indenter(expr, t);
+                        }
                     }
                     break;
                 }
@@ -107,6 +142,10 @@ IndentationAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &n, const LuaSyntaxTr
                 resolve.SetIndent();
                 break;
             }
+            case IndentStrategy::InvertIndentation: {
+//                resolve.
+                break;
+            }
             case IndentStrategy::WhenLineBreak: {
                 if (f.ShouldMeetIndent()) {
                     indentData.Strategy = IndentStrategy::Standard;
@@ -116,7 +155,7 @@ IndentationAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &n, const LuaSyntaxTr
             }
             case IndentStrategy::WhenPrevIndent: {
                 auto prev = n.GetPrevSibling(t);
-                if (_indentMark.contains(prev.GetIndex())) {
+                if (_indentMark.count(prev.GetIndex())) {
                     resolve.SetIndent();
                 }
                 break;

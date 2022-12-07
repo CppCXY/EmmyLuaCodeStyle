@@ -28,28 +28,27 @@ public:
 
     QuoteStyle quote_style = QuoteStyle::None;
 
-    TableSeparatorStyle table_separator_style = TableSeparatorStyle::None;
+    TableSeparatorStyle table_separator_style = TableSeparatorStyle::Comma;
 
-    std::size_t max_line_length = 60;
+    std::size_t max_line_length = 120;
 #ifndef _WINDOWS
     EndOfLine end_of_line = EndOfLine::LF;
 #else
     EndOfLine end_of_line = EndOfLine::CRLF;
 #endif
-//
-//	TrailingTableSeparator trailing_table_separator = TrailingTableSeparator::Keep;
-//
-//	CallArgParentheses call_arg_parentheses = CallArgParentheses::Keep;
+
+    TrailingTableSeparator trailing_table_separator = TrailingTableSeparator::Always;
+
+    CallArgParentheses call_arg_parentheses = CallArgParentheses::Keep;
 //	/*
 //	 * 延续行缩进
 //	 */
 //	int continuation_indent_size = 4;
 //
-//	int statement_inline_comment_space = 1;
-//
 //	bool detect_end_of_line = false;
 //
 //	bool insert_final_newline = true;
+
     // [Space]
     bool space_around_table_field_list = true;
 
@@ -68,34 +67,28 @@ public:
     // like t[#t+1] = 1
     bool space_around_table_append_operator = false;
 
-    // [AlignPos]
-    /*
-     * 调用参数对齐到第一个参数
-     */
-    AlignCallArgs align_call_args = AlignCallArgs::None;
+    std::size_t space_before_inline_comment = 1;
 
-    /*
-     * 函数定义的参数保持对齐到第一个参数
-     * 函数的定义通常不会太长，这种默认行为是可以接受的
-     */
+    // [Align]
+    AlignCallArgs align_call_args = AlignCallArgs::Normal;
+
     bool align_function_params = true;
 
-    bool align_chained_expression_statement = false;
+    // 感觉没啥用,就不实现了
+    // bool align_chained_expression_statement = false;
 
     bool align_continuous_assign_statement_to_equal = true;
 
     bool align_continuous_rect_table_field_to_equal = true;
+
     // [Indent]
-//
-//	/*
-//	 * if语句的条件可以无延续行缩进
-//	 */
-//	bool if_condition_no_continuation_indent = false;
-//
-//	bool if_branch_comments_after_block_no_indent = false;
-//	/*
-//	 * 表内每一个表项对齐到第一个表项
-//	 */
+
+	/*
+	 * if语句的条件可以无延续行缩进
+	 */
+	bool never_indent_before_if_condition = false;
+
+	bool never_indent_comment_on_if_branch = false;
 
 //
 //	/*
@@ -103,15 +96,14 @@ public:
 //	 */
 //	int max_continuous_line_distance = 1;
 //
-//
 //	bool if_condition_align_with_each_other = false;
-//
 //
 //	bool long_chain_expression_allow_one_space_after_colon = false;
 //
 //	bool remove_expression_list_finish_comma = false;
 //
 //	bool remove_empty_header_and_footer_lines_in_function = false;
+    // [preference]
 
 //
 //	std::shared_ptr<FormatElement> keep_line_after_if_statement;
@@ -124,7 +116,7 @@ public:
 //	std::shared_ptr<FormatElement> keep_line_after_expression_statement;
 //
 //
-    bool enable_check_codestyle = true;
+    bool enable_check_code_style = true;
 //
 //	// 命名风格检查
 //	bool enable_name_style_check = false;

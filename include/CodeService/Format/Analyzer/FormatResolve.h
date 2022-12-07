@@ -25,6 +25,8 @@ public:
 
     void SetRelativeIndentAlign(std::size_t align);
 
+    void SetTokenStrategy(TokenStrategy strategy);
+
     std::size_t GetNextSpace();
 
     std::size_t GetNextLine();

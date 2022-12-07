@@ -29,19 +29,11 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                 case TK_IDIV:
                 case TK_CONCAT:
                 case TK_IN: {
-                    SpaceAround(syntaxNode, t);
+                    SpaceAround(syntaxNode, t, 1, false);
                     break;
                 }
                 case TK_NOT: {
                     SpaceRight(syntaxNode, t);
-                    break;
-                }
-                case '(': {
-                    SpaceRight(syntaxNode, t, 0);
-                    break;
-                }
-                case ')': {
-                    SpaceLeft(syntaxNode, t, 0);
                     break;
                 }
                 case '-':
@@ -87,16 +79,17 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case '.':
-                case ':': {
-                    SpaceAround(syntaxNode, t, 0);
+                case ':':
+                case '[':
+                case ']':
+                case '(':
+                case ')': {
+                    SpaceAround(syntaxNode, t, 0, false);
                     break;
                 }
-                case TK_LONG_COMMENT: {
-                    SpaceLeft(syntaxNode, t, 1);
-                    break;
-                }
+                case TK_LONG_COMMENT:
                 case TK_SHORT_COMMENT: {
-                    SpaceLeft(syntaxNode, t, 1);
+                    SpaceAround(syntaxNode, t, f.GetStyle().space_before_inline_comment);
                     break;
                 }
                 default: {
@@ -106,8 +99,16 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
         } else {
             switch (syntaxNode.GetSyntaxKind(t)) {
                 case LuaSyntaxNodeKind::CallExpression: {
-                    if (syntaxNode.GetChildToken('(', t).IsToken(t)) {
-                        SpaceLeft(syntaxNode, t, 0);
+                    auto leftBrace = syntaxNode.GetChildToken('(', t);
+                    if (leftBrace.IsToken(t)) {
+                        if (f.GetStyle().space_inside_function_call_parentheses
+                            && leftBrace.GetNextToken(t).GetTokenKind(t) != ')') {
+                            auto rightBrace = syntaxNode.GetChildToken(')', t);
+                            SpaceRight(leftBrace, t, 1);
+                            SpaceLeft(rightBrace, t, 1);
+                        } else {
+                            SpaceLeft(syntaxNode, t, 0);
+                        }
                     } else {
                         SpaceLeft(syntaxNode, t, 1);
                     }
@@ -115,14 +116,15 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                 }
                 case LuaSyntaxNodeKind::TableExpression: {
                     auto leftCurly = syntaxNode.GetChildToken('{', t);
-                    if (leftCurly.GetNextToken(t).GetTokenKind(t) == '}') {
-                        SpaceRight(leftCurly, t, 0);
-                        auto rightCurly = syntaxNode.GetChildToken('}', t);
-                        SpaceLeft(rightCurly, t, 0);
-                    } else {
+                    if (leftCurly.GetNextToken(t).GetTokenKind(t) != '}'
+                        && f.GetStyle().space_around_table_field_list) {
                         SpaceRight(leftCurly, t, 1);
                         auto rightCurly = syntaxNode.GetChildToken('}', t);
                         SpaceLeft(rightCurly, t, 1);
+                    } else {
+                        SpaceRight(leftCurly, t, 0);
+                        auto rightCurly = syntaxNode.GetChildToken('}', t);
+                        SpaceLeft(rightCurly, t, 0);
                     }
                     break;
                 }
@@ -130,23 +132,69 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     auto leftSquareBracket = syntaxNode.GetChildToken('[', t);
                     auto rightSquareBracket = syntaxNode.GetChildToken(']', t);
                     if (leftSquareBracket.IsToken(t) && rightSquareBracket.IsToken(t)) {
-                        auto tokenKindAfterSquareBracket = leftSquareBracket.GetNextToken(t).GetTokenKind(t);
-                        auto tokenKindBeforeSquareBracket = rightSquareBracket.GetPrevToken(t).GetTokenKind(t);
-                        if (tokenKindAfterSquareBracket == TK_LONG_STRING
-                            || tokenKindAfterSquareBracket == TK_LONG_COMMENT
-                            || tokenKindBeforeSquareBracket == TK_LONG_COMMENT
-                            || tokenKindBeforeSquareBracket == TK_LONG_STRING) {
-                            SpaceLeft(leftSquareBracket, t, 0);
-                            SpaceRight(leftSquareBracket, t, 1);
+                        if (f.GetStyle().space_before_open_square_bracket) {
+                            SpaceLeft(leftSquareBracket, t, 1);
+                        }
 
+                        if (f.GetStyle().space_inside_square_brackets) {
+                            SpaceRight(leftSquareBracket, t, 1);
                             SpaceLeft(rightSquareBracket, t, 1);
-                            SpaceRight(rightSquareBracket, t, 0);
                         } else {
-                            SpaceAround(leftSquareBracket, t, 0);
-                            SpaceAround(rightSquareBracket, t, 0);
+                            auto tokenKindAfterSquareBracket = leftSquareBracket.GetNextToken(t).GetTokenKind(t);
+                            auto tokenKindBeforeSquareBracket = rightSquareBracket.GetPrevToken(t).GetTokenKind(t);
+                            if (tokenKindAfterSquareBracket == TK_LONG_STRING
+                                || tokenKindAfterSquareBracket == TK_LONG_COMMENT
+                                || tokenKindBeforeSquareBracket == TK_LONG_COMMENT
+                                || tokenKindBeforeSquareBracket == TK_LONG_STRING) {
+                                SpaceRight(leftSquareBracket, t, 1);
+                                SpaceLeft(rightSquareBracket, t, 1);
+                            }
+                        }
+
+                        if (f.GetStyle().space_around_table_append_operator) {
+                            auto binaryExpr = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::BinaryExpression, t);
+                            if (binaryExpr.IsNode(t)) {
+                                auto plus = binaryExpr.GetChildToken('+', t);
+                                if (plus.IsToken(t)) {
+                                    auto exprs = binaryExpr.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
+                                    if (exprs.size() == 2) {
+                                        auto leftExpr = exprs[0];
+                                        auto rightExpr = exprs[1];
+                                        if (leftExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::UnaryExpression
+                                            && leftExpr.GetChildToken('#', t).IsToken(t)
+                                            && rightExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::LiteralExpression
+                                            && rightExpr.GetText(t) == "1") {
+                                            SpaceAround(plus, t, 0);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
 
+                    break;
+                }
+                case LuaSyntaxNodeKind::Attribute: {
+                    if (f.GetStyle().space_before_attribute) {
+                        SpaceLeft(syntaxNode, t, 1);
+                    } else {
+                        SpaceLeft(syntaxNode, t, 0);
+                    }
+                    break;
+                }
+                case LuaSyntaxNodeKind::FunctionBody: {
+                    auto leftBrace = syntaxNode.GetChildToken('(', t);
+                    if (f.GetStyle().space_before_function_open_parenthesis) {
+                        SpaceLeft(leftBrace, t, 1);
+                    }
+                    if (f.GetStyle().space_inside_function_param_list_parentheses) {
+                        auto next = leftBrace.GetNextToken(t);
+                        if (next.GetTokenKind(t) != ')') {
+                            SpaceRight(leftBrace, t, 1);
+                            auto rightBrace = syntaxNode.GetChildToken(')', t);
+                            SpaceLeft(rightBrace, t, 1);
+                        }
+                    }
                     break;
                 }
                 default: {
@@ -166,19 +214,27 @@ void SpaceAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const Lua
 }
 
 
-void SpaceAnalyzer::SpaceAround(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space) {
-    SpaceLeft(n, t, space);
-    SpaceRight(n, t, space);
+void SpaceAnalyzer::SpaceAround(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space, bool force) {
+    SpaceLeft(n, t, space, force);
+    SpaceRight(n, t, space, force);
 }
 
-void SpaceAnalyzer::SpaceLeft(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space) {
+void SpaceAnalyzer::SpaceLeft(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space, bool force) {
     auto token = n.GetFirstToken(t);
-    _leftSpaces[token.GetIndex()] = space;
+    if (force) {
+        _leftSpaces[token.GetIndex()] = space;
+    } else {
+        _leftSpaces.insert({token.GetIndex(), space});
+    }
 }
 
-void SpaceAnalyzer::SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space) {
+void SpaceAnalyzer::SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space, bool force) {
     auto token = n.GetLastToken(t);
-    _rightSpaces[token.GetIndex()] = space;
+    if (force) {
+        _rightSpaces[token.GetIndex()] = space;
+    } else {
+        _rightSpaces.insert({token.GetIndex(), space});
+    }
 }
 
 std::optional<std::size_t> SpaceAnalyzer::GetLeftSpace(LuaSyntaxNode &n) const {

@@ -21,12 +21,18 @@ enum class TokenStrategy {
     Remove,
     StringSingleQuote,
     StringDoubleQuote,
+
+    TableSepSemicolon,
+    TableSepComma,
+    TableAddSep,
+
     RemoveCommentTrailSpace
 };
 
 enum class IndentStrategy {
     None,
     Standard,
+    InvertIndentation,
     WhenLineBreak,
     WhenPrevIndent
 };
@@ -81,4 +87,3 @@ struct AlignGroup {
     bool Resolve;
     std::size_t AlignPos;
 };
-

@@ -78,3 +78,7 @@ void FormatResolve::SetRelativeIndentAlign(std::size_t align) {
     _prevSpaceStrategy = PrevSpaceStrategy::AlignRelativeIndent;
     _prevSpaceData.Align = align;
 }
+
+void FormatResolve::SetTokenStrategy(TokenStrategy strategy) {
+    _tokenStrategy = strategy;
+}

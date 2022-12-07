@@ -646,7 +646,9 @@ void LuaParser::Field() {
     }
 
     if (Current() == ',' || Current() == ';') {
+        auto m2 = Mark();
         Next();
+        m2.Complete(*this, LuaSyntaxNodeKind::TableFieldSep);
     }
 
     m.Complete(*this, LuaSyntaxNodeKind::TableField);

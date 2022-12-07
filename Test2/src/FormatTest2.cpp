@@ -6,10 +6,11 @@
 
 int main() {
     std::string buffer = R"(
-local t = {
-    [ [[哎哟你干嘛啊]] .. 1 --[[afafa]] ] = 123
+local t = {1,2,3, --[[yes]]}
+local c = {
+a,b,c,d=123,
+sff,ddd --hello world
 }
-
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));

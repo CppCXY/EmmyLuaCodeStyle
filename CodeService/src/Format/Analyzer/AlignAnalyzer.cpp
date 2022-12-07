@@ -25,20 +25,23 @@ void AlignAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case LuaSyntaxNodeKind::CallExpression: {
-                    auto exprlist = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
                     if (f.GetStyle().align_call_args != AlignCallArgs::None) {
-
+                        auto exprlist = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+                        AnalyzeExpressionList(f, exprlist, t);
                     }
                     break;
                 }
                 case LuaSyntaxNodeKind::ParamList: {
                     if (f.GetStyle().align_function_params) {
-
+                        AnalyzeParamList(f, syntaxNode, t);
                     }
-
                     break;
                 }
-
+//                case LuaSyntaxNodeKind::ExpressionStatement: {
+//                    if (f.GetStyle().align_chained_expression_statement) {
+//                    }
+//                    break;
+//                }
                 default: {
                     break;
                 }
@@ -62,7 +65,7 @@ void AlignAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const Lua
         auto alignGroupIndex = it->second;
         auto &alignGroup = _alignGroup[alignGroupIndex];
         switch (alignGroup.Strategy) {
-            case AlignStrategy::AlignToEq:{
+            case AlignStrategy::AlignToEq: {
                 resolve.SetRelativeIndentAlign(alignGroup.AlignPos);
                 break;
             }
@@ -236,7 +239,34 @@ AlignAnalyzer::ResolveAlignGroup(FormatBuilder &f, std::size_t groupIndex, Align
             break;
         }
         case AlignStrategy::AlignToFirst: {
+            if (!f.ShouldMeetIndent()) {
+                auto width = f.GetCurrentWidth();
+                group.AlignPos = width;
+                for (auto i: group.SyntaxGroup) {
+                    auto node = LuaSyntaxNode(i);
+                    auto leftToken = node.GetFirstToken(t);
+                    _resolveGroupIndex[leftToken.GetIndex()] = groupIndex;
+                }
+            }
             break;
         }
     }
+}
+
+void AlignAnalyzer::AnalyzeExpressionList(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    std::vector<std::size_t> group;
+    for (auto expr: syntaxNode.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t)) {
+        group.push_back(expr.GetIndex());
+    }
+    PushAlignGroup(AlignStrategy::AlignToFirst, group);
+}
+
+void AlignAnalyzer::AnalyzeParamList(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    std::vector<std::size_t> group;
+    for (auto token: syntaxNode.GetChildren(t)) {
+        if (token.GetTokenKind(t) == TK_NAME || token.GetTokenKind(t) == TK_DOTS) {
+            group.push_back(token.GetIndex());
+        }
+    }
+    PushAlignGroup(AlignStrategy::AlignToFirst, group);
 }

@@ -68,6 +68,8 @@ enum class LuaSyntaxNodeKind {
 
     TableField,
 
+    TableFieldSep,
+
     FunctionBody,
 
     ParamList,

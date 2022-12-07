@@ -60,6 +60,10 @@ private:
 
     void WriteIndent();
 
+    void WriteChar(char ch);
+
+    void WriteText(std::string_view text);
+
     LuaStyle _style;
     std::stack<IndentState> _indentStack;
     std::size_t _writeLineWidth;
