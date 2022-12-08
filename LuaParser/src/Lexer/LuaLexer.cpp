@@ -121,7 +121,7 @@ LuaTokenKind LuaLexer::Lex() {
                     }
                 } else if (_reader.GetCurrentChar() == '-') {
                     _reader.SaveAndNext();
-                    type = TK_DOC_COMMENT;
+//                    type = TK_DOC_COMMENT;
                 }
 
                 // is short comment

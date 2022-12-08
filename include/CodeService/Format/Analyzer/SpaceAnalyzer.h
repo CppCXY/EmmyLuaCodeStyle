@@ -1,6 +1,8 @@
 #pragma once
 
 #include <optional>
+#include <unordered_set>
+#include <unordered_map>
 #include "CodeService/Format/Analyzer/FormatAnalyzer.h"
 
 class SpaceAnalyzer : public FormatAnalyzer {
@@ -19,6 +21,7 @@ public:
 
     void SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1, bool force = true);
 
+    void SpaceIgnore(LuaSyntaxNode &n, const LuaSyntaxTree &t);
 private:
     std::optional<std::size_t> GetLeftSpace(LuaSyntaxNode &n) const;
 
@@ -28,4 +31,5 @@ private:
 
     std::unordered_map<std::size_t, std::size_t> _leftSpaces;
     std::unordered_map<std::size_t, std::size_t> _rightSpaces;
+    std::unordered_set<std::size_t> _ignoreSpace;
 };

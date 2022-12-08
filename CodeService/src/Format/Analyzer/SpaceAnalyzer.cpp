@@ -109,6 +109,15 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                         } else {
                             SpaceLeft(syntaxNode, t, 0);
                         }
+                        if (f.GetStyle().ignore_spaces_inside_function_call) {
+                            auto exprList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+                            if (exprList.IsNode(t)) {
+                                auto commas = exprList.GetChildTokens(',', t);
+                                for (auto &comma: commas) {
+                                    SpaceIgnore(comma, t);
+                                }
+                            }
+                        }
                     } else {
                         SpaceLeft(syntaxNode, t, 1);
                     }
@@ -238,19 +247,27 @@ void SpaceAnalyzer::SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::si
 }
 
 std::optional<std::size_t> SpaceAnalyzer::GetLeftSpace(LuaSyntaxNode &n) const {
-    auto it = _leftSpaces.find(n.GetIndex());
-    if (it != _leftSpaces.end()) {
-        return it->second;
+    if (_ignoreSpace.count(n.GetIndex())) {
+        return {};
     }
-    return {};
+
+    auto it = _leftSpaces.find(n.GetIndex());
+    if (it == _leftSpaces.end()) {
+        return {};
+    }
+    return it->second;
 }
 
 std::optional<std::size_t> SpaceAnalyzer::GetRightSpace(LuaSyntaxNode &n) const {
-    auto it = _rightSpaces.find(n.GetIndex());
-    if (it != _rightSpaces.end()) {
-        return it->second;
+    if (_ignoreSpace.count(n.GetIndex())) {
+        return {};
     }
-    return {};
+
+    auto it = _rightSpaces.find(n.GetIndex());
+    if (it == _rightSpaces.end()) {
+        return {};
+    }
+    return it->second;
 }
 
 std::size_t
@@ -272,5 +289,9 @@ SpaceAnalyzer::ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSyntaxN
         return t.GetStartOffset(right.GetIndex()) - t.GetEndOffset(left.GetIndex()) - 1;
     }
     return 0;
+}
+
+void SpaceAnalyzer::SpaceIgnore(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    _ignoreSpace.insert(n.GetIndex());
 }
 

@@ -6,11 +6,20 @@
 
 int main() {
     std::string buffer = R"(
-local t = {1,2,3, --[[yes]]}
-local c = {
-a,b,c,d=123,
-sff,ddd --hello world
-}
+function f()
+if a
+and c
+or d then
+elseif aa then
+---hjoho
+local t =123
+---fuckfuck
+--fuckfuc
+else
+    --cnzb
+end
+
+end
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -23,7 +32,6 @@ sff,ddd --hello world
     LuaSyntaxTree t;
     t.BuildTree(p);
     LuaStyle s;
-    s.end_of_line = EndOfLine::LF;
     FormatBuilder b(s);
     b.FormatAnalyze(t);
     std::cout<<t.GetDebugView()<<std::endl;

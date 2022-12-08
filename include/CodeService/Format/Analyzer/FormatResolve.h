@@ -13,13 +13,13 @@ public:
 
     TokenStrategy GetTokenStrategy() const;
 
-    bool HasIndent() const;
+    IndentStrategy GetIndentStrategy() const;
 
     void SetNextSpace(std::size_t space);
 
     void SetNextLineBreak(std::size_t line);
 
-    void SetIndent(std::size_t indent = 0);
+    void SetIndent(std::size_t indent = 0, IndentStrategy strategy = IndentStrategy::Relative);
 
     void SetAlign(std::size_t alignPos);
 
@@ -41,6 +41,7 @@ private:
     NextSpaceStrategy _nextSpaceStrategy;
     PrevSpaceStrategy _prevSpaceStrategy;
     TokenStrategy _tokenStrategy;
+    IndentStrategy _indentStrategy;
     union NextData {
         std::size_t Space;
         std::size_t Line;
@@ -50,6 +51,5 @@ private:
         std::size_t Align;
     } _prevSpaceData;
 
-    bool _hasIndent;
     std::size_t _indent;
 };

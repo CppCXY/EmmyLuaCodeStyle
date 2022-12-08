@@ -44,7 +44,9 @@ public:
     std::size_t GetCurrentWidth() const;
 
 private:
-    void AddIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
+    void AddRelativeIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
+
+    void AddInvertIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
 
     void RecoverIndent();
 
@@ -65,6 +67,7 @@ private:
     void WriteText(std::string_view text);
 
     LuaStyle _style;
+    EndOfLine _fileEndOfLine;
     std::stack<IndentState> _indentStack;
     std::size_t _writeLineWidth;
     std::array<std::unique_ptr<FormatAnalyzer>, static_cast<std::size_t>(FormatAnalyzerType::Count)> _analyzers;

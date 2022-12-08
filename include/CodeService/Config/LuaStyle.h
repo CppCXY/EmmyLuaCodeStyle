@@ -40,14 +40,12 @@ public:
     TrailingTableSeparator trailing_table_separator = TrailingTableSeparator::Always;
 
     CallArgParentheses call_arg_parentheses = CallArgParentheses::Keep;
-//	/*
-//	 * 延续行缩进
-//	 */
-//	int continuation_indent_size = 4;
-//
-//	bool detect_end_of_line = false;
-//
-//	bool insert_final_newline = true;
+
+	std::size_t continuation_indent = 4;
+
+	bool detect_end_of_line = true;
+
+	bool insert_final_newline = true;
 
     // [Space]
     bool space_around_table_field_list = true;
@@ -66,6 +64,8 @@ public:
 
     // like t[#t+1] = 1
     bool space_around_table_append_operator = false;
+
+    bool ignore_spaces_inside_function_call = false;
 
     std::size_t space_before_inline_comment = 1;
 
@@ -91,9 +91,6 @@ public:
 	bool never_indent_comment_on_if_branch = false;
 
 //
-//	/*
-//	 * 如何认定连续行,相距超过该选项的值则认为不连续
-//	 */
 //	int max_continuous_line_distance = 1;
 //
 //	bool if_condition_align_with_each_other = false;

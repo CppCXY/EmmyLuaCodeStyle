@@ -5,11 +5,13 @@
 
 FormatBuilder::FormatBuilder(LuaStyle &style)
         : _style(style),
+          _fileEndOfLine(EndOfLine::LF),
           _writeLineWidth(0) {
 
 }
 
 void FormatBuilder::FormatAnalyze(const LuaSyntaxTree &t) {
+    _fileEndOfLine = t.GetFile().GetEndOfLine();
     AddAnalyzer<SpaceAnalyzer>();
     AddAnalyzer<IndentationAnalyzer>();
     AddAnalyzer<LineBreakAnalyzer>();
@@ -59,6 +61,28 @@ std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
         }
     }
 
+    if (!_formattedText.empty()) {
+        auto endChar = _formattedText.back();
+        if (_style.insert_final_newline) {
+            if (endChar != '\r' && endChar != '\n') {
+                WriteLine(1);
+            }
+        } else {
+            if (endChar == '\r' || endChar == '\n') {
+                auto lastIndex = _formattedText.size();
+                std::size_t reduce = 0;
+                while (_formattedText[lastIndex - reduce - 1] == '\r'
+                       || _formattedText[lastIndex - reduce - 1] == '\n') {
+                    reduce++;
+                    if (lastIndex <= reduce + 1) {
+                        break;
+                    }
+                }
+                _formattedText.resize(lastIndex - reduce);
+            }
+        }
+    }
+
     return _formattedText;
 }
 
@@ -79,7 +103,7 @@ void FormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTr
     }
 }
 
-void FormatBuilder::AddIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
+void FormatBuilder::AddRelativeIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
     if (_indentStack.empty()) {
         _indentStack.emplace(syntaxNoe, 0, 0);
         return;
@@ -94,6 +118,39 @@ void FormatBuilder::AddIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
             auto tabIndent = indent / _style.tab_width;
             auto spaceIndent = indent % _style.tab_width;
             _indentStack.emplace(syntaxNoe, top.SpaceSize + spaceIndent, top.TabSize + tabIndent);
+            break;
+        }
+    }
+}
+
+void FormatBuilder::AddInvertIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
+    if (_indentStack.empty()) {
+        _indentStack.emplace(syntaxNoe, 0, 0);
+        return;
+    }
+    auto top = _indentStack.top();
+    switch (_style.indent_style) {
+        case IndentStyle::Space: {
+            std::size_t spaceSize = 0;
+            if (top.SpaceSize > indent) {
+                spaceSize = top.SpaceSize - indent;
+            }
+            _indentStack.emplace(syntaxNoe, spaceSize, top.TabSize);
+            break;
+        }
+        case IndentStyle::Tab: {
+            auto tabIndent = indent / _style.tab_width;
+            auto spaceIndent = indent % _style.tab_width;
+            std::size_t spaceSize = 0;
+            std::size_t tabSize = 0;
+            if (top.SpaceSize > spaceIndent) {
+                spaceSize = top.SpaceSize - spaceIndent;
+            }
+            if (top.TabSize > tabIndent) {
+                tabSize = top.TabSize - tabIndent;
+            }
+
+            _indentStack.emplace(syntaxNoe, spaceSize, tabSize);
             break;
         }
     }
@@ -122,7 +179,7 @@ bool ExistDel(char del, std::string_view text) {
 }
 
 void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
-    if (resolve.HasIndent()) {
+    if (resolve.GetIndentStrategy() != IndentStrategy::None) {
         auto indent = resolve.GetIndent();
         if (indent == 0) {
             if (_style.indent_style == IndentStyle::Space) {
@@ -131,7 +188,20 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 indent = _style.tab_width;
             }
         }
-        AddIndent(syntaxNode, indent);
+
+        switch (resolve.GetIndentStrategy()) {
+            case IndentStrategy::Relative: {
+                AddRelativeIndent(syntaxNode, indent);
+                break;
+            }
+            case IndentStrategy::InvertRelative: {
+                AddInvertIndent(syntaxNode, indent);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 
     if (syntaxNode.IsToken(t)) {
@@ -259,7 +329,8 @@ void FormatBuilder::WriteLine(std::size_t line) {
     if (line == 0) {
         return;
     }
-    auto endOfLine = _style.end_of_line;
+    auto endOfLine = _style.detect_end_of_line ?
+                     _fileEndOfLine : _style.end_of_line;
     switch (endOfLine) {
         case EndOfLine::CRLF: {
             if (line == 1) {

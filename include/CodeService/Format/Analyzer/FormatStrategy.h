@@ -31,6 +31,13 @@ enum class TokenStrategy {
 
 enum class IndentStrategy {
     None,
+    Relative,
+    InvertRelative,
+    Absolute,
+};
+
+enum class IndentType {
+    None,
     Standard,
     InvertIndentation,
     WhenLineBreak,
@@ -38,11 +45,11 @@ enum class IndentStrategy {
 };
 
 struct IndentData {
-    IndentData(IndentStrategy strategy = IndentStrategy::Standard, std::size_t size = 0)
-            : Strategy(strategy), Data(size) {}
+    IndentData(IndentType type = IndentType::Standard, std::size_t size = 0)
+            : Type(type), Indent(size) {}
 
-    IndentStrategy Strategy;
-    std::size_t Data;
+    IndentType Type;
+    std::size_t Indent;
 };
 
 enum class LineBreakStrategy {
