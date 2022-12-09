@@ -16,7 +16,8 @@ enum class CallArgParentheses : int {
     Remove,
     RemoveStringOnly,
     RemoveTableOnly,
-    UnambiguousRemoveStringOnly
+    // 应该没人用
+    //UnambiguousRemoveStringOnly
 };
 
 enum class AlignCallArgs {

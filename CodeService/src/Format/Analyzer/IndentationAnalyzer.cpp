@@ -59,7 +59,10 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                         auto exprList = syntaxNode.GetChildSyntaxNode(NodeKind::ExpressionList, t);
                         if (exprList.IsNode(t)) {
                             for (auto expr: exprList.GetChildren(t)) {
-                                Indenter(expr, t, IndentData(IndentType::WhenLineBreak));
+                                Indenter(expr, t, IndentData(
+                                        IndentType::WhenLineBreak,
+                                        f.GetStyle().continuation_indent
+                                ));
                             }
                         }
                     }
@@ -86,7 +89,10 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     if (!f.GetStyle().never_indent_before_if_condition) {
                         auto exprs = syntaxNode.GetChildSyntaxNodes(MultiKind::Expression, t);
                         for (auto expr: exprs) {
-                            Indenter(expr, t);
+                            Indenter(expr, t, IndentData(
+                                    IndentType::Standard,
+                                    f.GetStyle().continuation_indent
+                            ));
                         }
                     }
                     break;
@@ -95,9 +101,15 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     auto suffixedExpression = syntaxNode.GetChildSyntaxNode(NodeKind::SuffixedExpression, t);
                     for (auto expr: suffixedExpression.GetChildren(t)) {
                         if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::IndexExpression) {
-                            Indenter(expr, t);
+                            Indenter(expr, t, IndentData(
+                                    IndentType::Standard,
+                                    f.GetStyle().continuation_indent
+                            ));
                         } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::CallExpression) {
-                            Indenter(expr, t, IndentData(IndentType::WhenPrevIndent));
+                            Indenter(expr, t, IndentData(
+                                    IndentType::WhenPrevIndent,
+                                    f.GetStyle().continuation_indent
+                            ));
                         }
                     }
                     break;
@@ -105,7 +117,10 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                 case LuaSyntaxNodeKind::TableExpression: {
                     auto tableFieldList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldList, t);
                     for (auto field: tableFieldList.GetChildren(t)) {
-                        Indenter(field, t, IndentData(IndentType::WhenLineBreak));
+                        Indenter(field, t, IndentData(
+                                IndentType::WhenLineBreak,
+                                f.GetStyle().continuation_indent
+                        ));
                     }
 
                     break;
@@ -129,7 +144,10 @@ void IndentationAnalyzer::AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode &exprL
             return;
         }
     }
-    Indenter(exprList, t);
+    Indenter(exprList, t, IndentData(
+            IndentType::Standard,
+            f.GetStyle().continuation_indent
+    ));
 }
 
 void

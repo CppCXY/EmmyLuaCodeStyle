@@ -7,17 +7,13 @@
 int main() {
     std::string buffer = R"(
 function f()
-if a
-and c
-or d then
-elseif aa then
----hjoho
-local t =123
----fuckfuck
---fuckfuc
-else
-    --cnzb
+
+
 end
+
+function f22()
+
+    local t = 12313 --12313
 
 end
 )";

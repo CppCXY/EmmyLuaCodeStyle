@@ -17,5 +17,10 @@ public:
 private:
     void TableFieldAddSep(FormatBuilder &f, LuaSyntaxNode &n, const LuaSyntaxTree &t);
 
+    void AnalyzeTableField(FormatBuilder &f, LuaSyntaxNode& syntaxNode ,const LuaSyntaxTree &t);
+
+    void AnalyzeCallExpression(FormatBuilder &f, LuaSyntaxNode& syntaxNode ,const LuaSyntaxTree &t);
+
+
     std::unordered_map<std::size_t, TokenStrategy> _tokenStrategies;
 };

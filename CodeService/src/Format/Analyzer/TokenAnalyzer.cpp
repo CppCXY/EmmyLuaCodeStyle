@@ -11,60 +11,13 @@ void TokenAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
         if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {
                 case LuaSyntaxNodeKind::TableField: {
-                    if (f.GetStyle().table_separator_style == TableSeparatorStyle::Semicolon) {
-                        auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
-                        auto comma = sep.GetChildToken(',', t);
-                        if (comma.IsToken(t)) {
-                            Mark(comma, t, TokenStrategy::TableSepSemicolon);
-                        }
-                    } else if (f.GetStyle().table_separator_style == TableSeparatorStyle::Comma) {
-                        auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
-                        auto semicolon = sep.GetChildToken(';', t);
-                        if (semicolon.IsToken(t)) {
-                            Mark(semicolon, t, TokenStrategy::TableSepComma);
-                        }
-                    }
-
-                    if (f.GetStyle().trailing_table_separator != TrailingTableSeparator::Keep) {
-                        auto nextToken = syntaxNode.GetNextToken(t);
-                        while (nextToken.GetTokenKind(t) == TK_SHORT_COMMENT
-                               || nextToken.GetTokenKind(t) == TK_LONG_COMMENT) {
-                            nextToken = nextToken.GetNextToken(t);
-                        }
-                        // the last table field
-                        if (nextToken.GetTokenKind(t) == '}') {
-                            switch (f.GetStyle().trailing_table_separator) {
-                                case TrailingTableSeparator::Never: {
-                                    auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
-                                    auto sepToken = sep.GetFirstToken(t);
-                                    Mark(sepToken, t, TokenStrategy::Remove);
-                                    break;
-                                }
-                                case TrailingTableSeparator::Always: {
-                                    TableFieldAddSep(f, syntaxNode, t);
-                                    break;
-                                }
-                                case TrailingTableSeparator::Smart: {
-                                    auto tableFieldList = syntaxNode.GetParent(t);
-                                    if (tableFieldList.GetStartLine(t) == syntaxNode.GetStartLine(t)) {
-                                        auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
-                                        auto sepToken = sep.GetFirstToken(t);
-                                        Mark(sepToken, t, TokenStrategy::Remove);
-                                    } else {
-                                        TableFieldAddSep(f, syntaxNode, t);
-                                    }
-                                    break;
-                                }
-                                default: {
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    AnalyzeTableField(f, syntaxNode, t);
                     break;
                 }
                 case LuaSyntaxNodeKind::CallExpression: {
-
+                    if (f.GetStyle().call_arg_parentheses != CallArgParentheses::Keep) {
+                        AnalyzeCallExpression(f, syntaxNode, t);
+                    }
                 }
                 default: {
                     break;
@@ -119,5 +72,163 @@ void TokenAnalyzer::TableFieldAddSep(FormatBuilder &f, LuaSyntaxNode &n, const L
             lastToken = lastToken.GetPrevToken(t);
         }
         Mark(lastToken, t, TokenStrategy::TableAddSep);
+    }
+}
+
+void TokenAnalyzer::AnalyzeTableField(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    if (f.GetStyle().table_separator_style == TableSeparatorStyle::Semicolon) {
+        auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
+        auto comma = sep.GetChildToken(',', t);
+        if (comma.IsToken(t)) {
+            Mark(comma, t, TokenStrategy::TableSepSemicolon);
+        }
+    } else if (f.GetStyle().table_separator_style == TableSeparatorStyle::Comma) {
+        auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
+        auto semicolon = sep.GetChildToken(';', t);
+        if (semicolon.IsToken(t)) {
+            Mark(semicolon, t, TokenStrategy::TableSepComma);
+        }
+    }
+
+    if (f.GetStyle().trailing_table_separator != TrailingTableSeparator::Keep) {
+        auto nextToken = syntaxNode.GetNextToken(t);
+        while (nextToken.GetTokenKind(t) == TK_SHORT_COMMENT
+               || nextToken.GetTokenKind(t) == TK_LONG_COMMENT) {
+            nextToken = nextToken.GetNextToken(t);
+        }
+        // the last table field
+        if (nextToken.GetTokenKind(t) == '}') {
+            switch (f.GetStyle().trailing_table_separator) {
+                case TrailingTableSeparator::Never: {
+                    auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
+                    auto sepToken = sep.GetFirstToken(t);
+                    Mark(sepToken, t, TokenStrategy::Remove);
+                    break;
+                }
+                case TrailingTableSeparator::Always: {
+                    TableFieldAddSep(f, syntaxNode, t);
+                    break;
+                }
+                case TrailingTableSeparator::Smart: {
+                    auto tableFieldList = syntaxNode.GetParent(t);
+                    if (tableFieldList.GetStartLine(t) == syntaxNode.GetStartLine(t)) {
+                        auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
+                        auto sepToken = sep.GetFirstToken(t);
+                        Mark(sepToken, t, TokenStrategy::Remove);
+                    } else {
+                        TableFieldAddSep(f, syntaxNode, t);
+                    }
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+        }
+    }
+}
+
+bool IsSingleTableOrStringArg(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    auto children = syntaxNode.GetChildren(t);
+    for (auto child: children) {
+        if (child.GetTokenKind(t) == TK_STRING
+            || child.GetTokenKind(t) == TK_LONG_STRING
+            || child.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
+            return true;
+        } else if (
+                child.GetSyntaxKind(t) == LuaSyntaxNodeKind::ExpressionList) {
+            auto exprs = child.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
+            if (exprs.size() == 1) {
+                auto expr = exprs.front();
+                if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
+                    return true;
+                } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::LiteralExpression) {
+                    auto firstToken = expr.GetFirstToken(t);
+                    return firstToken.GetTokenKind(t) == TK_STRING
+                           || firstToken.GetTokenKind(t) == TK_LONG_STRING;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+LuaSyntaxNode GetSingleArgStringOrTable(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    auto children = syntaxNode.GetChildren(t);
+    for (auto child: children) {
+        if (child.GetTokenKind(t) == TK_STRING
+            || child.GetTokenKind(t) == TK_LONG_STRING
+            || child.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
+            return syntaxNode;
+        } else if (child.GetSyntaxKind(t) == LuaSyntaxNodeKind::ExpressionList) {
+            auto exprs = child.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
+            if (exprs.size() == 1) {
+                auto expr = exprs.front();
+                if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
+                    return expr;
+                } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::LiteralExpression) {
+                    auto firstToken = expr.GetFirstToken(t);
+                    if (firstToken.GetTokenKind(t) == TK_STRING
+                        || firstToken.GetTokenKind(t) == TK_LONG_STRING) {
+                        return firstToken;
+                    }
+                }
+            }
+        }
+    }
+    return LuaSyntaxNode(0);
+}
+
+void TokenAnalyzer::AnalyzeCallExpression(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    if (IsSingleTableOrStringArg(syntaxNode, t)) {
+        switch (f.GetStyle().call_arg_parentheses) {
+            case CallArgParentheses::Remove : {
+                auto lbrace = syntaxNode.GetChildToken('(', t);
+                Mark(lbrace, t, TokenStrategy::Remove);
+                auto rbrace = syntaxNode.GetChildToken(')', t);
+                Mark(rbrace, t, TokenStrategy::Remove);
+                auto spaceAnalyzer = f.GetAnalyzer<SpaceAnalyzer>();
+                if (spaceAnalyzer) {
+                    auto node = GetSingleArgStringOrTable(syntaxNode, t);
+                    spaceAnalyzer->SpaceAround(node, t, 1);
+                }
+
+                break;
+            }
+            case CallArgParentheses::RemoveStringOnly: {
+                auto node = GetSingleArgStringOrTable(syntaxNode, t);
+                if (node.GetTokenKind(t) == TK_STRING
+                    || node.GetTokenKind(t) == TK_LONG_STRING) {
+                    auto lbrace = syntaxNode.GetChildToken('(', t);
+                    Mark(lbrace, t, TokenStrategy::Remove);
+                    auto rbrace = syntaxNode.GetChildToken(')', t);
+                    Mark(rbrace, t, TokenStrategy::Remove);
+                    auto spaceAnalyzer = f.GetAnalyzer<SpaceAnalyzer>();
+                    if (spaceAnalyzer) {
+                        spaceAnalyzer->SpaceAround(node, t, 1);
+                    }
+                }
+
+                break;
+            }
+            case CallArgParentheses::RemoveTableOnly: {
+                auto node = GetSingleArgStringOrTable(syntaxNode, t);
+                if (node.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
+                    auto lbrace = syntaxNode.GetChildToken('(', t);
+                    Mark(lbrace, t, TokenStrategy::Remove);
+                    auto rbrace = syntaxNode.GetChildToken(')', t);
+                    Mark(rbrace, t, TokenStrategy::Remove);
+                    auto spaceAnalyzer = f.GetAnalyzer<SpaceAnalyzer>();
+                    if (spaceAnalyzer) {
+                        spaceAnalyzer->SpaceAround(node, t, 1);
+                    }
+                }
+
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 }
