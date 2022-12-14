@@ -1,6 +1,5 @@
-#include "CodeFormatServer/Service/Service.h"
+#include "Service.h"
 
-Service::Service(std::shared_ptr<LanguageClient> owner)
-	: _owner(owner)
-{
+Service::Service(LanguageServer *owner)
+        : _owner(owner) {
 }

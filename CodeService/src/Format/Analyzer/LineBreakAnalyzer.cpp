@@ -26,6 +26,18 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     BreakAfter(syntaxNode, t);
 
                     for (auto stmt: syntaxNode.GetChildren(t)) {
+                        if (stmt.IsNode(t)) {
+                            switch (stmt.GetSyntaxKind(t)) {
+                                case LuaSyntaxNodeKind::LocalStatement:
+                                case LuaSyntaxNodeKind::AssignStatement: {
+                                    BreakAfter(stmt, t);
+                                }
+
+
+                            }
+                        } else {
+
+                        }
                         BreakAfter(stmt, t);
                     }
                     break;

@@ -81,7 +81,7 @@ public:
 
     bool align_continuous_rect_table_field_to_equal = true;
 
-//    bool align_if_branch = false;
+    bool align_if_branch = true;
 
     // [Indent]
 
@@ -92,26 +92,32 @@ public:
 
 	bool never_indent_comment_on_if_branch = false;
 
-
 //	int max_continuous_line_distance = 1;
 
 //	bool long_chain_expression_allow_one_space_after_colon = false;
 //
-	bool remove_expression_list_finish_comma = false;
+//	bool remove_expression_list_finish_comma = false;
 //
 //	bool remove_empty_header_and_footer_lines_in_function = false;
     // [preference]
 
     // [line space]
 
-//	LineSpace line_space_after_if_statement = LineSpace(Keep);
-//	LineSpace line_space_after_do_statement = LineSpace(Keep);
-//	LineSpace line_space_after_while_statement = LineSpace(Keep);
-//    LineSpace line_space_after_repeat_statement = LineSpace(Keep);
-//	LineSpace line_space_after_for_statement = LineSpace(Keep);
-//    LineSpace line_space_after_local_or_assign_statement = LineSpace(Keep);
-//	LineSpace line_space_after_function_statement = LineSpace(Fiexed, 1);
-//	LineSpace line_space_after_expression_statement = LineSpace(Keep);
+	LineSpace line_space_after_if_statement = LineSpace(LineSpaceType::Keep);
+
+	LineSpace line_space_after_do_statement = LineSpace(LineSpaceType::Keep);
+
+    LineSpace line_space_after_while_statement = LineSpace(LineSpaceType::Keep);
+
+    LineSpace line_space_after_repeat_statement = LineSpace(LineSpaceType::Keep);
+
+    LineSpace line_space_after_for_statement = LineSpace(LineSpaceType::Keep);
+
+    LineSpace line_space_after_local_or_assign_statement = LineSpace(LineSpaceType::Keep);
+
+    LineSpace line_space_after_function_statement = LineSpace(LineSpaceType::Fixed, 1);
+
+    LineSpace line_space_after_expression_statement = LineSpace(LineSpaceType::Keep);
 
     bool enable_check_code_style = true;
 //

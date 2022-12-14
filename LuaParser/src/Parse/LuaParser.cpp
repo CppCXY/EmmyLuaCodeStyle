@@ -761,7 +761,7 @@ void LuaParser::FunctionCallArgs() {
             Next();
             if (Current() != ')') {
                 // extend grammar, allow pcall(1,2,)
-                ExpressionList();
+                ExpressionList(')');
             }
 
             CheckAndNext(')');

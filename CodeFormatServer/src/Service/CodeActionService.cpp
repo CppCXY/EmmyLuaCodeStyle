@@ -1,12 +1,11 @@
-#include "CodeFormatServer/Service/CodeActionService.h"
+#include "CodeActionService.h"
 
-#include "CodeFormatServer/Service/CodeFormatService.h"
-#include "CodeFormatServer/Service/CommandService.h"
-#include "CodeFormatServer/Service/ModuleService.h"
+#include "FormatService.h"
+#include "CommandService.h"
 #include "Util/Url.h"
 #include "Util/format.h"
 
-CodeActionService::CodeActionService(std::shared_ptr<LanguageClient> owner)
+CodeActionService::CodeActionService(LanguageServer* owner)
 	: Service(owner)
 {
 }
@@ -20,8 +19,8 @@ bool CodeActionService::Initialize()
 	return true;
 }
 
-void CodeActionService::Dispatch(vscode::Diagnostic& diagnostic, std::shared_ptr<vscode::CodeActionParams> param,
-                                 std::shared_ptr<vscode::CodeActionResult> results)
+void CodeActionService::Dispatch(lsp::Diagnostic& diagnostic, std::shared_ptr<lsp::CodeActionParams> param,
+                                 std::shared_ptr<lsp::CodeActionResult> results)
 {
 	if (diagnostic.code.empty())
 	{
@@ -57,8 +56,8 @@ void CodeActionService::CodeProtocol(DiagnosticCode code, CodeActionHandleMember
 	};
 }
 
-void CodeActionService::Reformat(vscode::Diagnostic& diagnostic, std::shared_ptr<vscode::CodeActionParams> param,
-                                 std::shared_ptr<vscode::CodeActionResult> result)
+void CodeActionService::Reformat(lsp::Diagnostic& diagnostic, std::shared_ptr<lsp::CodeActionParams> param,
+                                 std::shared_ptr<lsp::CodeActionResult> result)
 {
 	auto& action = result->actions.emplace_back();
 	std::string title = "reformat current line";
@@ -68,11 +67,11 @@ void CodeActionService::Reformat(vscode::Diagnostic& diagnostic, std::shared_ptr
 	action.command.arguments.push_back(param->textDocument.uri);
 	action.command.arguments.push_back(param->range.Serialize());
 
-	action.kind = vscode::CodeActionKind::QuickFix;
+	action.kind = lsp::CodeActionKind::QuickFix;
 }
 
-void CodeActionService::Spell(vscode::Diagnostic& diagnostic, std::shared_ptr<vscode::CodeActionParams> param,
-                              std::shared_ptr<vscode::CodeActionResult> result)
+void CodeActionService::Spell(lsp::Diagnostic& diagnostic, std::shared_ptr<lsp::CodeActionParams> param,
+                              std::shared_ptr<lsp::CodeActionResult> result)
 {
 	auto& originText = diagnostic.data;
 	if (originText.empty())
@@ -89,10 +88,10 @@ void CodeActionService::Spell(vscode::Diagnostic& diagnostic, std::shared_ptr<vs
 		action.command.command = GetService<CommandService>()->GetCommand(CommandService::Command::SpellAddDict);
 		action.command.arguments.push_back(originText);
 
-		action.kind = vscode::CodeActionKind::QuickFix;
+		action.kind = lsp::CodeActionKind::QuickFix;
 	}
 
-	auto spellChecker = GetService<CodeFormatService>()->GetSpellChecker();
+	auto spellChecker = GetService<FormatService>()->GetSpellChecker();
 	auto suggests = spellChecker->GetSuggests(originText);
 	for (auto& suggest : suggests)
 	{
@@ -108,13 +107,13 @@ void CodeActionService::Spell(vscode::Diagnostic& diagnostic, std::shared_ptr<vs
 			action.command.arguments.push_back(diagnostic.range.Serialize());
 			action.command.arguments.push_back(term);
 
-			action.kind = vscode::CodeActionKind::QuickFix;
+			action.kind = lsp::CodeActionKind::QuickFix;
 		}
 	}
 }
 
-void CodeActionService::Module(vscode::Diagnostic& diagnostic, std::shared_ptr<vscode::CodeActionParams> param,
-                               std::shared_ptr<vscode::CodeActionResult> result)
+void CodeActionService::Module(lsp::Diagnostic& diagnostic, std::shared_ptr<lsp::CodeActionParams> param,
+                               std::shared_ptr<lsp::CodeActionResult> result)
 {
 	auto range = param->range;
 	auto uri = param->textDocument.uri;
@@ -140,5 +139,5 @@ void CodeActionService::Module(vscode::Diagnostic& diagnostic, std::shared_ptr<v
 		action.command.arguments.push_back(object);
 	}
 
-	action.kind = vscode::CodeActionKind::QuickFix;
+	action.kind = lsp::CodeActionKind::QuickFix;
 }

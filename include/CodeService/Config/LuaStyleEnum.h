@@ -39,3 +39,18 @@ enum class TrailingTableSeparator {
     Smart,
     Always
 };
+
+enum class LineSpaceType {
+    Keep,
+    Fixed,
+    Max,
+    Min
+};
+
+struct LineSpace {
+    explicit LineSpace(LineSpaceType type, std::size_t space = 0)
+            : Type(type), Space(space) {}
+
+    LineSpaceType Type;
+    std::size_t Space;
+};

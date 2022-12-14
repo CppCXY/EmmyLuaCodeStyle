@@ -338,7 +338,7 @@ void FormatBuilder::WriteLine(std::size_t line) {
                 _formattedText.push_back('\n');
             } else {
                 auto index = _formattedText.size();
-                _formattedText.resize(2 * line, '\n');
+                _formattedText.resize(index + 2 * line, '\n');
                 for (; index < _formattedText.size(); index += 2) {
                     _formattedText[index] = '\r';
                 }

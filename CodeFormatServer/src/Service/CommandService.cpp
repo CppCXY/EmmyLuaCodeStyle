@@ -1,12 +1,10 @@
-#include "CodeFormatServer/Service/CommandService.h"
+#include "CommandService.h"
 
-#include "CodeFormatServer/Service/CodeFormatService.h"
-#include "CodeFormatServer/Service/ModuleService.h"
-#include "CodeService/RangeFormat/LuaFormatRange.h"
+#include "FormatService.h"
 #include "Util/format.h"
 #include "Util/Url.h"
 
-CommandService::CommandService(std::shared_ptr<LanguageClient> owner)
+CommandService::CommandService(LanguageServer* owner)
 	: Service(owner)
 {
 }
@@ -49,7 +47,7 @@ std::string CommandService::GetCommand(Command command)
 	return "";
 }
 
-void CommandService::Dispatch(std::string_view command, std::shared_ptr<vscode::ExecuteCommandParams> param)
+void CommandService::Dispatch(std::string_view command, std::shared_ptr<lsp::ExecuteCommandParams> param)
 {
 	std::string cmd(command);
 	auto it = _handles.find(cmd);
@@ -59,7 +57,7 @@ void CommandService::Dispatch(std::string_view command, std::shared_ptr<vscode::
 	}
 }
 
-void CommandService::Reformat(std::shared_ptr<vscode::ExecuteCommandParams> param)
+void CommandService::Reformat(std::shared_ptr<lsp::ExecuteCommandParams> param)
 {
 	if (param->arguments.size() < 2)
 	{
@@ -67,40 +65,40 @@ void CommandService::Reformat(std::shared_ptr<vscode::ExecuteCommandParams> para
 	}
 
 	std::string uri = param->arguments[0];
-	vscode::Range range;
+	lsp::Range range;
 
 	range.Deserialize(param->arguments[1]);
 
-	auto parser = LanguageClient::GetInstance().GetFileParser(uri);
+	auto parser = LanguageServer::GetInstance().GetFileParser(uri);
 
-	auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();
+	auto applyParams = std::make_shared<lsp::ApplyWorkspaceEditParams>();
 
-	auto options = LanguageClient::GetInstance().GetOptions(uri);
+	auto options = LanguageServer::GetInstance().GetOptions(uri);
 
 	if (parser->HasError())
 	{
 		return;
 	}
 
-	auto it = applyParams->edit.changes.emplace(uri, std::vector<vscode::TextEdit>());
+	auto it = applyParams->edit.changes.emplace(uri, std::vector<lsp::TextEdit>());
 	auto& change = it.first->second;
 
 	auto& edit = change.emplace_back();
 	LuaFormatRange formattedRange(static_cast<int>(range.start.line), static_cast<int>(range.end.line));
 
-	auto formatResult = GetService<CodeFormatService>()->RangeFormat(formattedRange, parser, *options);
+	auto formatResult = GetService<FormatService>()->RangeFormat(formattedRange, parser, *options);
 
 	edit.newText = std::move(formatResult);
 
-	edit.range = vscode::Range(
-		vscode::Position(formattedRange.StartLine, formattedRange.StartCharacter),
-		vscode::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
+	edit.range = lsp::Range(
+            lsp::Position(formattedRange.StartLine, formattedRange.StartCharacter),
+            lsp::Position(formattedRange.EndLine + 1, formattedRange.EndCharacter)
 	);
 
 	_owner->SendRequest("workspace/applyEdit", applyParams);
 }
 
-void CommandService::Import(std::shared_ptr<vscode::ExecuteCommandParams> param)
+void CommandService::Import(std::shared_ptr<lsp::ExecuteCommandParams> param)
 {
 	if (param->arguments.size() < 4)
 	{
@@ -114,7 +112,7 @@ void CommandService::Import(std::shared_ptr<vscode::ExecuteCommandParams> param)
 	{
 		return;
 	}
-	vscode::Range range;
+	lsp::Range range;
 
 	range.Deserialize(param->arguments[1]);
 
@@ -125,8 +123,8 @@ void CommandService::Import(std::shared_ptr<vscode::ExecuteCommandParams> param)
 	std::string requireString = Util::format("local {} = {}(\"{}\")\n", moduleDefineName, config->import_function,
 	                                         moduleName);
 	auto parser = _owner->GetFileParser(uri);
-	auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();
-	auto it = applyParams->edit.changes.emplace(uri, std::vector<vscode::TextEdit>());
+	auto applyParams = std::make_shared<lsp::ApplyWorkspaceEditParams>();
+	auto it = applyParams->edit.changes.emplace(uri, std::vector<lsp::TextEdit>());
 	auto& change = it.first->second;
 
 	auto& edit = change.emplace_back();
@@ -138,17 +136,17 @@ void CommandService::Import(std::shared_ptr<vscode::ExecuteCommandParams> param)
 	_owner->SendRequest("workspace/applyEdit", applyParams);
 }
 
-void CommandService::SpellCorrect(std::shared_ptr<vscode::ExecuteCommandParams> param)
+void CommandService::SpellCorrect(std::shared_ptr<lsp::ExecuteCommandParams> param)
 {
 	std::string uri = param->arguments[0];
-	vscode::Range range;
+	lsp::Range range;
 
 	range.Deserialize(param->arguments[1]);
 
 	std::string newText = param->arguments[2];
 
-	auto applyParams = std::make_shared<vscode::ApplyWorkspaceEditParams>();
-	auto it = applyParams->edit.changes.emplace(uri, std::vector<vscode::TextEdit>());
+	auto applyParams = std::make_shared<lsp::ApplyWorkspaceEditParams>();
+	auto it = applyParams->edit.changes.emplace(uri, std::vector<lsp::TextEdit>());
 	auto& change = it.first->second;
 
 	auto& edit = change.emplace_back();
@@ -160,6 +158,6 @@ void CommandService::SpellCorrect(std::shared_ptr<vscode::ExecuteCommandParams> 
 	_owner->SendRequest("workspace/applyEdit", applyParams);
 }
 
-// void CommandService::SpellAddDict(std::shared_ptr<vscode::ExecuteCommandParams> param)
+// void CommandService::SpellAddDict(std::shared_ptr<lsp::ExecuteCommandParams> param)
 // {
 // }

@@ -210,3 +210,22 @@ std::size_t LuaSyntaxNode::GetFirstLineWidth(const LuaSyntaxTree &t) const {
     return utf8::Utf8nLenAtFirstLine(text.data(), text.size());
 }
 
+std::size_t LuaSyntaxNode::CountTokenChild(LuaTokenKind kind, const LuaSyntaxTree &t) {
+    auto count = 0;
+    for (auto child = GetFirstChild(t); !child.IsNull(t); child.ToNext(t)) {
+        if (child.GetTokenKind(t) == kind) {
+            count++;
+        }
+    }
+    return count;
+}
+
+std::size_t LuaSyntaxNode::CountNodeChild(LuaSyntaxNodeKind kind, const LuaSyntaxTree &t) {
+    auto count = 0;
+    for (auto child = GetFirstChild(t); !child.IsNull(t); child.ToNext(t)) {
+        if (child.GetSyntaxKind(t) == kind) {
+            count++;
+        }
+    }
+    return count;
+}

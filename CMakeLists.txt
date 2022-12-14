@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 option(BuildAsLuaLib "Build for lua dll" OFF)
 option(BuildCodeFormat "Build CodeFormat" OFF)
-option(BuildCodeFormatServer "Build CodeFormatServer" OFF)
+option(BuildCodeFormatServer "Build CodeFormatServer" ON)
 option(EnableTest "Test project" ON)
 
 if(APPLE)

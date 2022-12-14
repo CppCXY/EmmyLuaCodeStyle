@@ -31,6 +31,6 @@
 out
 3rd/uriparser/src/config.h
 .idea
-.vscode
+.lsp
 cmake-build-debug
 cmake-build-debug-visual-studio

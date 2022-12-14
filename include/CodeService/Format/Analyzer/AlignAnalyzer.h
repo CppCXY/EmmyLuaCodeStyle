@@ -24,6 +24,8 @@ private:
 
     void AnalyzeParamList(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
+    void AnalyzeIfStatement(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
+
     void ResolveAlignGroup(FormatBuilder &f, std::size_t groupIndex, AlignGroup &group, const LuaSyntaxTree &t);
 
     std::vector<AlignGroup> _alignGroup;

@@ -1,7 +1,9 @@
-#include "CodeFormatServer/Session/SocketIOSession.h"
+#include "SocketIOSession.h"
 #include <iostream>
-#include "CodeFormatServer/Protocol/ProtocolParser.h"
-#include "CodeFormatServer/Protocol/ProtocolBuffer.h"
+#include "Protocol/ProtocolParser.h"
+#include "Protocol/ProtocolBuffer.h"
+#include "LanguageServer.h"
+
 using namespace asio::ip;
 
 SocketIOSession::SocketIOSession(asio::ip::tcp::socket&& socket)
@@ -9,9 +11,10 @@ SocketIOSession::SocketIOSession(asio::ip::tcp::socket&& socket)
 {
 }
 
-int SocketIOSession::Run(asio::io_context& ioc)
+int SocketIOSession::Run(LanguageServer& server)
 {
-	IOSession::Run(ioc);
+    auto &ioc = server.GetIOContext();
+	IOSession::Run(server);
 	while (true)
 	{
 		do
@@ -44,9 +47,9 @@ int SocketIOSession::Run(asio::io_context& ioc)
 			auto parser = std::make_shared<ProtocolParser>();
 			parser->Parse(content);
 			_protocolBuffer.Reset();
-			asio::post(ioc, [this, parser]()
+			asio::post(ioc, [this, parser, &server]()
 			{
-				std::string result = Handle(parser);
+				std::string result = Handle(server, parser);
 
 				if (!result.empty())
 				{

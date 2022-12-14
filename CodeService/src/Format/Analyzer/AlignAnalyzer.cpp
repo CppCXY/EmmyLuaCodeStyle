@@ -37,6 +37,12 @@ void AlignAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     }
                     break;
                 }
+                case LuaSyntaxNodeKind::IfStatement: {
+                    if (f.GetStyle().align_if_branch) {
+                        AnalyzeIfStatement(f, syntaxNode, t);
+                    }
+                }
+
 //                case LuaSyntaxNodeKind::ExpressionStatement: {
 //                    if (f.GetStyle().align_chained_expression_statement) {
 //                    }
@@ -269,4 +275,14 @@ void AlignAnalyzer::AnalyzeParamList(FormatBuilder &f, LuaSyntaxNode &syntaxNode
         }
     }
     PushAlignGroup(AlignStrategy::AlignToFirst, group);
+}
+
+void AlignAnalyzer::AnalyzeIfStatement(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    // maybe keyword
+//    auto elseif_ = syntaxNode.GetChildToken(TK_ELSEIF, t);
+//    if (elseif_.IsToken(t)) {
+//
+//    } else { // not elseif
+////        auto ifExpr = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::BinaryExpression, t);
+//    }
 }

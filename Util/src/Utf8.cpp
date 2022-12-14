@@ -100,3 +100,20 @@ std::size_t utf8::Utf8nLenAtFirstLine(const char *source, std::size_t byteNum) {
     }
     return length;
 }
+
+std::size_t utf8::Utf8OneCharLen(const char *source) {
+    if (0xf0 == (0xf8 & *source)) {
+        // 4-byte utf8 code point (began with 0b11110xxx)
+        return 4;
+    } else if (0xe0 == (0xf0 & *source)) {
+        // 3-byte utf8 code point (began with 0b1110xxxx)
+        return 3;
+    } else if (0xc0 == (0xe0 & *source)) {
+        // 2-byte utf8 code point (began with 0b110xxxxx)
+        return 2;
+    } else {
+        // if (0x00 == (0x80 & *s)) {
+        // 1-byte ascii (began with 0b0xxxxxxx)
+        return 1;
+    }
+}

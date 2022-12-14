@@ -17,48 +17,39 @@ target_include_directories(CodeFormatServer PUBLIC
 target_compile_options(CodeFormatServer PUBLIC -DASIO_STANDALONE)
 
 target_sources(CodeFormatServer
-	PUBLIC
-	${LuaCodeStyle_SOURCE_DIR}/include/CodeFormatServer/Session/IOSession.h
-	${LuaCodeStyle_SOURCE_DIR}/include/CodeFormatServer/Session/SocketIOSession.h
-	${LuaCodeStyle_SOURCE_DIR}/include/CodeFormatServer/Session/StandardIOSession.h
-
-	${LuaCodeStyle_SOURCE_DIR}/include/CodeFormatServer/Protocol/ProtocolParser.h
-
-	${LuaCodeStyle_SOURCE_DIR}/include/CodeFormatServer/LanguageService.h
-	${LuaCodeStyle_SOURCE_DIR}/include/CodeFormatServer/LanguageClient.h
-
 	PRIVATE
-	${CodeFormatServer_SOURCE_DIR}/src/CodeFormatServer.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/LanguageClient.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/LanguageService.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/VirtualFile/VirtualFile.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/main.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/LanguageServer.cpp
+
+	#LSP
+	${CodeFormatServer_SOURCE_DIR}/src/LSP/LSP.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/LSP/LSPHandle.cpp
+	#Session
 	${CodeFormatServer_SOURCE_DIR}/src/Session/IOSession.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Session/SocketIOSession.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Session/StandardIOSession.cpp
-
 	#protocol
-	${CodeFormatServer_SOURCE_DIR}/src/Protocol/ProtocolParser.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/Protocol/ProtocolBuffer.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/Session/Protocol/ProtocolParser.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/Session/Protocol/ProtocolBuffer.cpp
 
-	${CodeFormatServer_SOURCE_DIR}/src/VSCode.cpp
-	
-	#Service/indexs
-	${CodeFormatServer_SOURCE_DIR}/src/Service/Indexs/ModuleIndex.cpp
+	#vfs
+	${CodeFormatServer_SOURCE_DIR}/src/VFS/VirtualFile.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/VFS/VirtualFileSystem.cpp
 
-	#Service/indexs/Config
-	${CodeFormatServer_SOURCE_DIR}/src/Service/Indexs/Config/ModuleConfig.cpp
+	#DB
+	${CodeFormatServer_SOURCE_DIR}/src/DB/FileDB.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/DB/UriDB.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/DB/LineIndexDB.cpp
 
-	#Service/AstUtil
-	${CodeFormatServer_SOURCE_DIR}/src/Service/AstUtil/ModuleFinder.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/Service/AstUtil/AstPattern.cpp
+	#lib
+	${CodeFormatServer_SOURCE_DIR}/src/Lib/LineIndex/LineIndex.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/Lib/LineIndex/LineTypes.cpp
 
 	#service
 	${CodeFormatServer_SOURCE_DIR}/src/Service/Service.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/Service/ModuleService.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/Service/CodeFormatService.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/Service/CompletionService.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/Service/CommandService.cpp
-	${CodeFormatServer_SOURCE_DIR}/src/Service/CodeActionService.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/Service/FormatService.cpp
+#	${CodeFormatServer_SOURCE_DIR}/src/Service/CommandService.cpp
+#	${CodeFormatServer_SOURCE_DIR}/src/Service/CodeActionService.cpp
 
 	# mimalloc
 	${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.3/src/static.c

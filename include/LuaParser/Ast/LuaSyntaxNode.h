@@ -76,6 +76,10 @@ public:
     LuaSyntaxNode GetLastToken(const LuaSyntaxTree &t) const;
 
     std::size_t GetFirstLineWidth(const LuaSyntaxTree &t) const;
+
+    std::size_t CountTokenChild(LuaTokenKind kind, const LuaSyntaxTree &t);
+
+    std::size_t CountNodeChild(LuaSyntaxNodeKind kind, const LuaSyntaxTree &t);
 private:
     std::size_t _index;
 };

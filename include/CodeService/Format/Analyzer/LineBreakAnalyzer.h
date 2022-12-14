@@ -20,13 +20,6 @@ public:
 
     void MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, LineBreakStrategy strategy);
 private:
-//    void BreakAnalyze(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t length);
-//
-//    void AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
-//
-//    void AnalyzeTableFieldList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
-//
-//    void AnalyzeCallList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
 
     void AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
 
