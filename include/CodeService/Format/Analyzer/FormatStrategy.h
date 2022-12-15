@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <vector>
+#include "CodeService/Config/LuaStyleEnum.h"
 
 enum class NextSpaceStrategy {
     None,
@@ -58,24 +59,44 @@ enum class LineBreakStrategy {
 };
 
 struct LineBreakData {
-    LineBreakData() : Strategy(LineBreakStrategy::Standard) {
-        Data.Line = 1;
+    LineBreakData() : Strategy(LineBreakStrategy::Standard), Data() {
     }
 
     explicit LineBreakData(std::size_t line)
-            : Strategy(LineBreakStrategy::Standard) {
-        Data.Line = line;
+            : Strategy(LineBreakStrategy::Standard),
+              Data(LineSpace(LineSpaceType::Fixed, line)) {
+    }
+
+    explicit LineBreakData(LineSpace lineSpace)
+            : Strategy(LineBreakStrategy::Standard),
+              Data(LineSpace(lineSpace)) {
     }
 
     LineBreakData(LineBreakStrategy strategy, std::size_t index)
-            : Strategy(strategy) {
-        Data.Index = index;
+            : Strategy(strategy),
+              Data(index) {
     }
 
 
     LineBreakStrategy Strategy;
+
     union BreakData {
-        std::size_t Line;
+        BreakData()
+                : Line() {
+
+        }
+
+        explicit BreakData(LineSpace line)
+                : Line(line) {
+
+        }
+
+        explicit BreakData(std::size_t index)
+                : Index(index) {
+
+        }
+
+        LineSpace Line;
         std::size_t Index;
     } Data;
 };

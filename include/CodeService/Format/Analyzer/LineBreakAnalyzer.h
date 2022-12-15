@@ -16,6 +16,8 @@ public:
 
     void BreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t line = 1);
 
+    void BreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t, LineSpace lineSpace);
+
     void BreakBefore(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t line = 1);
 
     void MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, LineBreakStrategy strategy);

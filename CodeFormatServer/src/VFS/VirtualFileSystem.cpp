@@ -202,5 +202,3 @@ FileDB &VirtualFileSystem::GetFileDB() {
 LineIndexDB &VirtualFileSystem::GetLineIndexDB() {
     return _lineIndexDB;
 }
-
-

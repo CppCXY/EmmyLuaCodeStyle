@@ -6,16 +6,17 @@
 
 int main() {
     std::string buffer = R"(
-function f()
+local PlayerPrefs = require 'PlayerPrefs'
+local PlayerPrefsDefine = require 'PlayerPrefsDefine'
+local CommonSettingUi = require 'CommonSettingUi'
+local PerformSwitchManager = require 'PerformSwitchManager'
+local MapShowDataManager = require 'MapShowDataManager'
+require("mobdebug.test23.test")
+-- GameAudioUtils
+---@type MapMiddleware
+local MapMiddleware
 
-
-end
-
-function f22()
-
-    local t = 12313 --12313
-
-end
+local EnableLog = false
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -27,10 +28,11 @@ end
 
     LuaSyntaxTree t;
     t.BuildTree(p);
+    std::cout<<t.GetDebugView()<<std::endl;
+
     LuaStyle s;
     FormatBuilder b(s);
     b.FormatAnalyze(t);
-    std::cout<<t.GetDebugView()<<std::endl;
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;
     return 0;

@@ -15,30 +15,77 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
         if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {
                 case LuaSyntaxNodeKind::Block: {
+                    auto children = syntaxNode.GetChildren(t);
                     if (syntaxNode.GetParent(t).IsSingleLineNode(t)) {
-                        if (syntaxNode.GetChildren(t).size() == 1) {
+                        if (children.size() == 1) {
                             auto spaceAnalyzer = f.GetAnalyzer<SpaceAnalyzer>();
                             spaceAnalyzer->SpaceAround(syntaxNode, t);
                             continue;
                         }
+                    } else if (children.empty()) {
+                        auto end = syntaxNode.GetParent(t).GetChildToken(TK_END, t);
+                        auto prev = end.GetPrevToken(t);
+                        BreakAfter(prev, t, LineSpace(LineSpaceType::Max, 2));
+                        continue;
                     }
                     BreakBefore(syntaxNode, t);
                     BreakAfter(syntaxNode, t);
 
-                    for (auto stmt: syntaxNode.GetChildren(t)) {
+                    auto &style = f.GetStyle();
+                    for (auto stmt: children) {
                         if (stmt.IsNode(t)) {
                             switch (stmt.GetSyntaxKind(t)) {
                                 case LuaSyntaxNodeKind::LocalStatement:
                                 case LuaSyntaxNodeKind::AssignStatement: {
-                                    BreakAfter(stmt, t);
+                                    BreakAfter(stmt, t, style.line_space_after_local_or_assign_statement);
+                                    break;
                                 }
-
-
+                                case LuaSyntaxNodeKind::IfStatement: {
+                                    BreakAfter(stmt, t, style.line_space_after_if_statement);
+                                    break;
+                                }
+                                case LuaSyntaxNodeKind::DoStatement: {
+                                    BreakAfter(stmt, t, style.line_space_after_do_statement);
+                                    break;
+                                }
+                                case LuaSyntaxNodeKind::WhileStatement: {
+                                    BreakAfter(stmt, t, style.line_space_after_while_statement);
+                                    break;
+                                }
+                                case LuaSyntaxNodeKind::RepeatStatement: {
+                                    BreakAfter(stmt, t, style.line_space_after_repeat_statement);
+                                    break;
+                                }
+                                case LuaSyntaxNodeKind::ForStatement: {
+                                    BreakAfter(stmt, t, style.line_space_after_for_statement);
+                                    break;
+                                }
+                                case LuaSyntaxNodeKind::FunctionStatement: {
+                                    BreakAfter(stmt, t, style.line_space_after_function_statement);
+                                    break;
+                                }
+                                case LuaSyntaxNodeKind::ExpressionStatement: {
+                                    BreakAfter(stmt, t, style.line_space_after_expression_statement);
+                                    break;
+                                }
+                                default: {
+                                    BreakAfter(stmt, t, LineSpace(LineSpaceType::Keep));
+                                    break;
+                                }
                             }
                         } else {
-
+                            switch (stmt.GetTokenKind(t)) {
+                                case TK_SHORT_COMMENT:
+                                case TK_LONG_STRING:
+                                case TK_SHEBANG: {
+                                    BreakAfter(stmt, t, style.line_space_after_comment);
+                                    break;
+                                }
+                                default: {
+                                    BreakAfter(stmt, t);
+                                }
+                            }
                         }
-                        BreakAfter(stmt, t);
                     }
                     break;
                 }
@@ -113,8 +160,7 @@ LineBreakAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaS
                 auto nextLine = nextToken.GetStartLine(t);
                 // 既然已经打断那就算了
                 if (nextLine > currentLine) {
-                    resolve.SetNextLineBreak(nextLine - currentLine);
-                    return;
+                    resolve.SetNextLineBreak(LineSpace(nextLine - currentLine));
                 }
             }
         }
@@ -135,7 +181,7 @@ LineBreakAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaS
                 auto relationNode = LuaSyntaxNode(lineBreakData.Data.Index);
                 auto guessLineWidth = lineWidth + syntaxNode.GetFirstLineWidth(t) + relationNode.GetFirstLineWidth(t);
                 if (guessLineWidth > style.max_line_length) {
-                    resolve.SetNextLineBreak(1);
+                    resolve.SetNextLineBreak(LineSpace(1));
                     return;
                 }
                 break;
@@ -148,6 +194,13 @@ void LineBreakAnalyzer::BreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t, std:
     auto token = n.GetLastToken(t);
     if (token.IsToken(t)) {
         _lineBreaks[token.GetIndex()] = LineBreakData(line);
+    }
+}
+
+void LineBreakAnalyzer::BreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t, LineSpace lineSpace) {
+    auto token = n.GetLastToken(t);
+    if (token.IsToken(t)) {
+        _lineBreaks[token.GetIndex()] = LineBreakData(lineSpace);
     }
 }
 
@@ -201,7 +254,7 @@ void LineBreakAnalyzer::AnalyzeSuffixedExpr(FormatBuilder &f, LuaSyntaxNode &exp
 
 void LineBreakAnalyzer::MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, LineBreakStrategy strategy) {
     auto prevToken = n.GetPrevToken(t);
-    if (prevToken.IsToken(t) && !_lineBreaks.contains(prevToken.GetIndex())) {
+    if (prevToken.IsToken(t) && !_lineBreaks.count(prevToken.GetIndex())) {
         _lineBreaks[prevToken.GetIndex()] = LineBreakData(strategy, n.GetIndex());
     }
 }
@@ -269,3 +322,4 @@ void LineBreakAnalyzer::AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode &expr, const
         }
     }
 }
+

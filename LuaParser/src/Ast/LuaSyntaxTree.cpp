@@ -372,5 +372,7 @@ std::string LuaSyntaxTree::GetDebugView() {
 }
 
 bool LuaSyntaxTree::IsEatAllComment(LuaSyntaxNodeKind kind) const {
-    return kind == LuaSyntaxNodeKind::Block || kind == LuaSyntaxNodeKind::TableFieldList;
+    return kind == LuaSyntaxNodeKind::Block
+    || kind == LuaSyntaxNodeKind::TableFieldList
+    || kind == LuaSyntaxNodeKind::File;
 }

@@ -34,8 +34,8 @@ void FormatResolve::Reset() {
     _nextSpaceStrategy = NextSpaceStrategy::None;
     _prevSpaceStrategy = PrevSpaceStrategy::None;
     _indentStrategy = IndentStrategy::None;
-    _nextSpaceData.Space = 0;
-    _prevSpaceData.Align = 0;
+    _nextSpaceData = NextData();
+    _prevSpaceData = PrevData();
     _indent = 0;
 }
 
@@ -48,11 +48,11 @@ std::size_t FormatResolve::GetNextSpace() {
     return _nextSpaceData.Space;
 }
 
-std::size_t FormatResolve::GetNextLine() {
+LineSpace FormatResolve::GetNextLine() {
     return _nextSpaceData.Line;
 }
 
-void FormatResolve::SetNextLineBreak(std::size_t line) {
+void FormatResolve::SetNextLineBreak(LineSpace line) {
     _nextSpaceStrategy = NextSpaceStrategy::LineBreak;
     _nextSpaceData.Line = line;
 }

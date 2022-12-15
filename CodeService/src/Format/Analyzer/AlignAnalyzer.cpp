@@ -222,10 +222,12 @@ AlignAnalyzer::ResolveAlignGroup(FormatBuilder &f, std::size_t groupIndex, Align
             for (auto i: group.SyntaxGroup) {
                 auto node = LuaSyntaxNode(i);
                 auto eq = node.GetChildToken('=', t);
-                auto diff = eq.GetTextRange(t).StartOffset - eq.GetPrevToken(t).GetTextRange(t).EndOffset;
-                if (diff > 2) {
-                    allowAlign = true;
-                    break;
+                if (eq.IsToken(t)) {
+                    auto diff = eq.GetTextRange(t).StartOffset - eq.GetPrevToken(t).GetTextRange(t).EndOffset;
+                    if (diff > 2) {
+                        allowAlign = true;
+                        break;
+                    }
                 }
             }
             if (allowAlign) {
@@ -233,12 +235,14 @@ AlignAnalyzer::ResolveAlignGroup(FormatBuilder &f, std::size_t groupIndex, Align
                 for (auto i: group.SyntaxGroup) {
                     auto node = LuaSyntaxNode(i);
                     auto eq = node.GetChildToken('=', t);
-                    auto prev = eq.GetPrevToken(t);
-                    auto newPos = prev.GetTextRange(t).EndOffset + 2 - node.GetTextRange(t).StartOffset;
-                    if (newPos > maxDis) {
-                        maxDis = newPos;
+                    if (eq.IsToken(t)) {
+                        auto prev = eq.GetPrevToken(t);
+                        auto newPos = prev.GetTextRange(t).EndOffset + 2 - node.GetTextRange(t).StartOffset;
+                        if (newPos > maxDis) {
+                            maxDis = newPos;
+                        }
+                        _resolveGroupIndex[eq.GetIndex()] = groupIndex;
                     }
-                    _resolveGroupIndex[eq.GetIndex()] = groupIndex;
                 }
                 group.AlignPos = maxDis;
             }

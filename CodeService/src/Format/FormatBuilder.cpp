@@ -63,23 +63,22 @@ std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
 
     if (!_formattedText.empty()) {
         auto endChar = _formattedText.back();
-        if (_style.insert_final_newline) {
-            if (endChar != '\r' && endChar != '\n') {
-                WriteLine(1);
-            }
-        } else {
-            if (endChar == '\r' || endChar == '\n') {
-                auto lastIndex = _formattedText.size();
-                std::size_t reduce = 0;
-                while (_formattedText[lastIndex - reduce - 1] == '\r'
-                       || _formattedText[lastIndex - reduce - 1] == '\n') {
-                    reduce++;
-                    if (lastIndex <= reduce + 1) {
-                        break;
-                    }
+        // trim end new line
+        if (endChar == '\r' || endChar == '\n') {
+            auto lastIndex = _formattedText.size();
+            std::size_t reduce = 0;
+            while (_formattedText[lastIndex - reduce - 1] == '\r'
+                   || _formattedText[lastIndex - reduce - 1] == '\n') {
+                reduce++;
+                if (lastIndex <= reduce + 1) {
+                    break;
                 }
-                _formattedText.resize(lastIndex - reduce);
             }
+            _formattedText.resize(lastIndex - reduce);
+        }
+
+        if (_style.insert_final_newline) {
+            WriteLine(1);
         }
     }
 
@@ -303,7 +302,56 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 break;
             }
             case NextSpaceStrategy::LineBreak: {
-                WriteLine(resolve.GetNextLine());
+                auto lineSpace = resolve.GetNextLine();
+                switch (lineSpace.Type) {
+                    case LineSpaceType::Fixed: {
+                        WriteLine(lineSpace.Space);
+                        break;
+                    }
+                    case LineSpaceType::Keep: {
+                        auto nextToken = syntaxNode.GetNextToken(t);
+                        if (nextToken.IsToken(t)) {
+                            auto currentLine = syntaxNode.GetEndLine(t);
+                            auto nextLine = nextToken.GetStartLine(t);
+                            if (nextLine > currentLine) {
+                                WriteLine(nextLine - currentLine);
+                                return;
+                            }
+                        }
+                        break;
+                    }
+                    case LineSpaceType::Max: {
+                        auto nextToken = syntaxNode.GetNextToken(t);
+                        if (nextToken.IsToken(t)) {
+                            auto currentLine = syntaxNode.GetEndLine(t);
+                            auto nextLine = nextToken.GetStartLine(t);
+                            if (nextLine > currentLine) {
+                                auto line = nextLine - currentLine;
+                                if (line > lineSpace.Space) {
+                                    line = lineSpace.Space;
+                                }
+                                WriteLine(line);
+                                return;
+                            }
+                        }
+                        break;
+                    }
+                    case LineSpaceType::Min: {
+                        auto nextToken = syntaxNode.GetNextToken(t);
+                        if (nextToken.IsToken(t)) {
+                            auto currentLine = syntaxNode.GetEndLine(t);
+                            auto nextLine = nextToken.GetStartLine(t);
+                            if (nextLine > currentLine) {
+                                auto line = nextLine - currentLine;
+                                if (line < lineSpace.Space) {
+                                    line = lineSpace.Space;
+                                }
+                                WriteLine(line);
+                                return;
+                            }
+                        }
+                    }
+                }
                 break;
             }
             default: {
@@ -328,6 +376,18 @@ void FormatBuilder::WriteSpace(std::size_t space) {
 void FormatBuilder::WriteLine(std::size_t line) {
     if (line == 0) {
         return;
+    }
+    // trim end space
+    auto lastIndex = _formattedText.size();
+    std::size_t reduce = 0;
+    while (_formattedText[lastIndex - reduce - 1] == ' ') {
+        reduce++;
+        if (lastIndex <= reduce + 1) {
+            break;
+        }
+    }
+    if (reduce > 0) {
+        _formattedText.resize(_formattedText.size() - reduce);
     }
     auto endOfLine = _style.detect_end_of_line ?
                      _fileEndOfLine : _style.end_of_line;

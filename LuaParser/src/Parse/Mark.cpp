@@ -26,6 +26,13 @@ CompleteMarker Marker::Complete(LuaParser &p, LuaSyntaxNodeKind kind) {
     return CompleteMarker(0, 0, LuaSyntaxNodeKind::None);
 }
 
+void Marker::Undo(LuaParser &p) {
+    auto &events = p.GetEvents();
+    if (Pos < events.size()) {
+        events[Pos].U.Start.Kind = LuaSyntaxNodeKind::None;
+    }
+}
+
 CompleteMarker::CompleteMarker()
         : Start(0),
           Finish(0),

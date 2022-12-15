@@ -47,10 +47,10 @@ public:
 class Position : public Serializable
 {
 public:
-	Position(uint64_t _line = 0, uint64_t _character = 0);
+	Position(std::size_t _line = 0, std::size_t _character = 0);
 
-	uint64_t line;
-	uint64_t character;
+	std::size_t line;
+	std::size_t character;
 
 	nlohmann::json Serialize() override;
 	void Deserialize(nlohmann::json json) override;

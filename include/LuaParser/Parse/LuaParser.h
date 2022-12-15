@@ -122,7 +122,7 @@ private:
 
 	void Check(LuaTokenKind c);
 
-    void PrimaryExpression();
+    CompleteMarker PrimaryExpression();
 
 	UnOpr GetUnaryOperator(LuaTokenKind op);
 

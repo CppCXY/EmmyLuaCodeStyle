@@ -47,6 +47,8 @@ public:
 
     bool IsNull(const LuaSyntaxTree &t) const;
 
+    bool IsEmpty(const LuaSyntaxTree &t) const;
+
     std::vector<LuaSyntaxNode> GetDescendants(const LuaSyntaxTree &t) const;
 
     std::vector<LuaSyntaxNode> GetChildren(const LuaSyntaxTree &t) const;

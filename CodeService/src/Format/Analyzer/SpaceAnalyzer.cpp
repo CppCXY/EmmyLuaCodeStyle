@@ -11,23 +11,30 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
     for (auto syntaxNode: t.GetSyntaxNodes()) {
         if (syntaxNode.IsToken(t)) {
             switch (syntaxNode.GetTokenKind(t)) {
+                // math operator
                 case '+':
                 case '*':
                 case '/':
                 case '%':
-                case '=':
                 case '&':
                 case '^':
-                case TK_AND:
-                case TK_OR:
                 case TK_SHL:
                 case TK_SHR:
+                case TK_IDIV: {
+                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_math_operator ? 1 : 0, false);
+                    break;
+                }
+                case TK_CONCAT: {
+                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_concat_operator ? 1 : 0, false);
+                    break;
+                }
+                case '=':
+                case TK_AND:
+                case TK_OR:
                 case TK_GE:
                 case TK_LE:
                 case TK_NE:
                 case TK_EQ:
-                case TK_IDIV:
-                case TK_CONCAT:
                 case TK_IN: {
                     SpaceAround(syntaxNode, t, 1, false);
                     break;
@@ -58,7 +65,11 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     }
                     break;
                 }
-                case ',':
+                case ',': {
+                    SpaceLeft(syntaxNode, t, 0);
+                    SpaceRight(syntaxNode, t, f.GetStyle().space_after_comma ? 1 : 0, false);
+                    break;
+                }
                 case ';': {
                     SpaceLeft(syntaxNode, t, 0);
                     SpaceRight(syntaxNode, t, 1);
@@ -74,8 +85,11 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     SpaceRight(syntaxNode, t);
                     break;
                 }
-                case TK_THEN: {
-                    SpaceLeft(syntaxNode, t);
+                case TK_THEN:
+                case TK_DO:
+                case TK_UNTIL:
+                case TK_WHILE: {
+                    SpaceAround(syntaxNode, t);
                     break;
                 }
                 case '.':
@@ -206,6 +220,38 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     }
                     break;
                 }
+                case LuaSyntaxNodeKind::ForNumber: {
+                    auto commas = syntaxNode.GetChildTokens(',', t);
+                    for (auto comma: commas) {
+                        SpaceRight(
+                                comma, t,
+                                f.GetStyle().space_after_comma_in_for_statement
+                                ? 1 : 0
+                        );
+                    }
+                    break;
+                }
+                case LuaSyntaxNodeKind::ForList: {
+                    auto nameList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::NameDefList, t);
+                    for (auto comma: nameList.GetChildTokens(',', t)) {
+                        SpaceRight(
+                                comma, t,
+                                f.GetStyle().space_after_comma_in_for_statement
+                                ? 1 : 0
+                        );
+                    }
+
+                    auto exprList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+                    for (auto comma: exprList.GetChildTokens(',', t)) {
+                        SpaceRight(
+                                comma, t,
+                                f.GetStyle().space_after_comma_in_for_statement
+                                ? 1 : 0
+                        );
+                    }
+                    break;
+                }
+
                 default: {
                     break;
                 }

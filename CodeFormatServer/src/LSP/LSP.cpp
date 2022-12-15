@@ -1,11 +1,10 @@
 #include "LSP.h"
 
-
 lsp::Serializable::~Serializable()
 {
 }
 
-lsp::Position::Position(uint64_t _line, uint64_t _character)
+lsp::Position::Position(std::size_t _line, std::size_t _character)
 	: line(_line),
 	  character(_character)
 {

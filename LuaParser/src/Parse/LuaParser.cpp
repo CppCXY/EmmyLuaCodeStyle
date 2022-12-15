@@ -421,13 +421,8 @@ void LuaParser::GotoStatement() {
     m.Complete(*this, LuaSyntaxNodeKind::GotoStatement);
 }
 
-/* stat -> func | assignment */
-/*
- * 以上是lua定义
- * 以下是修改定义
- * exprstat -> func
- * assignment -> varList '=' exprList
- */
+// exprStat -> call | assignment
+// assignment -> varList '=' exprList
 void LuaParser::ExpressionStatement() {
     auto m = Mark();
     SuffixedExpression();
@@ -721,7 +716,8 @@ void LuaParser::ParamList() {
 	 primaryexp { '.' NAME | '[' exp ']' | ':' NAME funcargs | funcargs }+ */
 CompleteMarker LuaParser::SuffixedExpression() {
     auto m = Mark();
-    PrimaryExpression();
+    auto cm = PrimaryExpression();
+    bool suffix = false;
     for (;;) {
         switch (Current()) {
             case '.': {
@@ -747,10 +743,15 @@ CompleteMarker LuaParser::SuffixedExpression() {
             default:
                 goto endLoop;
         }
+        suffix = true;
     }
     endLoop:
-
-    return m.Complete(*this, LuaSyntaxNodeKind::SuffixedExpression);
+    if (suffix) {
+        return m.Complete(*this, LuaSyntaxNodeKind::SuffixedExpression);
+    } else {
+        m.Undo(*this);
+        return cm;
+    }
 }
 
 void LuaParser::FunctionCallArgs() {
@@ -856,24 +857,23 @@ void LuaParser::Check(LuaTokenKind c) {
 }
 
 /* primaryexp -> NAME | '(' expr ')' */
-void LuaParser::PrimaryExpression() {
+CompleteMarker LuaParser::PrimaryExpression() {
     auto m = Mark();
     switch (Current()) {
         case '(': {
             Next();
             Expression();
             CheckAndNext(')');
-            m.Complete(*this, LuaSyntaxNodeKind::ParExpression);
-            break;
+            return m.Complete(*this, LuaSyntaxNodeKind::ParExpression);
         }
         case TK_NAME: {
             Next();
-            m.Complete(*this, LuaSyntaxNodeKind::NameExpression);
-            break;
+            return m.Complete(*this, LuaSyntaxNodeKind::NameExpression);
         }
         default:
             ThrowLuaError("unexpected symbol");
     }
+    return CompleteMarker();
 }
 
 UnOpr LuaParser::GetUnaryOperator(LuaTokenKind op) {

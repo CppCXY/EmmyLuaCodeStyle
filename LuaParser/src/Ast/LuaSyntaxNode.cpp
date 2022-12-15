@@ -170,31 +170,36 @@ bool LuaSyntaxNode::IsSingleLineNode(const LuaSyntaxTree &t) const {
 }
 
 LuaSyntaxNode LuaSyntaxNode::GetNextToken(const LuaSyntaxTree &t) const {
-    auto p = *this;
-    auto next = p.GetNextSibling(t);
-    while (next.IsNull(t) && !p.IsNull(t)) {
-        p = p.GetParent(t);
-        next = p.GetNextSibling(t);
+    if (_index == 0) {
+        return *this;
+    }
+    auto &children = t.GetSyntaxNodes();
+    if (children.empty()) {
+        return *this;
+    }
+    auto endIndex = children.back().GetIndex();
+
+    for (auto n = _index + 1; n <= endIndex; n++) {
+        if (t.IsToken(n)) {
+            return LuaSyntaxNode(n);
+        }
     }
 
-    if (!next.IsNull(t)) {
-        return next.GetFirstToken(t);
-    }
-    return next;
+    return LuaSyntaxNode(0);
 }
 
 LuaSyntaxNode LuaSyntaxNode::GetPrevToken(const LuaSyntaxTree &t) const {
-    auto p = *this;
-    auto prev = p.GetPrevSibling(t);
-    while (prev.IsNull(t) && !p.IsNull(t)) {
-        p = p.GetParent(t);
-        prev = p.GetPrevSibling(t);
+    if (_index == 0) {
+        return *this;
     }
 
-    if (!prev.IsNull(t)) {
-        return prev.GetLastToken(t);
+    for (auto n = _index - 1; n > 0; n--) {
+        if (t.IsToken(n)) {
+            return LuaSyntaxNode(n);
+        }
     }
-    return prev;
+
+    return LuaSyntaxNode(0);
 }
 
 LuaSyntaxNode LuaSyntaxNode::GetFirstToken(const LuaSyntaxTree &t) const {
@@ -228,4 +233,8 @@ std::size_t LuaSyntaxNode::CountNodeChild(LuaSyntaxNodeKind kind, const LuaSynta
         }
     }
     return count;
+}
+
+bool LuaSyntaxNode::IsEmpty(const LuaSyntaxTree &t) const {
+    return t.GetFirstChild(_index) == 0;
 }

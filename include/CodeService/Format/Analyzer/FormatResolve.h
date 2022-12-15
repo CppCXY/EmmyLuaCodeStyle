@@ -17,7 +17,7 @@ public:
 
     void SetNextSpace(std::size_t space);
 
-    void SetNextLineBreak(std::size_t line);
+    void SetNextLineBreak(LineSpace lineSpace);
 
     void SetIndent(std::size_t indent = 0, IndentStrategy strategy = IndentStrategy::Relative);
 
@@ -29,7 +29,7 @@ public:
 
     std::size_t GetNextSpace();
 
-    std::size_t GetNextLine();
+    LineSpace GetNextLine();
 
     std::size_t GetIndent() const;
 
@@ -42,9 +42,12 @@ private:
     PrevSpaceStrategy _prevSpaceStrategy;
     TokenStrategy _tokenStrategy;
     IndentStrategy _indentStrategy;
+
     union NextData {
+        NextData() : Line() {}
+
         std::size_t Space;
-        std::size_t Line;
+        LineSpace Line;
     } _nextSpaceData;
 
     union PrevData {

@@ -69,8 +69,17 @@ public:
 
     std::size_t space_before_inline_comment = 1;
 
+    // [operator space]
+    bool space_around_math_operator = false;
+
+    bool space_after_comma = true;
+
+    bool space_after_comma_in_for_statement = false;
+
+    bool space_around_concat_operator = true;
+
     // [Align]
-    AlignCallArgs align_call_args = AlignCallArgs::Normal;
+    AlignCallArgs align_call_args = AlignCallArgs::None;
 
     bool align_function_params = true;
 
@@ -92,15 +101,6 @@ public:
 
 	bool never_indent_comment_on_if_branch = false;
 
-//	int max_continuous_line_distance = 1;
-
-//	bool long_chain_expression_allow_one_space_after_colon = false;
-//
-//	bool remove_expression_list_finish_comma = false;
-//
-//	bool remove_empty_header_and_footer_lines_in_function = false;
-    // [preference]
-
     // [line space]
 
 	LineSpace line_space_after_if_statement = LineSpace(LineSpaceType::Keep);
@@ -115,21 +115,18 @@ public:
 
     LineSpace line_space_after_local_or_assign_statement = LineSpace(LineSpaceType::Keep);
 
-    LineSpace line_space_after_function_statement = LineSpace(LineSpaceType::Fixed, 1);
+    LineSpace line_space_after_function_statement = LineSpace(LineSpaceType::Fixed, 2);
 
     LineSpace line_space_after_expression_statement = LineSpace(LineSpaceType::Keep);
 
+    LineSpace line_space_after_comment = LineSpace(LineSpaceType::Keep);
+
+    // [preference]
+	bool long_chain_expression_allow_one_space_after_colon = false;
+
+	bool remove_call_expression_list_finish_comma = false;
+
+	bool remove_empty_header_and_footer_lines_in_function = true;
+
     bool enable_check_code_style = true;
-//
-//	// 命名风格检查
-//	bool enable_name_style_check = false;
-//	std::shared_ptr<NameStyleRuleMatcher> local_name_define_style;
-//	std::shared_ptr<NameStyleRuleMatcher> function_param_name_style;
-//	std::shared_ptr<NameStyleRuleMatcher> function_name_define_style;
-//	std::shared_ptr<NameStyleRuleMatcher> local_function_name_define_style;
-//	std::shared_ptr<NameStyleRuleMatcher> table_field_name_define_style;
-//	std::shared_ptr<NameStyleRuleMatcher> global_variable_name_define_style;
-//	std::shared_ptr<NameStyleRuleMatcher> module_name_define_style;
-//	std::shared_ptr<NameStyleRuleMatcher> require_module_name_style;
-//	std::shared_ptr<NameStyleRuleMatcher> class_name_define_style;
 };
