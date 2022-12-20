@@ -26,6 +26,8 @@ target_sources(CodeService
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/AlignAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/TokenAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/FormatResolve.cpp
+
+        ${CodeService_SOURCE_DIR}/src/Format/Analyzer/SyntaxNodeHelper.cpp
         # typeFormat
 #        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormat.cpp
 #        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp

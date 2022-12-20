@@ -506,3 +506,39 @@ void FormatBuilder::WriteText(std::string_view text) {
         }
     }
 }
+
+std::vector<StyleDiagnostic> FormatBuilder::GetStyleDiagnostic(const LuaSyntaxTree &t) {
+    auto root = t.GetRootNode();
+    std::vector<Traverse> traverseStack;
+    traverseStack.emplace_back(root, TraverseEvent::Enter);
+    // 非递归深度优先遍历
+    FormatResolve resolve;
+    while (!traverseStack.empty()) {
+        Traverse traverse = traverseStack.back();
+        resolve.Reset();
+        if (traverse.Event == TraverseEvent::Enter) {
+            traverseStack.back().Event = TraverseEvent::Exit;
+            for (auto &analyzer: _analyzers) {
+                analyzer->Query(*this, traverse.Node, t, resolve);
+            }
+            auto children = traverse.Node.GetChildren(t);
+            // 不采用 <range>
+            for (auto rIt = children.rbegin(); rIt != children.rend(); rIt++) {
+                traverseStack.emplace_back(*rIt, TraverseEvent::Enter);
+            }
+
+            DoResolve(traverse.Node, t, resolve);
+        } else {
+            traverseStack.pop_back();
+            for (auto &analyzer: _analyzers) {
+                analyzer->ExitQuery(*this, traverse.Node, t, resolve);
+            }
+            ExitResolve(traverse.Node, t, resolve);
+
+            if (!_indentStack.empty()
+                && _indentStack.top().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
+                RecoverIndent();
+            }
+        }
+    }
+}

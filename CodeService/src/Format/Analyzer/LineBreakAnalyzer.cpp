@@ -28,8 +28,6 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                         BreakAfter(prev, t, LineSpace(LineSpaceType::Max, 2));
                         continue;
                     }
-                    BreakBefore(syntaxNode, t);
-                    BreakAfter(syntaxNode, t);
 
                     auto &style = f.GetStyle();
                     for (auto stmt: children) {
@@ -87,6 +85,9 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                             }
                         }
                     }
+
+                    BreakBefore(syntaxNode, t);
+                    BreakAfter(syntaxNode, t);
                     break;
                 }
                 case LuaSyntaxNodeKind::LocalStatement:
@@ -128,6 +129,7 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     if (paramList.IsNode(t)) {
                         AnalyzeNameList(f, paramList, t);
                     }
+
                     break;
                 }
                 case LuaSyntaxNodeKind::ExpressionStatement: {

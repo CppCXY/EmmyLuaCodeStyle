@@ -1,6 +1,7 @@
 #include "CodeService/Format/Analyzer/AlignAnalyzer.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/FormatBuilder.h"
+#include "SyntaxNodeHelper.h"
 
 
 AlignAnalyzer::AlignAnalyzer() {
@@ -71,6 +72,7 @@ void AlignAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const Lua
         auto alignGroupIndex = it->second;
         auto &alignGroup = _alignGroup[alignGroupIndex];
         switch (alignGroup.Strategy) {
+            case AlignStrategy::Normal:
             case AlignStrategy::AlignToEq: {
                 resolve.SetRelativeIndentAlign(alignGroup.AlignPos);
                 break;
@@ -260,6 +262,9 @@ AlignAnalyzer::ResolveAlignGroup(FormatBuilder &f, std::size_t groupIndex, Align
             }
             break;
         }
+        default: {
+            break;
+        }
     }
 }
 
@@ -281,12 +286,56 @@ void AlignAnalyzer::AnalyzeParamList(FormatBuilder &f, LuaSyntaxNode &syntaxNode
     PushAlignGroup(AlignStrategy::AlignToFirst, group);
 }
 
+
 void AlignAnalyzer::AnalyzeIfStatement(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
-    // maybe keyword
-//    auto elseif_ = syntaxNode.GetChildToken(TK_ELSEIF, t);
-//    if (elseif_.IsToken(t)) {
-//
-//    } else { // not elseif
-////        auto ifExpr = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::BinaryExpression, t);
-//    }
+    auto ifExprs = syntaxNode.GetChildSyntaxNodes(LuaSyntaxNodeKind::BinaryExpression, t);
+    std::vector<LuaSyntaxNode> logicOps;
+    for (auto ifExpr: ifExprs) {
+        auto ops = helper::CollectBinaryOperator(ifExpr, t, [](LuaTokenKind kind) {
+            return kind == TK_AND || kind == TK_OR;
+        });
+        for (auto op: ops) {
+            logicOps.push_back(op);
+        }
+    }
+
+    std::size_t alignPos = 0;
+    auto elseifs = syntaxNode.GetChildTokens(TK_ELSEIF, t);
+    if (!elseifs.empty()) {
+        alignPos = 7; // sizeof 'elseif '
+    } else {
+        alignPos = 3; // sizeof 'if '
+        for (auto &n: logicOps) {
+            if (n.GetTokenKind(t) == TK_AND) {
+                alignPos = 4; // sizeof 'and '
+                break;
+            }
+        }
+    }
+
+    std::vector<std::size_t> group;
+    for (auto &n: logicOps) {
+        auto nextToken = n.GetNextToken(t);
+        if (nextToken.IsToken(t)) {
+            group.push_back(nextToken.GetIndex());
+        }
+    }
+    auto if_ = syntaxNode.GetChildToken(TK_IF, t);
+    group.push_back(if_.GetNextToken(t).GetIndex());
+
+    for (auto elseif_: elseifs) {
+        group.push_back(elseif_.GetNextToken(t).GetIndex());
+    }
+
+    PushNormalAlignGroup(alignPos, group);
+}
+
+void AlignAnalyzer::PushNormalAlignGroup(std::size_t alignPos, std::vector<std::size_t> &data) {
+    auto pos = _alignGroup.size();
+    auto &alignGroup = _alignGroup.emplace_back(AlignStrategy::Normal, data);
+    alignGroup.Resolve = true;
+    alignGroup.AlignPos = alignPos;
+    for (auto &n: data) {
+        _resolveGroupIndex[n] = pos;
+    }
 }

@@ -6,17 +6,7 @@
 
 int main() {
     std::string buffer = R"(
-local PlayerPrefs = require 'PlayerPrefs'
-local PlayerPrefsDefine = require 'PlayerPrefsDefine'
-local CommonSettingUi = require 'CommonSettingUi'
-local PerformSwitchManager = require 'PerformSwitchManager'
-local MapShowDataManager = require 'MapShowDataManager'
-require("mobdebug.test23.test")
--- GameAudioUtils
----@type MapMiddleware
-local MapMiddleware
-
-local EnableLog = false
+local t = function () return x() end
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -36,4 +26,4 @@ local EnableLog = false
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;
     return 0;
-}
+}  

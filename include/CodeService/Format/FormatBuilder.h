@@ -14,6 +14,8 @@
 #include "Analyzer/FormatResolve.h"
 #include "CodeService/Config/LuaStyle.h"
 #include "Types.h"
+#include "StyleDiagnostic.h"
+
 
 class FormatBuilder {
 public:
@@ -22,6 +24,8 @@ public:
     void FormatAnalyze(const LuaSyntaxTree &t);
 
     std::string GetFormatResult(const LuaSyntaxTree &t);
+
+    std::vector<StyleDiagnostic> GetStyleDiagnostic(const LuaSyntaxTree &t);
 
     template<class T>
     void AddAnalyzer() {

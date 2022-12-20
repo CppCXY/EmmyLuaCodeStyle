@@ -18,6 +18,13 @@ void TokenAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                     if (f.GetStyle().call_arg_parentheses != CallArgParentheses::Keep) {
                         AnalyzeCallExpression(f, syntaxNode, t);
                     }
+                    if (f.GetStyle().remove_call_expression_list_finish_comma) {
+                        auto exprList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+                        auto last = exprList.GetLastChild(t);
+                        if (last.GetTokenKind(t) == ',') {
+                            Mark(last, t, TokenStrategy::Remove);
+                        }
+                    }
                 }
                 default: {
                     break;

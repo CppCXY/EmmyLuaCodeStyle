@@ -59,6 +59,10 @@ LuaSyntaxNode LuaSyntaxNode::GetFirstChild(const LuaSyntaxTree &t) const {
     return LuaSyntaxNode(t.GetFirstChild(_index));
 }
 
+LuaSyntaxNode LuaSyntaxNode::GetLastChild(const LuaSyntaxTree &t) const {
+    return LuaSyntaxNode(t.GetLastChild(_index));
+}
+
 void LuaSyntaxNode::ToNext(const LuaSyntaxTree &t) {
     _index = t.GetNextSibling(_index);
 }
@@ -126,6 +130,16 @@ LuaSyntaxNode LuaSyntaxNode::GetChildToken(LuaTokenKind kind, const LuaSyntaxTre
     auto child = GetFirstChild(t);
     for (; !child.IsNull(t); child.ToNext(t)) {
         if (child.GetTokenKind(t) == kind) {
+            break;
+        }
+    }
+    return child;
+}
+
+LuaSyntaxNode LuaSyntaxNode::GetChildToken(std::function<bool(LuaTokenKind)> predicated, const LuaSyntaxTree &t) const {
+    auto child = GetFirstChild(t);
+    for (; !child.IsNull(t); child.ToNext(t)) {
+        if (predicated(child.GetTokenKind(t))) {
             break;
         }
     }
@@ -238,3 +252,5 @@ std::size_t LuaSyntaxNode::CountNodeChild(LuaSyntaxNodeKind kind, const LuaSynta
 bool LuaSyntaxNode::IsEmpty(const LuaSyntaxTree &t) const {
     return t.GetFirstChild(_index) == 0;
 }
+
+

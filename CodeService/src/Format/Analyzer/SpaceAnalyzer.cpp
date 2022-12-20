@@ -194,6 +194,12 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
                             }
                         }
                     }
+                    if (f.GetStyle().ignore_space_after_colon) {
+                        auto colon = syntaxNode.GetChildToken(':', t);
+                        if (colon.IsToken(t)) {
+                            SpaceIgnore(colon, t);
+                        }
+                    }
 
                     break;
                 }

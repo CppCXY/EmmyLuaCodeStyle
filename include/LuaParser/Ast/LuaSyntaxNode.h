@@ -43,6 +43,8 @@ public:
 
     LuaSyntaxNode GetFirstChild(const LuaSyntaxTree &t) const;
 
+    LuaSyntaxNode GetLastChild(const LuaSyntaxTree &t) const;
+
     void ToNext(const LuaSyntaxTree &t);
 
     bool IsNull(const LuaSyntaxTree &t) const;
@@ -60,6 +62,8 @@ public:
     LuaSyntaxNode GetChildSyntaxNode(LuaSyntaxMultiKind kind, const LuaSyntaxTree &t) const;
 
     LuaSyntaxNode GetChildToken(LuaTokenKind kind, const LuaSyntaxTree &t) const;
+
+    LuaSyntaxNode GetChildToken(std::function<bool(LuaTokenKind)> predicated, const LuaSyntaxTree &t) const;
 
     std::vector<LuaSyntaxNode> GetChildSyntaxNodes(LuaSyntaxNodeKind kind, const LuaSyntaxTree &t) const;
 

@@ -34,9 +34,9 @@ if(BuildCodeFormat)
 endif()
 
 if(BuildCodeFormatServer)
-	add_subdirectory(CodeFormatServer)
-endif()
 
+endif()
+add_subdirectory(CodeFormatServer)
 
 add_subdirectory(Test2)
 #if(EnableTest)

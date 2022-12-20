@@ -16,6 +16,8 @@ public:
 private:
     void PushAlignGroup(AlignStrategy strategy, std::vector<std::size_t> &data);
 
+    void PushNormalAlignGroup(std::size_t alignPos, std::vector<std::size_t> &data);
+
     void AnalyzeContinuousLocalOrAssign(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
     void AnalyzeContinuousTableField(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);

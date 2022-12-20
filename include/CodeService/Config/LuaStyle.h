@@ -97,7 +97,7 @@ public:
 	/*
 	 * if语句的条件可以无延续行缩进
 	 */
-	bool never_indent_before_if_condition = false;
+	bool never_indent_before_if_condition = true;
 
 	bool never_indent_comment_on_if_branch = false;
 
@@ -122,11 +122,7 @@ public:
     LineSpace line_space_after_comment = LineSpace(LineSpaceType::Keep);
 
     // [preference]
-	bool long_chain_expression_allow_one_space_after_colon = false;
+	bool ignore_space_after_colon = false;
 
 	bool remove_call_expression_list_finish_comma = false;
-
-	bool remove_empty_header_and_footer_lines_in_function = true;
-
-    bool enable_check_code_style = true;
 };
