@@ -27,3 +27,15 @@ struct Traverse {
     LuaSyntaxNode Node;
     TraverseEvent Event;
 };
+
+struct FormatRange {
+    FormatRange()
+            : StartLine(0), StartCol(0),
+              EndLine(0), EndCol(0) {}
+
+    std::size_t StartLine;
+    std::size_t StartCol;
+
+    std::size_t EndLine;
+    std::size_t EndCol;
+};

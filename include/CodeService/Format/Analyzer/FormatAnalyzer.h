@@ -17,7 +17,8 @@ public:
 
     virtual void Analyze(FormatBuilder &f, const LuaSyntaxTree &t) = 0;
 
-    virtual void Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) = 0;
+    virtual void Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) = 0;
 
-    virtual void ExitQuery(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) {};
+    virtual void
+    ExitQuery(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {};
 };

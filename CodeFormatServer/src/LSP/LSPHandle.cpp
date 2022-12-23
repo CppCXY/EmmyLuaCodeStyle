@@ -14,6 +14,7 @@
 #include "Util/Url.h"
 #include "Util/format.h"
 #include "LanguageServer.h"
+#include "CodeService/Format/Types.h"
 
 using namespace std::placeholders;
 
@@ -157,7 +158,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnDidOpen(
 std::shared_ptr<lsp::Serializable> LSPHandle::OnFormatting(
         std::shared_ptr<lsp::DocumentFormattingParams> params) {
     auto result = std::make_shared<lsp::DocumentFormattingResult>();
-    auto& vfs = _server->GetVFS();
+    auto &vfs = _server->GetVFS();
     auto vFile = vfs.GetVirtualFile(params->textDocument.uri);
     if (vFile.IsNull()) {
         result->hasError = true;
@@ -239,7 +240,39 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnRangeFormatting(
 //            lsp::Position(formatRange.EndLine + 1, formatRange.EndCharacter)
 //    );
 //    return result;
-    return nullptr;
+    auto result = std::make_shared<lsp::DocumentFormattingResult>();
+    auto &vfs = _server->GetVFS();
+    auto vFile = vfs.GetVirtualFile(params->textDocument.uri);
+    if (vFile.IsNull()) {
+        result->hasError = true;
+        return result;
+    }
+
+    auto opSyntaxTree = vFile.GetSyntaxTree(vfs);
+    if (!opSyntaxTree.has_value()) {
+        result->hasError = true;
+        return result;
+    }
+
+    auto &syntaxTree = opSyntaxTree.value();
+
+//    auto options = LanguageServer::GetInstance().GetOptions(param->textDocument.uri);
+
+    LuaStyle luaStyle;
+
+    FormatRange range;
+    range.StartLine = params->range.start.line;
+    range.EndLine = params->range.end.line;
+
+    auto newText = _server->GetService<FormatService>()->RangeFormat(syntaxTree, luaStyle, range);
+
+    auto &edit = result->edits.emplace_back();
+    edit.newText = std::move(newText);
+    edit.range = lsp::Range(
+            lsp::Position(range.StartLine, range.StartCol),
+            lsp::Position(range.EndLine + 1, 0)
+    );
+    return result;
 }
 
 std::shared_ptr<lsp::Serializable> LSPHandle::OnTypeFormatting(

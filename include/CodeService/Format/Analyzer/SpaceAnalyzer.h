@@ -22,12 +22,21 @@ public:
     void SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1, bool force = true);
 
     void SpaceIgnore(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+
 private:
     std::optional<std::size_t> GetLeftSpace(LuaSyntaxNode &n) const;
 
     std::optional<std::size_t> GetRightSpace(LuaSyntaxNode &n) const;
 
     std::size_t ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSyntaxNode &left, LuaSyntaxNode &right);
+
+//    void PushDiagnostic(FormatBuilder &f,
+//                        LuaSyntaxNode &node, LuaSyntaxNode &next, const LuaSyntaxTree &t,
+//                        size_t space, size_t shouldSpace,
+//                        DiagnosticResolve& resolve
+//                        );
+//
+//    std::string GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxNode& right, const LuaSyntaxTree& t);
 
     std::unordered_map<std::size_t, std::size_t> _leftSpaces;
     std::unordered_map<std::size_t, std::size_t> _rightSpaces;

@@ -31,40 +31,8 @@ target_sources(CodeService
         # typeFormat
 #        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormat.cpp
 #        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp
-
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/IndentElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/KeepLineElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/MinLineElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/StatementElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/TextElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/OperatorElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/KeyWordElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/SepElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/SpaceElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/FormatElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/LineElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/NoIndentElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/MaxSpaceElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/AlignmentElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/ExpressionElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/StringLiteralElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/FormatContext.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/SerializeContext.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/AlignmentLayoutElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/LongExpressionLayoutElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/AlignToFirstElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/AlignIfLayoutElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/IndentOnLineBreakElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/KeepElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/PlaceholderElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/SubExpressionElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/MaxLineElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/CallArgsListLayoutElement.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/DiagnosisContext.cpp
-#        ${CodeService_SOURCE_DIR}/src/FormatElement/RangeFormatContext.cpp
-#        ${CodeService_SOURCE_DIR}/src/LuaStyle.cpp
-#        ${CodeService_SOURCE_DIR}/src/LuaEditorConfig.cpp
-#        ${CodeService_SOURCE_DIR}/src/LanguageTranslator.cpp
+        # diagnostic
+        ${CodeService_SOURCE_DIR}/src/Diagnostic/StyleDiagnostic.cpp
 #        # nameStyle
 #        ${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleChecker.cpp
 #        ${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleRuleMatcher.cpp
@@ -73,7 +41,6 @@ target_sources(CodeService
 #        ${CodeService_SOURCE_DIR}/src/Spell/CodeSpellChecker.cpp
 #        ${CodeService_SOURCE_DIR}/src/Spell/IdentifyParser.cpp
 #        ${CodeService_SOURCE_DIR}/src/Spell/TextParser.cpp
-#        ${CodeService_SOURCE_DIR}/src/AstUtil.cpp
         )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

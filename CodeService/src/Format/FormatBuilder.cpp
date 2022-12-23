@@ -507,10 +507,21 @@ void FormatBuilder::WriteText(std::string_view text) {
     }
 }
 
-std::vector<StyleDiagnostic> FormatBuilder::GetStyleDiagnostic(const LuaSyntaxTree &t) {
+std::string FormatBuilder::GetRangeFormatResult(FormatRange &range, const LuaSyntaxTree &t) {
+    _formattedText.reserve(t.GetFile().GetSource().size());
     auto root = t.GetRootNode();
     std::vector<Traverse> traverseStack;
-    traverseStack.emplace_back(root, TraverseEvent::Enter);
+    for (auto child: root.GetChildren(t)) {
+        auto childEndLine = child.GetEndLine(t);
+        if (childEndLine >= range.StartLine) {
+            traverseStack.emplace_back(root, TraverseEvent::Enter);
+        }
+        if (childEndLine > range.EndLine) {
+            break;
+        }
+    }
+
+
     // 非递归深度优先遍历
     FormatResolve resolve;
     while (!traverseStack.empty()) {
@@ -527,7 +538,7 @@ std::vector<StyleDiagnostic> FormatBuilder::GetStyleDiagnostic(const LuaSyntaxTr
                 traverseStack.emplace_back(*rIt, TraverseEvent::Enter);
             }
 
-            DoResolve(traverse.Node, t, resolve);
+            DoRangeResolve(range, traverse.Node, t, resolve);
         } else {
             traverseStack.pop_back();
             for (auto &analyzer: _analyzers) {
@@ -538,6 +549,237 @@ std::vector<StyleDiagnostic> FormatBuilder::GetStyleDiagnostic(const LuaSyntaxTr
             if (!_indentStack.empty()
                 && _indentStack.top().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
                 RecoverIndent();
+            }
+        }
+    }
+
+    if (!_formattedText.empty()) {
+        auto endChar = _formattedText.back();
+        // trim end new line
+        if (endChar == '\r' || endChar == '\n') {
+            auto lastIndex = _formattedText.size();
+            std::size_t reduce = 0;
+            while (_formattedText[lastIndex - reduce - 1] == '\r'
+                   || _formattedText[lastIndex - reduce - 1] == '\n') {
+                reduce++;
+                if (lastIndex <= reduce + 1) {
+                    break;
+                }
+            }
+            _formattedText.resize(lastIndex - reduce);
+        }
+
+        if (_style.insert_final_newline) {
+            WriteLine(1);
+        }
+    }
+
+    return _formattedText;
+}
+
+void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode,
+                                   const LuaSyntaxTree &t, FormatResolve &resolve) {
+    if (resolve.GetIndentStrategy() != IndentStrategy::None) {
+        auto indent = resolve.GetIndent();
+        if (indent == 0) {
+            if (_style.indent_style == IndentStyle::Space) {
+                indent = _style.indent_size;
+            } else {
+                indent = _style.tab_width;
+            }
+        }
+
+        switch (resolve.GetIndentStrategy()) {
+            case IndentStrategy::Relative: {
+                AddRelativeIndent(syntaxNode, indent);
+                break;
+            }
+            case IndentStrategy::InvertRelative: {
+                AddInvertIndent(syntaxNode, indent);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    if (syntaxNode.IsToken(t)) {
+        auto tokenEndLine = syntaxNode.GetEndLine(t);
+        if (tokenEndLine < range.StartLine) {
+            return;
+        }
+        auto tokenStartLine = syntaxNode.GetStartLine(t);
+        if (tokenStartLine > range.EndLine) {
+            return;
+        }
+
+        if (tokenStartLine < range.StartLine) {
+            range.StartLine = tokenStartLine;
+            range.StartCol = syntaxNode.GetStartCol(t);
+        }
+        if (tokenEndLine > range.EndLine) {
+            range.EndLine = tokenEndLine;
+        }
+
+        if (!_formattedText.empty()) {
+            auto lastChar = _formattedText.back();
+            if (lastChar == '\n' || lastChar == '\r') {
+                WriteIndent();
+                auto indentAnalyzer = GetAnalyzer<IndentationAnalyzer>();
+                if (indentAnalyzer) {
+                    indentAnalyzer->MarkIndent(syntaxNode, t);
+                }
+            }
+        } else {
+            WriteIndent();
+            auto indentAnalyzer = GetAnalyzer<IndentationAnalyzer>();
+            if (indentAnalyzer) {
+                indentAnalyzer->MarkIndent(syntaxNode, t);
+            }
+        }
+
+        switch (resolve.GetPrevSpaceStrategy()) {
+            case PrevSpaceStrategy::AlignPos: {
+                auto pos = resolve.GetAlign();
+                if (pos > _writeLineWidth) {
+                    auto space = pos - _writeLineWidth;
+                    WriteSpace(space);
+                }
+                break;
+            }
+            case PrevSpaceStrategy::AlignRelativeIndent: {
+                auto relativePos = resolve.GetAlign();
+                auto &indentState = _indentStack.top();
+                auto pos = relativePos + indentState.SpaceSize + indentState.TabSize * _style.tab_width;
+                if (pos > _writeLineWidth) {
+                    auto space = pos - _writeLineWidth;
+                    WriteSpace(space);
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+        switch (resolve.GetTokenStrategy()) {
+            case TokenStrategy::Origin: {
+                WriteSyntaxNode(syntaxNode, t);
+                break;
+            }
+            case TokenStrategy::Remove: {
+                break;
+            }
+            case TokenStrategy::StringSingleQuote: {
+                if (syntaxNode.GetTokenKind(t) == TK_STRING) {
+                    auto text = syntaxNode.GetText(t);
+                    auto del = '\'';
+                    if (text.size() >= 2
+                        && text.front() == '\"'
+                        && !ExistDel(del, text)) {
+                        WriteChar(del);
+                        WriteText(text.substr(1, text.size() - 2));
+                        WriteChar(del);
+                    }
+                }
+                break;
+            }
+            case TokenStrategy::StringDoubleQuote: {
+                if (syntaxNode.GetTokenKind(t) == TK_STRING) {
+                    auto text = syntaxNode.GetText(t);
+                    auto del = '\"';
+                    if (text.size() >= 2
+                        && text.front() == '\''
+                        && !ExistDel(del, text)) {
+                        WriteChar(del);
+                        WriteText(text.substr(1, text.size() - 2));
+                        WriteChar(del);
+                    }
+                }
+                break;
+            }
+            case TokenStrategy::TableSepComma: {
+                WriteChar(',');
+                break;
+            }
+            case TokenStrategy::TableSepSemicolon: {
+                WriteChar(';');
+                break;
+            }
+            case TokenStrategy::TableAddSep: {
+                WriteSyntaxNode(syntaxNode, t);
+                if (_style.table_separator_style == TableSeparatorStyle::Semicolon) {
+                    WriteChar(';');
+                } else {
+                    WriteChar(',');
+                }
+            }
+            default: {
+                break;
+            }
+        }
+
+        switch (resolve.GetNextSpaceStrategy()) {
+            case NextSpaceStrategy::Space: {
+                WriteSpace(resolve.GetNextSpace());
+                break;
+            }
+            case NextSpaceStrategy::LineBreak: {
+                auto lineSpace = resolve.GetNextLine();
+                switch (lineSpace.Type) {
+                    case LineSpaceType::Fixed: {
+                        WriteLine(lineSpace.Space);
+                        break;
+                    }
+                    case LineSpaceType::Keep: {
+                        auto nextToken = syntaxNode.GetNextToken(t);
+                        if (nextToken.IsToken(t)) {
+                            auto currentLine = syntaxNode.GetEndLine(t);
+                            auto nextLine = nextToken.GetStartLine(t);
+                            if (nextLine > currentLine) {
+                                WriteLine(nextLine - currentLine);
+                                return;
+                            }
+                        }
+                        break;
+                    }
+                    case LineSpaceType::Max: {
+                        auto nextToken = syntaxNode.GetNextToken(t);
+                        if (nextToken.IsToken(t)) {
+                            auto currentLine = syntaxNode.GetEndLine(t);
+                            auto nextLine = nextToken.GetStartLine(t);
+                            if (nextLine > currentLine) {
+                                auto line = nextLine - currentLine;
+                                if (line > lineSpace.Space) {
+                                    line = lineSpace.Space;
+                                }
+                                WriteLine(line);
+                                return;
+                            }
+                        }
+                        break;
+                    }
+                    case LineSpaceType::Min: {
+                        auto nextToken = syntaxNode.GetNextToken(t);
+                        if (nextToken.IsToken(t)) {
+                            auto currentLine = syntaxNode.GetEndLine(t);
+                            auto nextLine = nextToken.GetStartLine(t);
+                            if (nextLine > currentLine) {
+                                auto line = nextLine - currentLine;
+                                if (line < lineSpace.Space) {
+                                    line = lineSpace.Space;
+                                }
+                                WriteLine(line);
+                                return;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            default: {
+                break;
             }
         }
     }

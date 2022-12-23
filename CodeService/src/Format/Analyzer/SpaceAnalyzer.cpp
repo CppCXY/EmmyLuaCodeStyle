@@ -1,6 +1,8 @@
 #include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/FormatBuilder.h"
+#include "Util/format.h"
+#include "CodeService/Config/LanguageTranslator.h"
 
 
 SpaceAnalyzer::SpaceAnalyzer() {
@@ -274,7 +276,6 @@ void SpaceAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const Lua
     }
 }
 
-
 void SpaceAnalyzer::SpaceAround(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space, bool force) {
     SpaceLeft(n, t, space, force);
     SpaceRight(n, t, space, force);
@@ -346,4 +347,67 @@ SpaceAnalyzer::ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSyntaxN
 void SpaceAnalyzer::SpaceIgnore(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
     _ignoreSpace.insert(n.GetIndex());
 }
-
+//
+//void SpaceAnalyzer::PushDiagnostic(FormatBuilder &f, LuaSyntaxNode &node, LuaSyntaxNode &next, const LuaSyntaxTree &t,
+//                                   size_t space, size_t shouldSpace, DiagnosticResolve &resolve) {
+//    auto leftOffset = node.GetTextRange(t).EndOffset;
+//    auto rightOffset = next.GetTextRange(t).StartOffset;
+//    int diff = static_cast<int>(rightOffset - leftOffset) - 1;
+//    auto additional = GetAdditionalNote(node, next, t);
+//    switch (shouldSpace) {
+//        case 0: {
+//            resolve.SpaceMessage(util::format(LText("unnecessary whitespace {}"), additional),
+//                                 TextRange(leftOffset, rightOffset));
+//            break;
+//        }
+//        case 1: {
+//            if (diff == 0) {
+//                resolve.SpaceMessage(util::format(LText("missing whitespace {}"), additional),
+//                                     TextRange(leftOffset, rightOffset));
+//            } else {
+//                resolve.SpaceMessage(util::format(LText("multiple spaces {}"), additional),
+//                                     TextRange(leftOffset + 1, rightOffset - 1));
+//            }
+//            break;
+//        }
+//        default: {
+//            if (diff < shouldSpace) {
+//                resolve.SpaceMessage(util::format(LText("expected {} whitespace, found {} {}"),
+//                                                  shouldSpace, diff, additional),
+//                                     TextRange(leftOffset, rightOffset));
+//            } else {
+//                resolve.SpaceMessage(util::format(LText("expected {} whitespace, found {} {}"),
+//                                                  shouldSpace, diff, additional),
+//                                     TextRange(leftOffset + 1, rightOffset - 1));
+//            }
+//        }
+//    }
+//}
+//
+//std::string SpaceAnalyzer::GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxNode &right, const LuaSyntaxTree &t) {
+//    switch(left.GetTokenKind(t)) {
+//        case TK_STRING:
+//        case TK_LONG_STRING:
+//        case TK_LONG_COMMENT:
+//        case TK_SHORT_COMMENT:
+//        case TK_NAME: {
+//            break;
+//        }
+//        default: {
+//            return util::format("after token '{}'", left.GetText(t));
+//        }
+//    }
+//
+//    switch (right.GetTokenKind(t)) {
+//        case TK_STRING:
+//        case TK_LONG_STRING:
+//        case TK_LONG_COMMENT:
+//        case TK_SHORT_COMMENT:
+//        case TK_NAME: {
+//            return "";
+//        }
+//        default: {
+//            return util::format("before token '{}'", left.GetText(t));
+//        }
+//    }
+//}

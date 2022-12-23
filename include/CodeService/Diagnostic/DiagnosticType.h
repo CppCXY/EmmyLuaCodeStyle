@@ -2,12 +2,11 @@
 
 enum class DiagnosticType
 {
-	MaxLineWidth = 0,
+    None,
+    Space,
+	MaxLineWidth,
 	StatementLineSpace,
 	Indent,
-	Align,
-	Blank,
-	EndWithNewLine,
 	NameStyle,
 	Spell
 };

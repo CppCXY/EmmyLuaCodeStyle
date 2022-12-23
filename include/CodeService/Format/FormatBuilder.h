@@ -14,7 +14,6 @@
 #include "Analyzer/FormatResolve.h"
 #include "CodeService/Config/LuaStyle.h"
 #include "Types.h"
-#include "StyleDiagnostic.h"
 
 
 class FormatBuilder {
@@ -25,7 +24,7 @@ public:
 
     std::string GetFormatResult(const LuaSyntaxTree &t);
 
-    std::vector<StyleDiagnostic> GetStyleDiagnostic(const LuaSyntaxTree &t);
+    std::string GetRangeFormatResult(FormatRange &range, const LuaSyntaxTree &t);
 
     template<class T>
     void AddAnalyzer() {
@@ -55,6 +54,9 @@ private:
     void RecoverIndent();
 
     void DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
+
+    void DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode,
+                        const LuaSyntaxTree &t, FormatResolve &resolve);
 
     void ExitResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
 

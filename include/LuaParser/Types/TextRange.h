@@ -5,6 +5,8 @@
 class TextRange
 {
 public:
+    TextRange();
+
 	TextRange(std::size_t startOffset, std::size_t endOffset);
 
 	bool IsEmpty() const;

@@ -8,21 +8,21 @@
 #include "Service.h"
 #include "CodeService/Config/LuaStyle.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
+#include "CodeService/Format/Types.h"
 //#include "CodeService/Spell/CodeSpellChecker.h"
 
-class FormatService : public Service
-{
+class FormatService : public Service {
 public:
-	LANGUAGE_SERVICE(FormatService);
+    LANGUAGE_SERVICE(FormatService);
 
-	FormatService(LanguageServer* owner);
+    FormatService(LanguageServer *owner);
 
 //	std::vector<lsp::Diagnostic> Diagnose(std::string_view filePath, std::shared_ptr<LuaParser> parser,
 //                                          std::shared_ptr<LuaCodeStyleOptions> options);
 
-	std::string Format(LuaSyntaxTree& luaSyntaxTree, LuaStyle& luaStyle);
+    std::string Format(LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle);
 
-//	std::string RangeFormat(LuaFormatRange& range, std::shared_ptr<LuaParser> parser, LuaCodeStyleOptions& options);
+    std::string RangeFormat(LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle, FormatRange &range);
 
 //	void LoadDictionary(std::string_view path);
 //

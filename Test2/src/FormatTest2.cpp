@@ -7,6 +7,8 @@
 int main() {
     std::string buffer = R"(
 local t = function () return x() end
+
+ccc=1231313
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -23,7 +25,9 @@ local t = function () return x() end
     LuaStyle s;
     FormatBuilder b(s);
     b.FormatAnalyze(t);
-    auto text = b.GetFormatResult(t);
+    std::size_t start = 3;
+    std::size_t end = 4;
+    auto text = b.GetRangeFormatResult(start, end, t);
     std::cout<< text << std::endl;
     return 0;
-}  
+}
