@@ -7,7 +7,7 @@ LineIndex::LineIndex() {
 
 void LineIndex::Parse(std::string &text) {
     _newLines.resize(1, LineOffset(0));
-    for (std::size_t i = 0; i != text.size(); i++) {
+    for (std::size_t i = 0; i < text.size(); i++) {
         char c = text[i];
         if (c > 0) {
             std::size_t cLen = sizeof(char);

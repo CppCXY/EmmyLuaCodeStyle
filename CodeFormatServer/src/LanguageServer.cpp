@@ -12,6 +12,7 @@
 #include "Service/FormatService.h"
 //#include "Service/CompletionService.h"
 //#include "Service/CommandService.h"
+#include "Service/ConfigService.h"
 
 LanguageServer::LanguageServer()
 	: _idCounter(0),
@@ -27,6 +28,7 @@ void LanguageServer::InitializeService()
 //	AddService<CompletionService>();
 //	AddService<CommandService>();
 //	AddService<CodeActionService>();
+    AddService<ConfigService>();
 
 	for (auto& service : _services)
 	{

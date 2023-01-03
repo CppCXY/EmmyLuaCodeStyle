@@ -4,12 +4,15 @@
 #include <string_view>
 #include <memory>
 #include <vector>
+#include <map>
 #include "LuaStyleEnum.h"
 #include "LuaParser/Types/EndOfLineType.h"
 
 class LuaStyle {
 public:
     LuaStyle() = default;
+
+    void ParseFromMap(std::map<std::string, std::string, std::less<>> &configMap);
     // [basic]
     /*
      * 缩进风格
@@ -125,4 +128,6 @@ public:
 	bool ignore_space_after_colon = false;
 
 	bool remove_call_expression_list_finish_comma = false;
+
+    bool auto_split_or_join_lines = false;
 };
