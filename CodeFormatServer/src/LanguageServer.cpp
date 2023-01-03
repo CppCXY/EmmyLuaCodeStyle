@@ -10,90 +10,77 @@
 //#include "Service/CodeActionService.h"
 //#include "Service/ModuleService.h"
 #include "Service/FormatService.h"
+#include "Service/DiagnosticService.h"
 //#include "Service/CompletionService.h"
 //#include "Service/CommandService.h"
 
 LanguageServer::LanguageServer()
-	: _idCounter(0),
-	  _ioc(1),
-      _lspHandle(this)
-{
+        : _idCounter(0),
+          _ioc(1),
+          _lspHandle(this) {
 }
 
-void LanguageServer::InitializeService()
-{
-	AddService<FormatService>();
+void LanguageServer::InitializeService() {
+    AddService<FormatService>();
+    AddService<DiagnosticService>();
 //	AddService<ModuleService>();
 //	AddService<CompletionService>();
 //	AddService<CommandService>();
 //	AddService<CodeActionService>();
 
-	for (auto& service : _services)
-	{
-		service->Initialize();
-	}
+    for (auto &service: _services) {
+        service->Initialize();
+    }
 
-	for (auto& service : _services)
-	{
-		service->Start();
-	}
+    for (auto &service: _services) {
+        service->Start();
+    }
 }
 
-void LanguageServer::SetSession(std::shared_ptr<IOSession> session)
-{
-	_session = session;
+void LanguageServer::SetSession(std::shared_ptr<IOSession> session) {
+    _session = session;
 }
 
-std::shared_ptr<IOSession> LanguageServer::GetSession()
-{
-	return _session;
+std::shared_ptr<IOSession> LanguageServer::GetSession() {
+    return _session;
 }
 
-void LanguageServer::SendNotification(std::string_view method, std::shared_ptr<lsp::Serializable> param)
-{
-	auto json = nlohmann::json::object();
-	json["jsonrpc"] = "2.0";
-	json["method"] = method;
-	if (param != nullptr)
-	{
-		json["params"] = param->Serialize();
-	}
-	else
-	{
-		json["params"] = nullptr;
-	}
+void LanguageServer::SendNotification(std::string_view method, std::shared_ptr<lsp::Serializable> param) {
+    auto json = nlohmann::json::object();
+    json["jsonrpc"] = "2.0";
+    json["method"] = method;
+    if (param != nullptr) {
+        json["params"] = param->Serialize();
+    } else {
+        json["params"] = nullptr;
+    }
 
-	if (_session)
-	{
-		auto dumpResult = json.dump();
-		std::string message = util::format("Content-Length:{}\r\n\r\n", dumpResult.size());
+    if (_session) {
+        auto dumpResult = json.dump();
+        std::string message = util::format("Content-Length:{}\r\n\r\n", dumpResult.size());
 
-		message.append(dumpResult);
-		_session->Send(std::move(message));
-	}
+        message.append(dumpResult);
+        _session->Send(std::move(message));
+    }
 }
 
-void LanguageServer::SendRequest(std::string_view method, std::shared_ptr<lsp::Serializable> param)
-{
-	auto json = nlohmann::json::object();
-	json["jsonrpc"] = "2.0";
-	json["method"] = method;
-	json["id"] = GetRequestId();
-	if (param) {
-		json["params"] = param->Serialize();
-	}
-	else
-	{
-		json["params"] = nullptr;
-	}
-	if (_session)
-	{
-		auto dumpResult = json.dump();
-		std::string message = util::format("Content-Length:{}\r\n\r\n", dumpResult.size());
+void LanguageServer::SendRequest(std::string_view method, std::shared_ptr<lsp::Serializable> param) {
+    auto json = nlohmann::json::object();
+    json["jsonrpc"] = "2.0";
+    json["method"] = method;
+    json["id"] = GetRequestId();
+    if (param) {
+        json["params"] = param->Serialize();
+    } else {
+        json["params"] = nullptr;
+    }
+    if (_session) {
+        auto dumpResult = json.dump();
+        std::string message = util::format("Content-Length:{}\r\n\r\n", dumpResult.size());
 
-		message.append(dumpResult);
-		_session->Send(std::move(message));
-	}
+        message.append(dumpResult);
+        _session->Send(std::move(message));
+    }
 }
 
 //
@@ -136,15 +123,13 @@ void LanguageServer::SendRequest(std::string_view method, std::shared_ptr<lsp::S
 // 	SendNotification("textDocument/publishDiagnostics", vscodeDiagnosis);
 // }
 
-int LanguageServer::Run()
-{
-	if (_session)
-	{
-		int ret = _session->Run(*this);
-		_session = nullptr;
-		return ret;
-	}
-	return 1;
+int LanguageServer::Run() {
+    if (_session) {
+        int ret = _session->Run(*this);
+        _session = nullptr;
+        return ret;
+    }
+    return 1;
 }
 
 //std::shared_ptr<LuaCodeStyleOptions> LanguageServer::GetOptions(std::string_view uriOrFilename)
@@ -226,9 +211,8 @@ int LanguageServer::Run()
 //	_root = root;
 //}
 
-asio::io_context& LanguageServer::GetIOContext()
-{
-	return _ioc;
+asio::io_context &LanguageServer::GetIOContext() {
+    return _ioc;
 }
 
 //lsp::VscodeSettings& LanguageServer::GetSettings()
@@ -244,9 +228,8 @@ asio::io_context& LanguageServer::GetIOContext()
 //	GetService<FormatService>()->SetCustomDictionary(_vscodeSettings.spellDict);
 //}
 
-uint64_t LanguageServer::GetRequestId()
-{
-	return ++_idCounter;
+uint64_t LanguageServer::GetRequestId() {
+    return ++_idCounter;
 }
 
 LSPHandle &LanguageServer::GetLSPHandle() {

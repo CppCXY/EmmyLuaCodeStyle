@@ -4,7 +4,7 @@ enum class ServiceType
 {
 	Service = -1,
 	FormatService = 0,
-//	SpellService,
+	DiagnosticService,
 //	CommandService,
 //	CodeActionService,
 

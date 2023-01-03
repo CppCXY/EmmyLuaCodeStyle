@@ -6,9 +6,12 @@
 
 int main() {
     std::string buffer = R"(
-local t = function () return x() end
+if a
+and c  then
 
-ccc=1231313
+elseif b then
+
+end
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -20,14 +23,20 @@ ccc=1231313
 
     LuaSyntaxTree t;
     t.BuildTree(p);
-    std::cout<<t.GetDebugView()<<std::endl;
-
+    std::cout << t.GetDebugView() << std::endl;
+ 
     LuaStyle s;
     FormatBuilder b(s);
     b.FormatAnalyze(t);
-    std::size_t start = 3;
-    std::size_t end = 4;
-    auto text = b.GetRangeFormatResult(start, end, t);
+//    std::size_t start = 3;
+//    std::size_t end = 4;
+    auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;
+//    LuaDiagnosticStyle style;
+//    StyleDiagnostic d(style);
+//    b.Diagnostic(d, t);
+//    for (auto &diag: d.GetDiagnosticResults()) {
+//        std::cout << diag.Message << std::endl;
+//    }
     return 0;
 }

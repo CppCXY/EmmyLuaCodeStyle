@@ -48,6 +48,7 @@ target_sources(CodeFormatServer
 	#service
 	${CodeFormatServer_SOURCE_DIR}/src/Service/Service.cpp
 	${CodeFormatServer_SOURCE_DIR}/src/Service/FormatService.cpp
+	${CodeFormatServer_SOURCE_DIR}/src/Service/DiagnosticService.cpp
 #	${CodeFormatServer_SOURCE_DIR}/src/Service/CommandService.cpp
 #	${CodeFormatServer_SOURCE_DIR}/src/Service/CodeActionService.cpp
 

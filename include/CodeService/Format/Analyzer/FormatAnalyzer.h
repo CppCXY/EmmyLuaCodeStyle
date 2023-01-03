@@ -4,6 +4,7 @@
 #include "LuaParser/Ast/LuaSyntaxNode.h"
 #include "FormatAnalyzerType.h"
 #include "FormatResolve.h"
+#include "CodeService/Diagnostic/StyleDiagnostic.h"
 
 class FormatBuilder;
 
@@ -21,4 +22,6 @@ public:
 
     virtual void
     ExitQuery(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {};
+
+    virtual void Diagnostic(StyleDiagnostic &d, const LuaSyntaxTree &t) {};
 };

@@ -784,3 +784,9 @@ void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode
         }
     }
 }
+
+void FormatBuilder::Diagnostic(StyleDiagnostic &d, const LuaSyntaxTree &t) {
+    for (auto& a: _analyzers) {
+        a->Diagnostic(d, t);
+    }
+}

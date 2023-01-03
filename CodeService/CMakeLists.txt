@@ -16,6 +16,8 @@ target_sources(CodeService
         # config
         ${CodeService_SOURCE_DIR}/src/Config/LuaStyle.cpp
         ${CodeService_SOURCE_DIR}/src/Config/LuaEditorConfig.cpp
+        ${CodeService_SOURCE_DIR}/src/Config/LuaDiagnosticStyle.cpp
+        ${CodeService_SOURCE_DIR}/src/Config/LanguageTranslator.cpp
 
         # format
         ${CodeService_SOURCE_DIR}/src/Format/FormatBuilder.cpp

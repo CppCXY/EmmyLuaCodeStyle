@@ -268,10 +268,22 @@ void SpaceAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
     }
 }
 
+void SpaceAnalyzer::Diagnostic(StyleDiagnostic &d, const LuaSyntaxTree &t) {
+    for (auto node: t.GetSyntaxNodes()) {
+        if (node.IsToken(t)) {
+            auto next = node.GetNextToken(t);
+            if (next.IsToken(t)) {
+                auto shouldSpace = ProcessSpace(t, node, next);
+                PushDiagnostic(node, next, t, shouldSpace, d);
+            }
+        }
+    }
+}
+
 void SpaceAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (syntaxNode.IsToken(t)) {
         auto nextToken = syntaxNode.GetNextToken(t);
-        auto space = ProcessSpace(f, t, syntaxNode, nextToken);
+        auto space = ProcessSpace(t, syntaxNode, nextToken);
         resolve.SetNextSpace(space);
     }
 }
@@ -324,7 +336,7 @@ std::optional<std::size_t> SpaceAnalyzer::GetRightSpace(LuaSyntaxNode &n) const 
 }
 
 std::size_t
-SpaceAnalyzer::ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSyntaxNode &left, LuaSyntaxNode &right) {
+SpaceAnalyzer::ProcessSpace(const LuaSyntaxTree &t, LuaSyntaxNode &left, LuaSyntaxNode &right) {
     auto rightSpaceOfLeftToken = GetRightSpace(left);
     auto leftSpaceOfRightToken = GetLeftSpace(right);
     std::optional<std::size_t> distance;
@@ -347,67 +359,76 @@ SpaceAnalyzer::ProcessSpace(FormatBuilder &f, const LuaSyntaxTree &t, LuaSyntaxN
 void SpaceAnalyzer::SpaceIgnore(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
     _ignoreSpace.insert(n.GetIndex());
 }
-//
-//void SpaceAnalyzer::PushDiagnostic(FormatBuilder &f, LuaSyntaxNode &node, LuaSyntaxNode &next, const LuaSyntaxTree &t,
-//                                   size_t space, size_t shouldSpace, DiagnosticResolve &resolve) {
-//    auto leftOffset = node.GetTextRange(t).EndOffset;
-//    auto rightOffset = next.GetTextRange(t).StartOffset;
-//    int diff = static_cast<int>(rightOffset - leftOffset) - 1;
-//    auto additional = GetAdditionalNote(node, next, t);
-//    switch (shouldSpace) {
-//        case 0: {
-//            resolve.SpaceMessage(util::format(LText("unnecessary whitespace {}"), additional),
-//                                 TextRange(leftOffset, rightOffset));
-//            break;
-//        }
-//        case 1: {
-//            if (diff == 0) {
-//                resolve.SpaceMessage(util::format(LText("missing whitespace {}"), additional),
-//                                     TextRange(leftOffset, rightOffset));
-//            } else {
-//                resolve.SpaceMessage(util::format(LText("multiple spaces {}"), additional),
-//                                     TextRange(leftOffset + 1, rightOffset - 1));
-//            }
-//            break;
-//        }
-//        default: {
-//            if (diff < shouldSpace) {
-//                resolve.SpaceMessage(util::format(LText("expected {} whitespace, found {} {}"),
-//                                                  shouldSpace, diff, additional),
-//                                     TextRange(leftOffset, rightOffset));
-//            } else {
-//                resolve.SpaceMessage(util::format(LText("expected {} whitespace, found {} {}"),
-//                                                  shouldSpace, diff, additional),
-//                                     TextRange(leftOffset + 1, rightOffset - 1));
-//            }
-//        }
-//    }
-//}
-//
-//std::string SpaceAnalyzer::GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxNode &right, const LuaSyntaxTree &t) {
-//    switch(left.GetTokenKind(t)) {
-//        case TK_STRING:
-//        case TK_LONG_STRING:
-//        case TK_LONG_COMMENT:
-//        case TK_SHORT_COMMENT:
-//        case TK_NAME: {
-//            break;
-//        }
-//        default: {
-//            return util::format("after token '{}'", left.GetText(t));
-//        }
-//    }
-//
-//    switch (right.GetTokenKind(t)) {
-//        case TK_STRING:
-//        case TK_LONG_STRING:
-//        case TK_LONG_COMMENT:
-//        case TK_SHORT_COMMENT:
-//        case TK_NAME: {
-//            return "";
-//        }
-//        default: {
-//            return util::format("before token '{}'", left.GetText(t));
-//        }
-//    }
-//}
+
+
+void SpaceAnalyzer::PushDiagnostic(LuaSyntaxNode &node, LuaSyntaxNode &next, const LuaSyntaxTree &t,
+                                   size_t shouldSpace, StyleDiagnostic &d) {
+    auto leftOffset = node.GetTextRange(t).EndOffset;
+    auto rightOffset = next.GetTextRange(t).StartOffset;
+    int diff = static_cast<int>(rightOffset - leftOffset) - 1;
+    if (diff == shouldSpace) {
+        return;
+    }
+    auto additional = GetAdditionalNote(node, next, t);
+    switch (shouldSpace) {
+        case 0: {
+            d.PushDiagnostic(DiagnosticType::Space, TextRange(leftOffset, rightOffset),
+                             util::format(LText("unnecessary whitespace {}"), additional)
+            );
+            break;
+        }
+        case 1: {
+            if (diff == 0) {
+                d.PushDiagnostic(DiagnosticType::Space, TextRange(leftOffset, rightOffset),
+                                 util::format(LText("missing whitespace {}"), additional)
+                );
+            } else {
+                d.PushDiagnostic(DiagnosticType::Space, TextRange(leftOffset + 1, rightOffset - 1),
+                                 util::format(LText("multiple spaces {}"), additional)
+                );
+            }
+            break;
+        }
+        default: {
+            if (diff < shouldSpace) {
+                d.PushDiagnostic(DiagnosticType::Space, TextRange(leftOffset, rightOffset),
+                                 util::format(LText("expected {} whitespace, found {} {}"),
+                                              shouldSpace, diff, additional)
+                );
+            } else {
+                d.PushDiagnostic(DiagnosticType::Space, TextRange(leftOffset + 1, rightOffset - 1),
+                                 util::format(LText("expected {} whitespace, found {} {}"),
+                                              shouldSpace, diff, additional)
+                );
+            }
+        }
+    }
+}
+
+std::string SpaceAnalyzer::GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxNode &right, const LuaSyntaxTree &t) {
+    switch (left.GetTokenKind(t)) {
+        case TK_STRING:
+        case TK_LONG_STRING:
+        case TK_LONG_COMMENT:
+        case TK_SHORT_COMMENT:
+        case TK_NAME: {
+            break;
+        }
+        default: {
+            return util::format("after token '{}'", left.GetText(t));
+        }
+    }
+
+    switch (right.GetTokenKind(t)) {
+        case TK_STRING:
+        case TK_LONG_STRING:
+        case TK_LONG_COMMENT:
+        case TK_SHORT_COMMENT:
+        case TK_NAME: {
+            return "";
+        }
+        default: {
+            return util::format("before token '{}'", right.GetText(t));
+        }
+    }
+}

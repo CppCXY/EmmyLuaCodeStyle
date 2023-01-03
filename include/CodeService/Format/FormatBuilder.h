@@ -26,6 +26,8 @@ public:
 
     std::string GetRangeFormatResult(FormatRange &range, const LuaSyntaxTree &t);
 
+    void Diagnostic(StyleDiagnostic& d, const LuaSyntaxTree &t);
+
     template<class T>
     void AddAnalyzer() {
         _analyzers[static_cast<std::size_t>(T::Type)] = std::make_unique<T>();

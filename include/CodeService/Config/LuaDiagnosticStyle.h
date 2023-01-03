@@ -27,20 +27,18 @@ public:
     std::size_t tab_width = 4;
 
     /*
-     * 引号风格
-     */
-    QuoteStyle quote_style = QuoteStyle::None;
-
-    /*
      * 行宽检查
      */
     std::size_t max_line_length = 120;
 
     // [space]
-
     bool enable_space_check = true;
 
     bool space_around_math_operator = true;
 
+    // [name style]
+    bool enable_name_style_check = false;
 
+    // [spell check]
+    bool enable_spell_check = true;
 };

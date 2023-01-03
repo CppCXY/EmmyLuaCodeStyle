@@ -1,13 +1,23 @@
 #pragma once
 
-enum class DiagnosticType
-{
+#include "LuaParser/Types/TextRange.h"
+
+enum class DiagnosticType {
     None,
     Space,
-	MaxLineWidth,
-	StatementLineSpace,
-	Indent,
-	NameStyle,
-	Spell
+    MaxLineWidth,
+    StatementLineSpace,
+    Indent,
+    NameStyle,
+    Spell
 };
 
+class LuaDiagnostic {
+public:
+    LuaDiagnostic(DiagnosticType type, TextRange range, std::string_view message)
+            : Type(type), Range(range), Message(message) {}
+
+    DiagnosticType Type;
+    TextRange Range;
+    std::string Message;
+};

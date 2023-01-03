@@ -15,6 +15,7 @@
 #include "Util/format.h"
 #include "LanguageServer.h"
 #include "CodeService/Format/Types.h"
+#include "Service/DiagnosticService.h"
 
 using namespace std::placeholders;
 
@@ -218,28 +219,6 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnEditorConfigUpdate(
 
 std::shared_ptr<lsp::Serializable> LSPHandle::OnRangeFormatting(
         std::shared_ptr<lsp::DocumentRangeFormattingParams> params) {
-//    auto parser = LanguageServer::GetInstance().GetFileParser(param->textDocument.uri);
-//
-//    auto result = std::make_shared<lsp::DocumentFormattingResult>();
-//
-//    auto options = LanguageServer::GetInstance().GetOptions(param->textDocument.uri);
-//
-//    if (parser->HasError()) {
-//        result->hasError = true;
-//        return result;
-//    }
-//
-//    LuaFormatRange formatRange(static_cast<int>(param->range.start.line), static_cast<int>(param->range.end.line));
-//    auto formatResult = LanguageServer::GetInstance().GetService<FormatService>()->RangeFormat(
-//            formatRange, parser, *options);
-//
-//    auto &edit = result->edits.emplace_back();
-//    edit.newText = std::move(formatResult);
-//    edit.range = lsp::Range(
-//            lsp::Position(formatRange.StartLine, formatRange.StartCharacter),
-//            lsp::Position(formatRange.EndLine + 1, formatRange.EndCharacter)
-//    );
-//    return result;
     auto result = std::make_shared<lsp::DocumentFormattingResult>();
     auto &vfs = _server->GetVFS();
     auto vFile = vfs.GetVirtualFile(params->textDocument.uri);
@@ -363,31 +342,13 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnWorkspaceDidChangeConfiguration(
 
 std::shared_ptr<lsp::DocumentDiagnosticReport> LSPHandle::OnTextDocumentDiagnostic(
         std::shared_ptr<lsp::DocumentDiagnosticParams> params) {
-//    auto report = _server->GetService<DiagnosticService>().DiagnosticFile(param->textDocument.uri, param->previousResultId);
+    auto report = _server->GetService<DiagnosticService>()->Diagnostic(param->textDocument.uri, param->previousResultId);
     return nullptr;
 }
 
 
 std::shared_ptr<lsp::WorkspaceDiagnosticReport> LSPHandle::OnWorkspaceDiagnostic(
         std::shared_ptr<lsp::WorkspaceDiagnosticParams> params) {
-    // if(param->previousResultIds.empty())
-    // {
-    // 	LanguageServer::GetInstance().LoadWorkspace();
-    // }
-
-//    auto workspaceReport = std::make_shared<lsp::WorkspaceDiagnosticReport>();
-//    for (auto &result: param->previousResultIds) {
-//        auto documentReport = std::make_shared<lsp::DocumentDiagnosticReport>();
-//        LanguageServer::GetInstance().DiagnosticFile(result.uri, result.value, documentReport);
-//        auto &item = workspaceReport->items.emplace_back();
-//        item.uri = result.uri;
-//        item.kind = documentReport->kind;
-//        item.items = documentReport->items;
-//        item.resultId = documentReport->resultId;
-//        item.version = LanguageServer::GetInstance().GetFileVersion(result.uri);
-//    }
-//
-//    return workspaceReport;
     return nullptr;
 }
 
