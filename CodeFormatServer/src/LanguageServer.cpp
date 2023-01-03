@@ -233,19 +233,6 @@ asio::io_context& LanguageServer::GetIOContext()
 	return _ioc;
 }
 
-//lsp::VscodeSettings& LanguageServer::GetSettings()
-//{
-//	return _vscodeSettings;
-//}
-//
-//void LanguageServer::SetVscodeSettings(lsp::VscodeSettings& settings)
-//{
-//	_configVersion++;
-//	_vscodeSettings = settings;
-//
-//	GetService<FormatService>()->SetCustomDictionary(_vscodeSettings.spellDict);
-//}
-
 uint64_t LanguageServer::GetRequestId()
 {
 	return ++_idCounter;
