@@ -9,6 +9,7 @@
 #include "LanguageServer.h"
 //#include "Service/CodeActionService.h"
 #include "Service/FormatService.h"
+#include "Service/ConfigService.h"
 //#include "Service/CommandService.h"
 //#include "CodeService/TypeFormat/LuaTypeFormat.h"
 #include "Util/Url.h"
@@ -83,33 +84,17 @@ std::shared_ptr<lsp::InitializeResult> LSPHandle::OnInitialize(std::shared_ptr<l
 //    result->capabilities.diagnosticProvider.workspaceDiagnostics = false;
 //    result->capabilities.diagnosticProvider.interFileDependencies = false;
 
-//    auto &editorConfigFiles = param->initializationOptions.editorConfigFiles;
-//    for (auto &configFile: editorConfigFiles) {
-//        _server->UpdateCodeStyleOptions(configFile.workspace, configFile.path);
-//    }
+    auto &editorConfigFiles = param->initializationOptions.editorConfigFiles;
+    for (auto &configFile: editorConfigFiles) {
+        _server->GetService<ConfigService>()->LoadEditorconfig(configFile.workspace, configFile.path);
+    }
 
     std::filesystem::path localePath = param->initializationOptions.localeRoot;
     localePath /= param->locale + ".json";
 
-//    if (std::filesystem::exists(localePath) && std::filesystem::is_regular_file(localePath)) {
-//        std::fstream fin(localePath.string(), std::ios::in);
-//
-//        if (fin.is_open()) {
-//            std::stringstream s;
-//            s << fin.rdbuf();
-//            std::string jsonText = s.str();
-//            auto json = nlohmann::json::parse(jsonText);
-//
-//            if (json.is_object()) {
-//                std::map<std::string, std::string> languageMap;
-//                for (auto [key, value]: json.items()) {
-//                    languageMap.insert({key, value});
-//                }
-//
-//                LanguageTranslator::GetInstance().SetLanguageMap(std::move(languageMap));
-//            }
-//        }
-//    }
+    if (std::filesystem::exists(localePath) && std::filesystem::is_regular_file(localePath)) {
+        _server->GetService<ConfigService>()->LoadLanguageTranslator(localePath.string());
+    }
 
 //    if (!param->initializationOptions.extensionChars.empty()) {
 //        for (auto &c: param->initializationOptions.extensionChars) {
@@ -174,9 +159,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnFormatting(
 
     auto &syntaxTree = opSyntaxTree.value();
 
-//    auto options = LanguageServer::GetInstance().GetOptions(param->textDocument.uri);
-
-    LuaStyle luaStyle;
+    LuaStyle& luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
 
     auto newText = _server->GetService<FormatService>()->Format(syntaxTree, luaStyle);
     auto lineIndex = vFile.GetLineIndex(vfs);
@@ -199,21 +182,20 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnClose(
 
 std::shared_ptr<lsp::Serializable> LSPHandle::OnEditorConfigUpdate(
         std::shared_ptr<lsp::ConfigUpdateParams> params) {
-//    switch (param->type) {
-//        case lsp::FileChangeType::Created:
-//        case lsp::FileChangeType::Changed: {
-//            LanguageServer::GetInstance().UpdateCodeStyleOptions(param->source.workspace, param->source.path);
-//            break;
-//        }
-//        case lsp::FileChangeType::Delete: {
-//            LanguageServer::GetInstance().RemoveCodeStyleOptions(param->source.workspace);
-//            break;
-//        }
-//    }
-//
-//    LanguageServer::GetInstance().RefreshDiagnostic();
-//
-//    return nullptr;
+    switch (params->type) {
+        case lsp::FileChangeType::Created:
+        case lsp::FileChangeType::Changed: {
+            _server->GetService<ConfigService>()->LoadEditorconfig(params->source.workspace, params->source.path);
+            break;
+        }
+        case lsp::FileChangeType::Delete: {
+            _server->GetService<ConfigService>()->RemoveEditorconfig(params->source.workspace);
+            break;
+        }
+    }
+
+    RefreshDiagnostic();
+
     return nullptr;
 }
 
@@ -235,9 +217,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnRangeFormatting(
 
     auto &syntaxTree = opSyntaxTree.value();
 
-//    auto options = LanguageServer::GetInstance().GetOptions(param->textDocument.uri);
-
-    LuaStyle luaStyle;
+    LuaStyle& luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
 
     FormatRange range;
     range.StartLine = params->range.start.line;

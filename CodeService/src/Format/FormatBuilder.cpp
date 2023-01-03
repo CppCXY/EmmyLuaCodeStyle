@@ -2,6 +2,7 @@
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/Analyzer/AlignAnalyzer.h"
 #include "CodeService/Format/Analyzer/TokenAnalyzer.h"
+#include "CodeService/Format/Analyzer/PreferenceAnalyzer.h"
 
 FormatBuilder::FormatBuilder(LuaStyle &style)
         : _style(style),
@@ -17,6 +18,7 @@ void FormatBuilder::FormatAnalyze(const LuaSyntaxTree &t) {
     AddAnalyzer<LineBreakAnalyzer>();
     AddAnalyzer<AlignAnalyzer>();
     AddAnalyzer<TokenAnalyzer>();
+    AddAnalyzer<PreferenceAnalyzer>();
 
     for (const auto &analyzer: _analyzers) {
         if (analyzer) {
@@ -97,7 +99,7 @@ void FormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTr
         }
         default: {
             _writeLineWidth += text.size();
-            _formattedText.append(syntaxNode.GetText(t));
+            _formattedText.append(text);
         }
     }
 }
@@ -257,8 +259,11 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                         WriteChar(del);
                         WriteText(text.substr(1, text.size() - 2));
                         WriteChar(del);
+                        break;
                     }
                 }
+
+                WriteSyntaxNode(syntaxNode, t);
                 break;
             }
             case TokenStrategy::StringDoubleQuote: {
@@ -271,8 +276,11 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                         WriteChar(del);
                         WriteText(text.substr(1, text.size() - 2));
                         WriteChar(del);
+                        break;
                     }
                 }
+
+                WriteSyntaxNode(syntaxNode, t);
                 break;
             }
             case TokenStrategy::TableSepComma: {
@@ -514,7 +522,7 @@ std::string FormatBuilder::GetRangeFormatResult(FormatRange &range, const LuaSyn
     for (auto child: root.GetChildren(t)) {
         auto childEndLine = child.GetEndLine(t);
         if (childEndLine >= range.StartLine) {
-            traverseStack.emplace_back(root, TraverseEvent::Enter);
+            traverseStack            .emplace_back(child, TraverseEvent::Enter);
         }
         if (childEndLine > range.EndLine) {
             break;
@@ -681,8 +689,11 @@ void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode
                         WriteChar(del);
                         WriteText(text.substr(1, text.size() - 2));
                         WriteChar(del);
+                        break;
                     }
                 }
+
+                WriteSyntaxNode(syntaxNode, t);
                 break;
             }
             case TokenStrategy::StringDoubleQuote: {
@@ -695,8 +706,11 @@ void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode
                         WriteChar(del);
                         WriteText(text.substr(1, text.size() - 2));
                         WriteChar(del);
+                        break;
                     }
                 }
+
+                WriteSyntaxNode(syntaxNode, t);
                 break;
             }
             case TokenStrategy::TableSepComma: {

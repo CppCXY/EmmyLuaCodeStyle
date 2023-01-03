@@ -8,6 +8,8 @@ enum class ServiceType
 //	CommandService,
 //	CodeActionService,
 
+    ConfigService,
+
 	ServiceCount 
 };
 

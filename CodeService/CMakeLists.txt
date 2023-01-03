@@ -18,6 +18,7 @@ target_sources(CodeService
         ${CodeService_SOURCE_DIR}/src/Config/LuaEditorConfig.cpp
         ${CodeService_SOURCE_DIR}/src/Config/LuaDiagnosticStyle.cpp
         ${CodeService_SOURCE_DIR}/src/Config/LanguageTranslator.cpp
+        ${CodeService_SOURCE_DIR}/src/Config/LanguageTranslator.cpp
 
         # format
         ${CodeService_SOURCE_DIR}/src/Format/FormatBuilder.cpp
@@ -27,6 +28,7 @@ target_sources(CodeService
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/LineBreakAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/AlignAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/TokenAnalyzer.cpp
+        ${CodeService_SOURCE_DIR}/src/Format/Analyzer/PreferenceAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/FormatResolve.cpp
 
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/SyntaxNodeHelper.cpp

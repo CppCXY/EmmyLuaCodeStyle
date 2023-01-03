@@ -23,8 +23,8 @@ enum class CallArgParentheses : int {
 enum class AlignCallArgs {
     None,
     Normal,
-    OnlyAfterMoreIndentionStatement,
-    OnlyNotExistCrossExpression,
+//    OnlyAfterMoreIndentionStatement,
+//    OnlyNotExistCrossExpression,
 };
 
 enum class TableSeparatorStyle {

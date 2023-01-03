@@ -13,6 +13,7 @@
 #include "Service/DiagnosticService.h"
 //#include "Service/CompletionService.h"
 //#include "Service/CommandService.h"
+#include "Service/ConfigService.h"
 
 LanguageServer::LanguageServer()
         : _idCounter(0),
@@ -27,6 +28,7 @@ void LanguageServer::InitializeService() {
 //	AddService<CompletionService>();
 //	AddService<CommandService>();
 //	AddService<CodeActionService>();
+    AddService<ConfigService>();
 
     for (auto &service: _services) {
         service->Initialize();
@@ -215,21 +217,9 @@ asio::io_context &LanguageServer::GetIOContext() {
     return _ioc;
 }
 
-//lsp::VscodeSettings& LanguageServer::GetSettings()
-//{
-//	return _vscodeSettings;
-//}
-//
-//void LanguageServer::SetVscodeSettings(lsp::VscodeSettings& settings)
-//{
-//	_configVersion++;
-//	_vscodeSettings = settings;
-//
-//	GetService<FormatService>()->SetCustomDictionary(_vscodeSettings.spellDict);
-//}
-
-uint64_t LanguageServer::GetRequestId() {
-    return ++_idCounter;
+uint64_t LanguageServer::GetRequestId()
+{
+	return ++_idCounter;
 }
 
 LSPHandle &LanguageServer::GetLSPHandle() {
