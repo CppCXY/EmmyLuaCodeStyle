@@ -1,7 +1,6 @@
 #include "DiagnosticService.h"
-#include "CodeService/Diagnostic/StyleDiagnostic.h"
-#include "CodeService/Format/FormatBuilder.h"
 #include "LanguageServer.h"
+#include "CodeService/Diagnostic/DiagnosticBuilder.h"
 
 DiagnosticService::DiagnosticService(LanguageServer *owner) : Service(owner) {
 
@@ -11,15 +10,16 @@ std::vector<lsp::Diagnostic>
 DiagnosticService::Diagnostic(std::size_t fileId,
                               const LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle,
                               LuaDiagnosticStyle &diagnosticStyle) {
-    StyleDiagnostic d(diagnosticStyle);
-    FormatBuilder f(luaStyle);
-    f.FormatAnalyze(luaSyntaxTree);
-    f.Diagnostic(d, luaSyntaxTree);
-
-    auto &results = d.GetDiagnosticResults();
+    DiagnosticBuilder d(luaStyle, diagnosticStyle);
+    d.DiagnosticAnalyze(luaSyntaxTree);
+    auto &results = d.GetDiagnosticResults(luaSyntaxTree);
     std::vector<lsp::Diagnostic> diagnostics;
     auto &vfs = _owner->GetVFS();
-    auto lineIndex = vfs.GetLineIndexDB().Query(fileId).value();
+    auto vFile = vfs.GetVirtualFile(fileId);
+    auto lineIndex = vFile.GetLineIndex(vfs);
+    if (!lineIndex) {
+        return diagnostics;
+    }
 
     for (auto &result: results) {
         auto &diag = diagnostics.emplace_back();
@@ -31,23 +31,40 @@ DiagnosticService::Diagnostic(std::size_t fileId,
                 lsp::Position(endLC.Line, endLC.Col)
         );
 
+        diag.source = "EmmyLua";
         switch (result.Type) {
-            case DiagnosticType::Indent:
-            case DiagnosticType::Space: {
+            case DiagnosticType::Indent: {
+                diag.code = "space-check";
                 diag.severity = lsp::DiagnosticSeverity::Warning;
-                diag.code = "style-check";
-                diag.source = "EmmyLua";
+                break;
+            }
+            case DiagnosticType::Space: {
+                diag.code = "space-check";
+                diag.severity = lsp::DiagnosticSeverity::Warning;
+                break;
+            }
+            case DiagnosticType::StringQuote: {
+                diag.code = "string-quote";
+                diag.severity = lsp::DiagnosticSeverity::Warning;
+                break;
+            }
+            case DiagnosticType::EndWithNewLine: {
+                diag.code = "end-with-new-line";
+                diag.severity = lsp::DiagnosticSeverity::Warning;
+                break;
+            }
+            case DiagnosticType::Align: {
+                diag.code = "code-align";
+                diag.severity = lsp::DiagnosticSeverity::Warning;
                 break;
             }
             case DiagnosticType::NameStyle: {
                 diag.code = "name-style-check";
-                diag.source = "EmmyLua";
                 diag.severity = lsp::DiagnosticSeverity::Information;
                 break;
             }
             case DiagnosticType::Spell: {
                 diag.code = "spell-check";
-                diag.source = "EmmyLua";
                 diag.severity = lsp::DiagnosticSeverity::Information;
                 break;
             }

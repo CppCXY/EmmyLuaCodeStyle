@@ -8,10 +8,10 @@ public:
 
     PreferenceAnalyzer();
 
-    void Analyze(FormatBuilder &f, const LuaSyntaxTree &t) override;
+    void Analyze(FormatState &f, const LuaSyntaxTree &t) override;
 
-    void Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
+    void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
 private:
-    void AnalyzeAutoSplitOrJoinLines(FormatBuilder &f, const LuaSyntaxTree &t);
+    void AnalyzeAutoSplitOrJoinLines(FormatState &f, const LuaSyntaxTree &t);
 };

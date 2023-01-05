@@ -18,16 +18,16 @@ public:
 
     IndentationAnalyzer();
 
-    void Analyze(FormatBuilder &f, const LuaSyntaxTree &t) override;
+    void Analyze(FormatState &f, const LuaSyntaxTree &t) override;
 
-    void Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) override;
+    void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) override;
 
     void Indenter(LuaSyntaxNode &n, const LuaSyntaxTree &t, IndentData indentData=IndentData());
 
     // 在格式化过程中标记Token缩进
     void MarkIndent(LuaSyntaxNode& n, const LuaSyntaxTree& t);
 private:
-    void AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
+    void AnalyzeExprList(FormatState &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
 
     std::unordered_map<std::size_t, IndentData> _indent;
     std::unordered_set<std::size_t> _indentMark;

@@ -1,6 +1,6 @@
 #include "CodeService/Format/Analyzer/LineBreakAnalyzer.h"
 #include <algorithm>
-#include "CodeService/Format/FormatBuilder.h"
+#include "CodeService/Format/FormatState.h"
 #include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 
@@ -10,7 +10,7 @@ LineBreakAnalyzer::LineBreakAnalyzer() {
 
 }
 
-void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
+void LineBreakAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
     for (auto syntaxNode: t.GetSyntaxNodes()) {
         if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {
@@ -152,7 +152,7 @@ void LineBreakAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
 }
 
 void
-LineBreakAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+LineBreakAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (syntaxNode.IsToken(t)) {
         if (resolve.GetNextSpaceStrategy() == NextSpaceStrategy::None
             || resolve.GetNextSpaceStrategy() == NextSpaceStrategy::Space) {
@@ -213,7 +213,7 @@ void LineBreakAnalyzer::BreakBefore(LuaSyntaxNode n, const LuaSyntaxTree &t, std
     }
 }
 
-void LineBreakAnalyzer::AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t) {
+void LineBreakAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t) {
     auto exprs = exprList.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
     if (exprs.empty()) {
         return;
@@ -229,7 +229,7 @@ void LineBreakAnalyzer::AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode &exprLis
     }
 }
 
-void LineBreakAnalyzer::AnalyzeConditionExpr(FormatBuilder &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
+void LineBreakAnalyzer::AnalyzeConditionExpr(FormatState &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
     switch (expr.GetSyntaxKind(t)) {
         case LuaSyntaxNodeKind::BinaryExpression: {
             break;
@@ -240,14 +240,14 @@ void LineBreakAnalyzer::AnalyzeConditionExpr(FormatBuilder &f, LuaSyntaxNode &ex
     }
 }
 
-void LineBreakAnalyzer::AnalyzeNameList(FormatBuilder &f, LuaSyntaxNode &nameList, const LuaSyntaxTree &t) {
+void LineBreakAnalyzer::AnalyzeNameList(FormatState &f, LuaSyntaxNode &nameList, const LuaSyntaxTree &t) {
     auto names = nameList.GetChildTokens(TK_NAME, t);
     for (auto name: names) {
         MarkLazyBreak(name, t, LineBreakStrategy::WhenMayExceed);
     }
 }
 
-void LineBreakAnalyzer::AnalyzeSuffixedExpr(FormatBuilder &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
+void LineBreakAnalyzer::AnalyzeSuffixedExpr(FormatState &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
     auto children = expr.GetChildren(t);
     for (auto child: children) {
         AnalyzeExpr(f, child, t);
@@ -261,7 +261,7 @@ void LineBreakAnalyzer::MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, L
     }
 }
 
-void LineBreakAnalyzer::AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
+void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
     switch (expr.GetSyntaxKind(t)) {
         case LuaSyntaxNodeKind::BinaryExpression: {
             auto exprs = expr.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);

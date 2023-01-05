@@ -24,6 +24,8 @@ public:
 
     VirtualFile GetVirtualFile(std::string_view uri);
 
+    VirtualFile GetVirtualFile(std::size_t fieldId);
+
     FileDB &GetFileDB();
 
     UriDB &GetUriDB();

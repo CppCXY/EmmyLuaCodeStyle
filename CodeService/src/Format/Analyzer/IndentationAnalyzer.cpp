@@ -1,5 +1,5 @@
 #include "CodeService/Format/Analyzer/IndentationAnalyzer.h"
-#include "CodeService/Format/FormatBuilder.h"
+#include "CodeService/Format/FormatState.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 
 // 但是我不能这样做
@@ -10,7 +10,7 @@ using MultiKind = LuaSyntaxMultiKind;
 IndentationAnalyzer::IndentationAnalyzer() {
 }
 
-void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
+void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
     for (auto syntaxNode: t.GetSyntaxNodes()) {
         if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {
@@ -137,7 +137,7 @@ void IndentationAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
     }
 }
 
-void IndentationAnalyzer::AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t) {
+void IndentationAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t) {
     auto exprs = exprList.GetChildSyntaxNodes(MultiKind::Expression, t);
     if (exprs.size() == 1) {
         auto expr = exprs.front();
@@ -155,7 +155,7 @@ void IndentationAnalyzer::AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode &exprL
 }
 
 void
-IndentationAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &n, const LuaSyntaxTree &t, FormatResolve &resolve) {
+IndentationAnalyzer::Query(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t, FormatResolve &resolve) {
     auto it = _indent.find(n.GetIndex());
     if (it != _indent.end()) {
         auto &indentData = it->second;
@@ -169,8 +169,7 @@ IndentationAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &n, const LuaSyntaxTr
                 break;
             }
             case IndentType::WhenLineBreak: {
-                if (f.ShouldMeetIndent()) {
-//                    indentData.Strategy = IndentStrategy::Standard;
+                if (f.IsNewLine()) {
                     resolve.SetIndent(indentData.Indent);
                 }
                 break;

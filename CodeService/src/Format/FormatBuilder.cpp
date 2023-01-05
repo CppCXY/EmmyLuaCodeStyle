@@ -1,30 +1,15 @@
 #include "CodeService/Format/FormatBuilder.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/Analyzer/AlignAnalyzer.h"
-#include "CodeService/Format/Analyzer/TokenAnalyzer.h"
-#include "CodeService/Format/Analyzer/PreferenceAnalyzer.h"
+#include "CodeService/Format/Analyzer/IndentationAnalyzer.h"
 
-FormatBuilder::FormatBuilder(LuaStyle &style)
-        : _style(style),
-          _fileEndOfLine(EndOfLine::LF),
-          _writeLineWidth(0) {
 
+FormatBuilder::FormatBuilder(LuaStyle &style) {
+    _state.SetFormatStyle(style);
 }
 
 void FormatBuilder::FormatAnalyze(const LuaSyntaxTree &t) {
-    _fileEndOfLine = t.GetFile().GetEndOfLine();
-    AddAnalyzer<SpaceAnalyzer>();
-    AddAnalyzer<IndentationAnalyzer>();
-    AddAnalyzer<LineBreakAnalyzer>();
-    AddAnalyzer<AlignAnalyzer>();
-    AddAnalyzer<TokenAnalyzer>();
-    AddAnalyzer<PreferenceAnalyzer>();
-
-    for (const auto &analyzer: _analyzers) {
-        if (analyzer) {
-            analyzer->Analyze(*this, t);
-        }
-    }
+    _state.Analyze(t);
 }
 
 std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
@@ -39,8 +24,8 @@ std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
         resolve.Reset();
         if (traverse.Event == TraverseEvent::Enter) {
             traverseStack.back().Event = TraverseEvent::Exit;
-            for (auto &analyzer: _analyzers) {
-                analyzer->Query(*this, traverse.Node, t, resolve);
+            for (auto &analyzer: _state.GetAnalyzers()) {
+                analyzer->Query(_state, traverse.Node, t, resolve);
             }
             auto children = traverse.Node.GetChildren(t);
             // 不采用 <range>
@@ -51,14 +36,13 @@ std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
             DoResolve(traverse.Node, t, resolve);
         } else {
             traverseStack.pop_back();
-            for (auto &analyzer: _analyzers) {
-                analyzer->ExitQuery(*this, traverse.Node, t, resolve);
+            for (auto &analyzer: _state.GetAnalyzers()) {
+                analyzer->ExitQuery(_state, traverse.Node, t, resolve);
             }
             ExitResolve(traverse.Node, t, resolve);
 
-            if (!_indentStack.empty()
-                && _indentStack.top().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
-                RecoverIndent();
+            if (_state.GetCurrentIndent().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
+                _state.RecoverIndent();
             }
         }
     }
@@ -79,7 +63,7 @@ std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
             _formattedText.resize(lastIndex - reduce);
         }
 
-        if (_style.insert_final_newline) {
+        if (_state.GetStyle().insert_final_newline) {
             WriteLine(1);
         }
     }
@@ -98,70 +82,10 @@ void FormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTr
             break;
         }
         default: {
-            _writeLineWidth += text.size();
+            _state.GetCurrentWidth() += text.size();
             _formattedText.append(text);
         }
     }
-}
-
-void FormatBuilder::AddRelativeIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
-    if (_indentStack.empty()) {
-        _indentStack.emplace(syntaxNoe, 0, 0);
-        return;
-    }
-    auto top = _indentStack.top();
-    switch (_style.indent_style) {
-        case IndentStyle::Space: {
-            _indentStack.emplace(syntaxNoe, top.SpaceSize + indent, top.TabSize);
-            break;
-        }
-        case IndentStyle::Tab: {
-            auto tabIndent = indent / _style.tab_width;
-            auto spaceIndent = indent % _style.tab_width;
-            _indentStack.emplace(syntaxNoe, top.SpaceSize + spaceIndent, top.TabSize + tabIndent);
-            break;
-        }
-    }
-}
-
-void FormatBuilder::AddInvertIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
-    if (_indentStack.empty()) {
-        _indentStack.emplace(syntaxNoe, 0, 0);
-        return;
-    }
-    auto top = _indentStack.top();
-    switch (_style.indent_style) {
-        case IndentStyle::Space: {
-            std::size_t spaceSize = 0;
-            if (top.SpaceSize > indent) {
-                spaceSize = top.SpaceSize - indent;
-            }
-            _indentStack.emplace(syntaxNoe, spaceSize, top.TabSize);
-            break;
-        }
-        case IndentStyle::Tab: {
-            auto tabIndent = indent / _style.tab_width;
-            auto spaceIndent = indent % _style.tab_width;
-            std::size_t spaceSize = 0;
-            std::size_t tabSize = 0;
-            if (top.SpaceSize > spaceIndent) {
-                spaceSize = top.SpaceSize - spaceIndent;
-            }
-            if (top.TabSize > tabIndent) {
-                tabSize = top.TabSize - tabIndent;
-            }
-
-            _indentStack.emplace(syntaxNoe, spaceSize, tabSize);
-            break;
-        }
-    }
-}
-
-void FormatBuilder::RecoverIndent() {
-    if (_indentStack.empty()) {
-        return;
-    }
-    _indentStack.pop();
 }
 
 bool ExistDel(char del, std::string_view text) {
@@ -183,20 +107,20 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
     if (resolve.GetIndentStrategy() != IndentStrategy::None) {
         auto indent = resolve.GetIndent();
         if (indent == 0) {
-            if (_style.indent_style == IndentStyle::Space) {
-                indent = _style.indent_size;
+            if (_state.GetStyle().indent_style == IndentStyle::Space) {
+                indent = _state.GetStyle().indent_size;
             } else {
-                indent = _style.tab_width;
+                indent = _state.GetStyle().tab_width;
             }
         }
 
         switch (resolve.GetIndentStrategy()) {
             case IndentStrategy::Relative: {
-                AddRelativeIndent(syntaxNode, indent);
+                _state.AddRelativeIndent(syntaxNode, indent);
                 break;
             }
             case IndentStrategy::InvertRelative: {
-                AddInvertIndent(syntaxNode, indent);
+                _state.AddInvertIndent(syntaxNode, indent);
                 break;
             }
             default: {
@@ -210,7 +134,7 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
             auto lastChar = _formattedText.back();
             if (lastChar == '\n' || lastChar == '\r') {
                 WriteIndent();
-                auto indentAnalyzer = GetAnalyzer<IndentationAnalyzer>();
+                auto indentAnalyzer = _state.GetAnalyzer<IndentationAnalyzer>();
                 if (indentAnalyzer) {
                     indentAnalyzer->MarkIndent(syntaxNode, t);
                 }
@@ -220,18 +144,18 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
         switch (resolve.GetPrevSpaceStrategy()) {
             case PrevSpaceStrategy::AlignPos: {
                 auto pos = resolve.GetAlign();
-                if (pos > _writeLineWidth) {
-                    auto space = pos - _writeLineWidth;
+                if (pos > _state.GetCurrentWidth()) {
+                    auto space = pos - _state.GetCurrentWidth();
                     WriteSpace(space);
                 }
                 break;
             }
             case PrevSpaceStrategy::AlignRelativeIndent: {
                 auto relativePos = resolve.GetAlign();
-                auto &indentState = _indentStack.top();
-                auto pos = relativePos + indentState.SpaceSize + indentState.TabSize * _style.tab_width;
-                if (pos > _writeLineWidth) {
-                    auto space = pos - _writeLineWidth;
+                auto indentState = _state.GetCurrentIndent();
+                auto pos = relativePos + indentState.SpaceSize + indentState.TabSize * _state.GetStyle().tab_width;
+                if (pos > _state.GetCurrentWidth()) {
+                    auto space = pos - _state.GetCurrentWidth();
                     WriteSpace(space);
                 }
                 break;
@@ -293,7 +217,7 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
             }
             case TokenStrategy::TableAddSep: {
                 WriteSyntaxNode(syntaxNode, t);
-                if (_style.table_separator_style == TableSeparatorStyle::Semicolon) {
+                if (_state.GetStyle().table_separator_style == TableSeparatorStyle::Semicolon) {
                     WriteChar(';');
                 } else {
                     WriteChar(',');
@@ -378,7 +302,7 @@ void FormatBuilder::WriteSpace(std::size_t space) {
         auto size = _formattedText.size();
         _formattedText.resize(size + space, ' ');
     }
-    _writeLineWidth += space;
+    _state.GetCurrentWidth() += space;
 }
 
 void FormatBuilder::WriteLine(std::size_t line) {
@@ -397,8 +321,7 @@ void FormatBuilder::WriteLine(std::size_t line) {
     if (reduce > 0) {
         _formattedText.resize(_formattedText.size() - reduce);
     }
-    auto endOfLine = _style.detect_end_of_line ?
-                     _fileEndOfLine : _style.end_of_line;
+    auto endOfLine = _state.GetEndOfLine();
     switch (endOfLine) {
         case EndOfLine::CRLF: {
             if (line == 1) {
@@ -432,15 +355,12 @@ void FormatBuilder::WriteLine(std::size_t line) {
             break;
         }
     }
-    _writeLineWidth = 0;
+    _state.GetCurrentWidth() = 0;
 }
 
 void FormatBuilder::WriteIndent() {
-    if (_indentStack.empty()) {
-        return;
-    }
-    auto &topLevelIndent = _indentStack.top();
-    switch (_style.indent_style) {
+    auto topLevelIndent = _state.GetCurrentIndent();
+    switch (_state.GetStyle().indent_style) {
         case IndentStyle::Space: {
             if (topLevelIndent.SpaceSize != 0) {
                 auto oldSize = _formattedText.size();
@@ -460,30 +380,15 @@ void FormatBuilder::WriteIndent() {
             break;
         }
     }
-    _writeLineWidth += topLevelIndent.SpaceSize + topLevelIndent.TabSize * _style.tab_width;
-}
-
-const LuaStyle &FormatBuilder::GetStyle() const {
-    return _style;
+    _state.GetCurrentWidth() += topLevelIndent.SpaceSize + topLevelIndent.TabSize * _state.GetStyle().tab_width;
 }
 
 void FormatBuilder::ExitResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
 
 }
 
-bool FormatBuilder::ShouldMeetIndent() const {
-    if (!_formattedText.empty()) {
-        return _formattedText.back() == '\n' || _formattedText.back() == '\r';
-    }
-    return false;
-}
-
-std::size_t FormatBuilder::GetCurrentWidth() const {
-    return _writeLineWidth;
-}
-
 void FormatBuilder::WriteChar(char ch) {
-    _writeLineWidth++;
+    _state.GetCurrentWidth()++;
     _formattedText.push_back(ch);
 }
 
@@ -506,7 +411,7 @@ void FormatBuilder::WriteText(std::string_view text) {
     }
 
     if (text.size() > last) {
-        _writeLineWidth += text.size() - last;
+        _state.GetCurrentWidth() += text.size() - last;
         if (last != 0) {
             _formattedText.append(text.substr(last));
         } else {
@@ -522,7 +427,7 @@ std::string FormatBuilder::GetRangeFormatResult(FormatRange &range, const LuaSyn
     for (auto child: root.GetChildren(t)) {
         auto childEndLine = child.GetEndLine(t);
         if (childEndLine >= range.StartLine) {
-            traverseStack            .emplace_back(child, TraverseEvent::Enter);
+            traverseStack.emplace_back(child, TraverseEvent::Enter);
         }
         if (childEndLine > range.EndLine) {
             break;
@@ -537,8 +442,8 @@ std::string FormatBuilder::GetRangeFormatResult(FormatRange &range, const LuaSyn
         resolve.Reset();
         if (traverse.Event == TraverseEvent::Enter) {
             traverseStack.back().Event = TraverseEvent::Exit;
-            for (auto &analyzer: _analyzers) {
-                analyzer->Query(*this, traverse.Node, t, resolve);
+            for (auto &analyzer: _state.GetAnalyzers()) {
+                analyzer->Query(_state, traverse.Node, t, resolve);
             }
             auto children = traverse.Node.GetChildren(t);
             // 不采用 <range>
@@ -549,14 +454,13 @@ std::string FormatBuilder::GetRangeFormatResult(FormatRange &range, const LuaSyn
             DoRangeResolve(range, traverse.Node, t, resolve);
         } else {
             traverseStack.pop_back();
-            for (auto &analyzer: _analyzers) {
-                analyzer->ExitQuery(*this, traverse.Node, t, resolve);
+            for (auto &analyzer: _state.GetAnalyzers()) {
+                analyzer->ExitQuery(_state, traverse.Node, t, resolve);
             }
             ExitResolve(traverse.Node, t, resolve);
 
-            if (!_indentStack.empty()
-                && _indentStack.top().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
-                RecoverIndent();
+            if (_state.GetCurrentIndent().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
+                _state.RecoverIndent();
             }
         }
     }
@@ -577,7 +481,7 @@ std::string FormatBuilder::GetRangeFormatResult(FormatRange &range, const LuaSyn
             _formattedText.resize(lastIndex - reduce);
         }
 
-        if (_style.insert_final_newline) {
+        if (_state.GetStyle().insert_final_newline) {
             WriteLine(1);
         }
     }
@@ -590,20 +494,20 @@ void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode
     if (resolve.GetIndentStrategy() != IndentStrategy::None) {
         auto indent = resolve.GetIndent();
         if (indent == 0) {
-            if (_style.indent_style == IndentStyle::Space) {
-                indent = _style.indent_size;
+            if (_state.GetStyle().indent_style == IndentStyle::Space) {
+                indent = _state.GetStyle().indent_size;
             } else {
-                indent = _style.tab_width;
+                indent = _state.GetStyle().tab_width;
             }
         }
 
         switch (resolve.GetIndentStrategy()) {
             case IndentStrategy::Relative: {
-                AddRelativeIndent(syntaxNode, indent);
+                _state.AddRelativeIndent(syntaxNode, indent);
                 break;
             }
             case IndentStrategy::InvertRelative: {
-                AddInvertIndent(syntaxNode, indent);
+                _state.AddInvertIndent(syntaxNode, indent);
                 break;
             }
             default: {
@@ -634,14 +538,14 @@ void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode
             auto lastChar = _formattedText.back();
             if (lastChar == '\n' || lastChar == '\r') {
                 WriteIndent();
-                auto indentAnalyzer = GetAnalyzer<IndentationAnalyzer>();
+                auto indentAnalyzer = _state.GetAnalyzer<IndentationAnalyzer>();
                 if (indentAnalyzer) {
                     indentAnalyzer->MarkIndent(syntaxNode, t);
                 }
             }
         } else {
             WriteIndent();
-            auto indentAnalyzer = GetAnalyzer<IndentationAnalyzer>();
+            auto indentAnalyzer = _state.GetAnalyzer<IndentationAnalyzer>();
             if (indentAnalyzer) {
                 indentAnalyzer->MarkIndent(syntaxNode, t);
             }
@@ -650,18 +554,18 @@ void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode
         switch (resolve.GetPrevSpaceStrategy()) {
             case PrevSpaceStrategy::AlignPos: {
                 auto pos = resolve.GetAlign();
-                if (pos > _writeLineWidth) {
-                    auto space = pos - _writeLineWidth;
+                if (pos > _state.GetCurrentWidth()) {
+                    auto space = pos - _state.GetCurrentWidth();
                     WriteSpace(space);
                 }
                 break;
             }
             case PrevSpaceStrategy::AlignRelativeIndent: {
                 auto relativePos = resolve.GetAlign();
-                auto &indentState = _indentStack.top();
-                auto pos = relativePos + indentState.SpaceSize + indentState.TabSize * _style.tab_width;
-                if (pos > _writeLineWidth) {
-                    auto space = pos - _writeLineWidth;
+                auto indentState = _state.GetCurrentIndent();
+                auto pos = relativePos + indentState.SpaceSize + indentState.TabSize * _state.GetStyle().tab_width;
+                if (pos > _state.GetCurrentWidth()) {
+                    auto space = pos - _state.GetCurrentWidth();
                     WriteSpace(space);
                 }
                 break;
@@ -723,7 +627,7 @@ void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode
             }
             case TokenStrategy::TableAddSep: {
                 WriteSyntaxNode(syntaxNode, t);
-                if (_style.table_separator_style == TableSeparatorStyle::Semicolon) {
+                if (_state.GetStyle().table_separator_style == TableSeparatorStyle::Semicolon) {
                     WriteChar(';');
                 } else {
                     WriteChar(',');
@@ -796,11 +700,5 @@ void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode
                 break;
             }
         }
-    }
-}
-
-void FormatBuilder::Diagnostic(StyleDiagnostic &d, const LuaSyntaxTree &t) {
-    for (auto& a: _analyzers) {
-        a->Diagnostic(d, t);
     }
 }

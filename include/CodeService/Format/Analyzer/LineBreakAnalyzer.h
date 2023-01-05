@@ -10,9 +10,9 @@ public:
 
     LineBreakAnalyzer();
 
-    void Analyze(FormatBuilder &f, const LuaSyntaxTree &t) override;
+    void Analyze(FormatState &f, const LuaSyntaxTree &t) override;
 
-    void Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) override;
+    void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) override;
 
     void BreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t line = 1);
 
@@ -23,15 +23,15 @@ public:
     void MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, LineBreakStrategy strategy);
 private:
 
-    void AnalyzeExprList(FormatBuilder &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
+    void AnalyzeExprList(FormatState &f, LuaSyntaxNode& exprList, const LuaSyntaxTree &t);
 
-    void AnalyzeExpr(FormatBuilder &f, LuaSyntaxNode& expr, const LuaSyntaxTree &t);
+    void AnalyzeExpr(FormatState &f, LuaSyntaxNode& expr, const LuaSyntaxTree &t);
 
-    void AnalyzeConditionExpr(FormatBuilder &f, LuaSyntaxNode& expr, const LuaSyntaxTree &t);
+    void AnalyzeConditionExpr(FormatState &f, LuaSyntaxNode& expr, const LuaSyntaxTree &t);
 
-    void AnalyzeNameList(FormatBuilder &f, LuaSyntaxNode& nameList, const LuaSyntaxTree &t);
+    void AnalyzeNameList(FormatState &f, LuaSyntaxNode& nameList, const LuaSyntaxTree &t);
 
-    void AnalyzeSuffixedExpr(FormatBuilder &f, LuaSyntaxNode& expr, const LuaSyntaxTree &t);
+    void AnalyzeSuffixedExpr(FormatState &f, LuaSyntaxNode& expr, const LuaSyntaxTree &t);
 
     std::unordered_map<std::size_t, LineBreakData> _lineBreaks;
 };

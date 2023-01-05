@@ -202,3 +202,7 @@ FileDB &VirtualFileSystem::GetFileDB() {
 LineIndexDB &VirtualFileSystem::GetLineIndexDB() {
     return _lineIndexDB;
 }
+
+VirtualFile VirtualFileSystem::GetVirtualFile(std::size_t fieldId) {
+    return VirtualFile(fieldId);
+}

@@ -1,12 +1,13 @@
 #include "CodeService/Format/Analyzer/TokenAnalyzer.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
-#include "CodeService/Format/FormatBuilder.h"
+#include "CodeService/Format/FormatState.h"
+#include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
 
 TokenAnalyzer::TokenAnalyzer() {
 
 }
 
-void TokenAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
+void TokenAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
     for (auto syntaxNode: t.GetSyntaxNodes()) {
         if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {
@@ -57,7 +58,7 @@ void TokenAnalyzer::Analyze(FormatBuilder &f, const LuaSyntaxTree &t) {
     }
 }
 
-void TokenAnalyzer::Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+void TokenAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (syntaxNode.IsToken(t)) {
         auto it = _tokenStrategies.find(syntaxNode.GetIndex());
         if (it != _tokenStrategies.end()) {
@@ -70,7 +71,7 @@ void TokenAnalyzer::Mark(LuaSyntaxNode &n, const LuaSyntaxTree &t, TokenStrategy
     _tokenStrategies[n.GetIndex()] = strategy;
 }
 
-void TokenAnalyzer::TableFieldAddSep(FormatBuilder &f, LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+void TokenAnalyzer::TableFieldAddSep(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t) {
     auto sep = n.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
     if (!sep.IsNode(t)) {
         auto lastToken = n.GetLastToken(t);
@@ -82,7 +83,7 @@ void TokenAnalyzer::TableFieldAddSep(FormatBuilder &f, LuaSyntaxNode &n, const L
     }
 }
 
-void TokenAnalyzer::AnalyzeTableField(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+void TokenAnalyzer::AnalyzeTableField(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
     if (f.GetStyle().table_separator_style == TableSeparatorStyle::Semicolon) {
         auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
         auto comma = sep.GetChildToken(',', t);
@@ -186,10 +187,10 @@ LuaSyntaxNode GetSingleArgStringOrTable(LuaSyntaxNode &syntaxNode, const LuaSynt
     return LuaSyntaxNode(0);
 }
 
-void TokenAnalyzer::AnalyzeCallExpression(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
     if (IsSingleTableOrStringArg(syntaxNode, t)) {
         switch (f.GetStyle().call_arg_parentheses) {
-            case CallArgParentheses::Remove : {
+            case CallArgParentheses::Remove: {
                 auto lbrace = syntaxNode.GetChildToken('(', t);
                 Mark(lbrace, t, TokenStrategy::Remove);
                 auto rbrace = syntaxNode.GetChildToken(')', t);

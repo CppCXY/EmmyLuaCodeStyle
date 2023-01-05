@@ -80,9 +80,9 @@ std::shared_ptr<lsp::InitializeResult> LSPHandle::OnInitialize(std::shared_ptr<l
 //    result->capabilities.executeCommandProvider.commands =
 //            _server->GetService<CommandService>()->GetCommands();
 //
-//    result->capabilities.diagnosticProvider.identifier = "EmmyLuaCodeStyle";
-//    result->capabilities.diagnosticProvider.workspaceDiagnostics = false;
-//    result->capabilities.diagnosticProvider.interFileDependencies = false;
+    result->capabilities.diagnosticProvider.identifier = "EmmyLuaCodeStyle";
+    result->capabilities.diagnosticProvider.workspaceDiagnostics = false;
+    result->capabilities.diagnosticProvider.interFileDependencies = false;
 
     auto &editorConfigFiles = param->initializationOptions.editorConfigFiles;
     for (auto &configFile: editorConfigFiles) {
@@ -159,7 +159,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnFormatting(
 
     auto &syntaxTree = opSyntaxTree.value();
 
-    LuaStyle& luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
+    LuaStyle &luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
 
     auto newText = _server->GetService<FormatService>()->Format(syntaxTree, luaStyle);
     auto lineIndex = vFile.GetLineIndex(vfs);
@@ -217,7 +217,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnRangeFormatting(
 
     auto &syntaxTree = opSyntaxTree.value();
 
-    LuaStyle& luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
+    LuaStyle &luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
 
     FormatRange range;
     range.StartLine = params->range.start.line;
@@ -322,8 +322,33 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnWorkspaceDidChangeConfiguration(
 
 std::shared_ptr<lsp::DocumentDiagnosticReport> LSPHandle::OnTextDocumentDiagnostic(
         std::shared_ptr<lsp::DocumentDiagnosticParams> params) {
-    auto report = _server->GetService<DiagnosticService>()->Diagnostic(param->textDocument.uri, param->previousResultId);
-    return nullptr;
+    auto report = std::make_shared<lsp::DocumentDiagnosticReport>();
+    report->kind = lsp::DocumentDiagnosticReportKind::Full;
+
+    auto &vfs = _server->GetVFS();
+    auto opFileId = vfs.GetUriDB().Query(params->textDocument.uri);
+    if (!opFileId.has_value()) {
+        return report;
+    }
+
+    auto opSyntaxTree = vfs.GetVirtualFile(params->textDocument.uri).GetSyntaxTree(vfs);
+    if (!opSyntaxTree.has_value()) {
+        return report;
+    }
+
+    auto &syntaxTree = opSyntaxTree.value();
+
+    LuaStyle &luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
+
+    LuaDiagnosticStyle dStyle;
+
+    auto diagnostics = _server->GetService<DiagnosticService>()->Diagnostic(
+            opFileId.value(), syntaxTree, luaStyle, dStyle
+    );
+    report->resultId = std::to_string(opFileId.value());
+
+    report->items = std::move(diagnostics);
+    return report;
 }
 
 

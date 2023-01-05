@@ -9,17 +9,17 @@ public:
 
     TokenAnalyzer();
 
-    void Analyze(FormatBuilder &f, const LuaSyntaxTree &t) override;
+    void Analyze(FormatState &f, const LuaSyntaxTree &t) override;
 
-    void Query(FormatBuilder &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
+    void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
     void Mark(LuaSyntaxNode &n, const LuaSyntaxTree &t, TokenStrategy strategy);
 private:
-    void TableFieldAddSep(FormatBuilder &f, LuaSyntaxNode &n, const LuaSyntaxTree &t);
+    void TableFieldAddSep(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t);
 
-    void AnalyzeTableField(FormatBuilder &f, LuaSyntaxNode& syntaxNode ,const LuaSyntaxTree &t);
+    void AnalyzeTableField(FormatState &f, LuaSyntaxNode& syntaxNode , const LuaSyntaxTree &t);
 
-    void AnalyzeCallExpression(FormatBuilder &f, LuaSyntaxNode& syntaxNode ,const LuaSyntaxTree &t);
+    void AnalyzeCallExpression(FormatState &f, LuaSyntaxNode& syntaxNode , const LuaSyntaxTree &t);
 
 
     std::unordered_map<std::size_t, TokenStrategy> _tokenStrategies;

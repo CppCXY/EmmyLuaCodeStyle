@@ -22,6 +22,7 @@ target_sources(CodeService
 
         # format
         ${CodeService_SOURCE_DIR}/src/Format/FormatBuilder.cpp
+        ${CodeService_SOURCE_DIR}/src/Format/FormatState.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/FormatAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/SpaceAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/IndentationAnalyzer.cpp
@@ -36,7 +37,7 @@ target_sources(CodeService
 #        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormat.cpp
 #        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp
         # diagnostic
-        ${CodeService_SOURCE_DIR}/src/Diagnostic/StyleDiagnostic.cpp
+        ${CodeService_SOURCE_DIR}/src/Diagnostic/DiagnosticBuilder.cpp
 #        # nameStyle
 #        ${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleChecker.cpp
 #        ${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleRuleMatcher.cpp

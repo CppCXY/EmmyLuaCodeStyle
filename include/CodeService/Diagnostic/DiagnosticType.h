@@ -5,8 +5,11 @@
 enum class DiagnosticType {
     None,
     Space,
+    Align,
     MaxLineWidth,
+    StringQuote,
     StatementLineSpace,
+    EndWithNewLine,
     Indent,
     NameStyle,
     Spell

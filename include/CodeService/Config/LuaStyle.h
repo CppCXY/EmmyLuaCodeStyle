@@ -92,6 +92,10 @@ public:
     bool align_continuous_assign_statement_to_equal = true;
 
     bool align_continuous_rect_table_field_to_equal = true;
+    // not implement now
+    bool align_continuous_similar_call_args = false;
+
+//    bool align_continuous_similar_array_table = false;
 
     bool align_if_branch = true;
 

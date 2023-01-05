@@ -188,7 +188,7 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
             }
 
             if (std::regex_search(value, m, keepLineRegex)) {
-                keepLineOption.second = LineSpace(LineSpaceType::Keep, std::stoi(m.str(1)));
+                keepLineOption.second = LineSpace(LineSpaceType::Fixed, std::stoi(m.str(1)));
                 continue;
             }
 

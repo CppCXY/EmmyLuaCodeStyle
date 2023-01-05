@@ -10,35 +10,9 @@ class LuaDiagnosticStyle {
 public:
     LuaDiagnosticStyle() = default;
 
-    // [basic]
-    /*
-     * 缩进风格
-     */
-    IndentStyle indent_style = IndentStyle::Space;
+    bool code_style_check = true;
 
-    /*
-     * 缩进的空白数
-     */
-    std::size_t indent_size = 4;
+    bool name_style_check = true;
 
-    /*
-     * tab的width
-     */
-    std::size_t tab_width = 4;
-
-    /*
-     * 行宽检查
-     */
-    std::size_t max_line_length = 120;
-
-    // [space]
-    bool enable_space_check = true;
-
-    bool space_around_math_operator = true;
-
-    // [name style]
-    bool enable_name_style_check = false;
-
-    // [spell check]
-    bool enable_spell_check = true;
+    bool spell_check = true;
 };
