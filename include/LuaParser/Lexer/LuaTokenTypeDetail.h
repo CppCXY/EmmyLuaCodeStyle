@@ -50,6 +50,7 @@ enum LuaTokenTypeDetail : int
 	TK_LONG_COMMENT, //长注释
 	TK_SHEBANG, //shebang
     TK_EOF, // 文件末尾
+    TK_ERR, // 错误Token
 	// DOC
 	TK_DOC_TAG_FORMAT,
 	TK_DOC_DISABLE_NEXT,

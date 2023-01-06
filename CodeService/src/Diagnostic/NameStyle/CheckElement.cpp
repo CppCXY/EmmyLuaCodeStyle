@@ -1,4 +1,4 @@
-﻿#include "CodeService/NameStyle/CheckElement.h"
+﻿#include "CodeService/Diagnostic//NameStyle/CheckElement.h"
 
 
 //CheckElement::CheckElement(NameDefineType type, std::shared_ptr<LuaAstNode> node,

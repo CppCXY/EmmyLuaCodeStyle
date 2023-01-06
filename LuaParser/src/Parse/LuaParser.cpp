@@ -33,8 +33,12 @@ std::shared_ptr<LuaFile> LuaParser::GetLuaFile() {
 }
 
 bool LuaParser::Parse() {
-    Block();
-
+    try {
+        Block();
+    }
+    catch (LuaParseException &e) {
+        // ignore
+    }
     return true;
 }
 
@@ -83,6 +87,12 @@ LuaTokenKind LuaParser::Current() {
         } else {
             _current = TK_EOF;
         }
+    }
+
+    if (_errors.size() > 100) {
+        std::string_view error = "too many errors, parse fail";
+        _errors.emplace_back(error, _tokens[_tokenIndex].Range);
+        throw LuaParseException(error);
     }
 
     return _current;
@@ -253,7 +263,7 @@ void LuaParser::ForStatement() {
             break;
         }
         default: {
-            ThrowLuaError("'=' or 'in' expected");
+            LuaExpectedError("'=' or 'in' expected");
         }
     }
 
@@ -703,10 +713,14 @@ void LuaParser::ParamList() {
                     break;
                 }
                 default: {
-                    ThrowLuaError("<name> or '...' expected");
+                    LuaExpectedError("<name> or '...' expected");
+                    goto endLoop;
                 }
             }
         } while (!isVararg && TestAndNext(','));
+        endLoop:
+        // empty stat
+        void(0);
     }
 
     m.Complete(*this, LuaSyntaxNodeKind::ParamList);
@@ -780,7 +794,7 @@ void LuaParser::FunctionCallArgs() {
             break;
         }
         default: {
-            ThrowLuaError("function arguments expected");
+            LuaExpectedError("function arguments expected");
         }
     }
 
@@ -825,15 +839,13 @@ void LuaParser::FunctionName() {
 }
 
 std::string_view LuaParser::CheckName() {
-    CheckAndNext(TK_NAME);
+    if (Current() == TK_NAME) {
+        auto range = _tokens[_tokenIndex].Range;
+        Next();
+        return _file->GetSource().substr(range.StartOffset, range.EndOffset - range.StartOffset);
+    }
 
-//    auto identify = CreateAstNodeFromCurrentToken(LuaSyntaxNodeKind::Identify);
-//
-//    parent->AddChild(identify);
-//
-//    _tokenParser->Next();
-
-//    return identify->GetText();
+    LuaExpectedError("expected <name>");
     return "";
 }
 
@@ -844,7 +856,7 @@ void LuaParser::LocalAttribute() {
         auto attributeName = CheckName();
         CheckAndNext('>');
         if (attributeName != "const" && attributeName != "close") {
-            ThrowMatchError(util::format("unknown attribute {}", attributeName));
+            LuaExpectedError(util::format("unknown attribute {}", attributeName));
         }
         m.Complete(*this, LuaSyntaxNodeKind::Attribute);
     }
@@ -852,7 +864,7 @@ void LuaParser::LocalAttribute() {
 
 void LuaParser::Check(LuaTokenKind c) {
     if (Current() != c) {
-        ThrowMatchError(util::format("{} expected", c));
+        LuaExpectedError(util::format("{} expected", c));
     }
 }
 
@@ -871,9 +883,10 @@ CompleteMarker LuaParser::PrimaryExpression() {
             return m.Complete(*this, LuaSyntaxNodeKind::NameExpression);
         }
         default:
-            ThrowLuaError("unexpected symbol");
+            LuaExpectedError("unexpected symbol");
     }
-    return CompleteMarker();
+    m.Undo(*this);
+    return m.Complete(*this, LuaSyntaxNodeKind::None);
 }
 
 UnOpr LuaParser::GetUnaryOperator(LuaTokenKind op) {
@@ -945,36 +958,29 @@ BinOpr LuaParser::GetBinaryOperator(LuaTokenKind op) {
     }
 }
 
-void LuaParser::CheckAndNext(LuaTokenKind c) {
-    if (Current() != c) {
-        ThrowLuaError(util::format("token type {} expected", c));
+void LuaParser::CheckAndNext(LuaTokenKind kind) {
+    if (Current() != kind) {
+        LuaExpectedError(util::format("token type {} expected", kind), kind);
         return;
     }
 
     Next();
 }
 
-bool LuaParser::TestAndNext(LuaTokenKind c) {
-    if (Current() == c) {
+bool LuaParser::TestAndNext(LuaTokenKind kind) {
+    if (Current() == kind) {
         Next();
         return true;
     }
     return false;
 }
 
-void LuaParser::ThrowLuaError(std::string_view message) {
-    if (Current() != TK_EOF) {
-        Next();
-//        _errors.emplace_back(message, 0);
-    }
-//    throw LuaParseException(message);
-}
-
-void LuaParser::ThrowMatchError(std::string message) {
-    Next();
-//    _errors.emplace_back(message, 0);
-//    _errors.emplace_back(message, range, token);
-//    throw LuaParseException(message);
+void LuaParser::LuaExpectedError(std::string_view message, LuaTokenKind expectedToken) {
+    auto me = MarkEvent(MarkEventType::Error);
+    me.U.Error.ErrorKind = LuaParserErrorKind::Expect;
+    me.U.Error.TokenKind = expectedToken;
+    _events.push_back(me);
+    _errors.emplace_back(message, _tokens[_tokenIndex].Range);
 }
 
 void LuaParser::NameDefList() {

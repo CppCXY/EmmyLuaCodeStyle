@@ -1,6 +1,5 @@
 ﻿#include "LuaParser/Lexer/LuaLexer.h"
 #include <limits>
-#include <cstdlib>
 #include "LuaDefine.h"
 #include "LuaParser/Lexer/LuaIdentify.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"

@@ -38,11 +38,11 @@ target_sources(CodeService
 #        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp
         # diagnostic
         ${CodeService_SOURCE_DIR}/src/Diagnostic/DiagnosticBuilder.cpp
-#        # nameStyle
-#        ${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleChecker.cpp
-#        ${CodeService_SOURCE_DIR}/src/NameStyle/NameStyleRuleMatcher.cpp
-#        ${CodeService_SOURCE_DIR}/src/NameStyle/CheckElement.cpp
-#        # spell
+#        # diagnostic/nameStyle
+#        ${CodeService_SOURCE_DIR}/src/Diagnostic/NameStyle/NameStyleChecker.cpp
+#        ${CodeService_SOURCE_DIR}/src/Diagnostic/NameStyle/NameStyleRuleMatcher.cpp
+#        ${CodeService_SOURCE_DIR}/src/Diagnostic/NameStyle/CheckElement.cpp
+#        # diagnostic/spell
         ${CodeService_SOURCE_DIR}/src/Diagnostic/Spell/CodeSpellChecker.cpp
         ${CodeService_SOURCE_DIR}/src/Diagnostic/Spell/IdentifyParser.cpp
         ${CodeService_SOURCE_DIR}/src/Diagnostic/Spell/TextParser.cpp

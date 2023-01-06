@@ -133,18 +133,16 @@ private:
 	 * 如果是就跳过当前,
 	 * 否则会生成错误
 	 */
-	void CheckAndNext(LuaTokenKind c);
+	void CheckAndNext(LuaTokenKind kind);
 
 	/*
 	 * 他是检查当前token的type是否与c相同
 	 * 如果是就跳过当前，并返回true
 	 * 否则返回false
 	 */
-	bool TestAndNext(LuaTokenKind c);
+	bool TestAndNext(LuaTokenKind kind);
 
-	void ThrowLuaError(std::string_view message);
-
-	void ThrowMatchError(std::string message);
+	void LuaExpectedError(std::string_view message, LuaTokenKind expectedToken = 0);
 
     std::vector<LuaToken> _tokens;
     std::size_t _tokenIndex;

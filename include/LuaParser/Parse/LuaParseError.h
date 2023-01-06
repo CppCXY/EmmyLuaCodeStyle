@@ -3,6 +3,12 @@
 #include <string_view>
 #include "LuaParser/Types/TextRange.h"
 
+enum class LuaParserErrorKind {
+    None,
+    Expect,
+    Match
+};
+
 class LuaParseError
 {
 public:

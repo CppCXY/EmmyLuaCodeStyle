@@ -3,12 +3,14 @@
 #include <vector>
 #include "LuaParser/Ast/LuaSyntaxNodeKind.h"
 #include "LuaParser/Lexer/LuaTokenKind.h"
+#include "LuaParseError.h"
 
 class LuaParser;
 
 enum class MarkEventType {
     NodeStart,
     EatToken,
+    Error,
     NodeEnd
 };
 
@@ -25,6 +27,11 @@ struct MarkEvent {
             std::size_t Index;
             LuaTokenKind Kind;
         } Token;
+
+        struct {
+            LuaTokenKind TokenKind;
+            LuaParserErrorKind ErrorKind;
+        } Error;
     } U;
 };
 
