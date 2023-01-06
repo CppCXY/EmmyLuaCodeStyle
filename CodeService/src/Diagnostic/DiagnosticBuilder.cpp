@@ -12,16 +12,30 @@ void DiagnosticBuilder::DiagnosticAnalyze(const LuaSyntaxTree &t) {
     _state.Analyze(t);
 }
 
-std::vector<LuaDiagnostic> &DiagnosticBuilder::GetDiagnosticResults(const LuaSyntaxTree &t) {
+std::vector<LuaDiagnostic> DiagnosticBuilder::GetDiagnosticResults(const LuaSyntaxTree &t) {
     CodeStyleCheck(t);
     NameStyleCheck(t);
     SpellCheck(t);
 
+    for (auto &d: _nextDiagnosticMap) {
+        _diagnostics.push_back(d.second);
+    }
+
     return _diagnostics;
 }
 
-void DiagnosticBuilder::PushDiagnostic(DiagnosticType type, TextRange range, std::string_view message) {
-    _diagnostics.emplace_back(type, range, message);
+void
+DiagnosticBuilder::PushDiagnostic(DiagnosticType type,
+                                  std::size_t leftIndex,
+                                  TextRange range,
+                                  std::string_view message,
+                                  std::string_view data) {
+    _nextDiagnosticMap[leftIndex] = LuaDiagnostic(type, range, message, data);
+}
+
+void DiagnosticBuilder::PushDiagnostic(DiagnosticType type, TextRange range, std::string_view message,
+                                       std::string_view data) {
+    _diagnostics.emplace_back(type, range, message, data);
 }
 
 void DiagnosticBuilder::CodeStyleCheck(const LuaSyntaxTree &t) {
@@ -94,6 +108,10 @@ void DiagnosticBuilder::SpellCheck(const LuaSyntaxTree &t) {
     if (!_state.GetDiagnosticStyle().spell_check) {
         return;
     }
+
+    if (_spellChecker) {
+        _spellChecker->Analyze(*this, t);
+    }
 }
 
 void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
@@ -128,12 +146,16 @@ void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaS
         switch (resolve.GetPrevSpaceStrategy()) {
             case PrevSpaceStrategy::AlignPos: {
                 auto pos = resolve.GetAlign();
-                if (pos != textRange.StartOffset) {
-                    PushDiagnostic(DiagnosticType::Align, textRange,
+                if (pos != file.GetLineOffset(textRange.StartOffset)) {
+                    PushDiagnostic(DiagnosticType::Align,
+                                   syntaxNode.GetPrevToken(t).GetIndex(),
+                                   textRange,
                                    util::format(LText("should align to {}"),
                                                 file.GetColumn(pos)
                                    )
                     );
+                } else {
+                    ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
                 }
                 break;
             }
@@ -141,12 +163,16 @@ void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaS
                 auto relativePos = resolve.GetAlign();
                 auto indentState = _state.GetCurrentIndent();
                 auto pos = relativePos + indentState.SpaceSize + indentState.TabSize * _state.GetStyle().tab_width;
-                if (pos != textRange.StartOffset) {
-                    PushDiagnostic(DiagnosticType::Align, textRange,
+                if (pos != file.GetLineOffset(textRange.StartOffset)) {
+                    PushDiagnostic(DiagnosticType::Align,
+                                   syntaxNode.GetPrevToken(t).GetIndex(),
+                                   textRange,
                                    util::format(LText("should align to {}"),
                                                 file.GetColumn(pos)
                                    )
                     );
+                } else {
+                    ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
                 }
                 break;
             }
@@ -283,18 +309,24 @@ void DiagnosticBuilder::ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNod
     auto additional = GetAdditionalNote(node, next, t);
     switch (shouldSpace) {
         case 0: {
-            PushDiagnostic(DiagnosticType::Space, TextRange(leftOffset, rightOffset),
+            PushDiagnostic(DiagnosticType::Space,
+                           node.GetIndex(),
+                           TextRange(leftOffset, rightOffset - 1),
                            util::format(LText("unnecessary whitespace {}"), additional)
             );
             break;
         }
         case 1: {
             if (diff == 0) {
-                PushDiagnostic(DiagnosticType::Space, TextRange(leftOffset, rightOffset + 1),
+                PushDiagnostic(DiagnosticType::Space,
+                               node.GetIndex(),
+                               TextRange(leftOffset, rightOffset + 1),
                                util::format(LText("missing whitespace {}"), additional)
                 );
             } else {
-                PushDiagnostic(DiagnosticType::Space, TextRange(leftOffset + 1, rightOffset),
+                PushDiagnostic(DiagnosticType::Space,
+                               node.GetIndex(),
+                               TextRange(leftOffset + 1, rightOffset - 1),
                                util::format(LText("multiple spaces {}"), additional)
                 );
             }
@@ -302,12 +334,14 @@ void DiagnosticBuilder::ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNod
         }
         default: {
             if (static_cast<std::size_t>(diff) < shouldSpace) {
-                PushDiagnostic(DiagnosticType::Space, TextRange(leftOffset, rightOffset),
+                PushDiagnostic(DiagnosticType::Space, node.GetIndex(),
+                               TextRange(leftOffset, rightOffset),
                                util::format(LText("expected {} whitespace, found {} {}"),
                                             shouldSpace, diff, additional)
                 );
             } else {
-                PushDiagnostic(DiagnosticType::Space, TextRange(leftOffset + 1, rightOffset),
+                PushDiagnostic(DiagnosticType::Space, node.GetIndex(),
+                               TextRange(leftOffset + 1, rightOffset - 1),
                                util::format(LText("expected {} whitespace, found {} {}"),
                                             shouldSpace, diff, additional)
                 );
@@ -315,6 +349,17 @@ void DiagnosticBuilder::ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNod
         }
     }
 
+}
+
+void DiagnosticBuilder::ClearDiagnostic(std::size_t leftIndex) {
+    auto it = _nextDiagnosticMap.find(leftIndex);
+    if (it != _nextDiagnosticMap.end()) {
+        _nextDiagnosticMap.erase(it);
+    }
+}
+
+void DiagnosticBuilder::SetSpellChecker(std::shared_ptr<CodeSpellChecker> spellChecker) {
+    _spellChecker = spellChecker;
 }
 
 

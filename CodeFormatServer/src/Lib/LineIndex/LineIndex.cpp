@@ -28,9 +28,12 @@ LineCol LineIndex::GetLineCol(std::size_t offset) {
     auto lineIt = std::partition_point(
             _newLines.begin(), _newLines.end(),
             [offset](LineOffset &lo) {
-                return lo.Start < offset;
+                return lo.Start <= offset;
             });
-    auto line = static_cast<std::size_t>(lineIt - _newLines.begin() - 1);
+    std::size_t line = 0;
+    if (lineIt > _newLines.begin()) {
+        line = static_cast<std::size_t>(lineIt - _newLines.begin() - 1);
+    }
     auto lineStartOffset = _newLines.at(line).Start;
     auto colOffset = offset - lineStartOffset;
     auto col = _newLines.at(line).GetCol(colOffset);

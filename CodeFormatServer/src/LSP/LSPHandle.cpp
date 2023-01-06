@@ -5,7 +5,6 @@
 #include "nlohmann/json.hpp"
 #include "LSP.h"
 #include "CodeService/Config/LuaStyle.h"
-//#include "CodeService/LuaFormatter.h"
 #include "LanguageServer.h"
 //#include "Service/CodeActionService.h"
 #include "Service/FormatService.h"
@@ -57,7 +56,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::Dispatch(std::string_view method,
     return nullptr;
 }
 
-std::shared_ptr<lsp::InitializeResult> LSPHandle::OnInitialize(std::shared_ptr<lsp::InitializeParams> param) {
+std::shared_ptr<lsp::InitializeResult> LSPHandle::OnInitialize(std::shared_ptr<lsp::InitializeParams> params) {
     _server->InitializeService();
 
     auto result = std::make_shared<lsp::InitializeResult>();
@@ -84,13 +83,13 @@ std::shared_ptr<lsp::InitializeResult> LSPHandle::OnInitialize(std::shared_ptr<l
     result->capabilities.diagnosticProvider.workspaceDiagnostics = false;
     result->capabilities.diagnosticProvider.interFileDependencies = false;
 
-    auto &editorConfigFiles = param->initializationOptions.editorConfigFiles;
+    auto &editorConfigFiles = params->initializationOptions.editorConfigFiles;
     for (auto &configFile: editorConfigFiles) {
         _server->GetService<ConfigService>()->LoadEditorconfig(configFile.workspace, configFile.path);
     }
 
-    std::filesystem::path localePath = param->initializationOptions.localeRoot;
-    localePath /= param->locale + ".json";
+    std::filesystem::path localePath = params->initializationOptions.localeRoot;
+    localePath /= params->locale + ".json";
 
     if (std::filesystem::exists(localePath) && std::filesystem::is_regular_file(localePath)) {
         _server->GetService<ConfigService>()->LoadLanguageTranslator(localePath.string());
@@ -104,12 +103,12 @@ std::shared_ptr<lsp::InitializeResult> LSPHandle::OnInitialize(std::shared_ptr<l
 
 //    _server->GetVFS().SetRoot(param->rootPath);
 
-//    auto dictionaryPath = param->initializationOptions.dictionaryPath;
-//    if (!dictionaryPath.empty()) {
-//        for (auto &path: dictionaryPath) {
-//            _server->GetService<FormatService>()->LoadDictionary(path);
-//        }
-//    }
+    auto dictionaryPath = params->initializationOptions.dictionaryPath;
+    if (!dictionaryPath.empty()) {
+        for (auto &path: dictionaryPath) {
+            _server->GetService<DiagnosticService>()->GetSpellChecker()->LoadDictionary(path);
+        }
+    }
     return result;
 }
 

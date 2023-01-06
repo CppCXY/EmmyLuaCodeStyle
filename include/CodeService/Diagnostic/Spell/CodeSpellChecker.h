@@ -3,32 +3,38 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include <set>
 #include "Util/SymSpell/SymSpell.h"
-#include "CodeService/FormatElement/DiagnosisContext.h"
 #include "IdentifyParser.h"
 #include "Util/StringUtil.h"
+#include "LuaParser/Ast/LuaSyntaxTree.h"
 
-class CodeSpellChecker
-{
+class DiagnosticBuilder;
+
+class CodeSpellChecker {
 public:
-	using CustomDictionary = std::set<std::string, string_util::CaseInsensitiveLess>;
+    using CustomDictionary = std::set<std::string, string_util::CaseInsensitiveLess>;
 
-	CodeSpellChecker();
+    CodeSpellChecker();
 
-	void LoadDictionary(std::string_view path);
+    void LoadDictionary(std::string_view path);
 
-	void LoadDictionaryFromBuffer(std::string_view buffer);
+    void LoadDictionaryFromBuffer(std::string_view buffer);
 
-	void Analysis(DiagnosisContext& ctx, const CustomDictionary& customDict = CustomDictionary());
+    void SetCustomDictionary(CustomDictionary& dictionary);
 
-	// copy once
-	std::vector<SuggestItem> GetSuggests(std::string word);
+    void Analyze(DiagnosticBuilder &d, const LuaSyntaxTree &t);
+
+    // copy once
+    std::vector<SuggestItem> GetSuggests(std::string word);
+
 private:
-	void IdentifyAnalysis(DiagnosisContext& ctx, LuaToken& token, const CustomDictionary& customDict);
+    void IdentifyAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &token, const LuaSyntaxTree &t);
 
-	void TextAnalysis(DiagnosisContext& ctx, LuaToken& token, const CustomDictionary& customDict);
+    void TextAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &token, const LuaSyntaxTree &t);
 
-	std::shared_ptr<SymSpell> _symSpell;
-	std::unordered_map<std::string, std::shared_ptr<spell::IdentifyParser>> _caches;
+    std::shared_ptr<SymSpell> _symSpell;
+    std::unordered_map<std::string, std::shared_ptr<spell::IdentifyParser>> _caches;
+    CustomDictionary _dictionary;
 };
 

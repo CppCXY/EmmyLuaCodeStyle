@@ -56,6 +56,17 @@ std::size_t LuaFile::GetColumn(std::size_t offset) const {
     return 0;
 }
 
+std::size_t LuaFile::GetLineOffset(std::size_t offset) const {
+    auto line = GetLine(offset);
+
+    auto lineStartOffset = _lineOffsetVec[line];
+
+    if (offset > lineStartOffset) {
+        return offset - lineStartOffset;
+    }
+    return 0;
+}
+
 std::size_t LuaFile::GetOffset(std::size_t line, std::size_t character) const {
     std::size_t sizeLine = line;
 
@@ -79,49 +90,9 @@ std::size_t LuaFile::GetTotalLine() const {
     return _linenumber;
 }
 
-bool LuaFile::IsEmptyLine(std::size_t line) const {
-    if (line >= _lineOffsetVec.size()) {
-        return true;
-    }
-
-    auto lineStartOffset = _lineOffsetVec[line];
-    std::size_t nextLineStartOffset = 0;
-
-    if (line == _linenumber) {
-        nextLineStartOffset = _source.size();
-    } else {
-        nextLineStartOffset = _lineOffsetVec[line + 1];
-    }
-
-    for (auto offset = lineStartOffset; offset < nextLineStartOffset; offset++) {
-        char ch = _source[offset];
-        if (ch != '\n' && ch != '\r' && ch != '\t' && ch != ' ') {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
 void LuaFile::PushLine(std::size_t offset) {
     _lineOffsetVec.push_back(offset);
     _linenumber++;
-}
-
-bool LuaFile::OnlyEmptyCharBefore(std::size_t offset) {
-    auto source = GetSource();
-    auto line = GetLine(offset);
-    auto start = GetOffset(line, 0);
-
-    for (; start < offset; start++) {
-        auto ch = source[start];
-        if (ch != '\t' && ch != ' ') {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 std::string_view LuaFile::GetSource() const {

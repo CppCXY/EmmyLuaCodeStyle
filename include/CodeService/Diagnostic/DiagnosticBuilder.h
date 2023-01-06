@@ -4,6 +4,7 @@
 #include "CodeService/Config/LuaDiagnosticStyle.h"
 #include "CodeService/Format/FormatState.h"
 #include "DiagnosticType.h"
+#include "CodeService/Diagnostic/Spell/CodeSpellChecker.h"
 
 class DiagnosticBuilder {
 public:
@@ -11,7 +12,20 @@ public:
 
     void DiagnosticAnalyze(const LuaSyntaxTree &t);
 
-    std::vector<LuaDiagnostic> &GetDiagnosticResults(const LuaSyntaxTree &t);
+    void SetSpellChecker(std::shared_ptr<CodeSpellChecker> spellChecker);
+
+    std::vector<LuaDiagnostic> GetDiagnosticResults(const LuaSyntaxTree &t);
+
+    void PushDiagnostic(DiagnosticType type,
+                        std::size_t leftIndex,
+                        TextRange range,
+                        std::string_view message,
+                        std::string_view data = "");
+
+    void PushDiagnostic(DiagnosticType type,
+                        TextRange range,
+                        std::string_view message,
+                        std::string_view data = "");
 
 private:
     void DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
@@ -22,9 +36,7 @@ private:
 
     void SpellCheck(const LuaSyntaxTree &t);
 
-    void PushDiagnostic(DiagnosticType type,
-                        TextRange range,
-                        std::string_view message);
+    void ClearDiagnostic(std::size_t leftIndex);
 
     void ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNode &next,
                                 const LuaSyntaxTree &t,
@@ -33,5 +45,7 @@ private:
     std::string GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxNode &right, const LuaSyntaxTree &t);
 
     FormatState _state;
+    std::shared_ptr<CodeSpellChecker> _spellChecker;
+    std::map<std::size_t, LuaDiagnostic> _nextDiagnosticMap;
     std::vector<LuaDiagnostic> _diagnostics;
 };

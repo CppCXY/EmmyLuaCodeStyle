@@ -5,6 +5,7 @@
 #include "CodeService/Config/LuaStyle.h"
 #include "CodeService/Config/LuaDiagnosticStyle.h"
 #include "LSP/LSP.h"
+#include "CodeService/Diagnostic/Spell/CodeSpellChecker.h"
 
 class DiagnosticService : public Service {
 public:
@@ -18,9 +19,9 @@ public:
             const LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle,
             LuaDiagnosticStyle &diagnosticStyle);
 
+    std::shared_ptr<CodeSpellChecker> GetSpellChecker();
+
 private:
-//    std::shared_ptr<CodeSpellChecker> _spellChecker;
-//
-//    CodeSpellChecker::CustomDictionary _customDictionary;
+    std::shared_ptr<CodeSpellChecker> _spellChecker;
 };
 

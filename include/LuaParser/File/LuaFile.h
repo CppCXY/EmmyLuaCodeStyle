@@ -14,15 +14,13 @@ public:
 
 	std::size_t GetColumn(std::size_t offset) const;
 
+    std::size_t GetLineOffset(std::size_t offset) const;
+
 	std::size_t GetOffset(std::size_t line, std::size_t character) const;
 
 	std::size_t GetTotalLine() const;
 
-	bool IsEmptyLine(std::size_t line) const;
-
 	void PushLine(std::size_t offset);
-
-	bool OnlyEmptyCharBefore(std::size_t offset);
 
 	std::string_view GetSource() const;
 

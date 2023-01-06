@@ -58,7 +58,9 @@ int IOSession::Run(LanguageServer& server)
 
 std::string IOSession::Handle(LanguageServer& server, std::shared_ptr<ProtocolParser> parser)
 {
+#if !defined(_DEBUG)
 	try
+#endif
 	{
         auto& lspHandle = server.GetLSPHandle();
 		auto params = parser->GetParams();
@@ -72,10 +74,11 @@ std::string IOSession::Handle(LanguageServer& server, std::shared_ptr<ProtocolPa
 			}
 		}
 	}
+#if !defined(_DEBUG)
 	catch (std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-
+#endif
 	return "";
 }

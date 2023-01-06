@@ -17,10 +17,14 @@ enum class DiagnosticType {
 
 class LuaDiagnostic {
 public:
-    LuaDiagnostic(DiagnosticType type, TextRange range, std::string_view message)
-            : Type(type), Range(range), Message(message) {}
+    LuaDiagnostic()
+        : Type(DiagnosticType::None), Range(), Message() {}
+
+    LuaDiagnostic(DiagnosticType type, TextRange range, std::string_view message, std::string_view data)
+            : Type(type), Range(range), Message(message), Data(data) {}
 
     DiagnosticType Type;
     TextRange Range;
     std::string Message;
+    std::string Data;
 };

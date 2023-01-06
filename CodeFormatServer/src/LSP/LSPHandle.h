@@ -40,7 +40,7 @@ private:
 		};
 	}
 
-	std::shared_ptr<lsp::InitializeResult> OnInitialize(std::shared_ptr<lsp::InitializeParams> param);
+	std::shared_ptr<lsp::InitializeResult> OnInitialize(std::shared_ptr<lsp::InitializeParams> params);
 
 	std::shared_ptr<lsp::Serializable> OnInitialized(std::shared_ptr<lsp::Serializable> param);
 

@@ -7,34 +7,33 @@
 
 namespace spell {
 
-class IdentifyParser
-{
+class IdentifyParser {
 public:
-	enum class IdentifyType
-	{
-		Unknown,
-		Ascii,
-		Unicode,
-		Ignore,
-		AsciiEnd,
-		End,
-	};
+    enum class IdentifyType {
+        Unknown,
+        Ascii,
+        Unicode,
+        Ignore,
+        AsciiEnd,
+        End,
+    };
 
-	IdentifyParser(std::string_view source);
+    IdentifyParser(std::string_view source);
 
-	void Parse();
+    void Parse();
 
-	std::vector<Word>& GetWords();
+    std::vector<Word> &GetWords();
+
 private:
-	IdentifyType Lex();
+    IdentifyType Lex();
 
-	int GetCurrentChar();
+    int GetCurrentChar();
 
-	void PushWords(spell::WordRange range);
+    void PushWords(spell::WordRange range);
 
-	std::string_view _source;
-	std::size_t _currentIndex;
-	std::vector<Word> _words;
+    std::string_view _source;
+    std::size_t _currentIndex;
+    std::vector<Word> _words;
 };
 
 }
