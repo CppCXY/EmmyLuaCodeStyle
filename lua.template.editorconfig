@@ -16,6 +16,7 @@ quote_style = none
 continuation_indent_size = 4
 
 # optional crlf/lf/cr/auto, if it is 'auto', in windows it is crlf other platforms are lf
+# in neovim the value 'auto' is not a valid option, please use 'unset' 
 end_of_line = auto
 
 detect_end_of_line = false
