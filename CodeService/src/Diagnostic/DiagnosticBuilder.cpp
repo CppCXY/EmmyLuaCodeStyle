@@ -102,6 +102,9 @@ void DiagnosticBuilder::NameStyleCheck(const LuaSyntaxTree &t) {
     if (!_state.GetDiagnosticStyle().name_style_check) {
         return;
     }
+
+
+    _nameStyleChecker.Analyze(*this, t);
 }
 
 void DiagnosticBuilder::SpellCheck(const LuaSyntaxTree &t) {
@@ -362,4 +365,6 @@ void DiagnosticBuilder::SetSpellChecker(std::shared_ptr<CodeSpellChecker> spellC
     _spellChecker = spellChecker;
 }
 
-
+FormatState &DiagnosticBuilder::GetState() {
+    return _state;
+}

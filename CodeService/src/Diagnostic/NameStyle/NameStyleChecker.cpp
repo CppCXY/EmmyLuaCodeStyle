@@ -1,8 +1,10 @@
 ﻿#include "CodeService/Diagnostic/NameStyle/NameStyleChecker.h"
 #include <algorithm>
+#include "CodeService/Diagnostic/DiagnosticBuilder.h"
 #include "Util/format.h"
 #include "CodeService/Config/LanguageTranslator.h"
 #include "CodeService/Diagnostic/NameStyle/NameStyleRuleMatcher.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 
 std::set<std::string, std::less<>> NameStyleChecker::TableFieldSpecialName = {
         "__add", "__sub", "__mul", "__div", "__mod", "__pow",
@@ -18,296 +20,456 @@ std::set<std::string, std::less<>> NameStyleChecker::GlobalSpecialName = {
 NameStyleChecker::NameStyleChecker() {
 }
 
-//void NameStyleChecker::Analysze() {
-//    for (auto checkElement: _nameStyleCheckVector) {
-//        switch (checkElement->Type) {
-//            case NameDefineType::LocalVariableName: {
-//                _ctx.GetOptions().local_name_define_style->Diagnosis(_ctx, checkElement);
-//                break;
-//            }
-//            case NameDefineType::ModuleDefineName: {
-//                _ctx.GetOptions().module_name_define_style->Diagnosis(_ctx, checkElement);
-//                break;
-//            }
-//            case NameDefineType::LocalFunctionName: {
-//                if (TableFieldSpecialName.count(checkElement->Node->GetText())) {
-//                    return;
-//                }
-//                _ctx.GetOptions().local_function_name_define_style->Diagnosis(_ctx, checkElement);
-//                break;
-//            }
-//            case NameDefineType::GlobalVariableDefineName: {
-//                if (GlobalSpecialName.count(checkElement->Node->GetText())) {
-//                    return;
-//                }
-//                _ctx.GetOptions().global_variable_name_define_style->Diagnosis(_ctx, checkElement);
-//                break;
-//            }
-//            case NameDefineType::ParamName: {
-//                _ctx.GetOptions().function_param_name_style->Diagnosis(_ctx, checkElement);
-//                break;
-//            }
-//            case NameDefineType::ImportModuleName: {
-//                _ctx.GetOptions().require_module_name_style->Diagnosis(_ctx, checkElement);
-//                break;
-//            }
-//            case NameDefineType::ClassVariableName: {
-//                _ctx.GetOptions().class_name_define_style->Diagnosis(_ctx, checkElement);
-//                break;
-//            }
-//            case NameDefineType::FunctionDefineName: {
-//                if (TableFieldSpecialName.count(checkElement->Node->GetText())) {
-//                    return;
-//                }
-//
-//                _ctx.GetOptions().function_name_define_style->Diagnosis(_ctx, checkElement);
-//                break;
-//            }
-//            case NameDefineType::TableFieldDefineName: {
-//                // 忽略元方法
-//                if (TableFieldSpecialName.count(checkElement->Node->GetText())) {
-//                    return;
-//                }
-//                _ctx.GetOptions().table_field_name_define_style->Diagnosis(_ctx, checkElement);
-//                break;
-//            }
-//        }
-//    }
-//}
-//
-//void NameStyleChecker::VisitLocalStatement(const std::shared_ptr<LuaAstNode> &localStatement) {
-//    std::shared_ptr<LuaAstNode> nameDefineList = nullptr;
-//    std::shared_ptr<LuaAstNode> expressionList = nullptr;
-//
-//    for (auto child: localStatement->GetChildren()) {
-//        if (child->GetType() == LuaAstNodeType::NameDefList) {
-//            nameDefineList = child;
-//        } else if (child->GetType() == LuaAstNodeType::ExpressionList) {
-//            expressionList = child;
-//            break;
-//        }
-//    }
-//
-//    if (nameDefineList && expressionList) {
-//        std::vector<std::shared_ptr<LuaAstNode>> nameVector;
-//        for (auto &nameIdentify: nameDefineList->GetChildren()) {
-//            if (nameIdentify->GetType() == LuaAstNodeType::Identify) {
-//                nameVector.push_back(nameIdentify);
-//            }
-//        }
-//
-//        std::vector<std::shared_ptr<LuaAstNode>> expressionVector;
-//
-//        for (auto &expression: expressionList->GetChildren()) {
-//            if (expression->GetType() == LuaAstNodeType::Expression) {
-//                expressionVector.push_back(expression);
-//            }
-//        }
-//
-//        for (std::size_t index = 0; index < nameVector.size(); index++) {
-//            auto nameIdentify = nameVector[index];
-//            if (index >= expressionVector.size()) {
-//                auto checkElement = std::make_shared<CheckElement>(NameDefineType::LocalVariableName, nameIdentify);
-//                _nameStyleCheckVector.push_back(checkElement);
-//                RecordLocalVariable(checkElement);
-//                continue;
-//            }
-//            auto expression = expressionVector[index];
-//            auto callExpression = expression->FindFirstOf(LuaAstNodeType::CallExpression);
-//
-//            if (callExpression) {
-//                // 将约定做成规范
-//                auto methodNameNode = callExpression->FindFirstOf(LuaAstNodeType::PrimaryExpression);
-//                if (methodNameNode) {
-//                    if (methodNameNode->GetText() == "require" || methodNameNode->GetText() == "import") {
-//                        auto callArgsList = callExpression->FindFirstOf(LuaAstNodeType::CallArgList);
-//
-//                        auto checkElement = std::make_shared<CheckElement>(
-//                                NameDefineType::ImportModuleName, nameIdentify, callArgsList);
-//                        _nameStyleCheckVector.push_back(checkElement);
-//                        RecordLocalVariable(checkElement);
-//                        continue;
-//                    } else if (methodNameNode->GetText() == "Class" || methodNameNode->GetText() == "class") {
-//                        auto callArgsList = callExpression->FindFirstOf(LuaAstNodeType::CallArgList);
-//                        auto checkElement = std::make_shared<CheckElement>(
-//                                NameDefineType::ClassVariableName, nameIdentify, callArgsList);
-//                        _nameStyleCheckVector.push_back(checkElement);
-//                        RecordLocalVariable(checkElement);
-//                        continue;
-//                    }
-//                }
-//            }
-//            auto checkElement = std::make_shared<CheckElement>(NameDefineType::LocalVariableName, nameIdentify);
-//            _nameStyleCheckVector.push_back(checkElement);
-//            RecordLocalVariable(checkElement);
-//        }
-//    } else if (nameDefineList) {
-//        for (auto &nameIdentify: nameDefineList->GetChildren()) {
-//            if (nameIdentify->GetType() == LuaAstNodeType::Identify) {
-//                auto checkElement = std::make_shared<CheckElement>(NameDefineType::LocalVariableName, nameIdentify);
-//                _nameStyleCheckVector.push_back(checkElement);
-//                RecordLocalVariable(checkElement);
-//            }
-//        }
-//    }
-//}
-//
-//void NameStyleChecker::VisitParamList(const std::shared_ptr<LuaAstNode> &paramList) {
-//    for (auto param: paramList->GetChildren()) {
-//        if (param->GetType() == LuaAstNodeType::Param && param->GetText() != "...") {
-//            _nameStyleCheckVector.push_back(std::make_shared<CheckElement>(NameDefineType::ParamName, param));
-//        }
-//    }
-//}
-//
-//void NameStyleChecker::VisitLocalFunctionStatement(const std::shared_ptr<LuaAstNode> &localFunctionStatement) {
-//    for (auto child: localFunctionStatement->GetChildren()) {
-//        if (child->GetType() == LuaAstNodeType::Identify) {
-//            _nameStyleCheckVector.push_back(std::make_shared<CheckElement>(NameDefineType::LocalFunctionName, child));
-//            break;
-//        }
-//    }
-//}
-//
-//void NameStyleChecker::VisitFunctionStatement(const std::shared_ptr<LuaAstNode> &functionStatement) {
-//    for (auto child: functionStatement->GetChildren()) {
-//        if (child->GetType() == LuaAstNodeType::NameExpression && !child->GetChildren().empty()) {
-//            std::shared_ptr<LuaAstNode> lastElement = child->GetChildren().back();
-//            while (lastElement) {
-//                if (lastElement->GetType() == LuaAstNodeType::IndexExpression && !lastElement->GetChildren().
-//                        empty()) {
-//                    lastElement = lastElement->GetChildren().back();
-//                } else {
-//                    break;
-//                }
-//            }
-//
-//            if (lastElement && ((lastElement->GetType() == LuaAstNodeType::Identify)
-//                                || (lastElement->GetType() == LuaAstNodeType::PrimaryExpression))) {
-//                _nameStyleCheckVector.push_back(
-//                        std::make_shared<CheckElement>(NameDefineType::FunctionDefineName, lastElement));
-//            }
-//        }
-//    }
-//}
-//
-//void NameStyleChecker::VisitAssignment(const std::shared_ptr<LuaAstNode> &assignStatement) {
-//    auto leftAssignStatement = assignStatement->FindFirstOf(LuaAstNodeType::ExpressionList);
-//
-//    for (auto expression: leftAssignStatement->GetChildren()) {
-//        if (expression->GetType() == LuaAstNodeType::Expression && !expression->GetChildren().empty()) {
-//            auto expressionFirstChild = expression->GetChildren().front();
-//            if (expressionFirstChild->GetType() == LuaAstNodeType::PrimaryExpression) {
-//                if (IsGlobal(expressionFirstChild)) {
-//                    _nameStyleCheckVector.push_back(
-//                            std::make_shared<CheckElement>(NameDefineType::GlobalVariableDefineName,
-//                                                           expressionFirstChild));
-//                }
-//            } else if (expressionFirstChild->GetType() == LuaAstNodeType::IndexExpression) {
-//                std::shared_ptr<LuaAstNode> lastElement = expressionFirstChild->GetChildren().back();
-//                while (lastElement) {
-//                    if (lastElement->GetType() == LuaAstNodeType::IndexExpression && !lastElement->GetChildren().
-//                            empty()) {
-//                        lastElement = lastElement->GetChildren().back();
-//                    } else {
-//                        break;
-//                    }
-//                }
-//
-//                if (lastElement && lastElement->GetType() == LuaAstNodeType::Identify) {
-//                    _nameStyleCheckVector.push_back(
-//                            std::make_shared<CheckElement>(NameDefineType::TableFieldDefineName, lastElement));
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//void NameStyleChecker::VisitTableField(const std::shared_ptr<LuaAstNode> &tableField) {
-//    auto identify = tableField->FindFirstOf(LuaAstNodeType::Identify);
-//
-//    if (identify) {
-//        _nameStyleCheckVector.push_back(std::make_shared<CheckElement>(NameDefineType::TableFieldDefineName, identify));
-//    }
-//}
-//
-//void NameStyleChecker::VisitReturnStatement(const std::shared_ptr<LuaAstNode> &returnStatement) {
-//    if (InTopBlock(returnStatement)) {
-//        auto expressionList = returnStatement->FindFirstOf(LuaAstNodeType::ExpressionList);
-//        if (expressionList && !expressionList->GetChildren().empty()) {
-//            auto firstReturnExpression = expressionList->GetChildren().front();
-//            if (firstReturnExpression->GetType() == LuaAstNodeType::Expression) {
-//                auto primaryReturnIdentify = firstReturnExpression->FindFirstOf(LuaAstNodeType::PrimaryExpression);
-//                if (primaryReturnIdentify) {
-//                    auto block = returnStatement->GetParent();
-//
-//                    if (_scopeMap.count(block)) {
-//                        auto &scope = _scopeMap[block];
-//                        auto it = scope.LocalVariableMap.find(primaryReturnIdentify->GetText());
-//                        if (it != scope.LocalVariableMap.end()) {
-//                            it->second->Type = NameDefineType::ModuleDefineName;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//void NameStyleChecker::VisitBlock(const std::shared_ptr<LuaAstNode> &block) {
-//    _scopeMap.insert({block, Scope()});
-//}
-//
-//void NameStyleChecker::RecordLocalVariable(std::shared_ptr<CheckElement> checkElement) {
-//    auto node = checkElement->Node;
-//    auto parent = node->GetParent();
-//    while (parent) {
-//        if (parent->GetType() == LuaAstNodeType::Block) {
-//            if (_scopeMap.count(parent)) {
-//                auto &scope = _scopeMap[parent];
-//                scope.LocalVariableMap.insert({std::string(node->GetText()), checkElement});
-//            }
-//            break;
-//        }
-//        parent = parent->GetParent();
-//    }
-//}
-//
-//bool NameStyleChecker::IsGlobal(std::shared_ptr<LuaAstNode> node) {
-//    auto identifyText = node->GetText();
-//
-//    auto parent = node->GetParent();
-//    while (parent) {
-//        if (parent->GetType() == LuaAstNodeType::Block) {
-//            if (_scopeMap.count(parent)) {
-//                auto &scope = _scopeMap[parent];
-//                auto it = scope.LocalVariableMap.find(identifyText);
-//                if (it != scope.LocalVariableMap.end()) {
-//                    return false;
-//                }
-//            }
-//        }
-//        parent = parent->GetParent();
-//    }
-//
-//    return true;
-//}
-
-void NameStyleChecker::Analyze(DiagnosticBuilder &d, const LuaSyntaxTree &t) {
-
+void NameStyleChecker::RecordLocalVariable(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    if (!_scopeStack.empty()) {
+        _scopeStack.back().insert(std::string(n.GetText(t)));
+    }
 }
 
-void NameStyleChecker::CollectToken(DiagnosticBuilder &d, const LuaSyntaxTree &t) {
-    for (auto &syntaxNode: t.GetSyntaxNodes()) {
+bool NameStyleChecker::CheckGlobal(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    auto text = n.GetText(t);
+    for (auto &scope: _scopeStack) {
+        if (scope.find(text) != scope.end()) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void NameStyleChecker::Analyze(DiagnosticBuilder &d, const LuaSyntaxTree &t) {
+    auto body = t.GetRootNode();
+    // todo check `do return end`
+    // todo check `if return`
+    auto retStmt = body.GetChildSyntaxNode(LuaSyntaxNodeKind::ReturnStatement, t);
+    if (retStmt.IsNode(t)) {
+        auto exprList = retStmt.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+        auto returnExpr = exprList.GetChildSyntaxNode(LuaSyntaxMultiKind::Expression, t);
+        if (returnExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::NameExpression) {
+            auto name = returnExpr.GetChildToken(TK_NAME, t);
+            _module = std::string(name.GetText(t));
+        }
+    }
+    EnterScope();
+    CheckInBody(body, t);
+    ExitScope();
+
+    Diagnostic(d, t);
+}
+
+void NameStyleChecker::EnterScope() {
+    _scopeStack.emplace_back();
+}
+
+void NameStyleChecker::ExitScope() {
+    if (!_scopeStack.empty()) {
+        _scopeStack.pop_back();
+    }
+}
+
+void NameStyleChecker::CheckInNode(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    for (auto syntaxNode: n.GetChildren(t)) {
         if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {
-                case LuaSyntaxNodeKind::LocalStatement: {
-                    auto nameDefList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::NameDefList, t);
-                    auto exprList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+                case LuaSyntaxNodeKind::ClosureExpression: {
+                    EnterScope();
+                    auto functionBody = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::FunctionBody, t);
+                    auto paramList = functionBody.GetChildSyntaxNode(LuaSyntaxNodeKind::ParamList, t);
+                    auto params = paramList.GetChildTokens(TK_NAME, t);
+                    for (auto paramName: params) {
+                        RecordLocalVariable(paramName, t);
+                        PushStyleCheck(NameDefineType::ParamName, paramName);
+                    }
 
+                    auto body = functionBody.GetChildSyntaxNode(LuaSyntaxNodeKind::Block, t);
+                    CheckInBody(body, t);
 
+                    ExitScope();
+                    break;
+                }
+                case LuaSyntaxNodeKind::Block: {
+                    EnterScope();
+
+                    CheckInBody(syntaxNode, t);
+
+                    ExitScope();
+                    break;
+                }
+                default: {
+                    CheckInNode(syntaxNode, t);
+                    break;
                 }
             }
         }
     }
+}
+
+void NameStyleChecker::CheckInBody(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    for (auto stmt: n.GetChildren(t)) {
+        if (stmt.IsNode(t)) {
+            switch (stmt.GetSyntaxKind(t)) {
+                case LuaSyntaxNodeKind::LocalStatement: {
+                    auto nameDefList = stmt.GetChildSyntaxNode(LuaSyntaxNodeKind::NameDefList, t);
+                    auto exprList = stmt.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+                    CheckInNode(exprList, t);
+
+                    auto names = nameDefList.GetChildTokens(TK_NAME, t);
+                    for (auto n: names) {
+                        RecordLocalVariable(n, t);
+                    }
+
+                    auto exprs = exprList.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
+                    for (std::size_t i = 0; i != names.size(); i++) {
+                        auto name = names[i];
+                        bool matchSpecialRule = false;
+                        if (i < exprs.size()) {
+                            auto expr = exprs[i];
+                            matchSpecialRule = CheckSpecialVariableRule(name, expr, t);
+                        }
+                        if (!matchSpecialRule) {
+                            if (_scopeStack.size() == 1 && _module == name.GetText(t)) {
+                                PushStyleCheck(NameDefineType::ModuleDefineName, name);
+                                break;
+                            }
+                            PushStyleCheck(NameDefineType::LocalVariableName, name);
+                        }
+                    }
+
+                    break;
+                }
+                case LuaSyntaxNodeKind::AssignStatement: {
+                    auto varList = stmt.GetChildSyntaxNode(LuaSyntaxNodeKind::VarList, t);
+                    auto exprList = stmt.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+                    CheckInNode(exprList, t);
+
+                    auto defineExprs = varList.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
+
+                    auto exprs = exprList.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
+                    for (std::size_t i = 0; i != defineExprs.size(); i++) {
+                        auto defineExpr = defineExprs[i];
+                        bool isNameDefine = defineExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::NameExpression;
+                        if (isNameDefine) {
+                            defineExpr = defineExpr.GetChildToken(TK_NAME, t);
+                        } else {
+                            // table field define
+                            auto children = defineExpr.GetChildren(t);
+                            if (!children.empty()) {
+                                defineExpr = children.back().GetChildToken(TK_NAME, t);
+                            }
+                        }
+
+                        bool matchSpecialRule = false;
+                        if (i < exprs.size()) {
+                            auto expr = exprs[i];
+                            matchSpecialRule = CheckSpecialVariableRule(defineExpr, expr, t);
+                        }
+
+                        if (!matchSpecialRule) {
+                            if (isNameDefine && CheckGlobal(defineExpr, t)) {
+                                PushStyleCheck(NameDefineType::GlobalVariableDefineName, defineExpr);
+                            } else if (!isNameDefine) {
+                                PushStyleCheck(NameDefineType::TableFieldDefineName, defineExpr);
+                            }
+                        }
+                    }
+
+                    break;
+                }
+                case LuaSyntaxNodeKind::ForStatement: {
+                    auto forNumber = stmt.GetChildSyntaxNode(LuaSyntaxNodeKind::ForNumber, t);
+                    LuaSyntaxNode forBody(0);
+                    if (forNumber.IsNode(t)) {
+                        for (auto expr: forNumber.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t)) {
+                            CheckInNode(expr, t);
+                        }
+
+                        EnterScope();
+
+                        auto indexName = forNumber.GetChildToken(TK_NAME, t);
+                        RecordLocalVariable(indexName, t);
+                        forBody = forNumber.GetChildSyntaxNode(LuaSyntaxNodeKind::ForBody, t);
+                    } else {
+                        auto forList = stmt.GetChildSyntaxNode(LuaSyntaxNodeKind::ForList, t);
+                        auto exprList = forList.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+                        for (auto expr: exprList.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t)) {
+                            CheckInNode(expr, t);
+                        }
+
+                        EnterScope();
+
+                        auto nameList = forList.GetChildSyntaxNode(LuaSyntaxNodeKind::NameDefList, t);
+                        for (auto name: nameList.GetChildTokens(TK_NAME, t)) {
+                            RecordLocalVariable(name, t);
+                        }
+
+                        forBody = forList.GetChildSyntaxNode(LuaSyntaxNodeKind::ForBody, t);
+                    }
+
+                    auto body = forBody.GetChildSyntaxNode(LuaSyntaxNodeKind::Block, t);
+                    CheckInBody(body, t);
+
+                    ExitScope();
+                    break;
+                }
+                case LuaSyntaxNodeKind::FunctionStatement: {
+                    auto functionNameExpr = stmt.GetChildSyntaxNode(LuaSyntaxNodeKind::FunctionNameExpression, t);
+                    LuaSyntaxNode functionName(0);
+                    bool simpleFunction = false;
+                    auto indexExpr = functionNameExpr.GetChildSyntaxNode(LuaSyntaxNodeKind::IndexExpression, t);
+                    if (indexExpr.IsNode(t)) {
+                        auto indexExprs = functionNameExpr.GetChildSyntaxNodes(LuaSyntaxNodeKind::IndexExpression, t);
+                        functionName = indexExprs.back().GetChildToken(TK_NAME, t);
+                    } else {
+                        functionName = functionNameExpr.GetChildToken(TK_NAME, t);
+                        simpleFunction = true;
+                    }
+
+                    PushStyleCheck(NameDefineType::FunctionDefineName, functionName);
+                    EnterScope();
+                    // for recursive
+                    if (simpleFunction) {
+                        RecordLocalVariable(functionName, t);
+                    }
+
+                    auto functionBody = stmt.GetChildSyntaxNode(LuaSyntaxNodeKind::FunctionBody, t);
+                    auto paramList = functionBody.GetChildSyntaxNode(LuaSyntaxNodeKind::ParamList, t);
+                    auto params = paramList.GetChildTokens(TK_NAME, t);
+                    for (auto paramName: params) {
+                        RecordLocalVariable(paramName, t);
+                        PushStyleCheck(NameDefineType::ParamName, paramName);
+                    }
+
+                    auto body = functionBody.GetChildSyntaxNode(LuaSyntaxNodeKind::Block, t);
+                    CheckInBody(body, t);
+
+                    ExitScope();
+                    break;
+                }
+                case LuaSyntaxNodeKind::LocalFunctionStatement: {
+                    auto functionName = stmt.GetChildToken(TK_NAME, t);
+                    PushStyleCheck(NameDefineType::LocalFunctionName, functionName);
+                    EnterScope();
+                    // for recursive
+                    RecordLocalVariable(functionName, t);
+
+                    auto functionBody = stmt.GetChildSyntaxNode(LuaSyntaxNodeKind::FunctionBody, t);
+                    auto paramList = functionBody.GetChildSyntaxNode(LuaSyntaxNodeKind::ParamList, t);
+                    auto params = paramList.GetChildTokens(TK_NAME, t);
+                    for (auto paramName: params) {
+                        RecordLocalVariable(paramName, t);
+                        PushStyleCheck(NameDefineType::ParamName, paramName);
+                    }
+
+                    auto body = functionBody.GetChildSyntaxNode(LuaSyntaxNodeKind::Block, t);
+                    CheckInBody(body, t);
+
+                    ExitScope();
+                    break;
+                }
+                default: {
+                    CheckInNode(stmt, t);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void NameStyleChecker::PushStyleCheck(NameDefineType type, LuaSyntaxNode &n) {
+    _nameStyleCheckVector.emplace_back(type, n.GetIndex());
+}
+
+bool NameStyleChecker::CheckSpecialVariableRule(LuaSyntaxNode &define, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
+    if (expr.GetSyntaxKind(t) != LuaSyntaxNodeKind::SuffixedExpression) {
+        return false;
+    }
+
+    auto childrens = expr.GetChildren(t);
+    if (childrens.empty()) {
+        return false;
+    }
+
+    if (childrens.back().GetSyntaxKind(t) != LuaSyntaxNodeKind::CallExpression) {
+        return false;
+    }
+
+    auto prevSyntaxNode = childrens.back().GetPrevSibling(t);
+    switch (prevSyntaxNode.GetSyntaxKind(t)) {
+        case LuaSyntaxNodeKind::IndexExpression:
+        case LuaSyntaxNodeKind::NameExpression: {
+            auto callName = prevSyntaxNode.GetChildToken(TK_NAME, t);
+            auto callNameText = callName.GetText(t);
+            if (callNameText == "class" || callNameText == "Class") {
+                // class rule
+                PushStyleCheck(NameDefineType::ClassVariableName, define);
+                return true;
+            } else if (callNameText == "require" || callNameText == "import" || callNameText == "Import") {
+                // module import rule
+                PushStyleCheck(NameDefineType::ImportModuleName, define);
+                return true;
+            }
+            // fall through
+        }
+        default: {
+            return false;
+        }
+    }
+
+    return false;
+}
+
+void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) {
+    NameStyleRuleMatcher matcher;
+    auto &state = d.GetState();
+    for (auto &nameStyle: _nameStyleCheckVector) {
+        auto n = LuaSyntaxNode(nameStyle.Index);
+        switch (nameStyle.Type) {
+            case NameDefineType::LocalVariableName: {
+                if (!matcher.Match(n, t, state.GetDiagnosticStyle().local_name_style)) {
+                    d.PushDiagnostic(DiagnosticType::NameStyle,
+                                     n.GetTextRange(t),
+                                     MakeDiagnosticInfo("LocalVariableName", n, t,
+                                                        state.GetDiagnosticStyle().local_name_style)
+                    );
+                }
+                break;
+            }
+            case NameDefineType::ModuleDefineName: {
+                if (!matcher.Match(n, t, state.GetDiagnosticStyle().module_name_style)) {
+                    d.PushDiagnostic(DiagnosticType::NameStyle,
+                                     n.GetTextRange(t),
+                                     MakeDiagnosticInfo("ModuleNameStyle", n, t,
+                                                        state.GetDiagnosticStyle().module_name_style)
+                    );
+                }
+                break;
+            }
+            case NameDefineType::LocalFunctionName: {
+                if (TableFieldSpecialName.count(n.GetText(t))) {
+                    return;
+                }
+                if (!matcher.Match(n, t, state.GetDiagnosticStyle().local_function_name_style)) {
+                    d.PushDiagnostic(DiagnosticType::NameStyle,
+                                     n.GetTextRange(t),
+                                     MakeDiagnosticInfo("LocalFunctionName", n, t,
+                                                        state.GetDiagnosticStyle().local_function_name_style)
+                    );
+                }
+                break;
+            }
+            case NameDefineType::GlobalVariableDefineName: {
+                if (GlobalSpecialName.count(n.GetText(t))) {
+                    return;
+                }
+                if (!matcher.Match(n, t, state.GetDiagnosticStyle().global_variable_name_style)) {
+                    d.PushDiagnostic(DiagnosticType::NameStyle,
+                                     n.GetTextRange(t),
+                                     MakeDiagnosticInfo("GlobalVariableDefineName", n, t,
+                                                        state.GetDiagnosticStyle().global_variable_name_style)
+                    );
+                }
+                break;
+            }
+            case NameDefineType::ParamName: {
+                if (!matcher.Match(n, t, state.GetDiagnosticStyle().function_param_name_style)) {
+                    d.PushDiagnostic(DiagnosticType::NameStyle,
+                                     n.GetTextRange(t),
+                                     MakeDiagnosticInfo("paramName", n, t,
+                                                        state.GetDiagnosticStyle().function_param_name_style)
+                    );
+                }
+                break;
+            }
+            case NameDefineType::ImportModuleName: {
+                if (!matcher.Match(n, t, state.GetDiagnosticStyle().require_module_name_style)) {
+                    d.PushDiagnostic(DiagnosticType::NameStyle,
+                                     n.GetTextRange(t),
+                                     MakeDiagnosticInfo("ImportModuleName", n, t,
+                                                        state.GetDiagnosticStyle().require_module_name_style)
+                    );
+                }
+                break;
+            }
+            case NameDefineType::ClassVariableName: {
+                if (!matcher.Match(n, t, state.GetDiagnosticStyle().class_name_style)) {
+                    d.PushDiagnostic(DiagnosticType::NameStyle,
+                                     n.GetTextRange(t),
+                                     MakeDiagnosticInfo("ClassVariableName", n, t,
+                                                        state.GetDiagnosticStyle().class_name_style)
+                    );
+                }
+                break;
+            }
+            case NameDefineType::FunctionDefineName: {
+                if (TableFieldSpecialName.count(n.GetText(t))) {
+                    return;
+                }
+
+                if (!matcher.Match(n, t, state.GetDiagnosticStyle().function_name_style)) {
+                    d.PushDiagnostic(DiagnosticType::NameStyle,
+                                     n.GetTextRange(t),
+                                     MakeDiagnosticInfo("FunctionDefineName", n, t,
+                                                        state.GetDiagnosticStyle().function_name_style)
+                    );
+                }
+                break;
+            }
+            case NameDefineType::TableFieldDefineName: {
+                // 忽略元方法
+                if (TableFieldSpecialName.count(n.GetText(t))) {
+                    return;
+                }
+                if (!matcher.Match(n, t, state.GetDiagnosticStyle().table_field_name_style)) {
+                    d.PushDiagnostic(DiagnosticType::NameStyle,
+                                     n.GetTextRange(t),
+                                     MakeDiagnosticInfo("TableFieldDefineName", n, t,
+                                                        state.GetDiagnosticStyle().table_field_name_style)
+                    );
+                }
+                break;
+            }
+        }
+    }
+}
+
+std::string NameStyleChecker::MakeDiagnosticInfo(std::string_view ruleName, LuaSyntaxNode &n, const LuaSyntaxTree &t,
+                                                 const std::vector<NameStyleRule> &rules) {
+    auto name = n.GetText(t);
+    std::string ruleMessage = "";
+    for (std::size_t index = 0; index < rules.size(); index++) {
+        auto &rule = rules[index];
+        switch (rule.Type) {
+            case NameStyleType::SnakeCase: {
+                ruleMessage.append("snake-case");
+                break;
+            }
+            case NameStyleType::CamelCase: {
+                ruleMessage.append("camel-case");
+                break;
+            }
+            case NameStyleType::PascalCase: {
+                ruleMessage.append("pascal-case");
+                break;
+            }
+            case NameStyleType::Same: {
+                ruleMessage.append(util::format("same('{}')", rule.Param));
+                break;
+            }
+            case NameStyleType::Pattern: {
+                ruleMessage.append(util::format("pattern('{}')", rule.Param));
+                break;
+            }
+            case NameStyleType::UpperSnakeCase: {
+                ruleMessage.append("upper-snake-case");
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+        if (index != rules.size() - 1) {
+            ruleMessage.append(" | ");
+        }
+    }
+    return util::format("Name '{}' does not match rule '{}', which require '{}'", name, ruleName, ruleMessage);
 }

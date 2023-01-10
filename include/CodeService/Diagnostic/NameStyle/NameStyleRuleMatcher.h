@@ -1,53 +1,25 @@
-﻿//#pragma once
-//
-//#include <functional>
-//#include <string_view>
-//#include <memory>
-//#include "CheckElement.h"
-//
-//class NameStyleRuleMatcher
-//{
-//public:
-//	enum class NameStyleType
-//	{
-//		Off,
-//		CamelCase,
-//		PascalCase,
-//		SnakeCase,
-//		UpperSnakeCase,
-//		Same,
-//		Custom
-//	};
-//
-//	struct NameStyleRule
-//	{
-//		explicit NameStyleRule(NameStyleType type);
-//		NameStyleRule(NameStyleType type, std::vector<std::string> param);
-//		NameStyleType Type;
-//		std::vector<std::string> Param;
-//	};
-//
-//	NameStyleRuleMatcher(std::string_view name);
-//
-//	void Diagnosis(DiagnosisContext& ctx, std::shared_ptr<CheckElement> checkElement);
-//
-//	void ParseRule(std::string_view rule);
-//private:
-//	static bool SnakeCase(std::shared_ptr<CheckElement> checkElement);
-//	static bool UpperSnakeCase(std::shared_ptr<CheckElement> checkElement);
-//	static bool CamelCase(std::shared_ptr<CheckElement> checkElement);
-//	static bool PascalCase(std::shared_ptr<CheckElement> checkElement);
-//
-//	static bool Same(DiagnosisContext& ctx, std::shared_ptr<CheckElement> checkElement,
-//	                 std::vector<std::string>& param);
-//
-//	static bool SameSimple(std::string_view text, std::shared_ptr<CheckElement> checkElement);
-//	static bool SameSnake(std::string_view text, std::shared_ptr<CheckElement> checkElement);
-//	static bool SameCamel(std::string_view text, std::shared_ptr<CheckElement> checkElement);
-//	static bool SamePascal(std::string_view text, std::shared_ptr<CheckElement> checkElement);
-//
-//	static std::vector<std::string_view> SplitPart(std::string_view source);
-//
-//	std::vector<NameStyleRule> _rulers;
-//	std::string _name;
-//};
+﻿#pragma once
+
+#include <functional>
+#include <string_view>
+#include <memory>
+#include "LuaParser/Ast/LuaSyntaxTree.h"
+#include "CodeService/Config/LuaDiagnosticStyleEnum.h"
+
+class NameStyleRuleMatcher {
+public:
+    bool Match(LuaSyntaxNode &n, const LuaSyntaxTree &t, const std::vector<NameStyleRule> &rules);
+
+private:
+    static bool SnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+
+    static bool UpperSnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+
+    static bool CamelCase(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+
+    static bool PascalCase(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+
+    static bool Same(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::string_view param);
+
+    static bool PatternMatch(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::string_view pattern);
+};

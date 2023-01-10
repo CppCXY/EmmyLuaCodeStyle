@@ -37,7 +37,8 @@ bool LuaParser::Parse() {
         Block();
     }
     catch (LuaParseException &e) {
-        // ignore
+        auto text = _file->GetSource();
+        _errors.emplace_back(e.what(), TextRange(text.size(), text.size()));
     }
     return true;
 }
@@ -91,7 +92,6 @@ LuaTokenKind LuaParser::Current() {
 
     if (_errors.size() > 100) {
         std::string_view error = "too many errors, parse fail";
-        _errors.emplace_back(error, _tokens[_tokenIndex].Range);
         throw LuaParseException(error);
     }
 
@@ -980,7 +980,14 @@ void LuaParser::LuaExpectedError(std::string_view message, LuaTokenKind expected
     me.U.Error.ErrorKind = LuaParserErrorKind::Expect;
     me.U.Error.TokenKind = expectedToken;
     _events.push_back(me);
-    _errors.emplace_back(message, _tokens[_tokenIndex].Range);
+    if (_tokenIndex < _tokens.size()) {
+        _errors.emplace_back(message, _tokens[_tokenIndex].Range);
+    } else if (!_tokens.empty()) {
+        auto tokenIndex = _tokens.size() - 1;
+        _errors.emplace_back(message, _tokens[tokenIndex].Range);
+    } else {
+        _errors.emplace_back(message, TextRange(0, 0));
+    }
 }
 
 void LuaParser::NameDefList() {

@@ -3,7 +3,8 @@
 #include "CodeService/Diagnostic/DiagnosticBuilder.h"
 
 DiagnosticService::DiagnosticService(LanguageServer *owner)
-        : Service(owner), _spellChecker(std::make_shared<CodeSpellChecker>()) {
+        : Service(owner),
+          _spellChecker(std::make_shared<CodeSpellChecker>()) {
 
 }
 

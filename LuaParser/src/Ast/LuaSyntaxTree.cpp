@@ -153,6 +153,7 @@ void LuaSyntaxTree::BuildNode(LuaSyntaxNodeKind kind) {
         }
         currentNode.Parent = parentIndex;
     }
+
     _nodePosStack.push(currentPos);
 }
 

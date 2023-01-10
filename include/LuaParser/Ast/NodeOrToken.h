@@ -23,6 +23,7 @@ struct NodeOrToken {
               PrevSibling(0),
               FirstChild(0),
               LastChild(0) {
+        std::memset((char *) &Data.Token, 0, sizeof(IncrementalToken));
         Data.NodeKind = nodeKind;
     }
 

@@ -1,105 +1,58 @@
-﻿//#include "CodeService/Diagnostic/NameStyle/NameStyleRuleMatcher.h"
-//#include <algorithm>
-//#include "Util/format.h"
-//#include "CodeService/Config/LanguageTranslator.h"
-//#include "Util/StringUtil.h"
-//
-//NameStyleRuleMatcher::NameStyleRule::NameStyleRule(NameStyleType type)
-//        : Type(type) {
-//}
-//
-//NameStyleRuleMatcher::NameStyleRule::NameStyleRule(NameStyleType type, std::vector<std::string> param)
-//        : Type(type),
-//          Param(param) {
-//}
-//
-//NameStyleRuleMatcher::NameStyleRuleMatcher(std::string_view name)
-//        : _name(name) {
-//}
-//
-//void NameStyleRuleMatcher::Diagnosis(DiagnosisContext &ctx, std::shared_ptr<CheckElement> checkElement) {
-//    if (_rulers.empty()) {
-//        return;
-//    }
-//
-//    for (auto &rule: _rulers) {
-//        switch (rule.Type) {
-//            case NameStyleType::SnakeCase: {
-//                if (SnakeCase(checkElement)) {
-//                    return;
-//                }
-//                break;
-//            }
-//            case NameStyleType::UpperSnakeCase: {
-//                if (UpperSnakeCase(checkElement)) {
-//                    return;
-//                }
-//                break;
-//            }
-//            case NameStyleType::CamelCase: {
-//                if (CamelCase(checkElement)) {
-//                    return;
-//                }
-//                break;
-//            }
-//            case NameStyleType::PascalCase: {
-//                if (PascalCase(checkElement)) {
-//                    return;
-//                }
-//                break;
-//            }
-//            case NameStyleType::Same: {
-//                if (Same(ctx, checkElement, rule.Param)) {
-//                    return;
-//                }
-//                break;
-//            }
-//            default: {
-//                break;
-//            }
-//        }
-//    }
-//
-//    std::string ruleMessage = "";
-//    for (std::size_t index = 0; index < _rulers.size(); index++) {
-//        auto &rule = _rulers[index];
-//        switch (rule.Type) {
-//            case NameStyleType::SnakeCase: {
-//                ruleMessage.append("snake-case");
-//                break;
-//            }
-//            case NameStyleType::CamelCase: {
-//                ruleMessage.append("camel-case");
-//                break;
-//            }
-//            case NameStyleType::PascalCase: {
-//                ruleMessage.append("pascal-case");
-//                break;
-//            }
-//            case NameStyleType::Same: {
-//                if (rule.Param.size() == 1) {
-//                    ruleMessage.append(Util::format("same({})", rule.Param[0]));
-//                } else if (rule.Param.size() == 2) {
-//                    ruleMessage.append(Util::format("same({},{})", rule.Param[0], rule.Param[1]));
-//                }
-//                break;
-//            }
-//            default: {
-//                break;
-//            }
-//        }
-//        if (index != _rulers.size() - 1) {
-//            ruleMessage.append(" | ");
-//        }
-//    }
-//
-//    ctx.PushDiagnosis(
-//            Util::format(
-//                    LText("Name '{}' does not match rule '{}', which require '{}'"),
-//                    checkElement->Node->GetText(), _name, ruleMessage),
-//            checkElement->Node->GetTextRange(), DiagnosisType::NameStyle);
-//}
-//
+﻿#include "CodeService/Diagnostic/NameStyle/NameStyleRuleMatcher.h"
+#include "Util/StringUtil.h"
+
+
+bool NameStyleRuleMatcher::Match(LuaSyntaxNode &n, const LuaSyntaxTree &t, const std::vector<NameStyleRule> &rules) {
+    if (rules.empty()) {
+        return false;
+    }
+
+    for (auto &rule: rules) {
+        switch (rule.Type) {
+            case NameStyleType::SnakeCase: {
+                if (SnakeCase(n, t)) {
+                    return true;
+                }
+                break;
+            }
+            case NameStyleType::UpperSnakeCase: {
+                if (UpperSnakeCase(n, t)) {
+                    return true;
+                }
+                break;
+            }
+            case NameStyleType::CamelCase: {
+                if (CamelCase(n, t)) {
+                    return true;
+                }
+                break;
+            }
+            case NameStyleType::PascalCase: {
+                if (PascalCase(n, t)) {
+                    return true;
+                }
+                break;
+            }
+            case NameStyleType::Same: {
+                if (Same(n, t, rule.Param)) {
+                    return true;
+                }
+                break;
+            }
+            case NameStyleType::Pattern: {
+                if (PatternMatch(n, t, rule.Param)) {
+                    return true;
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+    return false;
+}
+
 //void NameStyleRuleMatcher::ParseRule(std::string_view rule) {
 //    auto file = std::make_shared<LuaFile>("", std::string(rule));
 //    auto tokenParser = std::make_shared<LuaTokenParser>(file);
@@ -149,268 +102,265 @@
 //        tokenParser->Next();
 //    }
 //}
-//
-//bool NameStyleRuleMatcher::SnakeCase(std::shared_ptr<CheckElement> checkElement) {
-//    auto source = checkElement->Node->GetText();
-//    for (std::size_t index = 0; index != source.size(); index++) {
-//        char ch = source[index];
-//        if (ch < 0) {
-//            return false;
-//        }
-//
-//        if (!::islower(ch)) {
-//            if (ch == '_') {
-//                // 不允许双下划线
-//                if ((index < source.size() - 1) && source[index + 1] == '_') {
-//                    return false;
-//                }
-//            } else if (!::isdigit(ch)) {
-//                return false;
-//            }
-//        }
-//    }
-//    return true;
-//}
-//
-//bool NameStyleRuleMatcher::UpperSnakeCase(std::shared_ptr<CheckElement> checkElement) {
-//    auto source = checkElement->Node->GetText();
-//    for (std::size_t index = 0; index != source.size(); index++) {
-//        char ch = source[index];
-//        if (ch < 0) {
-//            return false;
-//        } else if (!::isupper(ch)) {
-//            if (ch == '_') {
-//                // 不允许双下划线
-//                if ((index < source.size() - 1) && source[index + 1] == '_') {
-//                    return false;
-//                }
-//            } else if (!::isdigit(ch)) {
-//                return false;
-//            }
-//        }
-//    }
-//    return true;
-//}
-//
-//bool NameStyleRuleMatcher::CamelCase(std::shared_ptr<CheckElement> checkElement) {
-//    auto source = checkElement->Node->GetText();
-//    for (std::size_t index = 0; index != source.size(); index++) {
-//        char ch = source[index];
-//        if (ch < 0) {
-//            return false;
-//        }
-//        if (index == 0) {
-//            // 首字母可以小写，也可以单下划线开头
-//            if (!::islower(ch)) {
-//                if (ch == '_') {
-//                    if (source.size() > 1 && !::islower(source[index + 1])) {
-//                        return false;
-//                    }
-//                } else {
-//                    return false;
-//                }
-//            }
-//        } else if (!::isalnum(ch)) {
-//            return false;
-//        }
-//    }
-//    return true;
-//}
-//
-//bool NameStyleRuleMatcher::PascalCase(std::shared_ptr<CheckElement> checkElement) {
-//    auto source = checkElement->Node->GetText();
-//    for (std::size_t index = 0; index != source.size(); index++) {
-//        char ch = source[index];
-//        if (ch < 0) {
-//            return false;
-//        }
-//
-//        if (index == 0) {
-//            // 首字母必须大写
-//            if (!::isupper(ch)) {
-//                // _ 亚元不受命名限制
-//                if (source.size() == 1 && ch == '_') {
-//                    return true;
-//                } else {
-//                    return false;
-//                }
-//            }
-//        }
-//            // 我又没办法分词简单处理下
-//        else if (!::isalnum(ch)) {
-//            return false;
-//        }
-//    }
-//    return true;
-//}
-//
-//bool NameStyleRuleMatcher::Same(DiagnosisContext &ctx, std::shared_ptr<CheckElement> checkElement,
-//                                std::vector<std::string> &param) {
-//    if (param.empty()) {
-//        return true;
-//    }
-//
-//    auto &firstParam = param.front();
-//
-//    if (firstParam == "first_param") {
-//        // 可空判断太长了
-//        if (!checkElement->ExtraInfoNode) {
-//            return true;
-//        }
-//        if (checkElement->ExtraInfoNode->GetType() != LuaAstNodeType::CallArgList) {
-//            return true;
-//        }
-//
-//        auto firstParamNode = checkElement->ExtraInfoNode->FindFirstOf(LuaAstNodeType::StringLiteralExpression);
-//
-//        if (!firstParamNode) {
-//            auto expressionList = checkElement->ExtraInfoNode->FindFirstOf(LuaAstNodeType::ExpressionList);
-//            if (!expressionList) {
-//                return true;
-//            }
-//            auto expressionNode = expressionList->FindFirstOf(LuaAstNodeType::Expression);
-//            if (!expressionNode) {
-//                return true;
-//            }
-//            firstParamNode = expressionNode->FindFirstOf(LuaAstNodeType::StringLiteralExpression);
-//            if (!firstParamNode) {
-//                return true;
-//            }
-//        }
-//
-//        std::string_view firstText = firstParamNode->GetText();
-//
-//        if (firstText.size() <= 2) {
-//            return true;
-//        }
-//
-//        firstText = firstText.substr(1, firstText.size() - 2);
-//        if (param.size() == 2) {
-//            auto &secondParam = param[1];
-//
-//            if (secondParam == "snake_case") {
-//                return SameSnake(firstText, checkElement);
-//            } else if (secondParam == "camel_case") {
-//                return SameCamel(firstText, checkElement);
-//            } else if (secondParam == "pascal_case") {
-//                return SamePascal(firstText, checkElement);
-//            }
-//        } else {
-//            return SameSimple(firstText, checkElement);
-//        }
-//    } else if (firstParam == "filename") {
-//        auto filename = ctx.GetParser()->GetFilename();
-//
-//        if (param.size() == 2) {
-//            auto &secondParam = param[1];
-//
-//            if (secondParam == "snake_case") {
-//                return SameSnake(filename, checkElement);
-//            } else if (secondParam == "camel_case") {
-//                return SameCamel(filename, checkElement);
-//            } else if (secondParam == "pascal_case") {
-//                return SamePascal(filename, checkElement);
-//            }
-//        } else {
-//            return SameSimple(filename, checkElement);
-//        }
-//    } else if (firstParam.size() > 2 && (string_util::StartWith(firstParam, "\'") || string_util::StartWith(
-//            firstParam, "\""))) {
-//        auto name = firstParam.substr(1, firstParam.size() - 2);
-//        return checkElement->Node->GetText() == name;
-//    }
-//
-//    return true;
-//}
-//
-//bool NameStyleRuleMatcher::SameSimple(std::string_view text, std::shared_ptr<CheckElement> checkElement) {
-//    auto checkText = checkElement->Node->GetText();
-//    return checkText == text;
-//}
-//
-//bool NameStyleRuleMatcher::SameSnake(std::string_view text, std::shared_ptr<CheckElement> checkElement) {
-//    if (!SnakeCase(checkElement)) {
-//        return false;
-//    }
-//
-//    auto checkText = checkElement->Node->GetText();
-//    auto textParts = SplitPart(text);
-//    auto checkParts = SplitPart(checkText);
-//
-//    if (checkParts.size() > textParts.size()) {
-//        return false;
-//    }
-//
-//    for (std::size_t i = 1; i <= checkParts.size(); i++) {
-//        if (checkParts[checkParts.size() - i] != textParts[textParts.size() - i]) {
-//            return false;
-//        }
-//    }
-//
-//    return true;
-//}
-//
-//bool NameStyleRuleMatcher::SameCamel(std::string_view text, std::shared_ptr<CheckElement> checkElement) {
-//    if (!CamelCase(checkElement)) {
-//        return false;
-//    }
-//
-//    auto checkText = checkElement->Node->GetText();
-//    auto textParts = SplitPart(text);
-//
-//
-//    for (auto it = textParts.rbegin(); it != textParts.rend(); ++it) {
-//        if (string_util::EndWith(checkText, *it)) {
-//            if (checkText.size() == it->size()) {
-//                return true;
-//            }
-//            checkText = checkText.substr(0, checkText.size() - it->size());
-//        } else {
-//            return false;
-//        }
-//    }
-//
-//    return true;
-//}
-//
-//bool NameStyleRuleMatcher::SamePascal(std::string_view text, std::shared_ptr<CheckElement> checkElement) {
-//    if (!PascalCase(checkElement)) {
-//        return false;
-//    }
-//
-//    auto checkText = checkElement->Node->GetText();
-//    auto textParts = SplitPart(text);
-//
-//
-//    for (auto it = textParts.rbegin(); it != textParts.rend(); --it) {
-//        if (string_util::EndWith(checkText, *it)) {
-//            if (checkText.size() == it->size()) {
-//                return true;
-//            }
-//            checkText = checkText.substr(0, checkText.size() - it->size());
-//        } else {
-//            return false;
-//        }
-//    }
-//
-//    return true;
-//}
-//
-//std::vector<std::string_view> NameStyleRuleMatcher::SplitPart(std::string_view source) {
-//    std::vector<std::string_view> result;
-//    std::size_t lastIndex = 0;
-//    for (std::size_t index = 0; index < source.size(); index++) {
-//        char ch = source[index];
-//
-//        if ((ch == '.' || ch == '_' || ch == '-' || ch == '/' || ch == '\\') && index != 0) {
-//            result.push_back(source.substr(lastIndex, index - lastIndex));
-//            lastIndex = index + 1;
-//        }
-//    }
-//
-//    if (lastIndex < source.size()) {
-//        result.push_back(source.substr(lastIndex, source.size() - lastIndex));
-//    }
-//
-//    return result;
-//}
+
+bool NameStyleRuleMatcher::SnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    enum class ParseState {
+        None,
+        PrefixUnderscore,
+        PrefixUnderscore2,
+        Underscore,
+        Letter,
+        EndDigit
+    } state = ParseState::None;
+
+    auto source = n.GetText(t);
+    for (std::size_t index = 0; index != source.size(); index++) {
+        char ch = source[index];
+        if (ch < 0) {
+            return false;
+        }
+
+        switch (state) {
+            case ParseState::None: {
+                if (ch == '_') {
+                    state = ParseState::PrefixUnderscore;
+                } else if (::islower(ch)) {
+                    state = ParseState::Letter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::PrefixUnderscore: {
+                if (ch == '_') {
+                    state = ParseState::PrefixUnderscore2;
+                } else if (::islower(ch)) {
+                    state = ParseState::Letter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::PrefixUnderscore2: {
+                if (::islower(ch)) {
+                    state = ParseState::Letter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::Underscore: {
+                if (::islower(ch)) {
+                    state = ParseState::Letter;
+                } else {
+                    return false;
+                }
+
+                break;
+            }
+            case ParseState::Letter: {
+                if (::islower(ch)) {
+                    // ignore
+                } else if (ch == '_') {
+                    state = ParseState::Underscore;
+                } else if (::isdigit(ch)) {
+                    state = ParseState::EndDigit;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::EndDigit: {
+                if (!::isdigit(ch)) {
+                    return false;
+                }
+                break;
+            }
+        }
+    }
+    return true;
+}
+
+bool NameStyleRuleMatcher::UpperSnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    enum class ParseState {
+        None,
+        Underscore,
+        Letter,
+        EndDigit
+    } state = ParseState::None;
+
+    auto source = n.GetText(t);
+    for (std::size_t index = 0; index != source.size(); index++) {
+        char ch = source[index];
+        if (ch < 0) {
+            return false;
+        }
+
+        switch (state) {
+            case ParseState::None: {
+                if (::isupper(ch)) {
+                    state = ParseState::Letter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::Underscore: {
+                if (::isupper(ch)) {
+                    state = ParseState::Letter;
+                } else {
+                    return false;
+                }
+
+                break;
+            }
+            case ParseState::Letter: {
+                if (::isupper(ch)) {
+                    // ignore
+                } else if (ch == '_') {
+                    state = ParseState::Underscore;
+                } else if (::isdigit(ch)) {
+                    state = ParseState::EndDigit;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::EndDigit: {
+                if (!::isdigit(ch)) {
+                    return false;
+                }
+                break;
+            }
+        }
+    }
+    return true;
+}
+
+bool NameStyleRuleMatcher::CamelCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    enum class ParseState {
+        None,
+        PrefixUnderscore,
+        PrefixUnderscore2,
+        LowerLetter,
+        UpperLetter
+    } state = ParseState::None;
+
+    auto source = n.GetText(t);
+    for (std::size_t index = 0; index != source.size(); index++) {
+        char ch = source[index];
+        if (ch < 0) {
+            return false;
+        }
+
+        switch (state) {
+            case ParseState::None: {
+                if (ch == '_') {
+                    state = ParseState::PrefixUnderscore;
+                } else if (::islower(ch)) {
+                    state = ParseState::LowerLetter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::PrefixUnderscore: {
+                if (ch == '_') {
+                    state = ParseState::PrefixUnderscore2;
+                } else if (::islower(ch)) {
+                    state = ParseState::LowerLetter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::PrefixUnderscore2: {
+                if (::islower(ch)) {
+                    state = ParseState::LowerLetter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::LowerLetter: {
+                if (::islower(ch) || ::isdigit(ch)) {
+                    // ignore
+                } else if (::isupper(ch)) {
+                    state = ParseState::UpperLetter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::UpperLetter: {
+                if (::isupper(ch) || ::isdigit(ch)) {
+                    // ignore
+                } else if (::islower(ch)) {
+                    state = ParseState::LowerLetter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+        }
+    }
+    return true;
+}
+
+bool NameStyleRuleMatcher::PascalCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    enum class ParseState {
+        None,
+        LowerLetter,
+        UpperLetter
+    } state = ParseState::None;
+
+    auto source = n.GetText(t);
+    for (std::size_t index = 0; index != source.size(); index++) {
+        char ch = source[index];
+        if (ch < 0) {
+            return false;
+        }
+
+        switch (state) {
+            case ParseState::None: {
+                if (::isupper(ch)) {
+                    state = ParseState::UpperLetter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::LowerLetter: {
+                if (::islower(ch) || ::isdigit(ch)) {
+                    // ignore
+                } else if (::isupper(ch)) {
+                    state = ParseState::UpperLetter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+            case ParseState::UpperLetter: {
+                if (::isupper(ch) || ::isdigit(ch)) {
+                    // ignore
+                } else if (::islower(ch)) {
+                    state = ParseState::LowerLetter;
+                } else {
+                    return false;
+                }
+                break;
+            }
+        }
+    }
+    return true;
+}
+
+bool NameStyleRuleMatcher::Same(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::string_view param) {
+    return n.GetText(t) == param;
+}
+
+bool NameStyleRuleMatcher::PatternMatch(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::string_view pattern) {
+    return string_util::FileWildcardMatch(n.GetText(t), pattern);
+}
+
+

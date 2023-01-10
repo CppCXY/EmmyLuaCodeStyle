@@ -39,9 +39,8 @@ target_sources(CodeService
         # diagnostic
         ${CodeService_SOURCE_DIR}/src/Diagnostic/DiagnosticBuilder.cpp
 #        # diagnostic/nameStyle
-#        ${CodeService_SOURCE_DIR}/src/Diagnostic/NameStyle/NameStyleChecker.cpp
-#        ${CodeService_SOURCE_DIR}/src/Diagnostic/NameStyle/NameStyleRuleMatcher.cpp
-#        ${CodeService_SOURCE_DIR}/src/Diagnostic/NameStyle/CheckElement.cpp
+        ${CodeService_SOURCE_DIR}/src/Diagnostic/NameStyle/NameStyleChecker.cpp
+        ${CodeService_SOURCE_DIR}/src/Diagnostic/NameStyle/NameStyleRuleMatcher.cpp
 #        # diagnostic/spell
         ${CodeService_SOURCE_DIR}/src/Diagnostic/Spell/CodeSpellChecker.cpp
         ${CodeService_SOURCE_DIR}/src/Diagnostic/Spell/IdentifyParser.cpp

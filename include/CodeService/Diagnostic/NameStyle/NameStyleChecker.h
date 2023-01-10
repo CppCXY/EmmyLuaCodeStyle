@@ -1,35 +1,49 @@
-﻿//#pragma once
-//
-//#include <vector>
-//#include <map>
-//#include <string>
-//#include "NameDefineType.h"
-//#include "CheckElement.h"
-//#include "CodeService/Diagnostic/DiagnosticBuilder.h"
-//#include "LuaParser/Ast/LuaSyntaxTree.h"
-//
-//class NameStyleChecker {
-//public:
-//    class Scope {
-//    public:
-//        std::map<std::string, std::shared_ptr<CheckElement>, std::less<>> LocalVariableMap;
-//    };
-//
-//    NameStyleChecker();
-//
-//    void Analyze(DiagnosticBuilder &d, const LuaSyntaxTree &t);
-//
-//private:
-//    void CollectToken(DiagnosticBuilder &d, const LuaSyntaxTree &t);
-//
-//    void RecordLocalVariable(std::shared_ptr<CheckElement> checkElement);
-//
-//    bool IsGlobal(LuaSyntaxNode &n);
-//
-//    static std::set<std::string, std::less<>> TableFieldSpecialName;
-//    static std::set<std::string, std::less<>> GlobalSpecialName;
-//
-//    // block到作用域的映射
-//    std::map<std::size_t, Scope> _scopeMap;
-//    std::vector<std::shared_ptr<CheckElement>> _nameStyleCheckVector;
-//};
+﻿#pragma once
+
+#include <vector>
+#include <map>
+#include <string>
+#include <set>
+#include "NameDefineType.h"
+#include "LuaParser/Ast/LuaSyntaxTree.h"
+#include "CodeService/Config/LuaDiagnosticStyleEnum.h"
+
+class DiagnosticBuilder;
+
+class NameStyleChecker {
+public:
+    NameStyleChecker();
+
+    void Analyze(DiagnosticBuilder &d, const LuaSyntaxTree &t);
+
+private:
+    static std::set<std::string, std::less<>> TableFieldSpecialName;
+    static std::set<std::string, std::less<>> GlobalSpecialName;
+
+    void Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t);
+
+    void CheckInNode(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+
+    void CheckInBody(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+
+    void RecordLocalVariable(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+
+    bool CheckGlobal(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+
+    void EnterScope();
+
+    void ExitScope();
+
+    void PushStyleCheck(NameDefineType type, LuaSyntaxNode &n);
+
+    bool CheckSpecialVariableRule(LuaSyntaxNode &define, LuaSyntaxNode &expr, const LuaSyntaxTree &t);
+
+    std::string MakeDiagnosticInfo(std::string_view ruleName,
+                                   LuaSyntaxNode &n,
+                                   const LuaSyntaxTree &t,
+                                   const std::vector<NameStyleRule> &rules);
+
+    std::string _module;
+    std::vector<std::set<std::string, std::less<>>> _scopeStack;
+    std::vector<NameStyleInfo> _nameStyleCheckVector;
+};

@@ -6,6 +6,7 @@
 #include "CodeService/Config/LuaDiagnosticStyle.h"
 #include "LSP/LSP.h"
 #include "CodeService/Diagnostic/Spell/CodeSpellChecker.h"
+#include "CodeService/Diagnostic/NameStyle/NameStyleChecker.h"
 
 class DiagnosticService : public Service {
 public:

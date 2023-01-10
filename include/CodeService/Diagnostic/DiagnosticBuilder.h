@@ -5,6 +5,7 @@
 #include "CodeService/Format/FormatState.h"
 #include "DiagnosticType.h"
 #include "CodeService/Diagnostic/Spell/CodeSpellChecker.h"
+#include "CodeService/Diagnostic/NameStyle/NameStyleChecker.h"
 
 class DiagnosticBuilder {
 public:
@@ -27,6 +28,7 @@ public:
                         std::string_view message,
                         std::string_view data = "");
 
+    FormatState& GetState();
 private:
     void DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
 
@@ -46,6 +48,7 @@ private:
 
     FormatState _state;
     std::shared_ptr<CodeSpellChecker> _spellChecker;
+    NameStyleChecker _nameStyleChecker;
     std::map<std::size_t, LuaDiagnostic> _nextDiagnosticMap;
     std::vector<LuaDiagnostic> _diagnostics;
 };
