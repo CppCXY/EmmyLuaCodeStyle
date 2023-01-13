@@ -33,6 +33,7 @@ private:
     );
 
     void FormatLine(std::size_t line,
+                    std::size_t character,
                     const LuaSyntaxTree &t,
                     LuaStyle &style
     );

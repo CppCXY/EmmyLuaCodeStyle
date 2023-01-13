@@ -397,7 +397,7 @@ LuaSyntaxNode LuaSyntaxTree::GetTokenBeforeOffset(std::size_t offset) const {
         return node;
     }
 
-    if (!node.IsToken(*this) || GetStartOffset(node.GetIndex()) <= offset) {
+    if (!node.IsToken(*this) || GetStartOffset(node.GetIndex()) == offset) {
         node = node.GetPrevToken(*this);
     }
 
@@ -408,32 +408,8 @@ LuaSyntaxNode LuaSyntaxTree::GetTokenBeforeOffset(std::size_t offset) const {
 }
 
 LuaSyntaxNode LuaSyntaxTree::GetTokenAtOffset(std::size_t offset) const {
-    auto node = GetRootNode();
-    while (!node.IsNull(*this) && node.GetTextRange(*this).ContainOffset(offset)) {
-        if (node.IsToken(*this)) {
-            break;
-        }
-        LuaSyntaxNode nextNode(0);
-        auto children = node.GetChildren(*this);
-        for (auto &childNode: children) {
-            if (childNode.GetTextRange(*this).StartOffset > offset) {
-                nextNode = childNode;
-                break;
-            }
-        }
-
-        if (!nextNode.IsNull(*this)) {
-            node = nextNode.GetPrevSibling(*this);
-        } else if (!children.empty()) {
-            node = children.back();
-        } else { // not child node
-            break;
-        }
-    }
-    if (node.IsToken(*this) && node.GetTextRange(*this).ContainOffset(offset)) {
-        return node;
-    }
-    return LuaSyntaxNode(0);
+    // TODO
+    return LuaSyntaxNode();
 }
 
 std::string LuaSyntaxTree::GetDebugView() {

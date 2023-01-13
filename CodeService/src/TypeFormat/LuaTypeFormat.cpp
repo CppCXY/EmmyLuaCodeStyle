@@ -184,7 +184,7 @@ void LuaTypeFormat::AnalyzeReturn(std::size_t line, std::size_t character, const
     }
 
     if (_typeOptions.format_line) {
-        FormatLine(line, t, style);
+        FormatLine(line, character, t, style);
     }
 
     if (_typeOptions.fix_indent) {
@@ -297,8 +297,32 @@ void LuaTypeFormat::CompleteMissToken(std::size_t line,
     }
 }
 
-void LuaTypeFormat::FormatLine(std::size_t line, const LuaSyntaxTree &t, LuaStyle &style) {
+void LuaTypeFormat::FormatLine(std::size_t line, std::size_t character, const LuaSyntaxTree &t, LuaStyle &style) {
+    if (line == 0) {
+        return;
+    }
+    FormatRange formatRange;
+    auto &file = t.GetFile();
+    auto offset = file.GetOffset(line, character);
+    auto prevToken = t.GetTokenBeforeOffset(offset);
+    switch(prevToken.GetTokenKind(t)) {
+        case TK_END: {
+            auto parent = prevToken.GetParent(t);
+            formatRange.StartLine = parent.GetStartLine(t);
+            formatRange.EndLine = parent.GetEndLine(t);
+            break;
+        }
+        default: {
+            return;
+        }
+    }
 
+    FormatBuilder f(style);
+    f.FormatAnalyze(t);
+    auto newText = f.GetRangeFormatResult(formatRange, t);
+    auto &result = _results.emplace_back();
+    result.Text = newText;
+    result.Range = formatRange;
 }
 
 void LuaTypeFormat::FixIndent(std::size_t line, std::size_t character, const LuaSyntaxTree &t, LuaStyle &style) {
