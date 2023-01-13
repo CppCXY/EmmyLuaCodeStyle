@@ -145,7 +145,7 @@ void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaS
 
     if (syntaxNode.IsToken(t)) {
         auto textRange = syntaxNode.GetTextRange(t);
-        auto file = t.GetFile();
+        auto& file = t.GetFile();
         switch (resolve.GetPrevSpaceStrategy()) {
             case PrevSpaceStrategy::AlignPos: {
                 auto pos = resolve.GetAlign();

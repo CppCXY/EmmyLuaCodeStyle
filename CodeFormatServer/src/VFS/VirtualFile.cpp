@@ -21,10 +21,6 @@ std::optional<LuaSyntaxTree> VirtualFile::GetSyntaxTree(VirtualFileSystem &vfs) 
         LuaParser p(file, std::move(luaLexer.GetTokens()));
         p.Parse();
 
-        if (p.HasError()) {
-            return std::nullopt;
-        }
-
         LuaSyntaxTree t;
         t.BuildTree(p);
         return t;

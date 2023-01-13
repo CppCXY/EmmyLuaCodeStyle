@@ -54,8 +54,6 @@ private:
 
 	std::shared_ptr<lsp::Serializable> OnEditorConfigUpdate(std::shared_ptr<lsp::ConfigUpdateParams> param);
 
-	std::shared_ptr<lsp::Serializable> OnModuleConfigUpdate(std::shared_ptr<lsp::ConfigUpdateParams> param);
-
 	std::shared_ptr<lsp::Serializable> OnRangeFormatting(std::shared_ptr<lsp::DocumentRangeFormattingParams> param);
 
 	std::shared_ptr<lsp::Serializable> OnTypeFormatting(std::shared_ptr<lsp::TextDocumentPositionParams> param);

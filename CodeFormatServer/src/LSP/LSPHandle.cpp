@@ -158,6 +158,11 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnFormatting(
 
     auto &syntaxTree = opSyntaxTree.value();
 
+    if (syntaxTree.HasError()) {
+        result->hasError = true;
+        return result;
+    }
+
     LuaStyle &luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
 
     auto newText = _server->GetService<FormatService>()->Format(syntaxTree, luaStyle);
@@ -216,6 +221,11 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnRangeFormatting(
 
     auto &syntaxTree = opSyntaxTree.value();
 
+    if (syntaxTree.HasError()) {
+        result->hasError = true;
+        return result;
+    }
+
     LuaStyle &luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
 
     FormatRange range;
@@ -235,32 +245,39 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnRangeFormatting(
 
 std::shared_ptr<lsp::Serializable> LSPHandle::OnTypeFormatting(
         std::shared_ptr<lsp::TextDocumentPositionParams> params) {
-//    auto parser = LanguageServer::GetInstance().GetFileParser(param->textDocument.uri);
-//    auto options = LanguageServer::GetInstance().GetOptions(param->textDocument.uri);
-//    auto position = param->position;
-//
-//    auto result = std::make_shared<lsp::DocumentFormattingResult>();
-//    LuaTypeFormatOptions typeOptions;
-//    LuaTypeFormat typeFormat(parser, *options, typeOptions);
-//    typeFormat.Analysis("\n", position.line, position.character);
-//
-//    if (!typeFormat.HasFormatResult()) {
-//        result->hasError = true;
-//        return result;
-//    }
-//
-//    for (auto &formatResult: typeFormat.GetResult()) {
-//        auto &formatRange = formatResult.Range;
-//
-//        auto &edit = result->edits.emplace_back();
-//        edit.newText = std::move(formatResult.Text);
-//        edit.range = lsp::Range(
-//                lsp::Position(formatRange.StartLine, formatRange.StartCharacter),
-//                lsp::Position(formatRange.EndLine, formatRange.EndCharacter)
-//        );
-//    }
-//    return result;
-    return nullptr;
+    auto result = std::make_shared<lsp::DocumentFormattingResult>();
+    auto &vfs = _server->GetVFS();
+    auto vFile = vfs.GetVirtualFile(params->textDocument.uri);
+    if (vFile.IsNull()) {
+        result->hasError = true;
+        return result;
+    }
+
+    auto opSyntaxTree = vFile.GetSyntaxTree(vfs);
+    if (!opSyntaxTree.has_value()) {
+        result->hasError = true;
+        return result;
+    }
+
+    auto& syntaxTree = opSyntaxTree.value();
+    LuaStyle &luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
+
+    LuaTypeFormatOptions typeFormatOptions;
+    auto typeFormatResults = _server->GetService<FormatService>()->TypeFormat(
+            "\n",
+            params->position.line,
+            params->position.character,
+            syntaxTree, luaStyle, typeFormatOptions);
+    for(auto& formatResult: typeFormatResults) {
+        auto &edit = result->edits.emplace_back();
+        edit.newText = std::move(formatResult.Text);
+        edit.range = lsp::Range(
+                lsp::Position(formatResult.Range.StartLine, formatResult.Range.StartCol),
+                lsp::Position(formatResult.Range.EndLine, formatResult.Range.EndCol)
+        );
+    }
+
+    return result;
 }
 
 std::shared_ptr<lsp::CodeActionResult> LSPHandle::OnCodeAction(std::shared_ptr<lsp::CodeActionParams> param) {
@@ -336,6 +353,10 @@ std::shared_ptr<lsp::DocumentDiagnosticReport> LSPHandle::OnTextDocumentDiagnost
     }
 
     auto &syntaxTree = opSyntaxTree.value();
+
+    if (syntaxTree.HasError()) {
+        return report;
+    }
 
     LuaStyle &luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
 

@@ -34,8 +34,8 @@ target_sources(CodeService
 
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/SyntaxNodeHelper.cpp
         # typeFormat
-#        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormat.cpp
-#        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp
+        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormat.cpp
+        ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp
         # diagnostic
         ${CodeService_SOURCE_DIR}/src/Diagnostic/DiagnosticBuilder.cpp
 #        # diagnostic/nameStyle

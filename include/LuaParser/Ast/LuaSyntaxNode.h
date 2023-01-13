@@ -13,7 +13,7 @@ class LuaSyntaxTree;
 
 class LuaSyntaxNode {
 public:
-    explicit LuaSyntaxNode(std::size_t index);
+    explicit LuaSyntaxNode(std::size_t index = 0);
 
     TextRange GetTextRange(const LuaSyntaxTree &t) const;
 

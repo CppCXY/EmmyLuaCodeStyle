@@ -5,19 +5,20 @@
 
 enum class LuaParserErrorKind {
     None,
-    Expect,
-    Match
+    Expect
 };
 
 class LuaParseError
 {
 public:
-    LuaParseError(std::string_view errorMessage, TextRange range)
+    LuaParseError(std::string_view errorMessage, TextRange range, LuaTokenKind expectToken = 0)
             : ErrorMessage(errorMessage),
-              ErrorRange(range)
+              ErrorRange(range),
+              ExpectToken(expectToken)
     {
     }
 
     std::string ErrorMessage;
     TextRange ErrorRange;
+    LuaTokenKind ExpectToken;
 };

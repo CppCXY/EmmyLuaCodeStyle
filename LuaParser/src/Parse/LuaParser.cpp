@@ -40,6 +40,12 @@ bool LuaParser::Parse() {
         auto text = _file->GetSource();
         _errors.emplace_back(e.what(), TextRange(text.size(), text.size()));
     }
+
+    if (_tokenIndex < _tokens.size()) {
+        _errors.emplace_back("parsing did not complete",
+                             _tokens[_tokenIndex].Range);
+    }
+
     return true;
 }
 
@@ -981,12 +987,12 @@ void LuaParser::LuaExpectedError(std::string_view message, LuaTokenKind expected
     me.U.Error.TokenKind = expectedToken;
     _events.push_back(me);
     if (_tokenIndex < _tokens.size()) {
-        _errors.emplace_back(message, _tokens[_tokenIndex].Range);
+        _errors.emplace_back(message, _tokens[_tokenIndex].Range, expectedToken);
     } else if (!_tokens.empty()) {
         auto tokenIndex = _tokens.size() - 1;
-        _errors.emplace_back(message, _tokens[tokenIndex].Range);
+        _errors.emplace_back(message, _tokens[tokenIndex].Range, expectedToken);
     } else {
-        _errors.emplace_back(message, TextRange(0, 0));
+        _errors.emplace_back(message, TextRange(0, 0), expectedToken);
     }
 }
 

@@ -49,7 +49,15 @@ public:
 
     LuaSyntaxNode GetRootNode() const;
 
+    LuaSyntaxNode GetTokenBeforeOffset(std::size_t offset) const;
+
+    LuaSyntaxNode GetTokenAtOffset(std::size_t offset) const;
+
     std::string GetDebugView();
+
+    bool HasError() const;
+
+    const std::vector<LuaParseError>& GetErrors() const;
 private:
     void StartNode(LuaSyntaxNodeKind kind, LuaParser &p);
 
@@ -72,4 +80,5 @@ private:
     std::vector<LuaSyntaxNode> _syntaxNodes;
     std::stack<std::size_t> _nodePosStack;
     std::size_t _tokenIndex;
+    std::vector<LuaParseError> _errors;
 };

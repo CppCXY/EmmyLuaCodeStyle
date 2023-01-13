@@ -68,6 +68,10 @@ void NameStyleChecker::ExitScope() {
 }
 
 void NameStyleChecker::CheckInNode(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    if (n.IsNull(t)) {
+        return;
+    }
+
     for (auto syntaxNode: n.GetChildren(t)) {
         if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {
@@ -338,7 +342,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                 if (!matcher.Match(n, t, state.GetDiagnosticStyle().module_name_style)) {
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
-                                     MakeDiagnosticInfo("ModuleNameStyle", n, t,
+                                     MakeDiagnosticInfo("ModuleName", n, t,
                                                         state.GetDiagnosticStyle().module_name_style)
                     );
                 }
@@ -374,7 +378,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                 if (!matcher.Match(n, t, state.GetDiagnosticStyle().function_param_name_style)) {
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
-                                     MakeDiagnosticInfo("paramName", n, t,
+                                     MakeDiagnosticInfo("ParamName", n, t,
                                                         state.GetDiagnosticStyle().function_param_name_style)
                     );
                 }

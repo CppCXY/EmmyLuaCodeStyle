@@ -38,7 +38,9 @@ public:
 
 	std::size_t GetLineRestCharacter(std::size_t offset);
 
-	std::string_view GetIndentString(std::size_t offset);
+	std::string_view GetIndentString(std::size_t offset) const;
+
+    bool IsEmptyLine(std::size_t line) const;
 protected:
 	std::string _source;
 

@@ -173,7 +173,7 @@ std::size_t LuaFile::GetLineRestCharacter(std::size_t offset) {
     }
 }
 
-std::string_view LuaFile::GetIndentString(std::size_t offset) {
+std::string_view LuaFile::GetIndentString(std::size_t offset) const {
     std::string_view source = GetSource();
     auto line = GetLine(offset);
     const auto start = GetOffset(line, 0);
@@ -187,6 +187,30 @@ std::string_view LuaFile::GetIndentString(std::size_t offset) {
     }
 
     return source.substr(start, static_cast<std::size_t>(index - start));
+}
+
+bool LuaFile::IsEmptyLine(std::size_t line) const {
+    if (line >= _lineOffsetVec.size()) {
+        return true;
+    }
+
+    std::size_t lineStartOffset = _lineOffsetVec[line];
+    std::size_t nextLineStartOffset = 0;
+
+    if (line + 1 == _lineOffsetVec.size()) {
+        nextLineStartOffset = _source.size();
+    } else {
+        nextLineStartOffset = _lineOffsetVec[line + 1];
+    }
+
+    for (auto offset = lineStartOffset; offset < nextLineStartOffset; offset++) {
+        char ch = _source[offset];
+        if (ch != '\n' && ch != '\r' && ch != '\t' && ch != ' ') {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 
