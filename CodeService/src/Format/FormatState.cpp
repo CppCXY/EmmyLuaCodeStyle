@@ -128,3 +128,62 @@ IndentState FormatState::GetCurrentIndent() const {
     return _indentStack.top();
 }
 
+void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
+                             const LuaSyntaxTree &t,
+                             const FormatState::FormatHandle &enterHandle) {
+    std::vector<Traverse> traverseStack;
+    for (auto &n: startNodes) {
+        traverseStack.emplace_back(n, TraverseEvent::Enter);
+    }
+
+    // 非递归深度优先遍历
+    FormatResolve resolve;
+    while (!traverseStack.empty()) {
+        Traverse traverse = traverseStack.back();
+        resolve.Reset();
+        if (traverse.Event == TraverseEvent::Enter) {
+            traverseStack.back().Event = TraverseEvent::Exit;
+            for (auto &analyzer: _analyzers) {
+                analyzer->Query(*this, traverse.Node, t, resolve);
+            }
+            auto children = traverse.Node.GetChildren(t);
+            // 不采用 <range>
+            for (auto rIt = children.rbegin(); rIt != children.rend(); rIt++) {
+                traverseStack.emplace_back(*rIt, TraverseEvent::Enter);
+            }
+
+            if (resolve.GetIndentStrategy() != IndentStrategy::None) {
+                auto indent = resolve.GetIndent();
+                if (indent == 0) {
+                    if (_formatStyle.indent_style == IndentStyle::Space) {
+                        indent = _formatStyle.indent_size;
+                    } else {
+                        indent = _formatStyle.tab_width;
+                    }
+                }
+
+                switch (resolve.GetIndentStrategy()) {
+                    case IndentStrategy::Relative: {
+                        AddRelativeIndent(traverse.Node, indent);
+                        break;
+                    }
+                    case IndentStrategy::InvertRelative: {
+                        AddInvertIndent(traverse.Node, indent);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            }
+
+            enterHandle(traverse.Node, t, resolve);
+        } else {
+            traverseStack.pop_back();
+            if (GetCurrentIndent().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
+                RecoverIndent();
+            }
+        }
+    }
+}
+

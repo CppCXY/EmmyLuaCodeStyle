@@ -44,37 +44,13 @@ void DiagnosticBuilder::CodeStyleCheck(const LuaSyntaxTree &t) {
     }
 
     auto root = t.GetRootNode();
-    std::vector<Traverse> traverseStack;
-    traverseStack.emplace_back(root, TraverseEvent::Enter);
-    // 非递归深度优先遍历
-    FormatResolve resolve;
-    while (!traverseStack.empty()) {
-        Traverse traverse = traverseStack.back();
-        resolve.Reset();
-        if (traverse.Event == TraverseEvent::Enter) {
-            traverseStack.back().Event = TraverseEvent::Exit;
-            for (auto &analyzer: _state.GetAnalyzers()) {
-                analyzer->Query(_state, traverse.Node, t, resolve);
-            }
-            auto children = traverse.Node.GetChildren(t);
-            // 不采用 <range>
-            for (auto rIt = children.rbegin(); rIt != children.rend(); rIt++) {
-                traverseStack.emplace_back(*rIt, TraverseEvent::Enter);
-            }
+    std::vector<LuaSyntaxNode> startNodes = {root};
 
-            DoDiagnosticResolve(traverse.Node, t, resolve);
-        } else {
-            traverseStack.pop_back();
-            for (auto &analyzer: _state.GetAnalyzers()) {
-                analyzer->ExitQuery(_state, traverse.Node, t, resolve);
-            }
-//            ExitResolve(traverse.Node, t, resolve);
-
-            if (_state.GetCurrentIndent().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
-                _state.RecoverIndent();
-            }
-        }
-    }
+    _state.DfsForeach(startNodes, t, [this](LuaSyntaxNode &syntaxNode,
+                                            const LuaSyntaxTree &t,
+                                            FormatResolve &resolve) {
+        DoDiagnosticResolve(syntaxNode, t, resolve);
+    });
 
     auto text = root.GetText(t);
     if (_state.GetStyle().insert_final_newline) {
@@ -145,7 +121,7 @@ void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaS
 
     if (syntaxNode.IsToken(t)) {
         auto textRange = syntaxNode.GetTextRange(t);
-        auto& file = t.GetFile();
+        auto &file = t.GetFile();
         switch (resolve.GetPrevSpaceStrategy()) {
             case PrevSpaceStrategy::AlignPos: {
                 auto pos = resolve.GetAlign();

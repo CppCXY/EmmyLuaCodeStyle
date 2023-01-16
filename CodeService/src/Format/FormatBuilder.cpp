@@ -15,59 +15,15 @@ void FormatBuilder::FormatAnalyze(const LuaSyntaxTree &t) {
 std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
     _formattedText.reserve(t.GetFile().GetSource().size());
     auto root = t.GetRootNode();
-    std::vector<Traverse> traverseStack;
-    traverseStack.emplace_back(root, TraverseEvent::Enter);
-    // 非递归深度优先遍历
-    FormatResolve resolve;
-    while (!traverseStack.empty()) {
-        Traverse traverse = traverseStack.back();
-        resolve.Reset();
-        if (traverse.Event == TraverseEvent::Enter) {
-            traverseStack.back().Event = TraverseEvent::Exit;
-            for (auto &analyzer: _state.GetAnalyzers()) {
-                analyzer->Query(_state, traverse.Node, t, resolve);
-            }
-            auto children = traverse.Node.GetChildren(t);
-            // 不采用 <range>
-            for (auto rIt = children.rbegin(); rIt != children.rend(); rIt++) {
-                traverseStack.emplace_back(*rIt, TraverseEvent::Enter);
-            }
+    std::vector<LuaSyntaxNode> startNodes = {root};
 
-            DoResolve(traverse.Node, t, resolve);
-        } else {
-            traverseStack.pop_back();
-            for (auto &analyzer: _state.GetAnalyzers()) {
-                analyzer->ExitQuery(_state, traverse.Node, t, resolve);
-            }
-            ExitResolve(traverse.Node, t, resolve);
+    _state.DfsForeach(startNodes, t, [this](LuaSyntaxNode &syntaxNode,
+                                            const LuaSyntaxTree &t,
+                                            FormatResolve &resolve) {
+        DoResolve(syntaxNode, t, resolve);
+    });
 
-            if (_state.GetCurrentIndent().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
-                _state.RecoverIndent();
-            }
-        }
-    }
-
-    if (!_formattedText.empty()) {
-        auto endChar = _formattedText.back();
-        // trim end new line
-        if (endChar == '\r' || endChar == '\n') {
-            auto lastIndex = _formattedText.size();
-            std::size_t reduce = 0;
-            while (_formattedText[lastIndex - reduce - 1] == '\r'
-                   || _formattedText[lastIndex - reduce - 1] == '\n') {
-                reduce++;
-                if (lastIndex <= reduce + 1) {
-                    break;
-                }
-            }
-            _formattedText.resize(lastIndex - reduce);
-        }
-
-        if (_state.GetStyle().insert_final_newline) {
-            WriteLine(1);
-        }
-    }
-
+    DealNewLine();
     return _formattedText;
 }
 
@@ -104,31 +60,6 @@ bool ExistDel(char del, std::string_view text) {
 }
 
 void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
-    if (resolve.GetIndentStrategy() != IndentStrategy::None) {
-        auto indent = resolve.GetIndent();
-        if (indent == 0) {
-            if (_state.GetStyle().indent_style == IndentStyle::Space) {
-                indent = _state.GetStyle().indent_size;
-            } else {
-                indent = _state.GetStyle().tab_width;
-            }
-        }
-
-        switch (resolve.GetIndentStrategy()) {
-            case IndentStrategy::Relative: {
-                _state.AddRelativeIndent(syntaxNode, indent);
-                break;
-            }
-            case IndentStrategy::InvertRelative: {
-                _state.AddInvertIndent(syntaxNode, indent);
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    }
-
     if (syntaxNode.IsToken(t)) {
         if (!_formattedText.empty()) {
             auto lastChar = _formattedText.back();
@@ -383,10 +314,6 @@ void FormatBuilder::WriteIndent() {
     _state.GetCurrentWidth() += topLevelIndent.SpaceSize + topLevelIndent.TabSize * _state.GetStyle().tab_width;
 }
 
-void FormatBuilder::ExitResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
-
-}
-
 void FormatBuilder::WriteChar(char ch) {
     _state.GetCurrentWidth()++;
     _formattedText.push_back(ch);
@@ -423,99 +350,29 @@ void FormatBuilder::WriteText(std::string_view text) {
 std::string FormatBuilder::GetRangeFormatResult(FormatRange &range, const LuaSyntaxTree &t) {
     _formattedText.reserve(t.GetFile().GetSource().size());
     auto root = t.GetRootNode();
-    std::vector<Traverse> traverseStack;
+    std::vector<LuaSyntaxNode> startNodes;
     for (auto child: root.GetChildren(t)) {
         auto childEndLine = child.GetEndLine(t);
         if (childEndLine >= range.StartLine) {
-            traverseStack.emplace_back(child, TraverseEvent::Enter);
+            startNodes.push_back(child);
         }
         if (childEndLine > range.EndLine) {
             break;
         }
     }
 
+    _state.DfsForeach(startNodes, t, [this, &range](LuaSyntaxNode &syntaxNode,
+                                                    const LuaSyntaxTree &t,
+                                                    FormatResolve &resolve) {
+        DoRangeResolve(range, syntaxNode, t, resolve);
+    });
 
-    // 非递归深度优先遍历
-    FormatResolve resolve;
-    while (!traverseStack.empty()) {
-        Traverse traverse = traverseStack.back();
-        resolve.Reset();
-        if (traverse.Event == TraverseEvent::Enter) {
-            traverseStack.back().Event = TraverseEvent::Exit;
-            for (auto &analyzer: _state.GetAnalyzers()) {
-                analyzer->Query(_state, traverse.Node, t, resolve);
-            }
-            auto children = traverse.Node.GetChildren(t);
-            // 不采用 <range>
-            for (auto rIt = children.rbegin(); rIt != children.rend(); rIt++) {
-                traverseStack.emplace_back(*rIt, TraverseEvent::Enter);
-            }
-
-            DoRangeResolve(range, traverse.Node, t, resolve);
-        } else {
-            traverseStack.pop_back();
-            for (auto &analyzer: _state.GetAnalyzers()) {
-                analyzer->ExitQuery(_state, traverse.Node, t, resolve);
-            }
-            ExitResolve(traverse.Node, t, resolve);
-
-            if (_state.GetCurrentIndent().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
-                _state.RecoverIndent();
-            }
-        }
-    }
-
-    if (!_formattedText.empty()) {
-        auto endChar = _formattedText.back();
-        // trim end new line
-        if (endChar == '\r' || endChar == '\n') {
-            auto lastIndex = _formattedText.size();
-            std::size_t reduce = 0;
-            while (_formattedText[lastIndex - reduce - 1] == '\r'
-                   || _formattedText[lastIndex - reduce - 1] == '\n') {
-                reduce++;
-                if (lastIndex <= reduce + 1) {
-                    break;
-                }
-            }
-            _formattedText.resize(lastIndex - reduce);
-        }
-
-        if (_state.GetStyle().insert_final_newline) {
-            WriteLine(1);
-        }
-    }
-
+    DealNewLine();
     return _formattedText;
 }
 
 void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode,
                                    const LuaSyntaxTree &t, FormatResolve &resolve) {
-    if (resolve.GetIndentStrategy() != IndentStrategy::None) {
-        auto indent = resolve.GetIndent();
-        if (indent == 0) {
-            if (_state.GetStyle().indent_style == IndentStyle::Space) {
-                indent = _state.GetStyle().indent_size;
-            } else {
-                indent = _state.GetStyle().tab_width;
-            }
-        }
-
-        switch (resolve.GetIndentStrategy()) {
-            case IndentStrategy::Relative: {
-                _state.AddRelativeIndent(syntaxNode, indent);
-                break;
-            }
-            case IndentStrategy::InvertRelative: {
-                _state.AddInvertIndent(syntaxNode, indent);
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    }
-
     if (syntaxNode.IsToken(t)) {
         auto tokenEndLine = syntaxNode.GetEndLine(t);
         if (tokenEndLine < range.StartLine) {
@@ -699,6 +556,29 @@ void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode
             default: {
                 break;
             }
+        }
+    }
+}
+
+void FormatBuilder::DealNewLine() {
+    if (!_formattedText.empty()) {
+        auto endChar = _formattedText.back();
+        // trim end new line
+        if (endChar == '\r' || endChar == '\n') {
+            auto lastIndex = _formattedText.size();
+            std::size_t reduce = 0;
+            while (_formattedText[lastIndex - reduce - 1] == '\r'
+                   || _formattedText[lastIndex - reduce - 1] == '\n') {
+                reduce++;
+                if (lastIndex <= reduce + 1) {
+                    break;
+                }
+            }
+            _formattedText.resize(lastIndex - reduce);
+        }
+
+        if (_state.GetStyle().insert_final_newline) {
+            WriteLine(1);
         }
     }
 }

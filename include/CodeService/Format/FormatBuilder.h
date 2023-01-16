@@ -26,8 +26,6 @@ private:
     void DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode,
                         const LuaSyntaxTree &t, FormatResolve &resolve);
 
-    void ExitResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
-
     void WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
     void WriteSpace(std::size_t space);
@@ -39,6 +37,8 @@ private:
     void WriteChar(char ch);
 
     void WriteText(std::string_view text);
+
+    void DealNewLine();
 
     FormatState _state;
     std::string _formattedText;

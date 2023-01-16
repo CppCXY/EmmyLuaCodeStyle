@@ -8,6 +8,10 @@
 
 class FormatState {
 public:
+    using FormatHandle = std::function<void(LuaSyntaxNode &syntaxNode,
+                                            const LuaSyntaxTree &t,
+                                            FormatResolve &resolve)>;
+
     FormatState();
 
     void SetFormatStyle(LuaStyle &style);
@@ -48,8 +52,15 @@ public:
 
     void Analyze(const LuaSyntaxTree &t);
 
-    std::array<std::unique_ptr<FormatAnalyzer>, static_cast<std::size_t>(FormatAnalyzerType::Count)>&
+    std::array<std::unique_ptr<FormatAnalyzer>, static_cast<std::size_t>(FormatAnalyzerType::Count)> &
     GetAnalyzers();
+
+
+    // 深度优先处理格式
+    void DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
+                    const LuaSyntaxTree &t,
+                    const FormatHandle &enterHandle
+    );
 
 private:
     LuaStyle _formatStyle;
