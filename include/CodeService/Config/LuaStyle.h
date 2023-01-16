@@ -94,8 +94,8 @@ public:
     bool align_continuous_rect_table_field_to_equal = true;
     // not implement now
     bool align_continuous_similar_call_args = false;
-
-//    bool align_continuous_similar_array_table = false;
+    // not implement now
+    bool align_continuous_similar_array_table = false;
 
     bool align_if_branch = true;
 
@@ -104,7 +104,7 @@ public:
 	/*
 	 * if语句的条件可以无延续行缩进
 	 */
-	bool never_indent_before_if_condition = true;
+	bool never_indent_before_if_condition = false;
 
 	bool never_indent_comment_on_if_branch = false;
 
@@ -128,10 +128,12 @@ public:
 
     LineSpace line_space_after_comment = LineSpace(LineSpaceType::Keep);
 
+    // [line break]
+    bool break_all_list_when_line_exceed = true;
+
+    bool auto_collapse_lines = true;
     // [preference]
 	bool ignore_space_after_colon = false;
 
 	bool remove_call_expression_list_finish_comma = false;
-
-    bool auto_split_or_join_lines = false;
 };

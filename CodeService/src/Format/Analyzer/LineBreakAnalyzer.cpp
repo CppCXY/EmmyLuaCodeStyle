@@ -153,7 +153,7 @@ void LineBreakAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
 
 void
 LineBreakAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
-    if (syntaxNode.IsToken(t)) {
+    if (syntaxNode.IsToken(t) && _lineBreaks.count(syntaxNode.GetIndex()) == 0) {
         if (resolve.GetNextSpaceStrategy() == NextSpaceStrategy::None
             || resolve.GetNextSpaceStrategy() == NextSpaceStrategy::Space) {
             auto nextToken = syntaxNode.GetNextToken(t);
@@ -175,7 +175,7 @@ LineBreakAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyn
         switch (lineBreakData.Strategy) {
             case LineBreakStrategy::Standard: {
                 resolve.SetNextLineBreak(lineBreakData.Data.Line);
-                return;
+                break;
             }
             case LineBreakStrategy::WhenMayExceed: {
                 auto lineWidth = f.GetCurrentWidth();
@@ -184,8 +184,10 @@ LineBreakAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyn
                 auto guessLineWidth = lineWidth + syntaxNode.GetFirstLineWidth(t) + relationNode.GetFirstLineWidth(t);
                 if (guessLineWidth > style.max_line_length) {
                     resolve.SetNextLineBreak(LineSpace(1));
-                    return;
                 }
+                break;
+            }
+            default: {
                 break;
             }
         }
@@ -242,6 +244,20 @@ void LineBreakAnalyzer::AnalyzeConditionExpr(FormatState &f, LuaSyntaxNode &expr
 
 void LineBreakAnalyzer::AnalyzeNameList(FormatState &f, LuaSyntaxNode &nameList, const LuaSyntaxTree &t) {
     auto names = nameList.GetChildTokens(TK_NAME, t);
+    if (f.GetStyle().auto_collapse_lines && CanCollapseLines(f, nameList, t)) {
+        for (auto name: names) {
+            MarkNotBreak(name, t);
+        }
+        return;
+    }
+
+    if (f.GetStyle().break_all_list_when_line_exceed && CanBreakAll(f, nameList, t)) {
+        for (auto name: names) {
+            BreakBefore(name, t);
+        }
+        return;
+    }
+
     for (auto name: names) {
         MarkLazyBreak(name, t, LineBreakStrategy::WhenMayExceed);
     }
@@ -258,6 +274,13 @@ void LineBreakAnalyzer::MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, L
     auto prevToken = n.GetPrevToken(t);
     if (prevToken.IsToken(t) && !_lineBreaks.count(prevToken.GetIndex())) {
         _lineBreaks[prevToken.GetIndex()] = LineBreakData(strategy, n.GetIndex());
+    }
+}
+
+void LineBreakAnalyzer::MarkNotBreak(LuaSyntaxNode n, const LuaSyntaxTree &t) {
+    auto prevToken = n.GetPrevToken(t);
+    if (prevToken.IsToken(t) && !_lineBreaks.count(prevToken.GetIndex())) {
+        _lineBreaks[prevToken.GetIndex()] = LineBreakData(LineBreakStrategy::NotBreak, n.GetIndex());
     }
 }
 
@@ -285,13 +308,21 @@ void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const L
         case LuaSyntaxNodeKind::TableExpression: {
             auto tableFieldList = expr.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldList, t);
             auto fields = tableFieldList.GetChildSyntaxNodes(LuaSyntaxNodeKind::TableField, t);
-            auto forceBreak =
-                    tableFieldList.GetStartLine(t) != tableFieldList.GetEndLine(t)
-                    && std::any_of(fields.begin(), fields.end(),
-                                   [&](LuaSyntaxNode &node) {
-                                       return node.GetChildToken('=', t).IsToken(t);
-                                   });
-
+            if (f.GetStyle().auto_collapse_lines && CanCollapseLines(f, tableFieldList, t)) {
+                for (auto field: fields) {
+                    MarkNotBreak(field, t);
+                }
+                MarkNotBreak(tableFieldList.GetNextToken(t), t);
+                return;
+            }
+            bool forceBreak = f.GetStyle().break_all_list_when_line_exceed && CanBreakAll(f, tableFieldList, t);
+            if (!forceBreak) {
+                forceBreak = tableFieldList.GetStartLine(t) != tableFieldList.GetEndLine(t)
+                             && std::any_of(fields.begin(), fields.end(),
+                                            [&](LuaSyntaxNode &node) {
+                                                return node.GetChildToken('=', t).IsToken(t);
+                                            });
+            }
             if (forceBreak) {
                 BreakAfter(expr.GetChildToken('{', t), t);
                 for (auto field: fields) {
@@ -325,3 +356,47 @@ void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const L
     }
 }
 
+bool LineBreakAnalyzer::CanBreakAll(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    switch (n.GetSyntaxKind(t)) {
+        case LuaSyntaxNodeKind::ParamList:
+        case LuaSyntaxNodeKind::TableFieldList: {
+            auto maxLineWidth = f.GetStyle().max_line_length;
+            if (n.GetEndCol(t) >= maxLineWidth) {
+                return true;
+            }
+            return !n.IsSingleLineNode(t);
+        }
+        default: {
+            return false;
+        }
+    }
+}
+
+bool LineBreakAnalyzer::CanCollapseLines(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+    auto maxLineWidth = f.GetStyle().max_line_length;
+    auto prevToken = n.GetPrevToken(t);
+    if (prevToken.IsNull(t)) {
+        return false;
+    }
+    auto startCol = prevToken.GetEndCol(t);
+    switch (n.GetSyntaxKind(t)) {
+        case LuaSyntaxNodeKind::ParamList:
+        case LuaSyntaxNodeKind::TableFieldList: {
+            auto children = n.GetChildren(t);
+            auto lineWidth = startCol;
+            for (auto child: children) {
+                auto tokenKind = child.GetTokenKind(t);
+                if (tokenKind == ',') {
+                    lineWidth++;// ', '
+                } else if (tokenKind == TK_SHORT_COMMENT || tokenKind == TK_LONG_COMMENT) {
+                    return false; // 若有注释禁止塌缩
+                }
+                lineWidth += child.GetText(t).size();
+            }
+            return lineWidth <= maxLineWidth;
+        }
+        default: {
+            return false;
+        }
+    }
+}

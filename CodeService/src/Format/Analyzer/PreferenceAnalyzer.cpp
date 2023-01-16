@@ -6,9 +6,6 @@ PreferenceAnalyzer::PreferenceAnalyzer() {
 }
 
 void PreferenceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
-    if (f.GetStyle().auto_split_or_join_lines) {
-        AnalyzeAutoSplitOrJoinLines(f, t);
-    }
 }
 
 void

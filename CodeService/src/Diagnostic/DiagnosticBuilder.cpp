@@ -80,7 +80,6 @@ void DiagnosticBuilder::NameStyleCheck(const LuaSyntaxTree &t) {
         return;
     }
 
-
     _nameStyleChecker.Analyze(*this, t);
 }
 
@@ -172,7 +171,8 @@ void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaS
         switch (resolve.GetNextSpaceStrategy()) {
             case NextSpaceStrategy::Space: {
                 auto nextToken = syntaxNode.GetNextToken(t);
-                if (nextToken.IsToken(t)) {
+                if (nextToken.IsToken(t)
+                    && nextToken.GetStartCol(t) == syntaxNode.GetEndLine(t)) {
                     ProcessSpaceDiagnostic(syntaxNode, nextToken, t, resolve.GetNextSpace());
                 }
                 break;

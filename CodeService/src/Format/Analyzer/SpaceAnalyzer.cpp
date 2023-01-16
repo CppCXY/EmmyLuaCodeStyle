@@ -1,7 +1,6 @@
 #include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/FormatState.h"
-#include "Util/format.h"
 #include "CodeService/Config/LanguageTranslator.h"
 
 

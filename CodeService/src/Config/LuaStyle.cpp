@@ -198,9 +198,11 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
         }
     }
 
+    BOOL_OPTION(break_all_list_when_line_exceed)
+
+    BOOL_OPTION(auto_collapse_lines)
+
     BOOL_OPTION(ignore_space_after_colon)
 
     BOOL_OPTION(remove_call_expression_list_finish_comma)
-
-    BOOL_OPTION(auto_split_or_join_lines)
 }

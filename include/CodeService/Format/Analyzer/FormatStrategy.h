@@ -56,6 +56,7 @@ struct IndentData {
 enum class LineBreakStrategy {
     Standard,
     WhenMayExceed,
+    NotBreak
 };
 
 struct LineBreakData {

@@ -346,55 +346,55 @@ void AlignAnalyzer::PushNormalAlignGroup(std::size_t alignPos, std::vector<std::
 
 void
 AlignAnalyzer::AnalyzeContinuousSimilarCallArgs(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
-    auto children = syntaxNode.GetChildren(t);
-    std::size_t lastLine = 0;
-    std::vector<std::size_t> group;
-    for (auto stmt: children) {
-        auto kind = stmt.GetSyntaxKind(t);
-        if (group.empty()) {
-            if (kind == LuaSyntaxNodeKind::ExpressionStatement) {
-                group.push_back(stmt.GetIndex());
-                lastLine = stmt.GetEndLine(t);
-            }
-            continue;
-        }
-
-        if (stmt.GetTokenKind(t) == TK_SHORT_COMMENT) {
-            auto line = stmt.GetStartLine(t);
-            if (line - lastLine > 2) {
-                if (group.size() > 1) {
-                    PushAlignGroup(AlignStrategy::AlignToEq, group);
-                }
-                group.clear();
-            } else {
-                lastLine = stmt.GetEndLine(t);
-            }
-            continue;
-        }
-
-        if (kind == LuaSyntaxNodeKind::LocalStatement
-            || kind == LuaSyntaxNodeKind::AssignStatement) {
-            auto line = stmt.GetStartLine(t);
-            if (line - lastLine <= 2) {
-                group.push_back(stmt.GetIndex());
-            } else {
-                if (group.size() > 1) {
-                    PushAlignGroup(AlignStrategy::AlignToEq, group);
-                }
-                group.clear();
-                group.push_back(stmt.GetIndex());
-            }
-
-            lastLine = stmt.GetEndLine(t);
-        } else if (group.size() > 1) {
-            PushAlignGroup(AlignStrategy::AlignToEq, group);
-            group.clear();
-        } else {
-            group.clear();
-        }
-    }
-
-    if (group.size() > 1) {
-        PushAlignGroup(AlignStrategy::AlignToEq, group);
-    }
+//    auto children = syntaxNode.GetChildren(t);
+//    std::size_t lastLine = 0;
+//    std::vector<std::size_t> group;
+//    for (auto stmt: children) {
+//        auto kind = stmt.GetSyntaxKind(t);
+//        if (group.empty()) {
+//            if (kind == LuaSyntaxNodeKind::ExpressionStatement) {
+//                group.push_back(stmt.GetIndex());
+//                lastLine = stmt.GetEndLine(t);
+//            }
+//            continue;
+//        }
+//
+//        if (stmt.GetTokenKind(t) == TK_SHORT_COMMENT) {
+//            auto line = stmt.GetStartLine(t);
+//            if (line - lastLine > 2) {
+//                if (group.size() > 1) {
+//                    PushAlignGroup(AlignStrategy::AlignToEq, group);
+//                }
+//                group.clear();
+//            } else {
+//                lastLine = stmt.GetEndLine(t);
+//            }
+//            continue;
+//        }
+//
+//        if (kind == LuaSyntaxNodeKind::LocalStatement
+//            || kind == LuaSyntaxNodeKind::AssignStatement) {
+//            auto line = stmt.GetStartLine(t);
+//            if (line - lastLine <= 2) {
+//                group.push_back(stmt.GetIndex());
+//            } else {
+//                if (group.size() > 1) {
+//                    PushAlignGroup(AlignStrategy::AlignToEq, group);
+//                }
+//                group.clear();
+//                group.push_back(stmt.GetIndex());
+//            }
+//
+//            lastLine = stmt.GetEndLine(t);
+//        } else if (group.size() > 1) {
+//            PushAlignGroup(AlignStrategy::AlignToEq, group);
+//            group.clear();
+//        } else {
+//            group.clear();
+//        }
+//    }
+//
+//    if (group.size() > 1) {
+//        PushAlignGroup(AlignStrategy::AlignToEq, group);
+//    }
 }

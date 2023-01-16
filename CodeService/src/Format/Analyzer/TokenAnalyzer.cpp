@@ -119,7 +119,7 @@ void TokenAnalyzer::AnalyzeTableField(FormatState &f, LuaSyntaxNode &syntaxNode,
                 }
                 case TrailingTableSeparator::Smart: {
                     auto tableFieldList = syntaxNode.GetParent(t);
-                    if (tableFieldList.GetStartLine(t) == syntaxNode.GetStartLine(t)) {
+                    if (tableFieldList.GetStartLine(t) == nextToken.GetStartLine(t)) {
                         auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
                         auto sepToken = sep.GetFirstToken(t);
                         Mark(sepToken, t, TokenStrategy::Remove);
