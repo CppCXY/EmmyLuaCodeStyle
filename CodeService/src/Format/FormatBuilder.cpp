@@ -23,7 +23,7 @@ std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
         DoResolve(syntaxNode, t, resolve);
     });
 
-    DealNewLine();
+    DealNewLine(_state.GetStyle().insert_final_newline);
     return _formattedText;
 }
 
@@ -361,13 +361,17 @@ std::string FormatBuilder::GetRangeFormatResult(FormatRange &range, const LuaSyn
         }
     }
 
+    LuaSyntaxNode n;
+    _state.AddRelativeIndent(n, 0);
+
     _state.DfsForeach(startNodes, t, [this, &range](LuaSyntaxNode &syntaxNode,
                                                     const LuaSyntaxTree &t,
                                                     FormatResolve &resolve) {
         DoRangeResolve(range, syntaxNode, t, resolve);
     });
 
-    DealNewLine();
+
+    DealNewLine(true);
     return _formattedText;
 }
 
@@ -560,7 +564,7 @@ void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode
     }
 }
 
-void FormatBuilder::DealNewLine() {
+void FormatBuilder::DealNewLine(bool newLine) {
     if (!_formattedText.empty()) {
         auto endChar = _formattedText.back();
         // trim end new line
@@ -577,7 +581,7 @@ void FormatBuilder::DealNewLine() {
             _formattedText.resize(lastIndex - reduce);
         }
 
-        if (_state.GetStyle().insert_final_newline) {
+        if (newLine) {
             WriteLine(1);
         }
     }

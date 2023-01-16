@@ -38,7 +38,7 @@ private:
 
     void WriteText(std::string_view text);
 
-    void DealNewLine();
+    void DealNewLine(bool newLine);
 
     FormatState _state;
     std::string _formattedText;
