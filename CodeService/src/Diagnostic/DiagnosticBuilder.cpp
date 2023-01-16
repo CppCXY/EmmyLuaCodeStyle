@@ -52,10 +52,11 @@ void DiagnosticBuilder::CodeStyleCheck(const LuaSyntaxTree &t) {
         DoDiagnosticResolve(syntaxNode, t, resolve);
     });
 
-    auto text = root.GetText(t);
+    auto &file = t.GetFile();
+    auto text = file.GetSource();
     if (_state.GetStyle().insert_final_newline) {
         if (!text.empty()) {
-            if (text.back() == '\n' || text.back() == '\r') {
+            if (text.back() != '\n' && text.back() != '\r') {
                 PushDiagnostic(DiagnosticType::EndWithNewLine,
                                TextRange(text.size(), text.size()),
                                LText("must end with new line")
@@ -64,7 +65,7 @@ void DiagnosticBuilder::CodeStyleCheck(const LuaSyntaxTree &t) {
         }
     } else {
         if (!text.empty()) {
-            if (text.back() != '\n' && text.back() != '\r') {
+            if (text.back() == '\n' || text.back() == '\r') {
                 PushDiagnostic(DiagnosticType::EndWithNewLine,
                                TextRange(text.size(), text.size()),
                                LText("can not end with new line")
@@ -94,31 +95,6 @@ void DiagnosticBuilder::SpellCheck(const LuaSyntaxTree &t) {
 }
 
 void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
-    if (resolve.GetIndentStrategy() != IndentStrategy::None) {
-        auto indent = resolve.GetIndent();
-        if (indent == 0) {
-            if (_state.GetStyle().indent_style == IndentStyle::Space) {
-                indent = _state.GetStyle().indent_size;
-            } else {
-                indent = _state.GetStyle().tab_width;
-            }
-        }
-
-        switch (resolve.GetIndentStrategy()) {
-            case IndentStrategy::Relative: {
-                _state.AddRelativeIndent(syntaxNode, indent);
-                break;
-            }
-            case IndentStrategy::InvertRelative: {
-                _state.AddInvertIndent(syntaxNode, indent);
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    }
-
     if (syntaxNode.IsToken(t)) {
         auto textRange = syntaxNode.GetTextRange(t);
         auto &file = t.GetFile();

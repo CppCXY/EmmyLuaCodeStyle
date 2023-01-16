@@ -180,6 +180,9 @@ std::vector<LuaSyntaxNode> LuaSyntaxNode::GetChildTokens(LuaTokenKind kind, cons
 }
 
 bool LuaSyntaxNode::IsSingleLineNode(const LuaSyntaxTree &t) const {
+    if (_index == 0) {
+        return false;
+    }
     return GetStartLine(t) == GetEndLine(t);
 }
 
@@ -191,9 +194,17 @@ LuaSyntaxNode LuaSyntaxNode::GetNextToken(const LuaSyntaxTree &t) const {
     if (children.empty()) {
         return *this;
     }
-    auto endIndex = children.back().GetIndex();
 
-    for (auto n = _index + 1; n <= endIndex; n++) {
+    std::size_t nextTokenStart = _index + 1;
+    if (!IsEmpty(t)) {
+        auto lastToken = GetLastToken(t);
+        if (!lastToken.IsNull(t)) {
+            nextTokenStart = lastToken.GetIndex() + 1;
+        }
+    }
+
+    auto endIndex = children.back().GetIndex();
+    for (auto n = nextTokenStart; n <= endIndex; n++) {
         if (t.IsToken(n)) {
             return LuaSyntaxNode(n);
         }

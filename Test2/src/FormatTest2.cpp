@@ -6,8 +6,9 @@
 
 int main() {
     std::string buffer = R"(
-function f()
-
+local t = {
+    a
+}
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -21,14 +22,11 @@ function f()
     t.BuildTree(p);
     std::cout << t.GetDebugView() << std::endl;
 
-    auto d = t.GetEndOffset(10);
-//    LuaStyle s;
-//    FormatBuilder b(s);
-//    b.FormatAnalyze(t);
-////    std::size_t start = 3;
-////    std::size_t end = 4;
-//    auto text = b.GetFormatResult(t);
-//    std::cout<< text << std::endl;
+    LuaStyle s;
+    FormatBuilder b(s);
+    b.FormatAnalyze(t);
+    auto text = b.GetFormatResult(t);
+    std::cout<< text << std::endl;
 //    LuaDiagnosticStyle style;
 //    StyleDiagnostic d(style);
 //    b.Diagnostic(d, t);

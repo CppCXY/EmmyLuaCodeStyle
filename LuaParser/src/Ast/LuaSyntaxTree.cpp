@@ -184,6 +184,9 @@ const LuaFile &LuaSyntaxTree::GetFile() const {
 }
 
 std::size_t LuaSyntaxTree::GetStartOffset(std::size_t index) const {
+    if (index == 0) {
+        return 0;
+    }
     if (index < _nodeOrTokens.size()) {
         auto &n = _nodeOrTokens[index];
         if (n.Type == NodeOrTokenType::Node) {
@@ -208,6 +211,9 @@ std::size_t LuaSyntaxTree::GetStartOffset(std::size_t index) const {
 }
 
 std::size_t LuaSyntaxTree::GetEndOffset(std::size_t index) const {
+    if (index == 0) {
+        return 0;
+    }
     std::size_t tokenIndex = index;
     if (index < _nodeOrTokens.size()) {
         auto &n = _nodeOrTokens[index];

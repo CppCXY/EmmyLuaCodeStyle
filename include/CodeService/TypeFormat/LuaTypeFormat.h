@@ -2,6 +2,7 @@
 
 #include "CodeService/Format/FormatBuilder.h"
 #include "LuaTypeFormatOptions.h"
+#include "CodeService/Format/Types.h"
 
 class LuaTypeFormat {
 public:
@@ -38,6 +39,11 @@ private:
                     LuaStyle &style
     );
 
+    void FormatByRange(FormatRange range,
+                       const LuaSyntaxTree &t,
+                       LuaStyle &style
+    );
+
     void FixIndent(std::size_t line,
                    std::size_t character,
                    const LuaSyntaxTree &t,
@@ -46,6 +52,5 @@ private:
     void FixEndIndent(std::size_t line, std::size_t character);
 
     LuaTypeFormatOptions _typeOptions;
-    bool _hasResult;
     std::vector<Result> _results;
 };

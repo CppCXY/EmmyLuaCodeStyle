@@ -4,152 +4,12 @@
 #include "Util/StringUtil.h"
 #include "Util/format.h"
 
-//std::shared_ptr<LuaAstNode> FindAstNodeBeforePosition(std::shared_ptr<LuaAstNode> root, int offset) {
-//    if (root->GetChildren().empty()) {
-//        return root;
-//    }
-//
-//    enum class FindState {
-//        None,
-//        Before,
-//        Contain
-//    } state = FindState::None;
-//
-//    auto it = root->GetChildren().begin();
-//    for (; it != root->GetChildren().end(); it++) {
-//        auto &child = *it;
-//        auto textRange = child->GetTextRange();
-//        if (textRange.StartOffset > offset) {
-//            state = FindState::Before;
-//            break;
-//        } else if (offset <= textRange.EndOffset) {
-//            state = FindState::Contain;
-//            break;
-//        }
-//    }
-//
-//    switch (state) {
-//        case FindState::Before: {
-//            if (it == root->GetChildren().begin()) {
-//                return root;
-//            }
-//            return *(it - 1);
-//        }
-//        case FindState::Contain: {
-//            return FindAstNodeBeforePosition(*it, offset);
-//        }
-//        case FindState::None: {
-//            return root->GetChildren().back();
-//        }
-//    }
-//    return nullptr;
-//}
-
-
 std::vector<LuaTypeFormat::Result> LuaTypeFormat::GetResult() {
     return _results;
 }
 
-//void LuaTypeFormat::FormatLine(int line) {
-//    LuaCodeStyleOptions temp = _options;
-//    temp.insert_final_newline = true;
-//    temp.remove_expression_list_finish_comma = false;
-//    if (_typeOptions.auto_complete_table_sep) {
-//        temp.trailing_table_separator = TrailingTableSeparator::Smart;
-//    } else {
-//        temp.trailing_table_separator = TrailingTableSeparator::Keep;
-//    }
-//
-//    LuaFormatter formatter(_parser, temp);
-//    formatter.BuildFormattedElement();
-//
-//    auto &result = _results.emplace_back();
-//    result.Range.StartLine = line - 1;
-//    result.Range.StartCharacter = 0;
-//    result.Range.EndLine = line - 1;
-//    result.Range.EndCharacter = 0;
-//    auto formatText = formatter.GetRangeFormattedText(result.Range);
-//    while (!formatText.empty()) {
-//        char ch = formatText.back();
-//        if (ch == ' ') {
-//            formatText.pop_back();
-//        } else {
-//            break;
-//        }
-//    }
-//    if (!formatText.empty() && formatText.back() != '\n') {
-//        formatText.push_back('\n');
-//    }
-//    result.Text = formatText;
-//    result.Range.EndLine++;
-//    _hasResult = true;
-//}
-
-//void LuaTypeFormat::FixIndent(int line, int character) {
-//    // FixEndIndent(line, character);
-//
-//    // auto root = _parser->GetAst();
-//    // auto astNode = FindAstNodeBeforePosition(root, offset);
-//    // if (!astNode)
-//    // {
-//    // 	return;
-//    // }
-//
-//    // auto block = astNode->GetParent();
-//    // if (block && block->GetType() == LuaNodeType::Block)
-//    // {
-//    // 	auto statement = block->GetParent();
-//    // 	if(statement->is)
-//    //
-//    //
-//    // }
-//
-//
-//}
-
-//void LuaTypeFormat::FixEndIndent(int line, int character) {
-//    auto luaFile = _parser->GetLuaFile();
-//    auto offset = luaFile->GetOffsetFromPosition(line, character);
-//
-//    auto &tokens = _parser->GetLuaLexer()->GetTokens();
-//    auto tokenIndex = FindTokenIndexAfterPosition(tokens, offset);
-//    if (tokenIndex == -1) {
-//        return;
-//    }
-//
-//    auto token = tokens[tokenIndex];
-//    if (token.TokenType == TK_END && luaFile->GetStartLine(token.Range.StartOffset) == line) {
-//        _hasResult = true;
-//        auto indentString = luaFile->GetIndentString(token.Range.StartOffset);
-//        {
-//            auto &result = _results.emplace_back();
-//            SerializeContext ctx1(_parser, _options);
-//            ctx1.Print(indentString);
-//            ctx1.PrintIndent(4, _options.indent_style);
-//            result.Text = ctx1.GetText();
-//            result.Range.StartLine = line;
-//            result.Range.StartCharacter = character;
-//            result.Range.EndLine = line;
-//            result.Range.EndCharacter = character;
-//        }
-//        {
-//            SerializeContext ctx2(_parser, _options);
-//            auto &result = _results.emplace_back();
-//            ctx2.PrintLine(1);
-//            ctx2.Print(indentString);
-//            ctx2.Print("e");
-//            result.Text = ctx2.GetText();
-//            result.Range.StartLine = luaFile->GetStartLine(token.Range.StartOffset);
-//            result.Range.StartCharacter = luaFile->GetColumn(token.Range.StartOffset);
-//            result.Range.EndLine = result.Range.StartLine;
-//            result.Range.EndCharacter = result.Range.StartCharacter + 1;
-//        }
-//    }
-//}
-
 LuaTypeFormat::LuaTypeFormat(LuaTypeFormatOptions &typeOptions)
-        : _typeOptions(typeOptions),
-          _hasResult(false) {
+        : _typeOptions(typeOptions) {
 
 }
 
@@ -271,6 +131,8 @@ void LuaTypeFormat::CompleteMissToken(std::size_t line,
                         endOfLine = '\r';
                         break;
                     }
+                    case EndOfLine::MIX:
+                    case EndOfLine::UNKNOWN:
                     case EndOfLine::LF: {
                         endOfLine = '\n';
                         break;
@@ -298,14 +160,11 @@ void LuaTypeFormat::CompleteMissToken(std::size_t line,
 }
 
 void LuaTypeFormat::FormatLine(std::size_t line, std::size_t character, const LuaSyntaxTree &t, LuaStyle &style) {
-    if (line == 0) {
-        return;
-    }
     FormatRange formatRange;
     auto &file = t.GetFile();
     auto offset = file.GetOffset(line, character);
     auto prevToken = t.GetTokenBeforeOffset(offset);
-    switch(prevToken.GetTokenKind(t)) {
+    switch (prevToken.GetTokenKind(t)) {
         case TK_END: {
             auto parent = prevToken.GetParent(t);
             formatRange.StartLine = parent.GetStartLine(t);
@@ -313,16 +172,19 @@ void LuaTypeFormat::FormatLine(std::size_t line, std::size_t character, const Lu
             break;
         }
         default: {
-            return;
+            formatRange.StartLine = line - 1;
+            formatRange.EndLine = line - 1;
+
+            if (_typeOptions.auto_complete_table_sep) {
+                LuaStyle tempStyle = style;
+                tempStyle.trailing_table_separator = TrailingTableSeparator::Smart;
+                return FormatByRange(formatRange, t, tempStyle);
+            }
+
+            break;
         }
     }
-
-    FormatBuilder f(style);
-    f.FormatAnalyze(t);
-    auto newText = f.GetRangeFormatResult(formatRange, t);
-    auto &result = _results.emplace_back();
-    result.Text = newText;
-    result.Range = formatRange;
+    return FormatByRange(formatRange, t, style);
 }
 
 void LuaTypeFormat::FixIndent(std::size_t line, std::size_t character, const LuaSyntaxTree &t, LuaStyle &style) {
@@ -331,4 +193,14 @@ void LuaTypeFormat::FixIndent(std::size_t line, std::size_t character, const Lua
 
 void LuaTypeFormat::FixEndIndent(std::size_t line, std::size_t character) {
 
+}
+
+void LuaTypeFormat::FormatByRange(FormatRange range, const LuaSyntaxTree &t, LuaStyle &style) {
+    FormatBuilder f(style);
+    f.FormatAnalyze(t);
+    auto newText = f.GetRangeFormatResult(range, t);
+    auto &result = _results.emplace_back();
+    result.Text = newText;
+    range.EndLine++;
+    result.Range = range;
 }
