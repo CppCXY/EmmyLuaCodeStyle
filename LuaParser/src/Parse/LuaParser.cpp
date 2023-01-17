@@ -857,15 +857,17 @@ std::string_view LuaParser::CheckName() {
 
 /* ATTRIB -> ['<' Name '>'] */
 void LuaParser::LocalAttribute() {
+    auto m = Mark();
     if (TestAndNext('<')) {
-        auto m = Mark();
         auto attributeName = CheckName();
         CheckAndNext('>');
         if (attributeName != "const" && attributeName != "close") {
             LuaExpectedError(util::format("unknown attribute {}", attributeName));
         }
         m.Complete(*this, LuaSyntaxNodeKind::Attribute);
+        return;
     }
+    m.Undo(*this);
 }
 
 void LuaParser::Check(LuaTokenKind c) {

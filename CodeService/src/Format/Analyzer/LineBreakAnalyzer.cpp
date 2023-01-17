@@ -153,7 +153,12 @@ void LineBreakAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
 
 void
 LineBreakAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
-    if (syntaxNode.IsToken(t) && _lineBreaks.count(syntaxNode.GetIndex()) == 0) {
+    auto it = _lineBreaks.find(syntaxNode.GetIndex());
+    bool collapse = false;
+    if (it != _lineBreaks.end()) {
+        collapse = it->second.Strategy == LineBreakStrategy::NotBreak;
+    }
+    if (syntaxNode.IsToken(t) && !collapse) {
         if (resolve.GetNextSpaceStrategy() == NextSpaceStrategy::None
             || resolve.GetNextSpaceStrategy() == NextSpaceStrategy::Space) {
             auto nextToken = syntaxNode.GetNextToken(t);
@@ -169,7 +174,6 @@ LineBreakAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyn
     }
 
     // force break
-    auto it = _lineBreaks.find(syntaxNode.GetIndex());
     if (it != _lineBreaks.end()) {
         auto &lineBreakData = it->second;
         switch (lineBreakData.Strategy) {
