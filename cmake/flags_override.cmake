@@ -1,7 +1,7 @@
 # see https://cloud.tencent.com/developer/article/1011688
 if(MSVC)     
 	# Use the static C library for all build types
-	MESSAGE(STATUS "link to static  C and C++ runtime lirbary(/MT /MTd)")
+	MESSAGE(STATUS "link to static  C and C++ runtime library(/MT /MTd)")
 	foreach(var 
 			CMAKE_C_FLAGS_DEBUG_INIT 
 			CMAKE_C_FLAGS_RELEASE_INIT

@@ -15,7 +15,7 @@
 
 class TestHelper {
 public:
-    static bool TestFormatted(std::string input, const std::string &shouldBe, LuaStyle &style);
+    static bool TestFormatted(std::string input, const std::string &shouldBe, LuaStyle &style = TestHelper::DefaultStyle);
 
     static std::string ReadFile(const std::string &path);
 
@@ -25,4 +25,6 @@ public:
     CollectLuaFile(std::filesystem::path directoryPath, std::vector<std::string> &paths, std::filesystem::path &root);
 
     static std::string ScriptBase;
+
+    static LuaStyle DefaultStyle;
 };

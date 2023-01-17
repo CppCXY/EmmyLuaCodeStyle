@@ -2,6 +2,8 @@
 
 std::string TestHelper::ScriptBase = "";
 
+LuaStyle TestHelper::DefaultStyle;
+
 bool TestHelper::TestFormatted(std::string input, const std::string& shouldBe, LuaStyle& style)
 {
     auto file = std::make_shared<LuaFile>(std::move(input));

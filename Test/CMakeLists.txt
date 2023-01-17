@@ -18,13 +18,19 @@ target_sources(CodeFormatTest
         src/TestHelper.cpp
         src/Grammar_unitest.cpp
         src/FormatResult_unitest.cpp
+        src/Performance_unitest.cpp
         )
 
 target_link_libraries(CodeFormatTest CodeService Util gtest)
 if(WIN32)
     # see https://github.com/google/googletest/issues/4067
-    set_property(TARGET gtest PROPERTY MSVC_RUNTIME_LIBRARY "/MD")
-    set_property(TARGET gtest_main PROPERTY MSVC_RUNTIME_LIBRARY "/MD")
+    if (CMAKE_BUILD_TYPE STREQUAL Debug)
+        set_property(TARGET gtest PROPERTY MSVC_RUNTIME_LIBRARY "/MD")
+        set_property(TARGET gtest_main PROPERTY MSVC_RUNTIME_LIBRARY "/MD")
+    else()
+        set_property(TARGET gtest PROPERTY MSVC_RUNTIME_LIBRARY "/MT")
+        set_property(TARGET gtest_main PROPERTY MSVC_RUNTIME_LIBRARY "/MT")
+    endif()
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 endif()
 
