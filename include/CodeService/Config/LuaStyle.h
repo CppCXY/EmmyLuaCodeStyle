@@ -40,7 +40,7 @@ public:
     EndOfLine end_of_line = EndOfLine::CRLF;
 #endif
 
-    TrailingTableSeparator trailing_table_separator = TrailingTableSeparator::Always;
+    TrailingTableSeparator trailing_table_separator = TrailingTableSeparator::Keep;
 
     CallArgParentheses call_arg_parentheses = CallArgParentheses::Keep;
 
@@ -97,7 +97,7 @@ public:
     // not implement now
     bool align_continuous_similar_array_table = false;
 
-    bool align_if_branch = true;
+    bool align_if_branch = false;
 
     // [Indent]
 
