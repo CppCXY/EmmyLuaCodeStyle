@@ -1,9 +1,6 @@
 #include "LuaCodeFormat.h"
 
 #include "CodeService/Config/LuaEditorConfig.h"
-#include "CodeService/LuaFormatter.h"
-#include "CodeService/NameStyle/NameStyleChecker.h"
-#include "LuaParser/LuaParser.h"
 #include "Util/StringUtil.h"
 
 LuaCodeFormat& LuaCodeFormat::GetInstance()
@@ -236,36 +233,4 @@ std::shared_ptr<LuaCodeStyleOptions> LuaCodeFormat::GetOptions(const std::string
 	}
 
 	return options;
-}
-
-LuaCodeStyleOptions LuaCodeFormat::CalculateOptions(const std::string& uri, ConfigMap& configMap)
-{
-	auto options = GetOptions(uri);
-
-	if (configMap.empty())
-	{
-		return *options;
-	}
-	else
-	{
-		LuaCodeStyleOptions tempOptions = *options;
-		if (configMap.count("insertSpaces"))
-		{
-			tempOptions.indent_style = configMap.at("insertSpaces") == "true"
-				                           ? IndentStyle::Space
-				                           : IndentStyle::Tab;
-		}
-		if (configMap.count("tabSize"))
-		{
-			if (tempOptions.indent_style == IndentStyle::Tab)
-			{
-				tempOptions.tab_width = std::stoi(configMap.at("tabSize"));
-			}
-			else if (tempOptions.indent_style == IndentStyle::Space)
-			{
-				tempOptions.indent_size = std::stoi(configMap.at("tabSize"));
-			}
-		}
-		return tempOptions;
-	}
 }

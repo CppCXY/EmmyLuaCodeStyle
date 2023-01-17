@@ -129,11 +129,14 @@ public:
     LineSpace line_space_after_comment = LineSpace(LineSpaceType::Keep);
 
     // [line break]
-    bool break_all_list_when_line_exceed = true;
+    bool break_all_list_when_line_exceed = false;
 
-    bool auto_collapse_lines = true;
+    bool auto_collapse_lines = false;
     // [preference]
 	bool ignore_space_after_colon = false;
 
 	bool remove_call_expression_list_finish_comma = false;
+
+    // not implement now
+    bool leading_comma_style = false;
 };

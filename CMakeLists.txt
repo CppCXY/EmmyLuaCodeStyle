@@ -34,12 +34,12 @@ if(BuildCodeFormat)
 endif()
 
 if(BuildCodeFormatServer)
-
+	add_subdirectory(CodeFormatServer)
 endif()
-add_subdirectory(CodeFormatServer)
 
 add_subdirectory(Test2)
-#if(EnableTest)
-#	enable_testing()
-#	add_subdirectory(Test)
-#endif()
+if(EnableTest)
+	enable_testing()
+	add_subdirectory(3rd/googletest-1.12.1)
+	add_subdirectory(Test)
+endif()

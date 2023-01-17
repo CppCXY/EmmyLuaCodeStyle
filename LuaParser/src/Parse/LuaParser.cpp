@@ -848,7 +848,7 @@ std::string_view LuaParser::CheckName() {
     if (Current() == TK_NAME) {
         auto range = _tokens[_tokenIndex].Range;
         Next();
-        return _file->GetSource().substr(range.StartOffset, range.EndOffset - range.StartOffset);
+        return _file->GetSource().substr(range.StartOffset, range.EndOffset - range.StartOffset + 1);
     }
 
     LuaExpectedError("expected <name>");
