@@ -5,8 +5,8 @@
 #include "CodeService/Format/FormatBuilder.h"
 
 int main() {
-    std::string buffer = R"(local t = { a = 123 }
-
+    std::string buffer = R"(
+    local t = (a + b)
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));

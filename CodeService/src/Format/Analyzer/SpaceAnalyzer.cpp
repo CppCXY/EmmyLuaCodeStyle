@@ -96,10 +96,16 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case '.':
                 case ':':
                 case '[':
-                case ']':
-                case '(':
-                case ')': {
+                case ']': {
                     SpaceAround(syntaxNode, t, 0, false);
+                    break;
+                }
+                case '(': {
+                    SpaceRight(syntaxNode, t, 0, false);
+                    break;
+                }
+                case ')': {
+                    SpaceLeft(syntaxNode, t, 0, false);
                     break;
                 }
                 case TK_LONG_COMMENT:

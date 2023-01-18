@@ -73,11 +73,11 @@ public:
     std::size_t space_before_inline_comment = 1;
 
     // [operator space]
-    bool space_around_math_operator = false;
+    bool space_around_math_operator = true;
 
     bool space_after_comma = true;
 
-    bool space_after_comma_in_for_statement = false;
+    bool space_after_comma_in_for_statement = true;
 
     bool space_around_concat_operator = true;
 

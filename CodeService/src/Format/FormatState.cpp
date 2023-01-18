@@ -132,8 +132,8 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
                              const LuaSyntaxTree &t,
                              const FormatState::FormatHandle &enterHandle) {
     std::vector<Traverse> traverseStack;
-    for (auto &n: startNodes) {
-        traverseStack.emplace_back(n, TraverseEvent::Enter);
+    for (auto it = startNodes.rbegin(); it != startNodes.rend(); it++) {
+        traverseStack.emplace_back(*it, TraverseEvent::Enter);
     }
 
     // 非递归深度优先遍历
