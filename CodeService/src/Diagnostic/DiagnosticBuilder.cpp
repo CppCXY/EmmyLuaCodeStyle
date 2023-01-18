@@ -172,7 +172,7 @@ void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaS
             case NextSpaceStrategy::Space: {
                 auto nextToken = syntaxNode.GetNextToken(t);
                 if (nextToken.IsToken(t)
-                    && nextToken.GetStartCol(t) == syntaxNode.GetEndLine(t)) {
+                    && nextToken.GetStartLine(t) == syntaxNode.GetEndLine(t)) {
                     ProcessSpaceDiagnostic(syntaxNode, nextToken, t, resolve.GetNextSpace());
                 }
                 break;
