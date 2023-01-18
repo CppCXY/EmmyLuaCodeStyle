@@ -521,9 +521,9 @@ t = (a + b) + 1
 t = "hello world"
 t = [[yes]] .. ddd
 t = { a, b }
-t = function ()
+t = function()
 end
-p(function ()
+p(function()
 end)
 t = p() + n.p()
 )"));

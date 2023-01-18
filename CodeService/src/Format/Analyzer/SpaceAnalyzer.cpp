@@ -222,7 +222,10 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     auto leftBrace = syntaxNode.GetChildToken('(', t);
                     if (f.GetStyle().space_before_function_open_parenthesis) {
                         SpaceLeft(leftBrace, t, 1);
+                    } else {
+                        SpaceLeft(leftBrace, t, 0);
                     }
+
                     if (f.GetStyle().space_inside_function_param_list_parentheses) {
                         auto next = leftBrace.GetNextToken(t);
                         if (next.GetTokenKind(t) != ')') {
