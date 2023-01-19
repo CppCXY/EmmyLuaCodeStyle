@@ -19,6 +19,7 @@ target_sources(CodeFormatTest
         src/Grammar_unitest.cpp
         src/FormatResult_unitest.cpp
         src/Performance_unitest.cpp
+        src/RangeFormat_unitest.cpp
         )
 
 target_link_libraries(CodeFormatTest CodeService Util gtest)

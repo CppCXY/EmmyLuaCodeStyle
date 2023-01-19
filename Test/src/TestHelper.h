@@ -15,7 +15,12 @@
 
 class TestHelper {
 public:
-    static bool TestFormatted(std::string input, const std::string &shouldBe, LuaStyle &style = TestHelper::DefaultStyle);
+    static bool
+    TestFormatted(std::string input, const std::string &shouldBe, LuaStyle &style = TestHelper::DefaultStyle);
+
+    static bool
+    TestRangeFormatted(std::size_t startLine, std::size_t endLine, std::string input, const std::string &shouldBe,
+                       LuaStyle &style = TestHelper::DefaultStyle);
 
     static std::string ReadFile(const std::string &path);
 
