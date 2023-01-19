@@ -20,7 +20,7 @@ std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
         DoResolve(syntaxNode, t, resolve);
     });
 
-    DealNewLine(_state.GetStyle().insert_final_newline);
+    DealEndWithNewLine(_state.GetStyle().insert_final_newline);
     return _formattedText;
 }
 
@@ -58,14 +58,11 @@ bool ExistDel(char del, std::string_view text) {
 
 void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (syntaxNode.IsToken(t)) {
-        if (!_formattedText.empty()) {
-            auto lastChar = _formattedText.back();
-            if (lastChar == '\n' || lastChar == '\r') {
-                WriteIndent();
-                auto indentAnalyzer = _state.GetAnalyzer<IndentationAnalyzer>();
-                if (indentAnalyzer) {
-                    indentAnalyzer->MarkIndent(syntaxNode, t);
-                }
+        if (_state.IsNewLine()) {
+            WriteIndent();
+            auto indentAnalyzer = _state.GetAnalyzer<IndentationAnalyzer>();
+            if (indentAnalyzer) {
+                indentAnalyzer->MarkIndent(syntaxNode, t);
             }
         }
 
@@ -344,34 +341,6 @@ void FormatBuilder::WriteText(std::string_view text) {
     }
 }
 
-std::string FormatBuilder::GetRangeFormatResult(FormatRange &range, const LuaSyntaxTree &t) {
-    _state.Analyze(t);
-    _formattedText.reserve(t.GetFile().GetSource().size());
-    auto root = t.GetRootNode();
-    std::vector<LuaSyntaxNode> startNodes;
-    for (auto child: root.GetChildren(t)) {
-        auto childEndLine = child.GetEndLine(t);
-        if (childEndLine >= range.StartLine) {
-            startNodes.push_back(child);
-        }
-        if (childEndLine > range.EndLine) {
-            break;
-        }
-    }
-
-    LuaSyntaxNode n;
-    _state.AddRelativeIndent(n, 0);
-
-    _state.DfsForeach(startNodes, t, [this, &range](LuaSyntaxNode &syntaxNode,
-                                                    const LuaSyntaxTree &t,
-                                                    FormatResolve &resolve) {
-        DoRangeResolve(range, syntaxNode, t, resolve);
-    });
-
-
-    DealNewLine(true);
-    return _formattedText;
-}
 
 void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode,
                                    const LuaSyntaxTree &t, FormatResolve &resolve) {
@@ -562,7 +531,7 @@ void FormatBuilder::DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode
     }
 }
 
-void FormatBuilder::DealNewLine(bool newLine) {
+void FormatBuilder::DealEndWithNewLine(bool newLine) {
     if (!_formattedText.empty()) {
         auto endChar = _formattedText.back();
         // trim end new line

@@ -3,6 +3,7 @@
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "Util/StringUtil.h"
 #include "Util/format.h"
+#include "CodeService/RangeFormat/RangeFormatBuilder.h"
 
 std::vector<LuaTypeFormat::Result> LuaTypeFormat::GetResult() {
     return _results;
@@ -196,8 +197,9 @@ void LuaTypeFormat::FixEndIndent(std::size_t line, std::size_t character) {
 }
 
 void LuaTypeFormat::FormatByRange(FormatRange range, const LuaSyntaxTree &t, LuaStyle &style) {
-    FormatBuilder f(style);
-    auto newText = f.GetRangeFormatResult(range, t);
+    RangeFormatBuilder f(style, range);
+    auto newText = f.GetFormatResult(t);
+    range = f.GetReplaceRange();
     auto &result = _results.emplace_back();
     result.Text = newText;
     range.EndLine++;

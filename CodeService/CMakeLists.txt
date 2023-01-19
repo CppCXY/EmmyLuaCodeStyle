@@ -33,6 +33,8 @@ target_sources(CodeService
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/FormatResolve.cpp
 
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/SyntaxNodeHelper.cpp
+        # rangeFormat
+        ${CodeService_SOURCE_DIR}/src/RangeFormat/RangeFormatBuilder.cpp
         # typeFormat
         ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormat.cpp
         ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp

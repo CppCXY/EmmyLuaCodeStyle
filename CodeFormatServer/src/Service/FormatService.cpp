@@ -7,6 +7,7 @@
 //#include "CodeService/NameStyle/NameStyleChecker.h"
 #include "LanguageServer.h"
 #include "CodeService/Format/FormatBuilder.h"
+#include "CodeService/RangeFormat/RangeFormatBuilder.h"
 
 
 FormatService::FormatService(LanguageServer *owner)
@@ -19,8 +20,10 @@ std::string FormatService::Format(LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaSty
 }
 
 std::string FormatService::RangeFormat(LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle, FormatRange &range) {
-    FormatBuilder f(luaStyle);
-    return f.GetRangeFormatResult(range, luaSyntaxTree);
+    RangeFormatBuilder f(luaStyle, range);
+    auto text = f.GetFormatResult(luaSyntaxTree);
+    range = f.GetReplaceRange();
+    return text;
 }
 
 std::vector<LuaTypeFormat::Result>

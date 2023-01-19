@@ -15,28 +15,26 @@ class FormatBuilder {
 public:
     explicit FormatBuilder(LuaStyle &style);
 
-    std::string GetFormatResult(const LuaSyntaxTree &t);
-
-    std::string GetRangeFormatResult(FormatRange &range, const LuaSyntaxTree &t);
-private:
+    virtual std::string GetFormatResult(const LuaSyntaxTree &t);
+protected:
     void DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
 
     void DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode,
                         const LuaSyntaxTree &t, FormatResolve &resolve);
 
-    void WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
+    virtual void WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
-    void WriteSpace(std::size_t space);
+    virtual void WriteSpace(std::size_t space);
 
-    void WriteLine(std::size_t line);
+    virtual void WriteLine(std::size_t line);
 
-    void WriteIndent();
+    virtual void WriteIndent();
 
-    void WriteChar(char ch);
+    virtual void WriteChar(char ch);
 
-    void WriteText(std::string_view text);
+    virtual void WriteText(std::string_view text);
 
-    void DealNewLine(bool newLine);
+    void DealEndWithNewLine(bool newLine);
 
     FormatState _state;
     std::string _formattedText;
