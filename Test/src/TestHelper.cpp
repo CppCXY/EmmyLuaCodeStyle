@@ -18,7 +18,6 @@ bool TestHelper::TestFormatted(std::string input, const std::string& shouldBe, L
 
     LuaStyle s;
     FormatBuilder b(s);
-    b.FormatAnalyze(t);
     auto text = b.GetFormatResult(t);
 
 	return string_util::TrimSpace(text) == string_util::TrimSpace(shouldBe);

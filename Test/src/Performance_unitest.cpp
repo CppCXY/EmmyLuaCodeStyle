@@ -10,7 +10,6 @@ TEST(FormatPerformance, 1k_row) {
     t.BuildTree(p);
 
     FormatBuilder b(TestHelper::DefaultStyle);
-    b.FormatAnalyze(t);
     auto formatted = b.GetFormatResult(t);
     EXPECT_TRUE(formatted.size() > 0);
 }
@@ -24,7 +23,6 @@ TEST(FormatPerformance, 10k_row) {
     t.BuildTree(p);
 
     FormatBuilder b(TestHelper::DefaultStyle);
-    b.FormatAnalyze(t);
     auto formatted = b.GetFormatResult(t);
     EXPECT_TRUE(formatted.size() > 0);
 }
@@ -38,7 +36,6 @@ TEST(FormatPerformance, 30k_row) {
     t.BuildTree(p);
 
     FormatBuilder b(TestHelper::DefaultStyle);
-    b.FormatAnalyze(t);
     auto formatted = b.GetFormatResult(t);
     EXPECT_TRUE(formatted.size() > 0);
 }
@@ -52,7 +49,6 @@ TEST(FormatPerformance, 100k_row) {
     t.BuildTree(p);
 
     FormatBuilder b(TestHelper::DefaultStyle);
-    b.FormatAnalyze(t);
     auto formatted = b.GetFormatResult(t);
     EXPECT_TRUE(formatted.size() > 0);
 }

@@ -197,7 +197,6 @@ void LuaTypeFormat::FixEndIndent(std::size_t line, std::size_t character) {
 
 void LuaTypeFormat::FormatByRange(FormatRange range, const LuaSyntaxTree &t, LuaStyle &style) {
     FormatBuilder f(style);
-    f.FormatAnalyze(t);
     auto newText = f.GetRangeFormatResult(range, t);
     auto &result = _results.emplace_back();
     result.Text = newText;

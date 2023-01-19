@@ -22,7 +22,6 @@ int main() {
 
     LuaStyle s;
     FormatBuilder b(s);
-    b.FormatAnalyze(t);
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;
 //    LuaDiagnosticStyle style;

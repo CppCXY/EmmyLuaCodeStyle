@@ -8,11 +8,8 @@ FormatBuilder::FormatBuilder(LuaStyle &style) {
     _state.SetFormatStyle(style);
 }
 
-void FormatBuilder::FormatAnalyze(const LuaSyntaxTree &t) {
-    _state.Analyze(t);
-}
-
 std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
+    _state.Analyze(t);
     _formattedText.reserve(t.GetFile().GetSource().size());
     auto root = t.GetRootNode();
     std::vector<LuaSyntaxNode> startNodes = {root};
@@ -348,6 +345,7 @@ void FormatBuilder::WriteText(std::string_view text) {
 }
 
 std::string FormatBuilder::GetRangeFormatResult(FormatRange &range, const LuaSyntaxTree &t) {
+    _state.Analyze(t);
     _formattedText.reserve(t.GetFile().GetSource().size());
     auto root = t.GetRootNode();
     std::vector<LuaSyntaxNode> startNodes;

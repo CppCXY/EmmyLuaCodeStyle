@@ -15,8 +15,6 @@ class FormatBuilder {
 public:
     explicit FormatBuilder(LuaStyle &style);
 
-    void FormatAnalyze(const LuaSyntaxTree &t);
-
     std::string GetFormatResult(const LuaSyntaxTree &t);
 
     std::string GetRangeFormatResult(FormatRange &range, const LuaSyntaxTree &t);

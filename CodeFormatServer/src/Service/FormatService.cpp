@@ -15,13 +15,11 @@ FormatService::FormatService(LanguageServer *owner)
 
 std::string FormatService::Format(LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle) {
     FormatBuilder f(luaStyle);
-    f.FormatAnalyze(luaSyntaxTree);
     return f.GetFormatResult(luaSyntaxTree);
 }
 
 std::string FormatService::RangeFormat(LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle, FormatRange &range) {
     FormatBuilder f(luaStyle);
-    f.FormatAnalyze(luaSyntaxTree);
     return f.GetRangeFormatResult(range, luaSyntaxTree);
 }
 

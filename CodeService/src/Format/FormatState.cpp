@@ -39,7 +39,6 @@ bool FormatState::IsNewLine() const {
     return _currentWidth == 0;
 }
 
-
 void FormatState::Analyze(const LuaSyntaxTree &t) {
     AddAnalyzer<SpaceAnalyzer>();
     AddAnalyzer<IndentationAnalyzer>();
