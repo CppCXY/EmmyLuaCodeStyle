@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	if (cmd.HasOption("file"))
+	if (cmd.HasOption("file") || cmd.HasOption("stdin"))
 	{
 		auto luaFormat = std::make_shared<LuaFormat>();
 		if (cmd.HasOption("file"))
