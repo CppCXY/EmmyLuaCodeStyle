@@ -17,7 +17,7 @@ public:
 
 	bool SetInputFile(std::string_view input);
 
-	bool ReadFromStdin(std::size_t size);
+	bool ReadFromStdin();
 
 	void SetOutputFile(std::string_view path);
 
