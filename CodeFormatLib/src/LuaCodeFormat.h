@@ -10,52 +10,52 @@
 #include "CodeService/Diagnostic/Spell/CodeSpellChecker.h"
 #include "CodeService/TypeFormat/LuaTypeFormat.h"
 #include "CodeService/Diagnostic/DiagnosticBuilder.h"
+#include "Types.h"
 
-struct LuaConfig {
-    explicit LuaConfig(std::string_view workspace)
-            : Workspace(workspace), Editorconfig(nullptr) {}
 
-    std::string Workspace;
-    std::shared_ptr<LuaEditorConfig> Editorconfig;
-};
-
-class LuaCodeFormat
-{
+class LuaCodeFormat {
 public:
-	using ConfigMap = std::map<std::string, std::string, std::less<>>;
-	static LuaCodeFormat& GetInstance();
+    using ConfigMap = std::map<std::string, std::string, std::less<>>;
 
-	LuaCodeFormat();
+    static LuaCodeFormat &GetInstance();
 
-	void UpdateCodeStyle(const std::string& workspaceUri, const std::string& configPath);
+    LuaCodeFormat();
 
-    void RemoveCodeStyle(const std::string& workspaceUri);
+    void UpdateCodeStyle(const std::string &workspaceUri, const std::string &configPath);
 
-    void SetDefaultCodeStyle(ConfigMap& configMap);
+    void RemoveCodeStyle(const std::string &workspaceUri);
 
-    void SetSupportNonStandardSymbol(const std::string& tokenType, const std::vector<std::string>& tokens);
+    void SetDefaultCodeStyle(ConfigMap &configMap);
 
-	void LoadSpellDictionary(const std::string& path);
+    void SetSupportNonStandardSymbol(const std::string &tokenType, const std::vector<std::string> &tokens);
 
-	void LoadSpellDictionaryFromBuffer(const std::string& buffer);
+    void LoadSpellDictionary(const std::string &path);
 
-	std::string Reformat(const std::string& uri, std::string&& text, ConfigMap& configMap);
+    void LoadSpellDictionaryFromBuffer(const std::string &buffer);
 
-	std::string RangeFormat(const std::string& uri, FormatRange& range, std::string&& text, ConfigMap& configMap);
+    std::string Reformat(const std::string &uri, std::string &&text, ConfigMap &configMap);
 
-	LuaTypeFormat TypeFormat(const std::string& uri, int line, int character, std::string&& text,
-	                         ConfigMap& configMap, ConfigMap& stringTypeOptions);
+    std::string RangeFormat(const std::string &uri, FormatRange &range, std::string &&text, ConfigMap &configMap);
 
-    std::vector<LuaDiagnostic> Diagnostic(const std::string& uri, std::string&& text);
+    std::vector<LuaTypeFormat::Result>
+    TypeFormat(const std::string &uri, std::size_t line, std::size_t character, std::string &&text,
+               ConfigMap &configMap, ConfigMap &stringTypeOptions);
 
-    std::vector<LuaDiagnostic> SpellCheck(const std::string& uri, std::string&& text,
-	                                         const CodeSpellChecker::CustomDictionary& tempDict);
+    std::vector<LuaDiagnosticInfo> Diagnostic(const std::string &uri, std::string &&text);
 
-	std::vector<SuggestItem> SpellCorrect(const std::string& word);
+    std::vector<LuaDiagnosticInfo> SpellCheck(const std::string &uri, std::string &&text,
+                                          const CodeSpellChecker::CustomDictionary &tempDict);
 
-	LuaStyle& GetStyle(const std::string& uri);
+    std::vector<LuaDiagnosticInfo> NameStyleCheck(const std::string &uri, std::string &&text);
+
+    std::vector<SuggestItem> SpellCorrect(const std::string &word);
+
+    LuaStyle &GetStyle(const std::string &uri);
 private:
-	std::vector<LuaConfig> _configs;
-	LuaStyle _defaultStyle;
-	std::shared_ptr<CodeSpellChecker> _codeSpellChecker;
+    std::vector<LuaDiagnosticInfo> MakeDiagnosticInfo(const std::vector<LuaDiagnostic>& diagnostics,
+                                                      std::shared_ptr<LuaFile> file);
+
+    std::vector<LuaConfig> _configs;
+    LuaStyle _defaultStyle;
+    std::shared_ptr<CodeSpellChecker> _spellChecker;
 };

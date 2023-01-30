@@ -2,235 +2,219 @@
 
 #include "CodeService/Config/LuaEditorConfig.h"
 #include "Util/StringUtil.h"
+#include "LuaParser/Parse/LuaParser.h"
+#include "CodeService/RangeFormat/RangeFormatBuilder.h"
 
-LuaCodeFormat& LuaCodeFormat::GetInstance()
-{
-	static LuaCodeFormat instance;
-	return instance;
+LuaCodeFormat &LuaCodeFormat::GetInstance() {
+    static LuaCodeFormat instance;
+    return instance;
 }
 
 LuaCodeFormat::LuaCodeFormat()
-	: _defaultOptions(std::make_shared<LuaCodeStyleOptions>()),
-	  _codeSpellChecker(std::make_shared<CodeSpellChecker>()),
-	  _customParser(std::make_shared<LuaCustomParser>())
-{
+        :
+        _spellChecker(std::make_shared<CodeSpellChecker>()) {
 }
 
-void LuaCodeFormat::UpdateCodeStyle(const std::string& workspaceUri, const std::string& configPath)
-{
-	auto editorconfig = LuaEditorConfig::LoadFromFile(configPath);
+void LuaCodeFormat::UpdateCodeStyle(const std::string &workspaceUri, const std::string &configPath) {
+    for (auto &config: _configs) {
+        if (config.Workspace == workspaceUri) {
+            config.Editorconfig = LuaEditorConfig::LoadFromFile(configPath);
+            config.Editorconfig->Parse();
+            return;
+        }
+    }
 
-	if (editorconfig == nullptr)
-	{
-		return;
-	}
-
-	for (auto& pair : _editorConfigVector)
-	{
-		if (pair.first == workspaceUri)
-		{
-			pair.second = editorconfig;
-			pair.second->SetWorkspace(workspaceUri);
-			return;
-		}
-	}
-
-	_editorConfigVector.push_back({
-		workspaceUri, editorconfig
-	});
-	_editorConfigVector.back().second->SetWorkspace(workspaceUri);
+    auto &config = _configs.emplace_back(
+            workspaceUri
+    );
+    config.Editorconfig = LuaEditorConfig::LoadFromFile(configPath);
+    config.Editorconfig->Parse();
 }
 
-void LuaCodeFormat::RemoveCodeStyle(const std::string& workspaceUri)
-{
-	for (auto it = _editorConfigVector.begin(); it != _editorConfigVector.end(); ++it)
-	{
-		if (it->first == workspaceUri)
-		{
-			_editorConfigVector.erase(it);
-			return;
-		}
-	}
+void LuaCodeFormat::RemoveCodeStyle(const std::string &workspaceUri) {
+    for (auto it = _configs.begin(); it != _configs.end(); it++) {
+        if (it->Workspace == workspaceUri) {
+            _configs.erase(it);
+            break;
+        }
+    }
 }
 
-void LuaCodeFormat::SetDefaultCodeStyle(ConfigMap& configMap)
-{
-	if (!configMap.empty())
-	{
-		LuaEditorConfig::ParseFromSection(_defaultOptions, configMap);
-	}
+void LuaCodeFormat::SetDefaultCodeStyle(ConfigMap &configMap) {
+    if (!configMap.empty()) {
+        LuaStyle style;
+        style.ParseFromMap(configMap);
+        _defaultStyle = style;
+    }
 }
 
-void LuaCodeFormat::SetSupportNonStandardSymbol(const std::string& tokenType, const std::vector<std::string>& tokens)
-{
-	if (tokenType.size() == 1)
-	{
-		_customParser->SetTokens(tokenType.front(), tokens);
-	}
+void LuaCodeFormat::SetSupportNonStandardSymbol(const std::string &tokenType, const std::vector<std::string> &tokens) {
+//    if (tokenType.size() == 1) {
+//        _customParser->SetTokens(tokenType.front(), tokens);
+//    }
 }
 
-void LuaCodeFormat::LoadSpellDictionary(const std::string& path)
-{
-	_codeSpellChecker->LoadDictionary(path);
+void LuaCodeFormat::LoadSpellDictionary(const std::string &path) {
+    _spellChecker->LoadDictionary(path);
 }
 
-void LuaCodeFormat::LoadSpellDictionaryFromBuffer(const std::string& buffer)
-{
-	_codeSpellChecker->LoadDictionaryFromBuffer(buffer);
+void LuaCodeFormat::LoadSpellDictionaryFromBuffer(const std::string &buffer) {
+    _spellChecker->LoadDictionaryFromBuffer(buffer);
 }
 
-std::string LuaCodeFormat::Reformat(const std::string& uri, std::string&& text, ConfigMap& configMap)
-{
-	auto parser = LuaParser::LoadFromBuffer(std::move(text));
-	if (_customParser->IsSupportCustomTokens())
-	{
-		parser->GetTokenParser()->SetCustomParser(_customParser);
-	}
-	parser->BuildAstWithComment();
+std::string LuaCodeFormat::Reformat(const std::string &uri, std::string &&text, ConfigMap &configMap) {
+    auto file = std::make_shared<LuaFile>(std::move(text));
+    LuaLexer luaLexer(file);
+    luaLexer.Parse();
 
-	if (parser->HasError())
-	{
-		return "";
-	}
-	auto options = GetOptions(uri);
-	auto tempOptions = CalculateOptions(uri, configMap);
-	LuaFormatter formatter(parser, tempOptions);
-	formatter.BuildFormattedElement();
-	return formatter.GetFormattedText();
+    LuaParser p(file, std::move(luaLexer.GetTokens()));
+    p.Parse();
+
+    LuaSyntaxTree t;
+    t.BuildTree(p);
+
+    LuaStyle style = GetStyle(uri);
+    FormatBuilder f(style);
+
+    return f.GetFormatResult(t);
 }
 
-std::string LuaCodeFormat::RangeFormat(const std::string& uri, LuaFormatRange& range, std::string&& text,
-                                       ConfigMap& configMap)
-{
-	auto parser = LuaParser::LoadFromBuffer(std::move(text));
-	if (_customParser->IsSupportCustomTokens())
-	{
-		parser->GetTokenParser()->SetCustomParser(_customParser);
-	}
-	parser->BuildAstWithComment();
+std::string LuaCodeFormat::RangeFormat(const std::string &uri, FormatRange &range,
+                                       std::string &&text,
+                                       ConfigMap &configMap) {
+    auto file = std::make_shared<LuaFile>(std::move(text));
+    LuaLexer luaLexer(file);
+    luaLexer.Parse();
 
-	if (parser->HasError())
-	{
-		return "";
-	}
-	auto options = GetOptions(uri);
+    LuaParser p(file, std::move(luaLexer.GetTokens()));
+    p.Parse();
 
-	auto tempOptions = CalculateOptions(uri, configMap);
-	LuaFormatter formatter(parser, tempOptions);
-	formatter.BuildFormattedElement();
+    LuaSyntaxTree t;
+    t.BuildTree(p);
 
-	return formatter.GetRangeFormattedText(range);
+    LuaStyle style = GetStyle(uri);
+    RangeFormatBuilder f(style, range);
+
+    auto formattedText = f.GetFormatResult(t);
+    range = f.GetReplaceRange();
+    return formattedText;
 }
 
-LuaTypeFormat LuaCodeFormat::TypeFormat(const std::string& uri, int line, int character, std::string&& text,
-                                        ConfigMap& configMap, ConfigMap& stringTypeOptions)
-{
-	auto parser = LuaParser::LoadFromBuffer(std::move(text));
-	if (_customParser->IsSupportCustomTokens())
-	{
-		parser->GetTokenParser()->SetCustomParser(_customParser);
-	}
-	parser->BuildAstWithComment();
-	auto options = GetOptions(uri);
-	auto tempOptions = CalculateOptions(uri, configMap);
-	auto typeOptions = LuaTypeFormatOptions::ParseFrom(stringTypeOptions);
-	LuaTypeFormat typeFormat(parser, tempOptions, typeOptions);
-	typeFormat.Analysis("\n", line, character);
+std::vector<LuaTypeFormat::Result>
+LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t character, std::string &&text,
+                          ConfigMap &configMap, ConfigMap &stringTypeOptions) {
+    auto file = std::make_shared<LuaFile>(std::move(text));
+    LuaLexer luaLexer(file);
+    luaLexer.Parse();
 
-	return typeFormat;
+    LuaParser p(file, std::move(luaLexer.GetTokens()));
+    p.Parse();
+
+    LuaSyntaxTree t;
+    t.BuildTree(p);
+
+    LuaStyle style = GetStyle(uri);
+
+    LuaTypeFormatOptions typeFormatOptions;
+    LuaTypeFormat tf(typeFormatOptions);
+    tf.Analyze("\n", line, character, t, style);
+    return tf.GetResult();
 }
 
+std::vector<LuaDiagnosticInfo> LuaCodeFormat::Diagnostic(const std::string &uri, std::string &&text) {
+    auto file = std::make_shared<LuaFile>(std::move(text));
+    LuaLexer luaLexer(file);
+    luaLexer.Parse();
 
-std::pair<bool, std::vector<LuaDiagnosisInfo>> LuaCodeFormat::Diagnose(const std::string& uri, std::string&& text)
-{
-	auto parser = LuaParser::LoadFromBuffer(std::move(text));
-	if (_customParser->IsSupportCustomTokens())
-	{
-		parser->GetTokenParser()->SetCustomParser(_customParser);
-	}
-	parser->BuildAstWithComment();
+    LuaParser p(file, std::move(luaLexer.GetTokens()));
+    p.Parse();
 
-	if (!parser->GetErrors().empty())
-	{
-		return std::make_pair(false, std::vector<LuaDiagnosisInfo>());
-	}
-	auto options = GetOptions(uri);
-	LuaFormatter formatter(parser, *options);
-	formatter.BuildFormattedElement();
+    LuaSyntaxTree t;
+    t.BuildTree(p);
 
-	DiagnosisContext ctx(parser, *options);
-	formatter.CalculateDiagnosisInfos(ctx);
+    LuaStyle style = GetStyle(uri);
 
-	if (options->enable_check_codestyle)
-	{
-		NameStyleChecker styleChecker(ctx);
-		styleChecker.Analysis();
-	}
-
-	ctx.DiagnoseLine();
-
-	return std::make_pair(true, ctx.GetDiagnosisInfos());
+    LuaDiagnosticStyle diagnosticStyle;
+    DiagnosticBuilder diagnosticBuilder(style, diagnosticStyle);
+    diagnosticBuilder.DiagnosticAnalyze(t);
+    return MakeDiagnosticInfo(diagnosticBuilder.GetDiagnosticResults(t), file);
 }
 
-std::vector<LuaDiagnosisInfo> LuaCodeFormat::SpellCheck(const std::string& uri, std::string&& text,
-                                                        const CodeSpellChecker::CustomDictionary& tempDict)
-{
-	auto parser = LuaParser::LoadFromBuffer(std::move(text));
-	if (_customParser->IsSupportCustomTokens())
-	{
-		parser->GetTokenParser()->SetCustomParser(_customParser);
-	}
-	parser->GetTokenParser()->Parse();
+std::vector<LuaDiagnosticInfo> LuaCodeFormat::SpellCheck(const std::string &uri, std::string &&text,
+                                                         const CodeSpellChecker::CustomDictionary &tempDict) {
+    auto file = std::make_shared<LuaFile>(std::move(text));
+    LuaLexer luaLexer(file);
+    luaLexer.Parse();
 
-	auto options = GetOptions(uri);
+    LuaParser p(file, std::move(luaLexer.GetTokens()));
+    p.Parse();
 
-	DiagnosisContext ctx(parser, *options);
+    LuaSyntaxTree t;
+    t.BuildTree(p);
 
-	_codeSpellChecker->Analysis(ctx, tempDict);
+    LuaStyle style = GetStyle(uri);
 
-	return ctx.GetDiagnosisInfos();
+    LuaDiagnosticStyle diagnosticStyle;
+    DiagnosticBuilder diagnosticBuilder(style, diagnosticStyle);
+    _spellChecker->SetCustomDictionary(tempDict);
+    diagnosticBuilder.SetSpellChecker(_spellChecker);
+    diagnosticBuilder.DiagnosticAnalyze(t);
+    return MakeDiagnosticInfo(diagnosticBuilder.GetDiagnosticResults(t), file);
 }
 
-std::vector<SuggestItem> LuaCodeFormat::SpellCorrect(const std::string& word)
-{
-	std::string letterWord = word;
-	for (auto& c : letterWord)
-	{
-		c = std::tolower(c);
-	}
-	bool upperFirst = false;
-	if (std::isupper(word.front()))
-	{
-		upperFirst = true;
-	}
+std::vector<SuggestItem> LuaCodeFormat::SpellCorrect(const std::string &word) {
+    std::string letterWord = word;
+    for (auto &c: letterWord) {
+        c = std::tolower(c);
+    }
+    bool upperFirst = false;
+    if (std::isupper(word.front())) {
+        upperFirst = true;
+    }
 
-	auto suggests = _codeSpellChecker->GetSuggests(letterWord);
+    auto suggests = _spellChecker->GetSuggests(letterWord);
 
-	for (auto& suggest : suggests)
-	{
-		if (!suggest.Term.empty())
-		{
-			if (upperFirst)
-			{
-				suggest.Term[0] = std::toupper(suggest.Term[0]);
-			}
-		}
-	}
-	return suggests;
+    for (auto &suggest: suggests) {
+        if (!suggest.Term.empty()) {
+            if (upperFirst) {
+                suggest.Term[0] = std::toupper(suggest.Term[0]);
+            }
+        }
+    }
+    return suggests;
 }
 
-std::shared_ptr<LuaCodeStyleOptions> LuaCodeFormat::GetOptions(const std::string& uri)
-{
-	std::size_t matchLength = 0;
-	std::shared_ptr<LuaCodeStyleOptions> options = _defaultOptions;
-	for (auto it = _editorConfigVector.begin(); it != _editorConfigVector.end(); it++)
-	{
-		if (StringUtil::StartWith(uri, it->first) && it->first.size() > matchLength)
-		{
-			matchLength = it->first.size();
-			options = it->second->Generate(uri);
-		}
-	}
+LuaStyle &LuaCodeFormat::GetStyle(const std::string &uri) {
+    std::shared_ptr<LuaEditorConfig> editorConfig = nullptr;
+    std::size_t matchProcess = 0;
+    for (auto &config: _configs) {
+        if (string_util::StartWith(uri, config.Workspace)) {
+            if (config.Workspace.size() > matchProcess) {
+                matchProcess = config.Workspace.size();
+                editorConfig = config.Editorconfig;
+            }
+        }
+    }
 
-	return options;
+    if (editorConfig) {
+        return editorConfig->Generate(uri);
+    }
+    return _defaultStyle;
+}
+
+std::vector<LuaDiagnosticInfo> LuaCodeFormat::MakeDiagnosticInfo(const std::vector<LuaDiagnostic> &diagnostics,
+                                                                 std::shared_ptr<LuaFile> file) {
+    std::vector<LuaDiagnosticInfo> results;
+    for (auto &diagnostic: diagnostics) {
+        auto result = results.emplace_back();
+        result.Type = diagnostic.Type;
+        result.Message = diagnostic.Message;
+        result.Data = diagnostic.Data;
+        result.Start.Line = file->GetLine(diagnostic.Range.StartOffset);
+        result.Start.Col = file->GetColumn(diagnostic.Range.StartOffset);
+        result.End.Line = file->GetLine(diagnostic.Range.EndOffset);
+        result.End.Col = file->GetColumn(diagnostic.Range.EndOffset);
+    }
+
+    return results;
 }

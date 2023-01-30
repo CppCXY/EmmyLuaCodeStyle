@@ -31,7 +31,7 @@ void ConfigService::LoadEditorconfig(std::string_view workspace, std::string_vie
         if (config.Workspace == workspace) {
             config.Editorconfig = LuaEditorConfig::LoadFromFile(path);
             config.Editorconfig->Parse();
-            break;
+            return;
         }
     }
 

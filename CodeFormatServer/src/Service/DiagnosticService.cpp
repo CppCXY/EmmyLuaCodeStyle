@@ -37,7 +37,7 @@ DiagnosticService::Diagnostic(std::size_t fileId,
         diag.source = "EmmyLua";
         switch (result.Type) {
             case DiagnosticType::Indent: {
-                diag.code = "space-check";
+                diag.code = "indent-check";
                 diag.severity = lsp::DiagnosticSeverity::Warning;
                 break;
             }

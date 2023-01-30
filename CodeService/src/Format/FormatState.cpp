@@ -53,11 +53,7 @@ void FormatState::Analyze(const LuaSyntaxTree &t) {
             analyzer->Analyze(*this, t);
         }
     }
-}
-
-std::array<std::unique_ptr<FormatAnalyzer>, static_cast<std::size_t>(FormatAnalyzerType::Count)> &
-FormatState::GetAnalyzers() {
-    return _analyzers;
+    // TODO split to complex analyzer
 }
 
 void FormatState::AddRelativeIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {

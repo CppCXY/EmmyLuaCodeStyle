@@ -198,6 +198,6 @@ void CodeSpellChecker::TextAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &token, c
     }
 }
 
-void CodeSpellChecker::SetCustomDictionary(CodeSpellChecker::CustomDictionary &dictionary) {
+void CodeSpellChecker::SetCustomDictionary(const CodeSpellChecker::CustomDictionary &dictionary) {
     _dictionary = dictionary;
 }

@@ -21,7 +21,7 @@ public:
 
     void LoadDictionaryFromBuffer(std::string_view buffer);
 
-    void SetCustomDictionary(CustomDictionary& dictionary);
+    void SetCustomDictionary(const CustomDictionary& dictionary);
 
     void Analyze(DiagnosticBuilder &d, const LuaSyntaxTree &t);
 

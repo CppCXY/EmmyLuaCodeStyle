@@ -33,6 +33,9 @@ struct FormatRange {
             : StartLine(0), StartCol(0),
               EndLine(0), EndCol(0) {}
 
+    FormatRange(std::size_t startLine, std::size_t endLine)
+            : StartLine(startLine), EndLine(endLine) {}
+
     std::size_t StartLine;
     std::size_t StartCol;
 
