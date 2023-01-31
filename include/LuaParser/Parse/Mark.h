@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include "LuaParser/Ast/LuaSyntaxNodeKind.h"
 #include "LuaParser/Lexer/LuaTokenKind.h"
 #include "LuaParseError.h"
