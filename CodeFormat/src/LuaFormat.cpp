@@ -23,14 +23,11 @@ bool LuaFormat::SetInputFile(std::string_view input)
 	return _parser != nullptr;
 }
 
-bool LuaFormat::ReadFromStdin(std::size_t size)
+bool LuaFormat::ReadFromStdin()
 {
-	std::string buffer;
-	buffer.resize(size);
-	std::cin.get(buffer.data(), size, EOF);
-	auto realSize = strnlen(buffer.data(), size);
-	buffer.resize(realSize);
-	_parser = LuaParser::LoadFromBuffer(std::move(buffer));
+	std::stringstream buffer;
+	buffer << std::cin.rdbuf();
+	_parser = LuaParser::LoadFromBuffer(std::move(buffer.str()));
 	return _parser != nullptr;
 }
 

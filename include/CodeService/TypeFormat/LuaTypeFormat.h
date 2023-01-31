@@ -54,3 +54,4 @@ private:
     LuaTypeFormatOptions _typeOptions;
     std::vector<Result> _results;
 };
+ 

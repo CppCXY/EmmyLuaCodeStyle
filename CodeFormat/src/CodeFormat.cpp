@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 	   .Add<bool>("overwrite", "ow", "Format overwrite the input file")
 	   .Add<std::string>("workspace", "w",
 	                     "Specify workspace directory,if no input file is specified, bulk formatting is performed")
-	   .Add<int>("stdin", "i", "Read from stdin and specify read size")
+	   .Add<bool>("stdin", "i", "Read from stdin and specify read size")
 	   .Add<std::string>("config", "c",
 	                     "Specify .editorconfig file, it decides on the effect of formatting")
 	   .Add<bool>("detect-config", "d",
@@ -84,10 +84,10 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	if (cmd.HasOption("file"))
+	if (cmd.HasOption("file") || cmd.HasOption("stdin"))
 	{
 		auto luaFormat = std::make_shared<LuaFormat>();
-		if (cmd.HasOption("file"))
+		if (cmd.HasOption("file") && !cmd.HasOption("stdin"))
 		{
 			if (!luaFormat->SetInputFile(cmd.Get<std::string>("file")))
 			{
@@ -95,18 +95,17 @@ int main(int argc, char** argv)
 				return -1;
 			}
 		}
-		else if (cmd.HasOption("stdin"))
+		else if (cmd.HasOption("stdin") && !cmd.HasOption("file"))
 		{
 			SET_BINARY_MODE();
-			std::size_t size = cmd.Get<int>("stdin");
-			if (!luaFormat->ReadFromStdin(size))
+			if (!luaFormat->ReadFromStdin())
 			{
 				return -1;
 			}
 		}
 		else
 		{
-			std::cerr << "not special input file" << std::endl;
+			std::cerr << "Either --file or --stdin must be specified." << std::endl;
 			return -1;
 		}
 
