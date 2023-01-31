@@ -4,7 +4,7 @@
 #include <string_view>
 #include <filesystem>
 #include "LuaFormat.h"
-#include "CodeService/Config/LuaCodeStyleOptions.h"
+#include "CodeService/Config/LuaStyle.h"
 #include "CodeService/Config/LuaEditorConfig.h"
 
 class LuaWorkspaceFormat
@@ -22,20 +22,17 @@ public:
 
 	void SetKeyValues(std::map<std::string, std::string, std::less<>>& keyValues);
 
-	// void SetOutput(std::string_view out);
-
 	void ReformatWorkspace();
 
 	bool CheckWorkspace();
 	
 private:
 	void CollectEditorconfig();
-	std::shared_ptr<LuaCodeStyleOptions> GetOptions(std::string_view path);
+	LuaStyle GetStyle(std::string_view path);
 
 	std::filesystem::path _workspace;
 	bool _autoDetectConfig;
 	std::vector<std::pair<std::string, std::shared_ptr<LuaEditorConfig>>> _editorConfigVector;
-	std::shared_ptr<LuaCodeStyleOptions> _defaultOptions;
+	LuaStyle _defaultStyle;
 	std::vector<std::string> _ignorePattern;
-	// std::string _output;
 };

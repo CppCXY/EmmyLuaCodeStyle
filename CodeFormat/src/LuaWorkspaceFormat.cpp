@@ -9,8 +9,7 @@
 
 LuaWorkspaceFormat::LuaWorkspaceFormat(std::string_view workspace)
 	: _workspace(absolute(std::filesystem::path(workspace))),
-	  _autoDetectConfig(false),
-	  _defaultOptions(std::make_shared<LuaCodeStyleOptions>())
+	  _autoDetectConfig(false)
 {
 }
 
@@ -40,7 +39,7 @@ void LuaWorkspaceFormat::AddIgnoresByFile(std::string_view gitIgnoreFile)
 			auto newLine = string_util::TrimSpace(line);
 			if (!string_util::StartWith(newLine, "#"))
 			{
-				_ignorePattern.push_back(std::string(newLine));
+				_ignorePattern.emplace_back(newLine);
 			}
 		}
 	}
@@ -48,7 +47,7 @@ void LuaWorkspaceFormat::AddIgnoresByFile(std::string_view gitIgnoreFile)
 
 void LuaWorkspaceFormat::AddIgnores(std::string_view pattern)
 {
-	_ignorePattern.push_back(std::string(pattern));
+	_ignorePattern.emplace_back(pattern);
 }
 
 void LuaWorkspaceFormat::SetAutoDetectConfig(bool detect)
@@ -63,11 +62,6 @@ void LuaWorkspaceFormat::SetKeyValues(std::map<std::string, std::string, std::le
 		LuaEditorConfig::ParseFromSection(_defaultOptions, keyValues);
 	}
 }
-
-// void LuaWorkspaceFormat::SetOutput(std::string_view out)
-// {
-// 	_output = out;
-// }
 
 void LuaWorkspaceFormat::ReformatWorkspace()
 {
@@ -95,15 +89,15 @@ void LuaWorkspaceFormat::ReformatWorkspace()
 	{
 		LuaFormat luaFormat;
 		luaFormat.SetInputFile(file);
-		luaFormat.SetOptions(GetOptions(file));
+        luaFormat.SetStyle(GetStyle(file));
 		luaFormat.SetOutputFile(file);
 		if (luaFormat.Reformat())
 		{
-			std::cerr << Util::format("reformat {} succeed.", file) << std::endl;
+			std::cerr << util::format("reformat {} succeed.", file) << std::endl;
 		}
 		else
 		{
-			std::cerr << Util::format("reformat {} fail.", file) << std::endl;
+			std::cerr << util::format("reformat {} fail.", file) << std::endl;
 		}
 	}
 }
@@ -137,8 +131,9 @@ bool LuaWorkspaceFormat::CheckWorkspace()
 	{
 		LuaFormat luaFormat;
 		luaFormat.SetInputFile(file);
-		luaFormat.SetOptions(GetOptions(file));
-		ret &= luaFormat.Check(workspaceString, nullptr);
+        auto style = GetStyle(file);
+        luaFormat.SetStyle(style);
+		ret &= luaFormat.Check(workspaceString);
 	}
 
 	return ret;

@@ -132,7 +132,6 @@ std::vector<LuaDiagnosticInfo> LuaCodeFormat::Diagnostic(const std::string &uri,
 
     LuaStyle style = GetStyle(uri);
 
-
     DiagnosticBuilder diagnosticBuilder(style, _diagnosticStyle);
     diagnosticBuilder.CodeStyleCheck(t);
     return MakeDiagnosticInfo(diagnosticBuilder.GetDiagnosticResults(t), file);

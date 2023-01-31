@@ -4,40 +4,61 @@
 #include <string_view>
 #include <filesystem>
 #include <cstring>
+#include "CodeService/Config/LuaStyle.h"
+#include "LuaParser/File/LuaFile.h"
+#include "LuaParser/Types/TextRange.h"
+#include "Types.h"
+#include "CodeService/Config/LuaDiagnosticStyle.h"
 
-#include "LuaParser/LuaParser.h"
-#include "CodeService/Config/LuaCodeStyleOptions.h"
-#include "CodeService/Diagnosis/LuaDiagnosisInfo.h"
-#include "CodeService/Spell/CodeSpellChecker.h"
-
-class LuaFormat
-{
+class LuaFormat {
 public:
-	LuaFormat();
+    LuaFormat();
 
-	bool SetInputFile(std::string_view input);
+    void SetWorkMode(WorkMode mode);
 
-	bool ReadFromStdin();
+    void SetWorkspace(std::string_view workspace);
 
-	void SetOutputFile(std::string_view path);
+    bool SetInputFile(std::string_view input);
 
-	void AutoDetectConfig(std::filesystem::path workspace = std::filesystem::current_path());
+    bool ReadFromStdin();
 
-	void SetConfigPath(std::string_view config);
+    void SetOutputFile(std::string_view path);
 
-	void SetOptions(std::shared_ptr<LuaCodeStyleOptions> options);
+    void AutoDetectConfig();
 
-	void SetDefaultOptions(std::map<std::string, std::string, std::less<>>& keyValues);
+    void SetConfigPath(std::string_view configPath);
 
-	bool Reformat();
+    void SetDefaultStyle(std::map<std::string, std::string, std::less<>> &keyValues);
 
-	bool Check(std::string_view workspace = "", std::shared_ptr<CodeSpellChecker> checker = nullptr);
+    bool Reformat();
 
-	void DiagnosisInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file, std::string_view path);
+    bool Check();
+
+    void AddIgnoresByFile(std::string_view ignoreFile);
+
+    void AddIgnores(std::string_view pattern);
+
 private:
-	std::string _inputFile;
-	std::string _outFile;
-	std::shared_ptr<LuaCodeStyleOptions> _options;
-	std::shared_ptr<LuaParser> _parser;
-	std::map<std::string, std::string, std::less<>> _defaultOptions;
+    LuaStyle GetStyle(std::string_view path);
+
+    void DiagnosticInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file,
+                              std::string_view path);
+
+    bool ReformatSingleFile(std::string_view inputPath, std::string_view outPath, std::string &&sourceText);
+
+    bool ReformatWorkspace();
+
+    bool CheckSingleFile();
+
+    bool CheckWorkspace();
+
+    WorkMode _mode;
+    std::string _inputPath;
+    std::string _inputFileText;
+    std::string _workspace;
+    std::string _outFile;
+    std::vector<LuaConfig> _configs;
+    LuaStyle _defaultStyle;
+    LuaDiagnosticStyle _diagnosticStyle;
+    std::vector<std::string> _ignorePattern;
 };
