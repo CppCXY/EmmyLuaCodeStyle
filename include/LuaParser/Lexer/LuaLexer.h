@@ -29,10 +29,9 @@ public:
 
 	std::shared_ptr<LuaFile> GetFile();
 
-	bool ConsumeAllTokens();
-
 	std::vector<LuaToken>& GetTokens();
 
+    
 //	void SetCustomParser(std::shared_ptr<LuaCustomParser> parser);
 private:
 	static std::map<std::string, LuaTokenKind, std::less<>> LuaReserved;
