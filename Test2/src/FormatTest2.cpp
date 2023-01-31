@@ -6,7 +6,11 @@
 
 int main() {
     std::string buffer = R"(
-    local t = (a + b)
+local t = {
+    { a, b, c = 123 },
+    { d, e, f },
+    { ddd, weff }
+}
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));

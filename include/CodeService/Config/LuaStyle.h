@@ -86,18 +86,18 @@ public:
 
     bool align_function_params = true;
 
-    // 感觉没啥用,就不实现了
-    // bool align_chained_expression_statement = false;
+    bool align_continuous_assign_statement = true;
 
-    bool align_continuous_assign_statement_to_equal = true;
-
-    bool align_continuous_rect_table_field_to_equal = true;
-    // not implement now
-    bool align_continuous_similar_call_args = false;
-    // not implement now
-    bool align_continuous_similar_array_table = false;
+    bool align_continuous_rect_table_field = true;
 
     bool align_if_branch = false;
+    // not implement now
+    bool align_continuous_similar_call_args = false;
+
+    bool align_array_table = true;
+
+    // not implement now
+    bool align_trailing_comments = false;
 
     // [Indent]
 
@@ -132,6 +132,7 @@ public:
     bool break_all_list_when_line_exceed = false;
 
     bool auto_collapse_lines = false;
+
     // [preference]
 	bool ignore_space_after_colon = false;
 

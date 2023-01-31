@@ -14,7 +14,7 @@ void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
         if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {
                 case LuaSyntaxNodeKind::Block: {
-                    if (f.GetStyle().align_continuous_assign_statement_to_equal) {
+                    if (f.GetStyle().align_continuous_assign_statement) {
                         AnalyzeContinuousLocalOrAssign(f, syntaxNode, t);
                     }
                     if (f.GetStyle().align_continuous_similar_call_args) {
@@ -24,8 +24,11 @@ void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case LuaSyntaxNodeKind::TableFieldList: {
-                    if (f.GetStyle().align_continuous_rect_table_field_to_equal) {
-                        AnalyzeContinuousTableField(f, syntaxNode, t);
+                    if (f.GetStyle().align_continuous_rect_table_field) {
+                        AnalyzeContinuousRectField(f, syntaxNode, t);
+                    }
+                    if (f.GetStyle().align_array_table) {
+                        AnalyzeContinuousArrayTableField(f, syntaxNode, t);
                     }
                     break;
                 }
@@ -83,6 +86,9 @@ void AlignAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSy
             }
             case AlignStrategy::AlignToFirst: {
                 resolve.SetAlign(alignGroup.AlignPos);
+                break;
+            }
+            default: {
                 break;
             }
         }
@@ -159,7 +165,7 @@ bool IsRectField(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
            && !syntaxNode.GetChildToken('=', t).IsNull(t);
 }
 
-void AlignAnalyzer::AnalyzeContinuousTableField(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+void AlignAnalyzer::AnalyzeContinuousRectField(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
     auto children = syntaxNode.GetChildren(t);
     std::size_t lastLine = 0;
     std::vector<std::size_t> group;
@@ -217,6 +223,82 @@ void AlignAnalyzer::AnalyzeContinuousTableField(FormatState &f, LuaSyntaxNode &s
 
     if (group.size() > 1) {
         PushAlignGroup(AlignStrategy::AlignToEq, group);
+    }
+}
+
+bool IsArrayTableField(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    if (syntaxNode.GetSyntaxKind(t) != LuaSyntaxNodeKind::TableField) {
+        return false;
+    }
+
+    auto expr = syntaxNode.GetFirstChild(t);
+    return expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression;
+}
+
+void
+AlignAnalyzer::AnalyzeContinuousArrayTableField(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    auto children = syntaxNode.GetChildren(t);
+    std::vector<LuaSyntaxNode> arrayTable;
+    std::size_t lastLine = 0;
+    for (auto field: children) {
+        if (field.GetTokenKind(t) == TK_SHORT_COMMENT || field.GetTokenKind(t) == TK_LONG_COMMENT) {
+            continue;
+        }
+
+        if (IsArrayTableField(field, t)
+            && field.IsSingleLineNode(t)
+            && field.GetStartLine(t) > lastLine) {
+            lastLine = field.GetStartLine(t);
+            auto tableExpr = field.GetFirstChild(t);
+            arrayTable.push_back(tableExpr);
+        } else if (arrayTable.size() > 1) {
+            AnalyzeArrayTableAlign(f, arrayTable, t);
+            arrayTable.clear();
+        }
+    }
+
+    if (arrayTable.size() > 1) {
+        AnalyzeArrayTableAlign(f, arrayTable, t);
+    }
+}
+
+void
+AlignAnalyzer::AnalyzeArrayTableAlign(FormatState &f, std::vector<LuaSyntaxNode> &arrayTable, const LuaSyntaxTree &t) {
+    std::vector<std::vector<LuaSyntaxNode>> arrayTableFieldVec;
+    std::size_t maxAlign = 0;
+    for (auto &table: arrayTable) {
+        auto tableFieldList = table.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldList, t);
+        auto tableFields = tableFieldList.GetChildSyntaxNodes(LuaSyntaxNodeKind::TableField, t);
+        if (tableFields.size() > maxAlign) {
+            maxAlign = tableFields.size();
+        }
+        arrayTableFieldVec.push_back(std::move(tableFields));
+    }
+
+    std::vector<std::size_t> group;
+    std::size_t alignPos = 1;
+    if (f.GetStyle().space_around_table_field_list) {
+        alignPos++;
+    }
+
+    std::size_t elementLength = 0;
+    for (std::size_t i = 0; i < maxAlign; i++) {
+        for (auto &tableFieldArray: arrayTableFieldVec) {
+            if (i < tableFieldArray.size()) {
+                auto text = tableFieldArray[i].GetText(t);
+                if (elementLength < text.size()) {
+                    elementLength = text.size();
+                }
+                group.push_back(tableFieldArray[i].GetFirstToken(t).GetIndex());
+            }
+        }
+        PushNormalAlignGroup(alignPos, group);
+        alignPos += elementLength;
+        if (f.GetStyle().space_after_comma) {
+            alignPos++;
+        }
+        elementLength = 0;
+        group.clear();
     }
 }
 

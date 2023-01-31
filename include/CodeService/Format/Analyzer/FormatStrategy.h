@@ -105,8 +105,7 @@ struct LineBreakData {
 enum class AlignStrategy {
     Normal,
     AlignToEq,
-    AlignToFirst,
-    AlignToComma
+    AlignToFirst
 };
 
 struct AlignGroup {

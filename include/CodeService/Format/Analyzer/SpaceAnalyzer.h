@@ -13,15 +13,15 @@ public:
 
     void Analyze(FormatState &f, const LuaSyntaxTree &t) override;
 
-//    void Diagnostic(StyleDiagnostic &d, const LuaSyntaxTree &t) override;
+    void ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) override;
 
     void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
-    void SpaceAround(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1, bool force = true);
+    void SpaceAround(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1);
 
-    void SpaceLeft(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1, bool force = true);
+    void SpaceLeft(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1);
 
-    void SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1, bool force = true);
+    void SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1);
 
     void SpaceIgnore(LuaSyntaxNode &n, const LuaSyntaxTree &t);
 

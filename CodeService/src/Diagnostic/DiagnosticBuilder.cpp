@@ -91,35 +91,37 @@ void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaS
         auto &file = t.GetFile();
         switch (resolve.GetPrevSpaceStrategy()) {
             case PrevSpaceStrategy::AlignPos: {
-                auto pos = resolve.GetAlign();
-                if (pos != file.GetLineOffset(textRange.StartOffset)) {
-                    PushDiagnostic(DiagnosticType::Align,
-                                   syntaxNode.GetPrevToken(t).GetIndex(),
-                                   textRange,
-                                   util::format(LText("should align to {}"),
-                                                file.GetColumn(pos)
-                                   )
-                    );
-                } else {
-                    ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
-                }
+//                auto pos = resolve.GetAlign();
+//                if (pos != file.GetLineOffset(textRange.StartOffset)) {
+//                    PushDiagnostic(DiagnosticType::Align,
+//                                   syntaxNode.GetPrevToken(t).GetIndex(),
+//                                   textRange,
+//                                   util::format(LText("should align to {}"),
+//                                                file.GetColumn(pos)
+//                                   )
+//                    );
+//                } else {
+//                    ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
+//                }
+                ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
                 break;
             }
             case PrevSpaceStrategy::AlignRelativeIndent: {
-                auto relativePos = resolve.GetAlign();
-                auto indentState = _state.GetCurrentIndent();
-                auto pos = relativePos + indentState.SpaceSize + indentState.TabSize * _state.GetStyle().tab_width;
-                if (pos != file.GetLineOffset(textRange.StartOffset)) {
-                    PushDiagnostic(DiagnosticType::Align,
-                                   syntaxNode.GetPrevToken(t).GetIndex(),
-                                   textRange,
-                                   util::format(LText("should align to {}"),
-                                                file.GetColumn(pos)
-                                   )
-                    );
-                } else {
-                    ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
-                }
+//                auto relativePos = resolve.GetAlign();
+//                auto indentState = _state.GetCurrentIndent();
+//                auto pos = relativePos + indentState.SpaceSize + indentState.TabSize * _state.GetStyle().tab_width;
+//                if (pos != file.GetLineOffset(textRange.StartOffset)) {
+//                    PushDiagnostic(DiagnosticType::Align,
+//                                   syntaxNode.GetPrevToken(t).GetIndex(),
+//                                   textRange,
+//                                   util::format(LText("should align to {}"),
+//                                                file.GetColumn(pos)
+//                                   )
+//                    );
+//                } else {
+//                    ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
+//                }
+                ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
                 break;
             }
             default: {

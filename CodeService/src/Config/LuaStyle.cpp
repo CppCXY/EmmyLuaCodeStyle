@@ -149,11 +149,13 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
 
     BOOL_OPTION(align_function_params)
 
-    BOOL_OPTION(align_continuous_assign_statement_to_equal)
+    BOOL_OPTION(align_continuous_assign_statement)
 
-    BOOL_OPTION(align_continuous_rect_table_field_to_equal)
+    BOOL_OPTION(align_continuous_rect_table_field)
 
     BOOL_OPTION(align_if_branch)
+
+    BOOL_OPTION(align_array_table)
 
     BOOL_OPTION(never_indent_before_if_condition)
 

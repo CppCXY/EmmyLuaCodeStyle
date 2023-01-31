@@ -22,11 +22,11 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case TK_SHL:
                 case TK_SHR:
                 case TK_IDIV: {
-                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_math_operator ? 1 : 0, false);
+                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_math_operator ? 1 : 0);
                     break;
                 }
                 case TK_CONCAT: {
-                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_concat_operator ? 1 : 0, false);
+                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_concat_operator ? 1 : 0);
                     break;
                 }
                 case '=':
@@ -37,7 +37,7 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case TK_NE:
                 case TK_EQ:
                 case TK_IN: {
-                    SpaceAround(syntaxNode, t, 1, false);
+                    SpaceAround(syntaxNode, t, 1);
                     break;
                 }
                 case TK_NOT: {
@@ -68,7 +68,7 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 }
                 case ',': {
                     SpaceLeft(syntaxNode, t, 0);
-                    SpaceRight(syntaxNode, t, f.GetStyle().space_after_comma ? 1 : 0, false);
+                    SpaceRight(syntaxNode, t, f.GetStyle().space_after_comma ? 1 : 0);
                     break;
                 }
                 case ';': {
@@ -97,15 +97,15 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case ':':
                 case '[':
                 case ']': {
-                    SpaceAround(syntaxNode, t, 0, false);
+                    SpaceAround(syntaxNode, t, 0);
                     break;
                 }
                 case '(': {
-                    SpaceRight(syntaxNode, t, 0, false);
+                    SpaceRight(syntaxNode, t, 0);
                     break;
                 }
                 case ')': {
-                    SpaceLeft(syntaxNode, t, 0, false);
+                    SpaceLeft(syntaxNode, t, 0);
                     break;
                 }
                 case TK_LONG_COMMENT:
@@ -117,7 +117,13 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     break;
                 }
             }
-        } else {
+        }
+    }
+}
+
+void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
+    for (auto syntaxNode: t.GetSyntaxNodes()) {
+        if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {
                 case LuaSyntaxNodeKind::CallExpression: {
                     auto leftBrace = syntaxNode.GetChildToken('(', t);
@@ -237,34 +243,26 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case LuaSyntaxNodeKind::ForNumber: {
-                    auto commas = syntaxNode.GetChildTokens(',', t);
-                    for (auto comma: commas) {
-                        SpaceRight(
-                                comma, t,
-                                f.GetStyle().space_after_comma_in_for_statement
-                                ? 1 : 0
-                        );
+                    if (!f.GetStyle().space_after_comma_in_for_statement) {
+                        auto commas = syntaxNode.GetChildTokens(',', t);
+                        for (auto comma: commas) {
+                            SpaceRight(comma, t, 0);
+                        }
                     }
                     break;
                 }
                 case LuaSyntaxNodeKind::ForList: {
-                    auto nameList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::NameDefList, t);
-                    for (auto comma: nameList.GetChildTokens(',', t)) {
-                        SpaceRight(
-                                comma, t,
-                                f.GetStyle().space_after_comma_in_for_statement
-                                ? 1 : 0
-                        );
+                    if (!f.GetStyle().space_after_comma_in_for_statement) {
+                        auto nameList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::NameDefList, t);
+                        for (auto comma: nameList.GetChildTokens(',', t)) {
+                            SpaceRight(comma, t, 0);
+                        }
+                        auto exprList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+                        for (auto comma: exprList.GetChildTokens(',', t)) {
+                            SpaceRight(comma, t, 0);
+                        }
                     }
 
-                    auto exprList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
-                    for (auto comma: exprList.GetChildTokens(',', t)) {
-                        SpaceRight(
-                                comma, t,
-                                f.GetStyle().space_after_comma_in_for_statement
-                                ? 1 : 0
-                        );
-                    }
                     break;
                 }
 
@@ -276,18 +274,6 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
     }
 }
 
-//void SpaceAnalyzer::Diagnostic(StyleDiagnostic &d, const LuaSyntaxTree &t) {
-//    for (auto node: t.GetSyntaxNodes()) {
-//        if (node.IsToken(t)) {
-//            auto next = node.GetNextToken(t);
-//            if (next.IsToken(t)) {
-//                auto shouldSpace = ProcessSpace(t, node, next);
-//                PushDiagnostic(node, next, t, shouldSpace, d);
-//            }
-//        }
-//    }
-//}
-
 void SpaceAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (syntaxNode.IsToken(t)) {
         auto nextToken = syntaxNode.GetNextToken(t);
@@ -296,27 +282,20 @@ void SpaceAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSy
     }
 }
 
-void SpaceAnalyzer::SpaceAround(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space, bool force) {
-    SpaceLeft(n, t, space, force);
-    SpaceRight(n, t, space, force);
+void SpaceAnalyzer::SpaceAround(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space) {
+    SpaceLeft(n, t, space);
+    SpaceRight(n, t, space);
 }
 
-void SpaceAnalyzer::SpaceLeft(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space, bool force) {
+void SpaceAnalyzer::SpaceLeft(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space) {
     auto token = n.GetFirstToken(t);
-    if (force) {
-        _leftSpaces[token.GetIndex()] = space;
-    } else {
-        _leftSpaces.insert({token.GetIndex(), space});
-    }
+
+    _leftSpaces[token.GetIndex()] = space;
 }
 
-void SpaceAnalyzer::SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space, bool force) {
+void SpaceAnalyzer::SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space) {
     auto token = n.GetLastToken(t);
-    if (force) {
-        _rightSpaces[token.GetIndex()] = space;
-    } else {
-        _rightSpaces.insert({token.GetIndex(), space});
-    }
+    _rightSpaces[token.GetIndex()] = space;
 }
 
 std::optional<std::size_t> SpaceAnalyzer::GetLeftSpace(LuaSyntaxNode &n) const {
@@ -367,4 +346,3 @@ SpaceAnalyzer::ProcessSpace(const LuaSyntaxTree &t, LuaSyntaxNode &left, LuaSynt
 void SpaceAnalyzer::SpaceIgnore(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
     _ignoreSpace.insert(n.GetIndex());
 }
-
