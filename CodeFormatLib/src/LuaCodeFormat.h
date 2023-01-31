@@ -57,5 +57,6 @@ private:
 
     std::vector<LuaConfig> _configs;
     LuaStyle _defaultStyle;
-    std::shared_ptr<CodeSpellChecker> _spellChecker;
+    CodeSpellChecker _spellChecker;
+    LuaDiagnosticStyle _diagnosticStyle;
 };

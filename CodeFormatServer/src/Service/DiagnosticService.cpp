@@ -13,8 +13,11 @@ DiagnosticService::Diagnostic(std::size_t fileId,
                               const LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle,
                               LuaDiagnosticStyle &diagnosticStyle) {
     DiagnosticBuilder d(luaStyle, diagnosticStyle);
-    d.SetSpellChecker(_spellChecker);
-    d.DiagnosticAnalyze(luaSyntaxTree);
+
+    d.CodeStyleCheck(luaSyntaxTree);
+    d.SpellCheck(luaSyntaxTree, *_spellChecker);
+    d.NameStyleCheck(luaSyntaxTree);
+
     auto results = d.GetDiagnosticResults(luaSyntaxTree);
     std::vector<lsp::Diagnostic> diagnostics;
     auto &vfs = _owner->GetVFS();

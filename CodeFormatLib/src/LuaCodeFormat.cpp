@@ -10,9 +10,7 @@ LuaCodeFormat &LuaCodeFormat::GetInstance() {
     return instance;
 }
 
-LuaCodeFormat::LuaCodeFormat()
-        :
-        _spellChecker(std::make_shared<CodeSpellChecker>()) {
+LuaCodeFormat::LuaCodeFormat() {
 }
 
 void LuaCodeFormat::UpdateCodeStyle(const std::string &workspaceUri, const std::string &configPath) {
@@ -55,11 +53,11 @@ void LuaCodeFormat::SetSupportNonStandardSymbol(const std::string &tokenType, co
 }
 
 void LuaCodeFormat::LoadSpellDictionary(const std::string &path) {
-    _spellChecker->LoadDictionary(path);
+    _spellChecker.LoadDictionary(path);
 }
 
 void LuaCodeFormat::LoadSpellDictionaryFromBuffer(const std::string &buffer) {
-    _spellChecker->LoadDictionaryFromBuffer(buffer);
+    _spellChecker.LoadDictionaryFromBuffer(buffer);
 }
 
 std::string LuaCodeFormat::Reformat(const std::string &uri, std::string &&text, ConfigMap &configMap) {
@@ -134,9 +132,9 @@ std::vector<LuaDiagnosticInfo> LuaCodeFormat::Diagnostic(const std::string &uri,
 
     LuaStyle style = GetStyle(uri);
 
-    LuaDiagnosticStyle diagnosticStyle;
-    DiagnosticBuilder diagnosticBuilder(style, diagnosticStyle);
-    diagnosticBuilder.DiagnosticAnalyze(t);
+
+    DiagnosticBuilder diagnosticBuilder(style, _diagnosticStyle);
+    diagnosticBuilder.CodeStyleCheck(t);
     return MakeDiagnosticInfo(diagnosticBuilder.GetDiagnosticResults(t), file);
 }
 
@@ -156,9 +154,28 @@ std::vector<LuaDiagnosticInfo> LuaCodeFormat::SpellCheck(const std::string &uri,
 
     LuaDiagnosticStyle diagnosticStyle;
     DiagnosticBuilder diagnosticBuilder(style, diagnosticStyle);
-    _spellChecker->SetCustomDictionary(tempDict);
-    diagnosticBuilder.SetSpellChecker(_spellChecker);
-    diagnosticBuilder.DiagnosticAnalyze(t);
+    _spellChecker.SetCustomDictionary(tempDict);
+    diagnosticBuilder.SpellCheck(t, _spellChecker);
+    return MakeDiagnosticInfo(diagnosticBuilder.GetDiagnosticResults(t), file);
+}
+
+std::vector<LuaDiagnosticInfo> LuaCodeFormat::NameStyleCheck(const std::string &uri, std::string &&text) {
+    auto file = std::make_shared<LuaFile>(std::move(text));
+    LuaLexer luaLexer(file);
+    luaLexer.Parse();
+
+    LuaParser p(file, std::move(luaLexer.GetTokens()));
+    p.Parse();
+
+    LuaSyntaxTree t;
+    t.BuildTree(p);
+
+    LuaStyle style = GetStyle(uri);
+
+    LuaDiagnosticStyle diagnosticStyle;
+    DiagnosticBuilder diagnosticBuilder(style, diagnosticStyle);
+
+    diagnosticBuilder.NameStyleCheck(t);
     return MakeDiagnosticInfo(diagnosticBuilder.GetDiagnosticResults(t), file);
 }
 
@@ -172,7 +189,7 @@ std::vector<SuggestItem> LuaCodeFormat::SpellCorrect(const std::string &word) {
         upperFirst = true;
     }
 
-    auto suggests = _spellChecker->GetSuggests(letterWord);
+    auto suggests = _spellChecker.GetSuggests(letterWord);
 
     for (auto &suggest: suggests) {
         if (!suggest.Term.empty()) {

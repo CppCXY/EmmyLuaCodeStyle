@@ -8,15 +8,7 @@ DiagnosticBuilder::DiagnosticBuilder(LuaStyle &style, LuaDiagnosticStyle &diagno
     _state.SetDiagnosticStyle(diagnosticStyle);
 }
 
-void DiagnosticBuilder::DiagnosticAnalyze(const LuaSyntaxTree &t) {
-    _state.Analyze(t);
-}
-
 std::vector<LuaDiagnostic> DiagnosticBuilder::GetDiagnosticResults(const LuaSyntaxTree &t) {
-    CodeStyleCheck(t);
-    NameStyleCheck(t);
-    SpellCheck(t);
-
     for (auto &d: _nextDiagnosticMap) {
         _diagnostics.push_back(d.second);
     }
@@ -43,6 +35,7 @@ void DiagnosticBuilder::CodeStyleCheck(const LuaSyntaxTree &t) {
         return;
     }
 
+    _state.Analyze(t);
     auto root = t.GetRootNode();
     std::vector<LuaSyntaxNode> startNodes = {root};
 
@@ -80,17 +73,16 @@ void DiagnosticBuilder::NameStyleCheck(const LuaSyntaxTree &t) {
         return;
     }
 
-    _nameStyleChecker.Analyze(*this, t);
+    NameStyleChecker nameStyleChecker;
+    nameStyleChecker.Analyze(*this, t);
 }
 
-void DiagnosticBuilder::SpellCheck(const LuaSyntaxTree &t) {
+void DiagnosticBuilder::SpellCheck(const LuaSyntaxTree &t, CodeSpellChecker &spellChecker) {
     if (!_state.GetDiagnosticStyle().spell_check) {
         return;
     }
 
-    if (_spellChecker) {
-        _spellChecker->Analyze(*this, t);
-    }
+    spellChecker.Analyze(*this, t);
 }
 
 void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
@@ -311,10 +303,6 @@ void DiagnosticBuilder::ClearDiagnostic(std::size_t leftIndex) {
     if (it != _nextDiagnosticMap.end()) {
         _nextDiagnosticMap.erase(it);
     }
-}
-
-void DiagnosticBuilder::SetSpellChecker(std::shared_ptr<CodeSpellChecker> spellChecker) {
-    _spellChecker = spellChecker;
 }
 
 FormatState &DiagnosticBuilder::GetState() {

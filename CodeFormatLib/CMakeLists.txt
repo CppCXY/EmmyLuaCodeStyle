@@ -10,14 +10,14 @@ set_target_properties(CodeFormatLib PROPERTIES OUTPUT_NAME code_format)
 
 add_dependencies(CodeFormatLib CodeService lua54)
 
-target_include_directories(CodeFormatLib PUBLIC
+target_include_directories(CodeFormatLib PRIVATE
 	${LuaCodeStyle_SOURCE_DIR}/include
 	${LuaCodeStyle_SOURCE_DIR}/3rd/lua-5.4.3/src
 	src
 )
 
 target_sources(CodeFormatLib
-	PUBLIC
+	PRIVATE
 	${CodeFormatLib_SOURCE_DIR}/src/CodeFormatLib.cpp
 	${CodeFormatLib_SOURCE_DIR}/src/LuaCodeFormat.cpp
 )

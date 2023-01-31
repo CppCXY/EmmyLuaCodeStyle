@@ -11,9 +11,11 @@ class DiagnosticBuilder {
 public:
     DiagnosticBuilder(LuaStyle &style, LuaDiagnosticStyle &diagnosticStyle);
 
-    void DiagnosticAnalyze(const LuaSyntaxTree &t);
+    void CodeStyleCheck(const LuaSyntaxTree &t);
 
-    void SetSpellChecker(std::shared_ptr<CodeSpellChecker> spellChecker);
+    void NameStyleCheck(const LuaSyntaxTree &t);
+
+    void SpellCheck(const LuaSyntaxTree &t, CodeSpellChecker& spellChecker);
 
     std::vector<LuaDiagnostic> GetDiagnosticResults(const LuaSyntaxTree &t);
 
@@ -32,12 +34,6 @@ public:
 private:
     void DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
 
-    void CodeStyleCheck(const LuaSyntaxTree &t);
-
-    void NameStyleCheck(const LuaSyntaxTree &t);
-
-    void SpellCheck(const LuaSyntaxTree &t);
-
     void ClearDiagnostic(std::size_t leftIndex);
 
     void ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNode &next,
@@ -47,8 +43,6 @@ private:
     std::string GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxNode &right, const LuaSyntaxTree &t);
 
     FormatState _state;
-    std::shared_ptr<CodeSpellChecker> _spellChecker;
-    NameStyleChecker _nameStyleChecker;
     std::map<std::size_t, LuaDiagnostic> _nextDiagnosticMap;
     std::vector<LuaDiagnostic> _diagnostics;
 };

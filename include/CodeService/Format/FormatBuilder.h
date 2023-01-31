@@ -19,9 +19,6 @@ public:
 protected:
     void DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
 
-    void DoRangeResolve(FormatRange &range, LuaSyntaxNode &syntaxNode,
-                        const LuaSyntaxTree &t, FormatResolve &resolve);
-
     virtual void WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
     virtual void WriteSpace(std::size_t space);

@@ -109,8 +109,15 @@ int range_format(lua_State *L) {
         try {
             std::string filename = lua_tostring(L, 1);
             std::string text = lua_tostring(L, 2);
-            int startLine = lua_tointeger(L, 3);
-            int endLine = lua_tointeger(L, 4);
+            auto startLine = lua_tointeger(L, 3);
+            auto endLine = lua_tointeger(L, 4);
+
+            if(startLine < 0 || endLine < 0){
+                lua_pushboolean(L, false);
+                lua_pushstring(L, "start line or end line < 0");
+                return 2;
+            }
+
             LuaCodeFormat::ConfigMap configMap;
 
             if (top == 5 && lua_istable(L, 5)) {
@@ -127,7 +134,7 @@ int range_format(lua_State *L) {
                 }
             }
 
-            FormatRange range(startLine, endLine);
+            FormatRange range(static_cast<std::size_t>(startLine), static_cast<std::size_t>(endLine));
             auto formattedText = LuaCodeFormat::GetInstance().RangeFormat(filename, range, std::move(text), configMap);
             if (formattedText.empty()) {
                 lua_pushboolean(L, false);
@@ -306,6 +313,65 @@ int update_config(lua_State *L) {
     return 0;
 }
 
+void PushDiagnosticToLua(lua_State *L, std::vector<LuaDiagnosticInfo> &diagnosticInfos) {
+    int count = 1;
+    lua_newtable(L);
+    for (auto &diagnosticInfo: diagnosticInfos) {
+        // 诊断信息表
+        lua_newtable(L);
+
+        //message
+        {
+            lua_pushstring(L, "message");
+            lua_pushlstring(L, diagnosticInfo.Message.c_str(), diagnosticInfo.Message.size());
+            lua_rawset(L, -3);
+
+            lua_pushstring(L, "type");
+            lua_pushstring(L, GetDiagnosisString(diagnosticInfo.Type).c_str());
+            lua_rawset(L, -3);
+        }
+
+        // range
+        {
+            lua_pushstring(L, "range");
+            //range table
+            lua_newtable(L);
+
+            lua_pushstring(L, "start");
+            // start table
+            lua_newtable(L);
+            lua_pushstring(L, "line");
+            lua_pushinteger(L, diagnosticInfo.Start.Line);
+            lua_rawset(L, -3);
+
+            lua_pushstring(L, "character");
+            lua_pushinteger(L, diagnosticInfo.Start.Col);
+            lua_rawset(L, -3);
+
+            lua_rawset(L, -3); // set start = {}
+
+            lua_pushstring(L, "end");
+            // end table
+            lua_newtable(L);
+            lua_pushstring(L, "line");
+            lua_pushinteger(L, diagnosticInfo.End.Line);
+            lua_rawset(L, -3);
+
+            lua_pushstring(L, "character");
+            lua_pushinteger(L, diagnosticInfo.End.Col);
+            lua_rawset(L, -3);
+
+            lua_rawset(L, -3); // set end = {}
+
+            lua_rawset(L, -3); // set range = {}
+        }
+
+        // 不确认lua会不会把他改成宏，所以不要在这里用++count
+        lua_rawseti(L, -2, count);
+        count++;
+    }
+}
+
 int diagnose_file(lua_State *L) {
     int top = lua_gettop(L);
 
@@ -324,62 +390,7 @@ int diagnose_file(lua_State *L) {
             }
 
             lua_pushboolean(L, true);
-            int count = 1;
-            lua_newtable(L);
-            for (auto &diagnosticInfo: results) {
-                // 诊断信息表
-                lua_newtable(L);
-
-                //message
-                {
-                    lua_pushstring(L, "message");
-                    lua_pushlstring(L, diagnosticInfo.Message.c_str(), diagnosticInfo.Message.size());
-                    lua_rawset(L, -3);
-
-                    lua_pushstring(L, "type");
-                    lua_pushstring(L, GetDiagnosisString(diagnosticInfo.Type).c_str());
-                    lua_rawset(L, -3);
-                }
-
-                // range
-                {
-                    lua_pushstring(L, "range");
-                    //range table
-                    lua_newtable(L);
-
-                    lua_pushstring(L, "start");
-                    // start table
-                    lua_newtable(L);
-                    lua_pushstring(L, "line");
-                    lua_pushinteger(L, diagnosticInfo.Start.Line);
-                    lua_rawset(L, -3);
-
-                    lua_pushstring(L, "character");
-                    lua_pushinteger(L, diagnosticInfo.Start.Col);
-                    lua_rawset(L, -3);
-
-                    lua_rawset(L, -3); // set start = {}
-
-                    lua_pushstring(L, "end");
-                    // end table
-                    lua_newtable(L);
-                    lua_pushstring(L, "line");
-                    lua_pushinteger(L, diagnosticInfo.End.Line);
-                    lua_rawset(L, -3);
-
-                    lua_pushstring(L, "character");
-                    lua_pushinteger(L, diagnosticInfo.End.Col);
-                    lua_rawset(L, -3);
-
-                    lua_rawset(L, -3); // set end = {}
-
-                    lua_rawset(L, -3); // set range = {}
-                }
-
-                // 不确认lua会不会把他改成宏，所以不要在这里用++count
-                lua_rawseti(L, -2, count);
-                count++;
-            }
+            PushDiagnosticToLua(L, results);
 
             return 2;
         }
@@ -546,69 +557,40 @@ int spell_analysis(lua_State *L) {
                 }
             }
 
-            auto diagnosticInfos = LuaCodeFormat::GetInstance().SpellCheck(filename, std::move(text), tempDict);
+            auto results = LuaCodeFormat::GetInstance().SpellCheck(filename, std::move(text), tempDict);
 
             lua_pushboolean(L, true);
-            int count = 1;
-            lua_newtable(L);
-            for (auto &diagnosticInfo: diagnosticInfos) {
-                // 诊断信息表
-                lua_newtable(L);
+            PushDiagnosticToLua(L, results);
 
-                //message
-                {
-                    lua_pushstring(L, "message");
-                    lua_pushlstring(L, diagnosticInfo.Message.c_str(), diagnosticInfo.Message.size());
-                    lua_rawset(L, -3);
+            return 2;
+        }
+        catch (std::exception &e) {
+            std::string err = e.what();
+            lua_settop(L, top);
+            lua_pushboolean(L, false);
+            lua_pushlstring(L, err.c_str(), err.size());
+            return 2;
+        }
+    }
+    return 0;
+}
 
-                    lua_pushstring(L, "type");
-                    lua_pushstring(L, GetDiagnosisString(diagnosticInfo.Type).c_str());
-                    lua_rawset(L, -3);
+int name_style_analysis(lua_State *L) {
+    int top = lua_gettop(L);
 
-                    lua_pushstring(L, "data");
-                    lua_pushstring(L, diagnosticInfo.Data.c_str());
-                    lua_rawset(L, -3);
-                }
+    if (top < 2) {
+        return 0;
+    }
 
-                // range
-                {
-                    lua_pushstring(L, "range");
-                    //range table
-                    lua_newtable(L);
+    if (lua_isstring(L, 1) && lua_isstring(L, 2)) {
+        try {
+            std::string filename = lua_tostring(L, 1);
+            std::string text = lua_tostring(L, 2);
 
-                    lua_pushstring(L, "start");
-                    // start table
-                    lua_newtable(L);
-                    lua_pushstring(L, "line");
-                    lua_pushinteger(L, diagnosticInfo.Start.Line);
-                    lua_rawset(L, -3);
+            auto results = LuaCodeFormat::GetInstance().NameStyleCheck(filename, std::move(text));
 
-                    lua_pushstring(L, "character");
-                    lua_pushinteger(L, diagnosticInfo.Start.Col);
-                    lua_rawset(L, -3);
-
-                    lua_rawset(L, -3); // set start = {}
-
-                    lua_pushstring(L, "end");
-                    // end table
-                    lua_newtable(L);
-                    lua_pushstring(L, "line");
-                    lua_pushinteger(L, diagnosticInfo.End.Line);
-                    lua_rawset(L, -3);
-
-                    lua_pushstring(L, "character");
-                    lua_pushinteger(L, diagnosticInfo.End.Col);
-                    lua_rawset(L, -3);
-
-                    lua_rawset(L, -3); // set end = {}
-
-                    lua_rawset(L, -3); // set range = {}
-                }
-
-                // 不确认lua会不会把他改成宏，所以不要在这里用++count
-                lua_rawseti(L, -2, count);
-                count++;
-            }
+            lua_pushboolean(L, true);
+            PushDiagnosticToLua(L, results);
 
             return 2;
         }
@@ -673,6 +655,7 @@ static const luaL_Reg lib[] = {
         {"spell_analysis",                    spell_analysis},
         {"spell_suggest",                     spell_suggest},
         {"set_nonstandard_symbol",            set_nonstandard_symbol},
+        {"name_style_analysis",               name_style_analysis},
         {nullptr,                             nullptr}
 };
 
