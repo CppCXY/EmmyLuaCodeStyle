@@ -3,6 +3,7 @@
 #include <optional>
 #include <unordered_map>
 #include <functional>
+#include <memory>
 
 template<class K, class V, class Container=std::unordered_map<K, V>>
 class DBBase {
