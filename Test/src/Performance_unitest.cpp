@@ -3,6 +3,7 @@
 
 TEST(FormatPerformance, 1k_row) {
     auto text = TestHelper::ReadFile("performance/1k_row_code.lua");
+    EXPECT_TRUE(text.size() != 0);
     auto p = TestHelper::GetParser(text);
 
     EXPECT_FALSE(p.HasError());
@@ -16,6 +17,7 @@ TEST(FormatPerformance, 1k_row) {
 
 TEST(FormatPerformance, 10k_row) {
     auto text = TestHelper::ReadFile("performance/10k_row_code.lua");
+    EXPECT_TRUE(text.size() != 0);
     auto p = TestHelper::GetParser(text);
 
     EXPECT_FALSE(p.HasError());
@@ -29,6 +31,7 @@ TEST(FormatPerformance, 10k_row) {
 
 TEST(FormatPerformance, 30k_row) {
     auto text = TestHelper::ReadFile("performance/30k_row_code.lua");
+    EXPECT_TRUE(text.size() != 0);
     auto p = TestHelper::GetParser(text);
 
     EXPECT_FALSE(p.HasError());
@@ -42,6 +45,7 @@ TEST(FormatPerformance, 30k_row) {
 
 TEST(FormatPerformance, 100k_row) {
     auto text = TestHelper::ReadFile("performance/100k_row_code.lua");
+    EXPECT_TRUE(text.size() != 0);
     auto p = TestHelper::GetParser(text);
 
     EXPECT_FALSE(p.HasError());

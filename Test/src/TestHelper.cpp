@@ -1,5 +1,6 @@
 ﻿#include "TestHelper.h"
 #include "CodeService/RangeFormat/RangeFormatBuilder.h"
+#include <filesystem>
 
 std::string TestHelper::ScriptBase = "";
 
@@ -59,7 +60,8 @@ void TestHelper::CollectLuaFile(std::filesystem::path directoryPath, std::vector
 }
 
 std::string TestHelper::ReadFile(const std::string &path) {
-    std::string newPath = ScriptBase + "/" + path;
+    std::filesystem::path base(ScriptBase);
+    std::string newPath = (base / path).string();
 #ifdef _WIN32
     std::fstream fin(newPath, std::ios::in | std::ios::binary);
 #else
