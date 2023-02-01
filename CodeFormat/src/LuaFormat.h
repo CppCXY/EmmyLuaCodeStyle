@@ -4,6 +4,7 @@
 #include <string_view>
 #include <filesystem>
 #include <cstring>
+#include <optional>
 #include "CodeService/Config/LuaStyle.h"
 #include "LuaParser/File/LuaFile.h"
 #include "LuaParser/Types/TextRange.h"
