@@ -62,11 +62,10 @@ void TestHelper::CollectLuaFile(std::filesystem::path directoryPath, std::vector
 std::string TestHelper::ReadFile(const std::string &path) {
     std::filesystem::path base(ScriptBase);
     std::string newPath = (base / path).string();
-    std::cerr<<"read file from "<< newPath <<std::endl;
 #ifdef _WIN32
     std::fstream fin(newPath, std::ios::in | std::ios::binary);
 #else
-    std::fstream fin(path, std::ios::in);
+    std::fstream fin(newPath, std::ios::in);
 #endif
 
     if (fin.is_open()) {
