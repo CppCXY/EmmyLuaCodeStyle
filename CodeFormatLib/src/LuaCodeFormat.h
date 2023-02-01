@@ -27,7 +27,7 @@ public:
 
     void SetDefaultCodeStyle(ConfigMap &configMap);
 
-    void SetSupportNonStandardSymbol(const std::string &tokenType, const std::vector<std::string> &tokens);
+    void SupportNonStandardSymbol();
 
     void LoadSpellDictionary(const std::string &path);
 
@@ -55,8 +55,11 @@ private:
     std::vector<LuaDiagnosticInfo> MakeDiagnosticInfo(const std::vector<LuaDiagnostic>& diagnostics,
                                                       std::shared_ptr<LuaFile> file);
 
+    void CalculateTempStyle(LuaStyle& style, ConfigMap &configMap);
+
     std::vector<LuaConfig> _configs;
     LuaStyle _defaultStyle;
     CodeSpellChecker _spellChecker;
     LuaDiagnosticStyle _diagnosticStyle;
+    bool _supportNonStandardSymbol;
 };

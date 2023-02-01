@@ -159,6 +159,10 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
 
     BOOL_OPTION(never_indent_before_if_condition)
 
+    if(align_if_branch){
+        never_indent_before_if_condition = true;
+    }
+
     BOOL_OPTION(never_indent_comment_on_if_branch)
 
     std::vector<std::pair<std::string, LineSpace &>> fieldList = {

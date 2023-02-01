@@ -372,12 +372,61 @@ void AlignAnalyzer::AnalyzeParamList(FormatState &f, LuaSyntaxNode &syntaxNode, 
     PushAlignGroup(AlignStrategy::AlignToFirst, group);
 }
 
-
+// 需求真是复杂
 void AlignAnalyzer::AnalyzeIfStatement(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
-    auto ifExprs = syntaxNode.GetChildSyntaxNodes(LuaSyntaxNodeKind::BinaryExpression, t);
+    auto if_ = syntaxNode.GetChildToken(TK_IF, t);
+    auto elseifs = syntaxNode.GetChildTokens(TK_ELSEIF, t);
+    std::vector<std::size_t> group;
+
+    // if 之后的表达式可以有多种对齐方式
+    group.push_back(if_.GetNextToken(t).GetIndex());
+    auto ifCondition = if_.GetNextSibling(t);
     std::vector<LuaSyntaxNode> logicOps;
-    for (auto ifExpr: ifExprs) {
-        auto ops = helper::CollectBinaryOperator(ifExpr, t, [](LuaTokenKind kind) {
+    std::size_t ifAlignPos = 0;
+    if (ifCondition.GetSyntaxKind(t) == LuaSyntaxNodeKind::BinaryExpression) {
+        auto ifConditionLogicOps = helper::CollectBinaryOperator(ifCondition, t, [](LuaTokenKind kind) {
+            return kind == TK_AND || kind == TK_OR;
+        });
+
+        for (auto op: ifConditionLogicOps) {
+            if (op.GetPrevToken(t).GetEndLine(t) != op.GetStartLine(t)) {
+                if (op.GetTokenKind(t) == TK_AND) {
+                    ifAlignPos = std::max(ifAlignPos, 4u);
+                } else if (op.GetTokenKind(t) == TK_OR) {
+                    ifAlignPos = std::max(ifAlignPos, 3u);
+                }
+            }
+        }
+        logicOps = ifConditionLogicOps;
+    }
+
+    // 如果仅仅if语句
+    if (elseifs.empty()) {
+        if (ifAlignPos != 0) {
+            for (auto &n: logicOps) {
+                auto nextToken = n.GetNextToken(t);
+                if (nextToken.IsToken(t)) {
+                    group.push_back(nextToken.GetIndex());
+                }
+            }
+            PushNormalAlignGroup(ifAlignPos, group);
+        }
+        return;
+    }
+
+    // 若有 elseif
+
+    auto spaceAfterIf = if_.GetNextToken(t).GetStartCol(t) - if_.GetStartCol(t);
+    if(spaceAfterIf == 3 && ifAlignPos == 0){
+        group.clear();
+        logicOps.clear();
+    }
+
+    ifAlignPos = 7;
+
+    for (auto elseif_: elseifs) {
+        auto elseifCondition = elseif_.GetNextSibling(t);
+        auto ops = helper::CollectBinaryOperator(elseifCondition, t, [](LuaTokenKind kind) {
             return kind == TK_AND || kind == TK_OR;
         });
         for (auto op: ops) {
@@ -385,35 +434,14 @@ void AlignAnalyzer::AnalyzeIfStatement(FormatState &f, LuaSyntaxNode &syntaxNode
         }
     }
 
-    std::size_t alignPos = 0;
-    auto elseifs = syntaxNode.GetChildTokens(TK_ELSEIF, t);
-    if (!elseifs.empty()) {
-        alignPos = 7; // sizeof 'elseif '
-    } else {
-        alignPos = 3; // sizeof 'if '
-        for (auto &n: logicOps) {
-            if (n.GetTokenKind(t) == TK_AND) {
-                alignPos = 4; // sizeof 'and '
-                break;
-            }
-        }
-    }
-
-    std::vector<std::size_t> group;
     for (auto &n: logicOps) {
         auto nextToken = n.GetNextToken(t);
         if (nextToken.IsToken(t)) {
             group.push_back(nextToken.GetIndex());
         }
     }
-    auto if_ = syntaxNode.GetChildToken(TK_IF, t);
-    group.push_back(if_.GetNextToken(t).GetIndex());
 
-    for (auto elseif_: elseifs) {
-        group.push_back(elseif_.GetNextToken(t).GetIndex());
-    }
-
-    PushNormalAlignGroup(alignPos, group);
+    PushNormalAlignGroup(ifAlignPos, group);
 }
 
 void AlignAnalyzer::PushNormalAlignGroup(std::size_t alignPos, std::vector<std::size_t> &data) {

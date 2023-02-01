@@ -10,7 +10,8 @@ LuaCodeFormat &LuaCodeFormat::GetInstance() {
     return instance;
 }
 
-LuaCodeFormat::LuaCodeFormat() {
+LuaCodeFormat::LuaCodeFormat()
+        : _supportNonStandardSymbol(false) {
 }
 
 void LuaCodeFormat::UpdateCodeStyle(const std::string &workspaceUri, const std::string &configPath) {
@@ -46,10 +47,8 @@ void LuaCodeFormat::SetDefaultCodeStyle(ConfigMap &configMap) {
     }
 }
 
-void LuaCodeFormat::SetSupportNonStandardSymbol(const std::string &tokenType, const std::vector<std::string> &tokens) {
-//    if (tokenType.size() == 1) {
-//        _customParser->SetTokens(tokenType.front(), tokens);
-//    }
+void LuaCodeFormat::SupportNonStandardSymbol() {
+    _supportNonStandardSymbol = true;
 }
 
 void LuaCodeFormat::LoadSpellDictionary(const std::string &path) {
@@ -72,6 +71,8 @@ std::string LuaCodeFormat::Reformat(const std::string &uri, std::string &&text, 
     t.BuildTree(p);
 
     LuaStyle style = GetStyle(uri);
+    CalculateTempStyle(style, configMap);
+
     FormatBuilder f(style);
 
     return f.GetFormatResult(t);
@@ -91,6 +92,8 @@ std::string LuaCodeFormat::RangeFormat(const std::string &uri, FormatRange &rang
     t.BuildTree(p);
 
     LuaStyle style = GetStyle(uri);
+    CalculateTempStyle(style, configMap);
+
     RangeFormatBuilder f(style, range);
 
     auto formattedText = f.GetFormatResult(t);
@@ -112,8 +115,10 @@ LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t 
     t.BuildTree(p);
 
     LuaStyle style = GetStyle(uri);
+    CalculateTempStyle(style, configMap);
 
-    LuaTypeFormatOptions typeFormatOptions;
+    LuaTypeFormatOptions typeFormatOptions = LuaTypeFormatOptions::ParseFromMap(stringTypeOptions);
+
     LuaTypeFormat tf(typeFormatOptions);
     tf.Analyze("\n", line, character, t, style);
     return tf.GetResult();
@@ -233,4 +238,23 @@ std::vector<LuaDiagnosticInfo> LuaCodeFormat::MakeDiagnosticInfo(const std::vect
     }
 
     return results;
+}
+
+void LuaCodeFormat::CalculateTempStyle(LuaStyle &style, ConfigMap &configMap) {
+    if (configMap.empty()) {
+        return;
+    }
+
+    if (configMap.count("insertSpaces")) {
+        style.indent_style = configMap.at("insertSpaces") == "true"
+                                   ? IndentStyle::Space
+                                   : IndentStyle::Tab;
+    }
+    if (configMap.count("tabSize")) {
+        if (style.indent_style == IndentStyle::Tab) {
+            style.tab_width = std::stoi(configMap.at("tabSize"));
+        } else if (style.indent_style == IndentStyle::Space) {
+            style.indent_size = std::stoi(configMap.at("tabSize"));
+        }
+    }
 }

@@ -45,6 +45,7 @@ std::map<std::string, LuaTokenKind, std::less<>> LuaLexer::LuaReserved = {
 LuaLexer::LuaLexer(std::shared_ptr<LuaFile> file)
         :
         _linenumber(0),
+        _supportNonStandardSymbol(false),
         _reader(file->GetSource()),
         _file(file) {
 }
@@ -106,6 +107,9 @@ LuaTokenKind LuaLexer::Lex() {
             case '-': {
                 _reader.SaveAndNext();
                 if (_reader.GetCurrentChar() != '-') {
+                    if (_supportNonStandardSymbol && _reader.CheckNext1('=')) {
+                        return '=';
+                    }
                     return '-';
                 }
                 // is comment
@@ -129,6 +133,13 @@ LuaTokenKind LuaLexer::Lex() {
                 }
 
                 return type;
+            }
+            case '+': {
+                _reader.SaveAndNext();
+                if (_supportNonStandardSymbol && _reader.CheckNext1('=')) {
+                    return '=';
+                }
+                return '+';
             }
             case '[': {
                 std::size_t sep = SkipSep();

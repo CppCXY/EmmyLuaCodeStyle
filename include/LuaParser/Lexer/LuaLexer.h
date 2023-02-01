@@ -31,6 +31,7 @@ public:
 
 	std::vector<LuaToken>& GetTokens();
 
+    void SupportNonStandardSymbol();
 
 //	void SetCustomParser(std::shared_ptr<LuaCustomParser> parser);
 private:
@@ -55,6 +56,7 @@ private:
 	void TokenError(std::string_view message, TextRange range);
 
 	int _linenumber;
+    bool _supportNonStandardSymbol;
     TextReader _reader;
 	std::vector<LuaToken> _tokens;
 	std::vector<LuaTokenError> _errors;
