@@ -137,6 +137,10 @@ void LineBreakAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     if (suffixedExpression.IsNode(t)) {
                         AnalyzeSuffixedExpr(f, suffixedExpression, t);
                     }
+                    break;
+                }
+                default: {
+                    break;
                 }
             }
         } else {
@@ -144,6 +148,9 @@ void LineBreakAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case TK_SHEBANG:
                 case TK_SHORT_COMMENT: {
                     BreakAfter(syntaxNode, t);
+                    break;
+                }
+                default: {
                     break;
                 }
             }

@@ -1,5 +1,6 @@
 #include "ConfigService.h"
 #include <fstream>
+#include <sstream>
 #include "CodeService/Config/LanguageTranslator.h"
 
 ConfigService::ConfigService(LanguageServer *owner)

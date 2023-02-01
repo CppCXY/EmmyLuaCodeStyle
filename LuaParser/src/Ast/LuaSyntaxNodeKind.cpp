@@ -97,6 +97,8 @@ std::string_view detail::debug::GetSyntaxKindDebugName(LuaSyntaxNodeKind kind) {
             return "ShebangComment";
         case LuaSyntaxNodeKind::DocTagFormat:
             return "DocTagFormat";
+        case LuaSyntaxNodeKind::TableFieldSep:
+            return "TableFieldSep";
     }
     return "Unknown";
 }
