@@ -38,6 +38,7 @@ public:
 
     void AddIgnores(std::string_view pattern);
 
+    void SupportNameStyleCheck();
 private:
     std::optional<std::string> ReadFile(std::string_view path);
 

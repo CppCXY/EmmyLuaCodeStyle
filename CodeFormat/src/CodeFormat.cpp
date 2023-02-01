@@ -3,10 +3,8 @@
 #include <fstream>
 
 #include "LuaFormat.h"
-#include "CodeService/Config/LuaEditorConfig.h"
 #include "Util/format.h"
 #include "Util/CommandLine.h"
-#include "LuaWorkspaceFormat.h"
 #include "Util/StringUtil.h"
 
 // https://stackoverflow.com/questions/1598985/c-read-binary-stdin
@@ -70,6 +68,7 @@ int main(int argc, char **argv) {
                               "Use file wildcards to specify how to ignore files\n"
                               "\t\tseparated by ';'"
             )
+            .Add<bool>("name-style", "ns", "Enable name-style check")
             .EnableKeyValueArgs();
 
 
@@ -130,6 +129,10 @@ int main(int argc, char **argv) {
         format.SetConfigPath(cmd.Get<std::string>("config"));
     } else {
         format.SetDefaultStyle(cmd.GetKeyValueOptions());
+    }
+
+    if(cmd.Get<bool>("name-style")){
+        format.SupportNameStyleCheck();
     }
 
     if (cmd.GetTarget() == "format") {

@@ -75,6 +75,7 @@ LuaTokenKind LuaParser::LookAhead() {
             case TK_LONG_COMMENT:
             case TK_SHEBANG: {
                 nextIndex++;
+                break;
             }
             default: {
                 return tk;

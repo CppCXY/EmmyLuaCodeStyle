@@ -15,6 +15,7 @@
 #include "Util/FileFinder.h"
 
 LuaFormat::LuaFormat() {
+    _diagnosticStyle.name_style_check = false;
 }
 
 void LuaFormat::SetWorkspace(std::string_view workspace) {
@@ -156,7 +157,15 @@ bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view 
 
 bool LuaFormat::Check() {
     if (_mode == WorkMode::File) {
-        return CheckSingleFile(_inputPath, std::move(_inputFileText));
+        if (_inputPath != "stdin") {
+            std::cerr << util::format("Check {} ...", _inputPath) << std::endl;
+        }
+
+        if (CheckSingleFile(_inputPath, std::move(_inputFileText))) {
+            std::cerr << util::format("Check {} ... ok", _inputPath) << std::endl;
+            return true;
+        }
+        return false;
     }
     return CheckWorkspace();
 }
@@ -167,7 +176,7 @@ void LuaFormat::DiagnosticInspection(std::string_view message, TextRange range, 
     auto startChar = file->GetColumn(range.StartOffset);
     auto endLine = file->GetLine(range.EndOffset);
     auto endChar = file->GetColumn(range.EndOffset);
-    std::cout << util::format("\t{}({}:{} to {}:{}): {}", path, startLine + 1, startChar, endLine + 1, endChar,
+    std::cerr << util::format("\t{}({}:{} to {}:{}): {}", path, startLine + 1, startChar, endLine + 1, endChar,
                               message) << std::endl;
 }
 
@@ -269,14 +278,17 @@ bool LuaFormat::CheckWorkspace() {
     auto files = finder.FindFiles();
     for (auto &filePath: files) {
         auto opText = ReadFile(filePath);
+        std::string displayPath = filePath;
+        if (!_workspace.empty())
+        {
+            displayPath = string_util::GetFileRelativePath(_workspace, filePath);
+        }
         if (opText.has_value()) {
-            if (CheckSingleFile(filePath, std::move(opText.value()))) {
-                std::cerr << util::format("Check {} ok.", filePath) << std::endl;
-            } else {
-                std::cerr << util::format("Check {} fail.", filePath) << std::endl;
+            if (CheckSingleFile(displayPath, std::move(opText.value()))) {
+                std::cerr << util::format("Check {} ok.", displayPath) << std::endl;
             }
         } else {
-            std::cerr << util::format("Can not read file {}", filePath) << std::endl;
+            std::cerr << util::format("Can not read file {}", displayPath) << std::endl;
         }
     }
     return true;
@@ -317,17 +329,26 @@ bool LuaFormat::ReformatWorkspace() {
     auto files = finder.FindFiles();
     for (auto &filePath: files) {
         auto opText = ReadFile(filePath);
+        std::string displayPath = filePath;
+        if (!_workspace.empty())
+        {
+            displayPath = string_util::GetFileRelativePath(_workspace, filePath);
+        }
         if (opText.has_value()) {
-            if (ReformatSingleFile(filePath, filePath, std::move(opText.value()))) {
-                std::cerr << util::format("Reformat {} succeed.", filePath) << std::endl;
+            if (ReformatSingleFile(displayPath, filePath, std::move(opText.value()))) {
+                std::cerr << util::format("Reformat {} succeed.", displayPath) << std::endl;
             } else {
-                std::cerr << util::format("Reformat {} fail.", filePath) << std::endl;
+                std::cerr << util::format("Reformat {} fail.", displayPath) << std::endl;
             }
         } else {
-            std::cerr << util::format("Can not read file {}", filePath) << std::endl;
+            std::cerr << util::format("Can not read file {}", displayPath) << std::endl;
         }
     }
     return true;
+}
+
+void LuaFormat::SupportNameStyleCheck() {
+    _diagnosticStyle.name_style_check = true;
 }
 
 
