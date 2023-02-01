@@ -146,7 +146,7 @@ bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view 
     auto formattedText = f.GetFormatResult(t);
 
     if (!outPath.empty()) {
-        std::fstream fout(outPath, std::ios::out | std::ios::binary);
+        std::fstream fout(std::string(outPath), std::ios::out | std::ios::binary);
         fout.write(formattedText.data(), formattedText.size());
         fout.close();
     } else {
