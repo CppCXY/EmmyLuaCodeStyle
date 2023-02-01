@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_set>
+#include <unordered_map>
 #include "CodeService/Format/Analyzer/FormatAnalyzer.h"
 #include "FormatStrategy.h"
 
