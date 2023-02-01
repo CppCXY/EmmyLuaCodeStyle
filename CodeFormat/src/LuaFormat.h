@@ -39,6 +39,8 @@ public:
     void AddIgnores(std::string_view pattern);
 
 private:
+    std::optional<std::string> ReadFile(std::string_view path);
+
     LuaStyle GetStyle(std::string_view path);
 
     void DiagnosticInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file,
@@ -48,7 +50,7 @@ private:
 
     bool ReformatWorkspace();
 
-    bool CheckSingleFile();
+    bool CheckSingleFile(std::string_view inputPath, std::string &&sourceText);
 
     bool CheckWorkspace();
 
@@ -56,7 +58,7 @@ private:
     std::string _inputPath;
     std::string _inputFileText;
     std::string _workspace;
-    std::string _outFile;
+    std::string _outPath;
     std::vector<LuaConfig> _configs;
     LuaStyle _defaultStyle;
     LuaDiagnosticStyle _diagnosticStyle;

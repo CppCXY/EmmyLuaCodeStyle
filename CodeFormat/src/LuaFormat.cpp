@@ -23,19 +23,11 @@ void LuaFormat::SetWorkspace(std::string_view workspace) {
 
 bool LuaFormat::SetInputFile(std::string_view input) {
     _inputPath = std::string(input);
-#ifdef _WIN32
-    std::fstream fin(_inputPath, std::ios::in | std::ios::binary);
-#else
-    std::fstream fin(_inputPath, std::ios::in);
-#endif
-
-    if (fin.is_open()) {
-        std::stringstream s;
-        s << fin.rdbuf();
-        _inputFileText = std::move(s.str());
+    auto opText = ReadFile(input);
+    if (opText.has_value()) {
+        _inputFileText = std::move(opText.value());
         return true;
     }
-
     return false;
 }
 
@@ -48,7 +40,7 @@ bool LuaFormat::ReadFromStdin() {
 }
 
 void LuaFormat::SetOutputFile(std::string_view path) {
-    _outFile = std::string(path);
+    _outPath = std::string(path);
 }
 
 bool IsSubRelative(std::filesystem::path &path, std::filesystem::path base) {
@@ -123,7 +115,7 @@ void LuaFormat::SetDefaultStyle(std::map<std::string, std::string, std::less<>> 
 
 bool LuaFormat::Reformat() {
     if (_mode == WorkMode::File) {
-        return ReformatSingleFile(std::move(_inputFileText));
+        return ReformatSingleFile(_inputPath, _outPath, std::move(_inputFileText));
     }
     return ReformatWorkspace();
 }
@@ -143,8 +135,8 @@ bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view 
     LuaSyntaxTree t;
     t.BuildTree(p);
 
-    LuaStyle style = GetStyle(_inputPath);
-    if (_outFile.empty()) {
+    LuaStyle style = GetStyle(inputPath);
+    if (outPath.empty()) {
         style.detect_end_of_line = false;
         style.end_of_line = EndOfLine::LF;
     }
@@ -152,8 +144,8 @@ bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view 
     FormatBuilder f(style);
     auto formattedText = f.GetFormatResult(t);
 
-    if (!_outFile.empty()) {
-        std::fstream fout(_outFile, std::ios::out | std::ios::binary);
+    if (!outPath.empty()) {
+        std::fstream fout(outPath, std::ios::out | std::ios::binary);
         fout.write(formattedText.data(), formattedText.size());
         fout.close();
     } else {
@@ -164,7 +156,7 @@ bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view 
 
 bool LuaFormat::Check() {
     if (_mode == WorkMode::File) {
-        return CheckSingleFile();
+        return CheckSingleFile(_inputPath, std::move(_inputFileText));
     }
     return CheckWorkspace();
 }
@@ -181,6 +173,23 @@ void LuaFormat::DiagnosticInspection(std::string_view message, TextRange range, 
 
 void LuaFormat::SetWorkMode(WorkMode mode) {
     _mode = mode;
+}
+
+std::optional<std::string> LuaFormat::ReadFile(std::string_view path) {
+    std::string newPath(path);
+#ifdef _WIN32
+    std::fstream fin(newPath, std::ios::in | std::ios::binary);
+#else
+    std::fstream fin(newPath, std::ios::in);
+#endif
+
+    if (fin.is_open()) {
+        std::stringstream s;
+        s << fin.rdbuf();
+        return std::move(s.str());
+    }
+
+    return std::nullopt;
 }
 
 LuaStyle LuaFormat::GetStyle(std::string_view path) {
@@ -201,8 +210,8 @@ LuaStyle LuaFormat::GetStyle(std::string_view path) {
     return _defaultStyle;
 }
 
-bool LuaFormat::CheckSingleFile() {
-    auto file = std::make_shared<LuaFile>(std::move(_inputFileText));
+bool LuaFormat::CheckSingleFile(std::string_view inputPath, std::string &&sourceText) {
+    auto file = std::make_shared<LuaFile>(std::move(sourceText));
     LuaLexer luaLexer(file);
     luaLexer.Parse();
 
@@ -215,9 +224,9 @@ bool LuaFormat::CheckSingleFile() {
 
     if (p.HasError()) {
         auto &errors = p.GetErrors();
-        std::cout << util::format("Check {} ...\t{} error", _inputPath, errors.size()) << std::endl;
+        std::cout << util::format("Check {} ...\t{} error", inputPath, errors.size()) << std::endl;
         for (auto &error: errors) {
-            DiagnosticInspection(error.ErrorMessage, error.ErrorRange, file, _inputPath);
+            DiagnosticInspection(error.ErrorMessage, error.ErrorRange, file, inputPath);
         }
 
         return false;
@@ -226,26 +235,51 @@ bool LuaFormat::CheckSingleFile() {
     LuaSyntaxTree t;
     t.BuildTree(p);
 
-    LuaStyle style = GetStyle(_inputPath);
+    LuaStyle style = GetStyle(inputPath);
     DiagnosticBuilder diagnosticBuilder(style, _diagnosticStyle);
     diagnosticBuilder.CodeStyleCheck(t);
     diagnosticBuilder.NameStyleCheck(t);
     auto diagnostics = diagnosticBuilder.GetDiagnosticResults(t);
     if (!diagnostics.empty()) {
-        std::cout << util::format("Check {}\t{} warning", _inputPath, diagnostics.size()) << std::endl;
+        std::cout << util::format("Check {}\t{} warning", inputPath, diagnostics.size()) << std::endl;
 
         for (auto &d: diagnostics) {
-            DiagnosticInspection(d.Message, d.Range, file, _inputPath);
+            DiagnosticInspection(d.Message, d.Range, file, inputPath);
         }
 
         return false;
     }
-    std::cout << util::format("Check {} OK", _inputPath) << std::endl;
     return true;
 }
 
 bool LuaFormat::CheckWorkspace() {
-    return false;
+    FileFinder finder(_workspace);
+    finder.AddFindExtension(".lua");
+    finder.AddFindExtension(".lua.txt");
+    finder.AddIgnoreDirectory(".git");
+    finder.AddIgnoreDirectory(".github");
+    finder.AddIgnoreDirectory(".svn");
+    finder.AddIgnoreDirectory(".idea");
+    finder.AddIgnoreDirectory(".vs");
+    finder.AddIgnoreDirectory(".vscode");
+    for (auto pattern: _ignorePattern) {
+        finder.AddignorePatterns(pattern);
+    }
+
+    auto files = finder.FindFiles();
+    for (auto &filePath: files) {
+        auto opText = ReadFile(filePath);
+        if (opText.has_value()) {
+            if (CheckSingleFile(filePath, std::move(opText.value()))) {
+                std::cerr << util::format("Check {} ok.", filePath) << std::endl;
+            } else {
+                std::cerr << util::format("Check {} fail.", filePath) << std::endl;
+            }
+        } else {
+            std::cerr << util::format("Can not read file {}", filePath) << std::endl;
+        }
+    }
+    return true;
 }
 
 void LuaFormat::AddIgnoresByFile(std::string_view ignoreConfigFile) {
@@ -282,16 +316,18 @@ bool LuaFormat::ReformatWorkspace() {
 
     auto files = finder.FindFiles();
     for (auto &filePath: files) {
-
-//        if (luaFormat.Reformat())
-//        {
-//            std::cerr << util::format("reformat {} succeed.", file) << std::endl;
-//        }
-//        else
-//        {
-//            std::cerr << util::format("reformat {} fail.", file) << std::endl;
-//        }
+        auto opText = ReadFile(filePath);
+        if (opText.has_value()) {
+            if (ReformatSingleFile(filePath, filePath, std::move(opText.value()))) {
+                std::cerr << util::format("Reformat {} succeed.", filePath) << std::endl;
+            } else {
+                std::cerr << util::format("Reformat {} fail.", filePath) << std::endl;
+            }
+        } else {
+            std::cerr << util::format("Can not read file {}", filePath) << std::endl;
+        }
     }
     return true;
 }
+
 
