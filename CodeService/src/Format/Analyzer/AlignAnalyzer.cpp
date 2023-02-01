@@ -391,9 +391,9 @@ void AlignAnalyzer::AnalyzeIfStatement(FormatState &f, LuaSyntaxNode &syntaxNode
         for (auto op: ifConditionLogicOps) {
             if (op.GetPrevToken(t).GetEndLine(t) != op.GetStartLine(t)) {
                 if (op.GetTokenKind(t) == TK_AND) {
-                    ifAlignPos = std::max(ifAlignPos, 4u);
+                    ifAlignPos = std::max(ifAlignPos, std::size_t(4));
                 } else if (op.GetTokenKind(t) == TK_OR) {
-                    ifAlignPos = std::max(ifAlignPos, 3u);
+                    ifAlignPos = std::max(ifAlignPos, std::size_t(3));
                 }
             }
         }
