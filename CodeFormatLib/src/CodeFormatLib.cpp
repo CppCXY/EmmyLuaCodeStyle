@@ -112,7 +112,7 @@ int range_format(lua_State *L) {
             auto startLine = lua_tointeger(L, 3);
             auto endLine = lua_tointeger(L, 4);
 
-            if(startLine < 0 || endLine < 0){
+            if (startLine < 0 || endLine < 0) {
                 lua_pushboolean(L, false);
                 lua_pushstring(L, "start line or end line < 0");
                 return 2;
@@ -170,8 +170,14 @@ int type_format(lua_State *L) {
         try {
             std::string filename = lua_tostring(L, 1);
             std::string text = lua_tostring(L, 2);
-            int line = lua_tointeger(L, 3);
-            int character = lua_tointeger(L, 4);
+            auto line = lua_tointeger(L, 3);
+            auto character = lua_tointeger(L, 4);
+
+            if(line < 0 || character < 0){
+                lua_pushboolean(L, false);
+                lua_pushstring(L, "line or character param error");
+                return 2;
+            }
 
             LuaCodeFormat::ConfigMap configMap;
 
@@ -204,7 +210,8 @@ int type_format(lua_State *L) {
                 }
             }
             auto typeFormatResult = LuaCodeFormat::GetInstance()
-                    .TypeFormat(filename, line, character,
+                    .TypeFormat(filename,
+                                static_cast<std::size_t>(line), static_cast<std::size_t>(character),
                                 std::move(text), configMap, stringTypeOptions);
 
             if (typeFormatResult.empty()) {
