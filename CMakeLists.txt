@@ -5,7 +5,7 @@ project(LuaCodeStyle)
 set(CMAKE_CXX_STANDARD 20)
 
 option(BuildAsLuaLib "Build for lua dll" OFF)
-option(BuildCodeFormat "Build CodeFormat" OFF)
+option(BuildCodeFormat "Build CodeFormat" ON)
 option(BuildCodeFormatServer "Build CodeFormatServer" ON)
 option(EnableTest "Test project" ON)
 
@@ -37,9 +37,10 @@ if(BuildCodeFormatServer)
 	add_subdirectory(CodeFormatServer)
 endif()
 
-add_subdirectory(Test2)
 if(EnableTest)
 	enable_testing()
 	add_subdirectory(3rd/googletest-1.12.1)
 	add_subdirectory(Test)
+	# for feature develop simple test
+	add_subdirectory(Test2)
 endif()
