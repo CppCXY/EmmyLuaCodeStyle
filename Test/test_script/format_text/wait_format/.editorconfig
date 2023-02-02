@@ -1,5 +1,0 @@
-
-# see https://github.com/CppCXY/EmmyLuaCodeStyle
-[*.lua]
-enable_check_codestyle = false
-indent_style = space
