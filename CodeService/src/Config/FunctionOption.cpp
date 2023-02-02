@@ -1,6 +1,6 @@
 #include "FunctionOption.h"
 #include "LuaParser/Lexer/LuaLexer.h"
-#include "LuaParser/lexer/LuaTokenTypeDetail.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 
 void FunctionOption::Parse(std::string_view option) {
     std::string text(option);
