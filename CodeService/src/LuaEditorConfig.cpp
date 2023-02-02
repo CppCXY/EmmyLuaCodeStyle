@@ -478,7 +478,7 @@ void LuaEditorConfig::ParseFromSection(std::shared_ptr<LuaCodeStyleOptions> opti
 		}
 		else if (configMap.at("max_line_length") == "unset")
 		{
-			options->max_line_length = std::numeric_limits<int>::max();
+			options->max_line_length = 998;
 		}
 	}
 
