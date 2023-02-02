@@ -173,6 +173,8 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                             if (nextLine > currentLine) {
                                 WriteLine(nextLine - currentLine);
                                 return;
+                            } else {
+                                WriteLine(1);
                             }
                         }
                         break;
@@ -189,6 +191,8 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                                 }
                                 WriteLine(line);
                                 return;
+                            } else {
+                                WriteLine(1);
                             }
                         }
                         break;
@@ -205,6 +209,8 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                                 }
                                 WriteLine(line);
                                 return;
+                            } else {
+                                WriteLine(1);
                             }
                         }
                     }

@@ -19,17 +19,12 @@
 
 ## RoadMap
 
-* 重写范围格式化[0%]
-* 重新实现type formatting[0%]
 * plugin[0%]
 
 ## 文档
-* [使用方式](docs/usage.md)
 * [格式化行为介绍](docs/format_action.md)
 * [如何配置格式化](docs/format_config.md)
 * [代码诊断配置](docs/diagnosis_config.md)
-* [部分屏蔽格式化](docs/disable_format.md)
-* [auto import配置](docs/auto_import_config.md)
 # Contribute
 
 任何pr或者issue都是欢迎的
@@ -54,6 +49,9 @@ cmake --build .
 
 **Contributors**
 
+[**@obszczymucha**](https://github.com/obszczymucha)
+
+[**@Rainer Poisel**](https://github.com/rpoisel)
 
 ## License
 

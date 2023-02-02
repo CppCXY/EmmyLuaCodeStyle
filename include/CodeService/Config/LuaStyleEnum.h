@@ -51,7 +51,7 @@ struct LineSpace {
     explicit LineSpace(std::size_t space = 1)
             : Type(LineSpaceType::Fixed), Space(space) {}
 
-    LineSpace(LineSpaceType type, std::size_t space = 0)
+    explicit LineSpace(LineSpaceType type, std::size_t space = 0)
             : Type(type), Space(space) {}
 
     LineSpaceType Type;

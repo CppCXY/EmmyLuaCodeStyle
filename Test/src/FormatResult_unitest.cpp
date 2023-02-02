@@ -565,3 +565,28 @@ local t = {
             R"(#! lua 1.lua
 )"));
 }
+
+TEST(Format, MultiLine) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function g(x)
+    if not x then return 3 end return (x('a', 'x'))
+end
+)",
+            R"(
+function g(x)
+    if not x then return 3 end
+    return (x('a', 'x'))
+end
+)"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+if a then
+else end
+)",
+            R"(
+if a then
+else
+end
+)"));
+}

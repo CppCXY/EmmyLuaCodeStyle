@@ -50,12 +50,6 @@ void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                         AnalyzeIfStatement(f, syntaxNode, t);
                     }
                 }
-
-//                case LuaSyntaxNodeKind::ExpressionStatement: {
-//                    if (f.GetStyle().align_chained_expression_statement) {
-//                    }
-//                    break;
-//                }
                 default: {
                     break;
                 }

@@ -82,7 +82,9 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case TK_RETURN:
                 case TK_GOTO:
                 case TK_FOR:
-                case TK_FUNCTION: {
+                case TK_ELSE:
+                case TK_FUNCTION:
+                case TK_END: {
                     SpaceRight(syntaxNode, t);
                     break;
                 }

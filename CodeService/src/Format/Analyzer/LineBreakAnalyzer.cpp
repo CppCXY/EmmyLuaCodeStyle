@@ -12,6 +12,23 @@ LineBreakAnalyzer::LineBreakAnalyzer() {
 
 void LineBreakAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
     for (auto syntaxNode: t.GetSyntaxNodes()) {
+        if (syntaxNode.IsToken(t)) {
+            switch (syntaxNode.GetTokenKind(t)) {
+                case TK_SHEBANG:
+                case TK_SHORT_COMMENT: {
+                    BreakAfter(syntaxNode, t, LineSpace(LineSpaceType::Keep));
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
+    for (auto syntaxNode: t.GetSyntaxNodes()) {
         if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {
                 case LuaSyntaxNodeKind::Block: {
@@ -137,17 +154,6 @@ void LineBreakAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     if (suffixedExpression.IsNode(t)) {
                         AnalyzeSuffixedExpr(f, suffixedExpression, t);
                     }
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-        } else {
-            switch (syntaxNode.GetTokenKind(t)) {
-                case TK_SHEBANG:
-                case TK_SHORT_COMMENT: {
-                    BreakAfter(syntaxNode, t);
                     break;
                 }
                 default: {
@@ -411,3 +417,4 @@ bool LineBreakAnalyzer::CanCollapseLines(FormatState &f, LuaSyntaxNode &n, const
         }
     }
 }
+

@@ -1,6 +1,6 @@
 #include "CodeService/Config/LuaStyle.h"
 #include <map>
-#include <regex>
+#include "FunctionOption.h"
 
 bool IsNumber(std::string_view source) {
     for (auto c: source) {
@@ -159,7 +159,7 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
 
     BOOL_OPTION(never_indent_before_if_condition)
 
-    if(align_if_branch){
+    if (align_if_branch) {
         never_indent_before_if_condition = true;
     }
 
@@ -176,30 +176,33 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
             {"line_space_after_expression_statement",      line_space_after_expression_statement},
             {"line_space_after_comment",                   line_space_after_comment}
     };
-    std::regex minLineRegex = std::regex(R"(minLine:\s*(\d+))");
-    std::regex keepLineRegex = std::regex(R"(keepLine:\s*(\d+))");
-    std::regex maxLineRegex = std::regex(R"(maxLine:\s*(\d+))");
-    for (auto &keepLineOption: fieldList) {
-        if (configMap.count(keepLineOption.first)) {
-            std::string value = configMap.at(keepLineOption.first);
-            if (value == "keepLine") {
-                keepLineOption.second = LineSpace(LineSpaceType::Keep);
-                continue;
-            }
-            std::smatch m;
 
-            if (std::regex_search(value, m, minLineRegex)) {
-                keepLineOption.second = LineSpace(LineSpaceType::Min, std::stoi(m.str(1)));
-                continue;
-            }
+    for (auto &lineOption: fieldList) {
+        if (configMap.count(lineOption.first)) {
+            std::string value = configMap.at(lineOption.first);
+            FunctionOption option;
+            option.Parse(value);
 
-            if (std::regex_search(value, m, keepLineRegex)) {
-                keepLineOption.second = LineSpace(LineSpaceType::Fixed, std::stoi(m.str(1)));
-                continue;
+            if (option.GetKey() == "keep") {
+                lineOption.second = LineSpace(LineSpaceType::Keep);
             }
-
-            if (std::regex_search(value, m, maxLineRegex)) {
-                keepLineOption.second = LineSpace(LineSpaceType::Max, std::stoi(m.str(1)));
+            else if(option.GetKey() == "min") {
+                auto p1 = option.GetParam(0);
+                if(!p1.empty() && IsNumber(p1)) {
+                    lineOption.second = LineSpace(LineSpaceType::Min, std::stoi(p1));
+                }
+            }
+            else if(option.GetKey() == "fixed") {
+                auto p1 = option.GetParam(0);
+                if(!p1.empty() && IsNumber(p1)) {
+                    lineOption.second = LineSpace(LineSpaceType::Fixed, std::stoi(p1));
+                }
+            }
+            else if(option.GetKey() == "max") {
+                auto p1 = option.GetParam(0);
+                if(!p1.empty() && IsNumber(p1)) {
+                    lineOption.second = LineSpace(LineSpaceType::Max, std::stoi(p1));
+                }
             }
         }
     }

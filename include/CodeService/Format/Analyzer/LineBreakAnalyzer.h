@@ -13,6 +13,8 @@ public:
 
     void Analyze(FormatState &f, const LuaSyntaxTree &t) override;
 
+    void ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) override;
+
     void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve& resolve) override;
 
     void BreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t line = 1);

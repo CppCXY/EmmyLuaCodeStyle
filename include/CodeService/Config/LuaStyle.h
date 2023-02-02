@@ -31,6 +31,8 @@ public:
 
     QuoteStyle quote_style = QuoteStyle::None;
 
+    std::size_t continuation_indent = 4;
+
     TableSeparatorStyle table_separator_style = TableSeparatorStyle::Comma;
 
     std::size_t max_line_length = 120;
@@ -43,8 +45,6 @@ public:
     TrailingTableSeparator trailing_table_separator = TrailingTableSeparator::Keep;
 
     CallArgParentheses call_arg_parentheses = CallArgParentheses::Keep;
-
-	std::size_t continuation_indent = 4;
 
 	bool detect_end_of_line = true;
 

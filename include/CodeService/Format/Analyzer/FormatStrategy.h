@@ -70,7 +70,7 @@ struct LineBreakData {
 
     explicit LineBreakData(LineSpace lineSpace)
             : Strategy(LineBreakStrategy::Standard),
-              Data(LineSpace(lineSpace)) {
+              Data(lineSpace) {
     }
 
     LineBreakData(LineBreakStrategy strategy, std::size_t index)
