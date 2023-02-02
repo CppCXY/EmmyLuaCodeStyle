@@ -6,8 +6,7 @@
 
 int main() {
     std::string buffer = R"(
-if a then
-else end
+p("456")
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -22,6 +21,7 @@ else end
     std::cout << t.GetDebugView() << std::endl;
 
     LuaStyle s;
+    s.call_arg_parentheses = CallArgParentheses::Remove;
     FormatBuilder b(s);
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;

@@ -150,10 +150,8 @@ bool IsSingleTableOrStringArg(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t)
                 auto expr = exprs.front();
                 if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
                     return true;
-                } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::LiteralExpression) {
-                    auto firstToken = expr.GetFirstToken(t);
-                    return firstToken.GetTokenKind(t) == TK_STRING
-                           || firstToken.GetTokenKind(t) == TK_LONG_STRING;
+                } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::StringLiteralExpression) {
+                    return true;
                 }
             }
         }
@@ -174,7 +172,7 @@ LuaSyntaxNode GetSingleArgStringOrTable(LuaSyntaxNode &syntaxNode, const LuaSynt
                 auto expr = exprs.front();
                 if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
                     return expr;
-                } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::LiteralExpression) {
+                } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::StringLiteralExpression) {
                     auto firstToken = expr.GetFirstToken(t);
                     if (firstToken.GetTokenKind(t) == TK_STRING
                         || firstToken.GetTokenKind(t) == TK_LONG_STRING) {

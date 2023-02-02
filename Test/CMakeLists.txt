@@ -20,6 +20,7 @@ target_sources(CodeFormatTest
         src/FormatResult_unitest.cpp
         src/Performance_unitest.cpp
         src/RangeFormat_unitest.cpp
+        src/FormatStyle_unitest.cpp
         )
 
 target_link_libraries(CodeFormatTest CodeService Util gtest)
