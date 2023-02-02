@@ -6,16 +6,16 @@
 #include "LSP.h"
 #include "CodeService/Config/LuaStyle.h"
 #include "LanguageServer.h"
-//#include "Service/CodeActionService.h"
+#include "Service/CodeActionService.h"
 #include "Service/FormatService.h"
 #include "Service/ConfigService.h"
-//#include "Service/CommandService.h"
-//#include "CodeService/TypeFormat/LuaTypeFormat.h"
+#include "Service/CommandService.h"
 #include "Util/Url.h"
 #include "Util/format.h"
 #include "LanguageServer.h"
 #include "CodeService/Format/Types.h"
 #include "Service/DiagnosticService.h"
+#include "Config/ClientConfig.h"
 
 using namespace std::placeholders;
 
@@ -39,8 +39,6 @@ bool LSPHandle::Initialize() {
     JsonProtocol("textDocument/onTypeFormatting", &LSPHandle::OnTypeFormatting);
     JsonProtocol("textDocument/codeAction", &LSPHandle::OnCodeAction);
     JsonProtocol("workspace/executeCommand", &LSPHandle::OnExecuteCommand);
-//    JsonProtocol("workspace/didChangeWatchedFiles", &LSPHandle::OnDidChangeWatchedFiles);
-//    JsonProtocol("textDocument/completion", &LSPHandle::OnCompletion);
     JsonProtocol("workspace/didChangeConfiguration", &LSPHandle::OnWorkspaceDidChangeConfiguration);
     JsonProtocol("textDocument/diagnostic", &LSPHandle::OnTextDocumentDiagnostic);
     JsonProtocol("workspace/diagnostic", &LSPHandle::OnWorkspaceDiagnostic);
@@ -73,12 +71,10 @@ std::shared_ptr<lsp::InitializeResult> LSPHandle::OnInitialize(std::shared_ptr<l
     result->capabilities.textDocumentSync.change = lsp::TextDocumentSyncKind::Incremental;
     result->capabilities.textDocumentSync.openClose = true;
 
-//    LanguageServer::GetInstance().SetVscodeSettings(param->initializationOptions.vscodeConfig);
+    result->capabilities.codeActionProvider = true;
+    result->capabilities.executeCommandProvider.commands =
+            _server->GetService<CommandService>()->GetCommands();
 
-//    result->capabilities.codeActionProvider = true;
-//    result->capabilities.executeCommandProvider.commands =
-//            _server->GetService<CommandService>()->GetCommands();
-//
     result->capabilities.diagnosticProvider.identifier = "EmmyLuaCodeStyle";
     result->capabilities.diagnosticProvider.workspaceDiagnostics = false;
     result->capabilities.diagnosticProvider.interFileDependencies = false;
@@ -95,13 +91,15 @@ std::shared_ptr<lsp::InitializeResult> LSPHandle::OnInitialize(std::shared_ptr<l
         _server->GetService<ConfigService>()->LoadLanguageTranslator(localePath.string());
     }
 
+    ClientConfig clientConfig;
+    clientConfig.Deserialize(params->initializationOptions.vscodeConfig);
+    _server->GetService<ConfigService>()->UpdateClientConfig(clientConfig);
+
 //    if (!param->initializationOptions.extensionChars.empty()) {
 //        for (auto &c: param->initializationOptions.extensionChars) {
 //            LuaIdentify::AddIdentifyChar(c);
 //        }
 //    }
-
-//    _server->GetVFS().SetRoot(param->rootPath);
 
     auto dictionaryPath = params->initializationOptions.dictionaryPath;
     if (!dictionaryPath.empty()) {
@@ -259,7 +257,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnTypeFormatting(
         return result;
     }
 
-    auto& syntaxTree = opSyntaxTree.value();
+    auto &syntaxTree = opSyntaxTree.value();
     LuaStyle &luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
 
     LuaTypeFormatOptions typeFormatOptions;
@@ -268,7 +266,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnTypeFormatting(
             params->position.line,
             params->position.character,
             syntaxTree, luaStyle, typeFormatOptions);
-    for(auto& formatResult: typeFormatResults) {
+    for (auto &formatResult: typeFormatResults) {
         auto &edit = result->edits.emplace_back();
         edit.newText = std::move(formatResult.Text);
         edit.range = lsp::Range(
@@ -281,58 +279,26 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnTypeFormatting(
 }
 
 std::shared_ptr<lsp::CodeActionResult> LSPHandle::OnCodeAction(std::shared_ptr<lsp::CodeActionParams> param) {
-//    auto codeActionResult = std::make_shared<lsp::CodeActionResult>();
-//
-//    for (auto &diagnostic: param->context.diagnostics) {
-//        _server->GetService<CodeActionService>()->Dispatch(diagnostic, param, codeActionResult);
-//    }
-//    return codeActionResult;
-    return nullptr;
+    auto codeActionResult = std::make_shared<lsp::CodeActionResult>();
+
+    for (auto &diagnostic: param->context.diagnostics) {
+        _server->GetService<CodeActionService>()->Dispatch(diagnostic, param, codeActionResult);
+    }
+    return codeActionResult;
 }
 
 std::shared_ptr<lsp::Serializable> LSPHandle::OnExecuteCommand(
-        std::shared_ptr<lsp::ExecuteCommandParams> param) {
-//    _server->GetService<CommandService>()->Dispatch(param->command, param);
+        std::shared_ptr<lsp::ExecuteCommandParams> params) {
+    _server->GetService<CommandService>()->Dispatch(params->command, params);
     return nullptr;
 }
 
 std::shared_ptr<lsp::Serializable> LSPHandle::OnWorkspaceDidChangeConfiguration(
-        std::shared_ptr<lsp::DidChangeConfigurationParams> param) {
-//    lsp::VscodeSettings &setting = _server->GetSettings();
-//    // TODO more modern method
-//    if (param->settings["emmylua"].is_object()) {
-//        auto emmylua = param->settings["emmylua"];
-//        if (emmylua["lint"].is_object()) {
-//            auto lint = emmylua["lint"];
-//            if (lint["moduleCheck"].is_boolean()) {
-//                setting.lintModule = lint["moduleCheck"];
-//            }
-//            if (lint["codeStyle"].is_boolean()) {
-//                setting.lintCodeStyle = lint["codeStyle"];
-//            }
-//        }
-//
-//        if (emmylua["spell"].is_object()) {
-//            auto spell = emmylua["spell"];
-//            if (spell["enable"].is_boolean()) {
-//                setting.spellEnable = spell["enable"];
-//            }
-//
-//            if (spell["dict"].is_array()) {
-//                setting.spellDict.clear();
-//                for (auto j: spell["dict"]) {
-//                    if (j.is_string()) {
-//                        setting.spellDict.push_back(j);
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-
-//    _sever->SetVscodeSettings(setting);
-//    RefreshDiagnostic();
-
+        std::shared_ptr<lsp::DidChangeConfigurationParams> params) {
+    ClientConfig clientConfig;
+    clientConfig.Deserialize(params->settings);
+    _server->GetService<ConfigService>()->UpdateClientConfig(clientConfig);
+    RefreshDiagnostic();
     return nullptr;
 }
 
@@ -360,10 +326,8 @@ std::shared_ptr<lsp::DocumentDiagnosticReport> LSPHandle::OnTextDocumentDiagnost
 
     LuaStyle &luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
 
-    LuaDiagnosticStyle dStyle;
-
     auto diagnostics = _server->GetService<DiagnosticService>()->Diagnostic(
-            opFileId.value(), syntaxTree, luaStyle, dStyle
+            opFileId.value(), syntaxTree, luaStyle
     );
     report->resultId = std::to_string(opFileId.value());
 

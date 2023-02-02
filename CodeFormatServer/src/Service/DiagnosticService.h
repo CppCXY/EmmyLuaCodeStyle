@@ -15,10 +15,8 @@ public:
     explicit DiagnosticService(LanguageServer *owner);
 
     std::vector<lsp::Diagnostic>
-    Diagnostic(
-            std::size_t fileId,
-            const LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle,
-            LuaDiagnosticStyle &diagnosticStyle);
+    Diagnostic(std::size_t fileId,
+               const LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle);
 
     std::shared_ptr<CodeSpellChecker> GetSpellChecker();
 

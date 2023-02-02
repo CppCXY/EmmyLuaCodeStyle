@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include "CodeService/Config/LanguageTranslator.h"
+#include "LanguageServer.h"
+#include "DiagnosticService.h"
 
 ConfigService::ConfigService(LanguageServer *owner)
         : Service(owner) {
@@ -65,12 +67,27 @@ void ConfigService::LoadLanguageTranslator(std::string_view filePath) {
 }
 
 void ConfigService::RemoveEditorconfig(std::string_view workspace) {
-    for (auto it = _styleConfigs.begin(); it != _styleConfigs.end(); it ++) {
+    for (auto it = _styleConfigs.begin(); it != _styleConfigs.end(); it++) {
         if (it->Workspace == workspace) {
             _styleConfigs.erase(it);
             break;
         }
     }
+}
+
+void ConfigService::UpdateClientConfig(ClientConfig clientConfig) {
+    _diagnosticStyle.code_style_check = clientConfig.emmylua_lint_codeStyle;
+    _diagnosticStyle.name_style_check = clientConfig.emmylua_lint_nameStyle;
+    _diagnosticStyle.spell_check = clientConfig.emmylua_spell_enable;
+
+    CodeSpellChecker::CustomDictionary dictionary(clientConfig.emmylua_spell_dict.begin(),
+                                                  clientConfig.emmylua_spell_dict.end());
+    auto diagnosticService = _owner->GetService<DiagnosticService>();
+    diagnosticService->GetSpellChecker()->SetCustomDictionary(dictionary);
+}
+
+LuaDiagnosticStyle &ConfigService::GetDiagnosticStyle() {
+    return _diagnosticStyle;
 }
 
 

@@ -5,8 +5,8 @@ enum class ServiceType
 	Service = -1,
 	FormatService = 0,
 	DiagnosticService,
-//	CommandService,
-//	CodeActionService,
+	CommandService,
+	CodeActionService,
 
     ConfigService,
 

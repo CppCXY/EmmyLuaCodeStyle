@@ -1,49 +1,47 @@
 #pragma once
 
 #include "Service.h"
+#include "LSP/LSP.h"
+#include <map>
+#include <functional>
+#include <string_view>
 
-class CommandService : public Service
-{
+class CommandService : public Service {
 public:
-	LANGUAGE_SERVICE(CommandService);
+    LANGUAGE_SERVICE(CommandService);
 
-	enum class Command
-	{
-		Reformat = 1,
-		Import = 2,
-		SpellCorrect = 3,
-		SpellAddDict = 4
-	};
+    enum class Command {
+        Reformat = 1,
+        SpellCorrect,
+        SpellAddDict
+    };
 
-	using CommandHandle = std::function<void(std::shared_ptr<lsp::ExecuteCommandParams> param)>;
+    using CommandHandle = std::function<void(std::shared_ptr<lsp::ExecuteCommandParams> params)>;
 
-	CommandService(LanguageServer* owner);
+    explicit CommandService(LanguageServer *owner);
 
-	void Start() override;
+    void Start() override;
 
-	bool Initialize() override;
+    bool Initialize() override;
 
-	std::vector<std::string> GetCommands();
+    std::vector<std::string> GetCommands();
 
-	std::string GetCommand(Command command);
+    std::string GetCommand(Command command);
 
-	void Dispatch(std::string_view command, std::shared_ptr<lsp::ExecuteCommandParams> param);
+    void Dispatch(std::string_view command, std::shared_ptr<lsp::ExecuteCommandParams> params);
+
 private:
 
-	void CommandProtocol(std::string_view command, void(CommandService::* handle)(std::shared_ptr<lsp::ExecuteCommandParams>))
-	{
-		_handles[std::string(command)] = [this, handle](auto params) {
-			return (this->*handle)(params);
-		};
-	}
+    void CommandProtocol(std::string_view command,
+                         void(CommandService::* handle)(std::shared_ptr<lsp::ExecuteCommandParams>)) {
+        _handles[std::string(command)] = [this, handle](auto params) {
+            return (this->*handle)(params);
+        };
+    }
 
-	void Reformat(std::shared_ptr<lsp::ExecuteCommandParams> param);
+    void Reformat(std::shared_ptr<lsp::ExecuteCommandParams> params);
 
-	void Import(std::shared_ptr<lsp::ExecuteCommandParams> param);
+    void SpellCorrect(std::shared_ptr<lsp::ExecuteCommandParams> params);
 
-	void SpellCorrect(std::shared_ptr<lsp::ExecuteCommandParams> param);
-
-	// void SpellAddDict(std::shared_ptr<lsp::ExecuteCommandParams> param);
-
-	std::map<std::string, CommandHandle> _handles;
+    std::map<std::string, CommandHandle, std::less<>> _handles;
 };

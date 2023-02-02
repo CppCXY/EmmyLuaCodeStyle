@@ -218,7 +218,7 @@ void lsp::InitializationOptions::Deserialize(nlohmann::json json)
 
 	if (json["vscodeConfig"].is_object())
 	{
-		vscodeConfig.Deserialize(json["vscodeConfig"]);
+		vscodeConfig = json["vscodeConfig"];
 	}
 
 	if (json["dictionaryPath"].is_array())
@@ -332,33 +332,6 @@ void lsp::ConfigSource::Deserialize(nlohmann::json json)
 	uri = json["uri"];
 	path = json["path"];
 	workspace = json["workspace"];
-}
-
-void lsp::VscodeSettings::Deserialize(nlohmann::json json)
-{
-	if (json["emmylua.lint.moduleCheck"].is_boolean())
-	{
-		lintModule = json["emmylua.lint.moduleCheck"];
-	}
-
-	if (json["emmylua.lint.codeStyle"].is_boolean())
-	{
-		lintCodeStyle = json["emmylua.lint.codeStyle"];
-	}
-
-	if (json["emmylua.spell.enable"].is_boolean())
-	{
-		spellEnable = json["emmylua.spell.enable"];
-	}
-
-	if (json["emmylua.spell.dict"].is_array())
-	{
-		spellDict.clear();
-		for (auto j : json["emmylua.spell.dict"])
-		{
-			spellDict.push_back(j);
-		}
-	}
 }
 
 void lsp::ConfigUpdateParams::Deserialize(nlohmann::json json)

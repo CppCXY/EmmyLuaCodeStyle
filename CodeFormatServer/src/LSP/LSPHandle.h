@@ -62,9 +62,9 @@ private:
 
 	std::shared_ptr<lsp::Serializable> OnExecuteCommand(std::shared_ptr<lsp::ExecuteCommandParams> param);
 
-	std::shared_ptr<lsp::Serializable> OnDidChangeWatchedFiles(std::shared_ptr<lsp::DidChangeWatchedFilesParams> param);
-
-	std::shared_ptr<lsp::CompletionList> OnCompletion(std::shared_ptr<lsp::CompletionParams> param);
+//	std::shared_ptr<lsp::Serializable> OnDidChangeWatchedFiles(std::shared_ptr<lsp::DidChangeWatchedFilesParams> param);
+//
+//	std::shared_ptr<lsp::CompletionList> OnCompletion(std::shared_ptr<lsp::CompletionParams> param);
 
 	std::shared_ptr<lsp::Serializable> OnWorkspaceDidChangeConfiguration(std::shared_ptr<lsp::DidChangeConfigurationParams> param);
 

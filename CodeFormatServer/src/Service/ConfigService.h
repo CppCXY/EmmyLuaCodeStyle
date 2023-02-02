@@ -4,6 +4,8 @@
 #include "LSP/LSP.h"
 #include "Service.h"
 #include "CodeService/Config/LuaEditorConfig.h"
+#include "Config/ClientConfig.h"
+#include "CodeService/Config/LuaDiagnosticStyle.h"
 
 struct LuaConfig {
     explicit LuaConfig(std::string_view workspace)
@@ -26,7 +28,13 @@ public:
     void RemoveEditorconfig(std::string_view workspace);
 
     void LoadLanguageTranslator(std::string_view filePath);
+
+    void UpdateClientConfig(ClientConfig clientConfig);
+
+    LuaDiagnosticStyle &GetDiagnosticStyle();
+
 private:
     std::vector<LuaConfig> _styleConfigs;
     LuaStyle _defaultStyle;
+    LuaDiagnosticStyle _diagnosticStyle;
 };

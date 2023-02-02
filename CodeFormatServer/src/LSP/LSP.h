@@ -254,18 +254,6 @@ public:
 
 class ConfigSource;
 
-class VscodeSettings : public Serializable
-{
-public:
-	bool lintCodeStyle = true;
-	bool lintModule = true;
-	// bool autoImport = true;
-	bool spellEnable;
-	std::vector<std::string> spellDict;
-
-	void Deserialize(nlohmann::json json) override;
-};
-
 class InitializationOptions : public Serializable
 {
 public:
@@ -275,7 +263,7 @@ public:
 	std::string localeRoot;
 	std::string extensionChars;
 	std::vector<std::string> dictionaryPath;
-	VscodeSettings vscodeConfig;
+    nlohmann::json vscodeConfig;
 	void Deserialize(nlohmann::json json) override;
 };
 

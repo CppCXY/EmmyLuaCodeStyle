@@ -6,11 +6,11 @@
 #include "Util/FileFinder.h"
 #include "asio.hpp"
 #include "Service/Service.h"
-//#include "Service/CodeActionService.h"
-//#include "Service/ModuleService.h"
+#include "Service/CodeActionService.h"
 #include "Service/FormatService.h"
 #include "Service/DiagnosticService.h"
 #include "Service/ConfigService.h"
+#include "Service/CommandService.h"
 
 LanguageServer::LanguageServer()
         : _idCounter(0),
@@ -21,10 +21,8 @@ LanguageServer::LanguageServer()
 void LanguageServer::InitializeService() {
     AddService<FormatService>();
     AddService<DiagnosticService>();
-//	AddService<ModuleService>();
-//	AddService<CompletionService>();
-//	AddService<CommandService>();
-//	AddService<CodeActionService>();
+	AddService<CommandService>();
+	AddService<CodeActionService>();
     AddService<ConfigService>();
 
     for (auto &service: _services) {

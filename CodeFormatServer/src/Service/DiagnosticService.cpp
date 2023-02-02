@@ -1,6 +1,8 @@
 #include "DiagnosticService.h"
 #include "LanguageServer.h"
 #include "CodeService/Diagnostic/DiagnosticBuilder.h"
+#include "CodeActionService.h"
+#include "ConfigService.h"
 
 DiagnosticService::DiagnosticService(LanguageServer *owner)
         : Service(owner),
@@ -10,8 +12,9 @@ DiagnosticService::DiagnosticService(LanguageServer *owner)
 
 std::vector<lsp::Diagnostic>
 DiagnosticService::Diagnostic(std::size_t fileId,
-                              const LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle,
-                              LuaDiagnosticStyle &diagnosticStyle) {
+                              const LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle) {
+    LuaDiagnosticStyle& diagnosticStyle = _owner->GetService<ConfigService>()->GetDiagnosticStyle();
+
     DiagnosticBuilder d(luaStyle, diagnosticStyle);
 
     d.CodeStyleCheck(luaSyntaxTree);
@@ -36,41 +39,36 @@ DiagnosticService::Diagnostic(std::size_t fileId,
                 lsp::Position(startLC.Line, startLC.Col),
                 lsp::Position(endLC.Line, endLC.Col + 1)
         );
+        diag.data = result.Data;
 
         diag.source = "EmmyLua";
+        diag.code = _owner->GetService<CodeActionService>()->GetCode(result.Type);
         switch (result.Type) {
             case DiagnosticType::Indent: {
-                diag.code = "indent-check";
                 diag.severity = lsp::DiagnosticSeverity::Warning;
                 break;
             }
             case DiagnosticType::Space: {
-                diag.code = "space-check";
                 diag.severity = lsp::DiagnosticSeverity::Warning;
                 break;
             }
             case DiagnosticType::StringQuote: {
-                diag.code = "string-quote";
                 diag.severity = lsp::DiagnosticSeverity::Warning;
                 break;
             }
             case DiagnosticType::EndWithNewLine: {
-                diag.code = "end-with-new-line";
                 diag.severity = lsp::DiagnosticSeverity::Warning;
                 break;
             }
             case DiagnosticType::Align: {
-                diag.code = "code-align";
                 diag.severity = lsp::DiagnosticSeverity::Warning;
                 break;
             }
             case DiagnosticType::NameStyle: {
-                diag.code = "name-style-check";
                 diag.severity = lsp::DiagnosticSeverity::Information;
                 break;
             }
             case DiagnosticType::Spell: {
-                diag.code = "spell-check";
                 diag.severity = lsp::DiagnosticSeverity::Information;
                 break;
             }
