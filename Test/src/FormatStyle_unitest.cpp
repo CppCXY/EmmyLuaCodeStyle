@@ -424,3 +424,110 @@ print(1, 2, 3)
 print(1, 2, 3)
 )", style));
 }
+
+TEST(FormatByStyleOption, space_before_closure_open_parenthesis) {
+    LuaStyle style;
+
+    style.space_before_closure_open_parenthesis = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local f = function ()
+end
+)",
+            R"(
+local f = function ()
+end
+)", style));
+    style.space_before_closure_open_parenthesis = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local f = function ()
+end
+)",
+            R"(
+local f = function()
+end
+)", style));
+}
+
+TEST(FormatByStyleOption, space_before_function_call_single_arg) {
+    LuaStyle style;
+
+    style.space_before_function_call_single_arg = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local f = p { a = 123 }
+)",
+            R"(
+local f = p { a = 123 }
+)", style));
+    style.space_before_function_call_single_arg = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local f = p { a = 123 }
+)",
+            R"(
+local f = p{ a = 123 }
+)", style));
+}
+
+TEST(FormatByStyleOption, space_inside_function_call_parentheses) {
+    LuaStyle style;
+
+    style.space_inside_function_call_parentheses = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+p(1,2,3)
+p()
+)",
+            R"(
+p( 1, 2, 3 )
+p()
+)", style));
+    style.space_inside_function_call_parentheses = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+p(1,2,3)
+p()
+)",
+            R"(
+p(1, 2, 3)
+p()
+)", style));
+}
+
+TEST(FormatByStyleOption, space_inside_function_param_list_parentheses) {
+    LuaStyle style;
+
+    style.space_inside_function_param_list_parentheses = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f()
+end
+function f2(a,b,c)
+end
+)",
+            R"(
+function f()
+end
+
+function f2( a, b, c )
+end
+)", style));
+    style.space_inside_function_param_list_parentheses = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f()
+end
+
+function f2(a,b,c)
+end
+)",
+            R"(
+function f()
+end
+
+function f2(a, b, c)
+end
+)", style));
+}
