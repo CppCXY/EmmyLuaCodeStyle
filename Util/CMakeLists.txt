@@ -31,7 +31,6 @@ target_sources(Util
 	${Util_SOURCE_DIR}/src/SymSpell/SymSpell.cpp
 	${Util_SOURCE_DIR}/src/SymSpell/SuggestItem.cpp
 	${Util_SOURCE_DIR}/src/SymSpell/EditDistance.cpp
-	${Util_SOURCE_DIR}/src/Trie.cpp
 )
 
 

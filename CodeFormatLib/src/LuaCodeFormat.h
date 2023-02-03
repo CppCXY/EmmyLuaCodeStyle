@@ -4,53 +4,62 @@
 #include <string>
 #include <string_view>
 
-#include "CodeService/LuaCodeStyleOptions.h"
-#include "CodeService/Diagnosis/LuaDiagnosisInfo.h"
-#include "CodeService/LuaEditorConfig.h"
-#include "CodeService/LuaFormatRange.h"
-#include "CodeService/Spell/CodeSpellChecker.h"
+#include "CodeService/Config/LuaStyle.h"
+#include "CodeService/Config/LuaEditorConfig.h"
+#include "CodeService/Format/FormatBuilder.h"
+#include "CodeService/Diagnostic/Spell/CodeSpellChecker.h"
 #include "CodeService/TypeFormat/LuaTypeFormat.h"
+#include "CodeService/Diagnostic/DiagnosticBuilder.h"
+#include "Types.h"
 
-class LuaCodeFormat
-{
+
+class LuaCodeFormat {
 public:
-	using ConfigMap = std::map<std::string, std::string, std::less<>>;
-	static LuaCodeFormat& GetInstance();
+    using ConfigMap = std::map<std::string, std::string, std::less<>>;
 
-	LuaCodeFormat();
+    static LuaCodeFormat &GetInstance();
 
-	void UpdateCodeStyle(const std::string& workspaceUri, const std::string& configPath);
-	void RemoveCodeStyle(const std::string& workspaceUri);
-	void SetDefaultCodeStyle(ConfigMap& configMap);
-	void SetSupportNonStandardSymbol(const std::string& tokenType, const std::vector<std::string>& tokens);
+    LuaCodeFormat();
 
-	void LoadSpellDictionary(const std::string& path);
+    void UpdateCodeStyle(const std::string &workspaceUri, const std::string &configPath);
 
-	void LoadSpellDictionaryFromBuffer(const std::string& buffer);
+    void RemoveCodeStyle(const std::string &workspaceUri);
 
-	std::string Reformat(const std::string& uri, std::string&& text, ConfigMap& configMap);
+    void SetDefaultCodeStyle(ConfigMap &configMap);
 
-	std::string RangeFormat(const std::string& uri, LuaFormatRange& range, std::string&& text, ConfigMap& configMap);
+    void SupportNonStandardSymbol();
 
-	LuaTypeFormat TypeFormat(const std::string& uri, int line, int character, std::string&& text,
-	                         ConfigMap& configMap, ConfigMap& stringTypeOptions);
+    void LoadSpellDictionary(const std::string &path);
 
-	std::pair<bool, std::vector<LuaDiagnosisInfo>> Diagnose(const std::string& uri, std::string&& text);
+    void LoadSpellDictionaryFromBuffer(const std::string &buffer);
 
-	std::vector<LuaDiagnosisInfo> SpellCheck(const std::string& uri, std::string&& text,
-	                                         const CodeSpellChecker::CustomDictionary& tempDict);
+    std::string Reformat(const std::string &uri, std::string &&text, ConfigMap &configMap);
 
-	std::vector<SuggestItem> SpellCorrect(const std::string& word);
+    std::string RangeFormat(const std::string &uri, FormatRange &range, std::string &&text, ConfigMap &configMap);
 
-	std::shared_ptr<LuaCodeStyleOptions> GetOptions(const std::string& uri);
+    std::vector<LuaTypeFormat::Result>
+    TypeFormat(const std::string &uri, std::size_t line, std::size_t character, std::string &&text,
+               ConfigMap &configMap, ConfigMap &stringTypeOptions);
 
-	LuaCodeStyleOptions CalculateOptions(const std::string& uri, ConfigMap& configMap);
+    std::vector<LuaDiagnosticInfo> Diagnostic(const std::string &uri, std::string &&text);
+
+    std::vector<LuaDiagnosticInfo> SpellCheck(const std::string &uri, std::string &&text,
+                                          const CodeSpellChecker::CustomDictionary &tempDict);
+
+    std::vector<LuaDiagnosticInfo> NameStyleCheck(const std::string &uri, std::string &&text);
+
+    std::vector<SuggestItem> SpellCorrect(const std::string &word);
+
+    LuaStyle &GetStyle(const std::string &uri);
 private:
-	std::vector<std::pair<std::string, std::shared_ptr<LuaEditorConfig>>> _editorConfigVector;
+    std::vector<LuaDiagnosticInfo> MakeDiagnosticInfo(const std::vector<LuaDiagnostic>& diagnostics,
+                                                      std::shared_ptr<LuaFile> file);
 
-	std::shared_ptr<LuaCodeStyleOptions> _defaultOptions;
+    void CalculateTempStyle(LuaStyle& style, ConfigMap &configMap);
 
-	std::shared_ptr<CodeSpellChecker> _codeSpellChecker;
-
-	std::shared_ptr<LuaCustomParser> _customParser;
+    std::vector<LuaConfig> _configs;
+    LuaStyle _defaultStyle;
+    CodeSpellChecker _spellChecker;
+    LuaDiagnosticStyle _diagnosticStyle;
+    bool _supportNonStandardSymbol;
 };

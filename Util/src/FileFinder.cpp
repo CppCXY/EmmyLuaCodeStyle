@@ -52,12 +52,12 @@ std::vector<std::string> FileFinder::FindFiles()
 	auto rootPath = _root.string();
 	for (auto& originFile : files)
 	{
-		auto matchFilePath = StringUtil::GetFileRelativePath(rootPath, originFile);
+		auto matchFilePath = string_util::GetFileRelativePath(rootPath, originFile);
 		if (!matchFilePath.empty())
 		{
 			for (auto& pattern : _ignorePatterns)
 			{
-				if (StringUtil::FileWildcardMatch(matchFilePath, pattern))
+				if (string_util::FileWildcardMatch(matchFilePath, pattern))
 				{
 					goto nextFile;
 				}

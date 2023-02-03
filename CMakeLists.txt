@@ -39,5 +39,8 @@ endif()
 
 if(EnableTest)
 	enable_testing()
+	add_subdirectory(3rd/googletest-1.12.1)
 	add_subdirectory(Test)
+	# for feature develop simple test
+	add_subdirectory(Test2)
 endif()

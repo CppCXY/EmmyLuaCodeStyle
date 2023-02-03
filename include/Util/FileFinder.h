@@ -6,27 +6,26 @@
 #include <set>
 #include <vector>
 
-class FileFinder
-{
+class FileFinder {
 public:
-	FileFinder(std::filesystem::path root);
+    FileFinder(std::filesystem::path root);
 
-	void AddIgnoreDirectory(const std::string& extension);
+    void AddIgnoreDirectory(const std::string &extension);
 
-	void AddFindExtension(const std::string& extension);
+    void AddFindExtension(const std::string &extension);
 
-	void AddFindFile(const std::string& fileName);
+    void AddFindFile(const std::string &fileName);
 
-	void AddignorePatterns(const std::string& pattern);
+    void AddignorePatterns(const std::string &pattern);
 
-	std::vector<std::string> FindFiles();
+    std::vector<std::string> FindFiles();
 
 private:
-	void CollectFile(std::filesystem::path directoryPath, std::vector<std::string>& paths);
+    void CollectFile(std::filesystem::path directoryPath, std::vector<std::string> &paths);
 
-	std::filesystem::path _root;
-	std::set<std::string> _ignoreDirectory;
-	std::set<std::string> _findExtension;
-	std::set<std::string> _findFile;
-	std::vector<std::string> _ignorePatterns;
+    std::filesystem::path _root;
+    std::set<std::string> _ignoreDirectory;
+    std::set<std::string> _findExtension;
+    std::set<std::string> _findFile;
+    std::vector<std::string> _ignorePatterns;
 };

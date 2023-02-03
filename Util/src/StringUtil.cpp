@@ -4,7 +4,7 @@
 #include <algorithm>
 #include "wildcards/match.hpp"
 
-std::vector<std::string_view> StringUtil::Split(std::string_view source, std::string_view separator)
+std::vector<std::string_view> string_util::Split(std::string_view source, std::string_view separator)
 {
 	if (source.empty() || separator.empty())
 	{
@@ -31,7 +31,7 @@ std::vector<std::string_view> StringUtil::Split(std::string_view source, std::st
 	return result;
 }
 
-std::string_view StringUtil::TrimSpace(std::string_view source)
+std::string_view string_util::TrimSpace(std::string_view source)
 {
 	if (source.empty())
 	{
@@ -65,7 +65,7 @@ std::string_view StringUtil::TrimSpace(std::string_view source)
 	return source.substr(start, end - start + 1);
 }
 
-std::string StringUtil::Replace(std::string_view source, std::string_view oldString, std::string_view newString)
+std::string string_util::Replace(std::string_view source, std::string_view oldString, std::string_view newString)
 {
 	if (oldString.empty())
 	{
@@ -73,7 +73,7 @@ std::string StringUtil::Replace(std::string_view source, std::string_view oldStr
 	}
 
 	std::string result;
-	// ¼ÙÉèÖ»ÓÐÒ»´ÎÌæ»»
+	// ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½Ò»ï¿½ï¿½ï¿½æ»»
 	result.reserve(source.size() - oldString.size() + newString.size());
 
 	while (true)
@@ -91,7 +91,7 @@ std::string StringUtil::Replace(std::string_view source, std::string_view oldStr
 	return result;
 }
 
-bool StringUtil::StartWith(std::string_view source, std::string_view str)
+bool string_util::StartWith(std::string_view source, std::string_view str)
 {
 	if (source.size() < str.size())
 	{
@@ -101,7 +101,7 @@ bool StringUtil::StartWith(std::string_view source, std::string_view str)
 	return strncmp(source.data(), str.data(), str.size()) == 0;
 }
 
-bool StringUtil::EndWith(std::string_view source, std::string_view str)
+bool string_util::EndWith(std::string_view source, std::string_view str)
 {
 	if (source.size() < str.size())
 	{
@@ -111,7 +111,7 @@ bool StringUtil::EndWith(std::string_view source, std::string_view str)
 	return strncmp(source.data() + source.size() - str.size(), str.data(), str.size()) == 0;
 }
 
-bool StringUtil::IsStringEqualIgnoreCase(std::string_view lhs, std::string_view rhs)
+bool string_util::IsStringEqualIgnoreCase(std::string_view lhs, std::string_view rhs)
 {
 	if (lhs.size() != rhs.size())
 	{
@@ -127,7 +127,7 @@ bool StringUtil::IsStringEqualIgnoreCase(std::string_view lhs, std::string_view 
 	return true;
 }
 
-std::string_view StringUtil::GetFileRelativePath(std::string_view workspace, std::string_view filePath)
+std::string_view string_util::GetFileRelativePath(std::string_view workspace, std::string_view filePath)
 {
 	if (workspace.size() >= filePath.size())
 	{
@@ -169,7 +169,7 @@ struct equal_to
 	}
 };
 
-bool StringUtil::FileWildcardMatch(std::string_view sourceFile, std::string_view pattern)
+bool string_util::FileWildcardMatch(std::string_view sourceFile, std::string_view pattern)
 {
 	equal_to eq;
 
@@ -191,7 +191,7 @@ bool StringUtil::FileWildcardMatch(std::string_view sourceFile, std::string_view
 	return match;
 }
 
-// glibc º¯Êý
+// glibc ï¿½ï¿½ï¿½ï¿½
 int __strncasecmp(const char* s1, const char* s2, int n)
 {
 	if (n && s1 != s2)
@@ -207,7 +207,7 @@ int __strncasecmp(const char* s1, const char* s2, int n)
 	return 0;
 }
 
-bool StringUtil::CaseInsensitiveLess::operator()(std::string_view lhs, std::string_view rhs) const
+bool string_util::CaseInsensitiveLess::operator()(std::string_view lhs, std::string_view rhs) const
 {
 	std::size_t llen = lhs.size();
 	std::size_t rlen = rhs.size();

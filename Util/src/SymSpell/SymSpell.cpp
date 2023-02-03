@@ -41,12 +41,12 @@ bool SymSpell::LoadWordDictionary(std::string path)
 
 bool SymSpell::LoadWordDictionaryFromBuffer(std::string_view buffer)
 {
-	auto lines = StringUtil::Split(buffer, "\n");
+	auto lines = string_util::Split(buffer, "\n");
 	try
 	{
 		for (auto& line : lines)
 		{
-			auto tokens = StringUtil::Split(line, " ");
+			auto tokens = string_util::Split(line, " ");
 			if (tokens.empty())
 			{
 				continue;
@@ -79,12 +79,12 @@ bool SymSpell::LoadBuildInDictionary()
 {
 	// std::string_view dictionarySource = BuildInWords;
 	//
-	// auto lines = StringUtil::Split(dictionarySource, "\n");
+	// auto lines = string_util::Split(dictionarySource, "\n");
 	// try
 	// {
 	// 	for (auto& line : lines)
 	// 	{
-	// 		auto tokens = StringUtil::Split(line, " ");
+	// 		auto tokens = string_util::Split(line, " ");
 	// 		if (tokens.size() < 2)
 	// 		{
 	// 			continue;
@@ -114,7 +114,7 @@ bool SymSpell::CreateDictionaryEntry(const std::string& key, int count)
 		return false;
 	}
 
-	// modify: ¿³µôµ¥´Ê½úÉýµÄÅÐ¶Ï
+	// modify: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
 	auto wordsFounded = _words.find(key);
 	if (wordsFounded != _words.end())
 	{
@@ -176,7 +176,7 @@ std::vector<SuggestItem> SymSpell::LookUp(const std::string& input, int maxEditD
 	{
 		// suggestionCount = founded->second;
 		// suggestions.emplace_back(std::string(input), 0, suggestionCount);
-		// Modify: Èç¹ûÊÇÒÑ¾­´æÔÚµÄµ¥´ÊÔò²»¸ø³ö½¨Òé
+		// Modify: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ÚµÄµï¿½ï¿½ï¿½ï¿½ò²»¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		return suggestions;
 	}
 
@@ -372,7 +372,7 @@ bool SymSpell::BuildDeletesWords(const std::string& key)
 	}
 	//create deletes
 	auto edits = EditsPrefix(key);
-	// ¿³µôÎÞÒâÒåµÄÐ´·¨
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½
 	for (auto it = edits.begin(); it != edits.end(); ++it)
 	{
 		int deleteHash = GetStringHash(*it);

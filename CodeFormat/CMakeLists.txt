@@ -15,7 +15,6 @@ target_sources(CodeFormat
 	PUBLIC
 	${CodeFormat_SOURCE_DIR}/src/CodeFormat.cpp
 	${CodeFormat_SOURCE_DIR}/src/LuaFormat.cpp
-	${CodeFormat_SOURCE_DIR}/src/LuaWorkspaceFormat.cpp
 )
 
 target_link_libraries(CodeFormat CodeService Util)

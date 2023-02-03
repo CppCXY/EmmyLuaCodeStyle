@@ -6,7 +6,8 @@
 #include <sstream>
 #include <type_traits>
 
-namespace Util {
+// 加命名空间是为了不和std format混淆
+namespace util {
 
 class FormatReplaceExpress
 {

@@ -1,17 +1,17 @@
-﻿#include "CodeFormatServer/Session/IOSession.h"
+﻿#include "IOSession.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
-#include "CodeFormatServer/Protocol/ProtocolParser.h"
+#include "Protocol/ProtocolParser.h"
 #include <chrono>
 #include <thread>
 #include "Util/format.h"
+#include "LanguageServer.h"
 
 namespace chrono = std::chrono;
 
 IOSession::IOSession()
 	: _protocolBuffer(65535)
 {
-	_service.Initialize();
 }
 
 IOSession::~IOSession()
@@ -27,8 +27,9 @@ IOSession::~IOSession()
 	}
 }
 
-int IOSession::Run(asio::io_context& ioc)
+int IOSession::Run(LanguageServer& server)
 {
+    auto& ioc = server.GetIOContext();
 	//苹果暂未支持 这个jthread
 #ifndef __APPLE__
 	_logicThread = std::make_shared<std::jthread>([&ioc](std::stop_token st)
@@ -42,43 +43,42 @@ int IOSession::Run(asio::io_context& ioc)
 	});
 #else
 	_logicThread = std::make_shared<std::thread>([&ioc, this]()
-		{
-			while (_running)
-			{
-				ioc.run();
-				ioc.reset();
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
-			}
-		});
+    {
+        while (_running)
+        {
+            ioc.run();
+            ioc.reset();
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    });
 #endif
 
 	return 0;
 }
 
-std::string IOSession::Handle(std::shared_ptr<ProtocolParser> parser)
+std::string IOSession::Handle(LanguageServer& server, std::shared_ptr<ProtocolParser> parser)
 {
+#if !defined(_DEBUG)
 	try
+#endif
 	{
+        auto& lspHandle = server.GetLSPHandle();
 		auto params = parser->GetParams();
 
 		if (!params.is_null())
 		{
-			auto start = chrono::system_clock::now();
-			auto result = _service.Dispatch(parser->GetMethod(), params);
-			std::cerr << Util::format("request {}, it cost: {}ms\n", parser->GetMethod(),
-			                    chrono::duration_cast<chrono::milliseconds>(
-				                    chrono::system_clock::now() - start
-			                    ).count());
+			auto result = lspHandle.Dispatch(parser->GetMethod(), params);
 			if (result)
 			{
 				return parser->SerializeProtocol(result);
 			}
 		}
 	}
+#if !defined(_DEBUG)
 	catch (std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-
+#endif
 	return "";
 }

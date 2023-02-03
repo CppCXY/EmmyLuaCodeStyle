@@ -1,10 +1,34 @@
 # Change Log
 
-## 0.17.0
+## 1.0.0
 
-`NEW` 支持配置table的分隔符风格是逗号还是分号还是不处理
+`EmmyLuaCodeStyle`经过一年的更新现在进入正式版
 
-`NEW` 支持通过配置移除或者保留或者新增表的尾部分隔符
+`Refactor` 大部分代码重写, 数据结构重新设计
+
+`Refactor` 大部分选项被重新命名, 新增了一批选项, 移除了一批选项
+
+`Performance` 得益于从头开始重新设计, 格式化性能提高三倍, 在windows上一般的机器上格式化`10w`行代码仅需1到2秒 
+
+## 0.18.0
+
+`FIX` typeformat不会在字符串或者长注释内部做格式化行为
+
+以下由[@obszczymucha](https://github.com/obszczymucha)实现:
+
+`NEW` 支持选项
+* `space_inside_function_call_parentheses`
+* `space_inside_function_param_list_parentheses`
+* `space_inside_square_brackets`
+
+
+## 0.17.2
+
+`NEW` typeformat会智能填补表项之后的逗号
+
+`NEW` 支持选项`table_separator_style` 可选值为`none/comma/semicolon`
+
+`NEW` 支持选项`trailing_table_separator` 可选值为 `keep/never/always/smart`
 
 ## 0.16.1
 
