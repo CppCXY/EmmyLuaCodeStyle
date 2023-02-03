@@ -2,6 +2,10 @@
 
 [English doc](README_EN.md)
 
+## BreakChange
+
+整个项目被重写了, 文档以后再写
+
 ## 项目介绍
 
 该项目是基于C++的lua代码解析\格式化\代码诊断算法库和语言服务实例
@@ -22,9 +26,11 @@
 * plugin[0%]
 
 ## 文档
-* [格式化行为介绍](docs/format_action.md)
-* [如何配置格式化](docs/format_config.md)
-* [代码诊断配置](docs/diagnosis_config.md)
+
+* [格式化行为介绍](docs/old_version_doc/format_action.md)
+* [如何配置格式化](docs/old_version_doc/format_config.md)
+* [代码诊断配置](docs/old_version_doc/diagnosis_config.md)
+
 # Contribute
 
 任何pr或者issue都是欢迎的
