@@ -41,6 +41,9 @@ std::string GetDiagnosisString(DiagnosticType type) {
             return "spell";
         case DiagnosticType::StringQuote:
             return "string-quote";
+        default: {
+            break;
+        }
     }
     return "";
 }
