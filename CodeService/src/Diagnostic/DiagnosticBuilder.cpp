@@ -88,7 +88,7 @@ void DiagnosticBuilder::SpellCheck(const LuaSyntaxTree &t, CodeSpellChecker &spe
 void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (syntaxNode.IsToken(t)) {
         auto textRange = syntaxNode.GetTextRange(t);
-        auto &file = t.GetFile();
+//        auto &file = t.GetFile();
         switch (resolve.GetPrevSpaceStrategy()) {
             case PrevSpaceStrategy::AlignPos: {
 //                auto pos = resolve.GetAlign();
@@ -252,7 +252,7 @@ void DiagnosticBuilder::ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNod
     auto leftOffset = node.GetTextRange(t).EndOffset;
     auto rightOffset = next.GetTextRange(t).StartOffset;
     int diff = static_cast<int>(rightOffset - leftOffset) - 1;
-    if (diff == shouldSpace) {
+    if (diff == static_cast<int>(shouldSpace)) {
         return;
     }
     auto additional = GetAdditionalNote(node, next, t);

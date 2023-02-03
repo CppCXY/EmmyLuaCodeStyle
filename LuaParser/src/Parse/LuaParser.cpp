@@ -1,5 +1,5 @@
 ﻿#include "LuaParser/Parse/LuaParser.h"
-#include "Lexer/LuaDefine.h"
+#include "LuaParser/Lexer/LuaDefine.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "LuaParser/Parse/LuaOperatorType.h"
 #include "Util/format.h"

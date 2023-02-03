@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "LuaParser/Lexer/LuaIdentify.h"
+#include "LuaIdentify.h"
 #include <climits>
 
 const int EOZ = -1;
