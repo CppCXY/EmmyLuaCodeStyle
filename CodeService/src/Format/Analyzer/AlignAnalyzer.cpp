@@ -33,7 +33,7 @@ void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case LuaSyntaxNodeKind::CallExpression: {
-                    if (f.GetStyle().align_call_args != AlignCallArgs::None) {
+                    if (f.GetStyle().align_call_args) {
                         auto exprlist = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
                         AnalyzeExpressionList(f, exprlist, t);
                     }

@@ -72,8 +72,7 @@ space_around_concat_operator = true
 
 # [align]
 
-# none/normal
-align_call_args = none
+align_call_args = false
 
 align_function_params = true
 

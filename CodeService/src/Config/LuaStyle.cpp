@@ -141,13 +141,7 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
 
     BOOL_OPTION(space_around_concat_operator)
 
-    if (configMap.count("align_call_args")) {
-        if (configMap.at("align_call_args") == "none") {
-            align_call_args = AlignCallArgs::None;
-        } else if (configMap.at("align_call_args") == "normal") {
-            align_call_args = AlignCallArgs::Normal;
-        }
-    }
+    BOOL_OPTION(align_call_args)
 
     BOOL_OPTION(align_function_params)
 

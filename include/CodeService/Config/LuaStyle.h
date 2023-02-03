@@ -88,7 +88,7 @@ public:
     bool space_around_concat_operator = true;
 
     // [Align]
-    AlignCallArgs align_call_args = AlignCallArgs::None;
+    bool align_call_args = false;
 
     bool align_function_params = true;
 

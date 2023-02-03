@@ -48,9 +48,10 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case '~': {
                     auto p = syntaxNode.GetParent(t);
                     if (p.IsNode(t) && p.GetSyntaxKind(t) == LuaSyntaxNodeKind::BinaryExpression) {
-                        SpaceAround(syntaxNode, t);
+                        SpaceAround(syntaxNode, t, f.GetStyle().space_around_math_operator ? 1 : 0);
                     } else {
                         SpaceLeft(syntaxNode, t);
+                        SpaceRight(syntaxNode, t, 0);
                     }
                     break;
                 }
@@ -304,26 +305,13 @@ void SpaceAnalyzer::SpaceAround(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::s
 }
 
 void SpaceAnalyzer::SpaceLeft(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space) {
-    auto token = n.GetFirstToken(t);
-
-    _leftSpaces[token.GetIndex()] = space;
+    auto token = n.GetPrevToken(t);
+    _rightSpaces[token.GetIndex()] = space;
 }
 
 void SpaceAnalyzer::SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space) {
     auto token = n.GetLastToken(t);
     _rightSpaces[token.GetIndex()] = space;
-}
-
-std::optional<std::size_t> SpaceAnalyzer::GetLeftSpace(LuaSyntaxNode &n) const {
-    if (_ignoreSpace.count(n.GetIndex())) {
-        return {};
-    }
-
-    auto it = _leftSpaces.find(n.GetIndex());
-    if (it == _leftSpaces.end()) {
-        return {};
-    }
-    return it->second;
 }
 
 std::optional<std::size_t> SpaceAnalyzer::GetRightSpace(LuaSyntaxNode &n) const {
@@ -341,17 +329,8 @@ std::optional<std::size_t> SpaceAnalyzer::GetRightSpace(LuaSyntaxNode &n) const 
 std::size_t
 SpaceAnalyzer::ProcessSpace(const LuaSyntaxTree &t, LuaSyntaxNode &left, LuaSyntaxNode &right) {
     auto rightSpaceOfLeftToken = GetRightSpace(left);
-    auto leftSpaceOfRightToken = GetLeftSpace(right);
-    std::optional<std::size_t> distance;
-    if (!rightSpaceOfLeftToken.has_value()) {
-        distance = leftSpaceOfRightToken;
-    } else if (!leftSpaceOfRightToken.has_value()) {
-        distance = rightSpaceOfLeftToken;
-    } else {
-        distance = leftSpaceOfRightToken;
-    }
-    if (distance.has_value()) {
-        return distance.value();
+    if (rightSpaceOfLeftToken.has_value()) {
+        return rightSpaceOfLeftToken.value();
     }
     if (!right.IsNull(t)) {
         return t.GetStartOffset(right.GetIndex()) - t.GetEndOffset(left.GetIndex()) - 1;

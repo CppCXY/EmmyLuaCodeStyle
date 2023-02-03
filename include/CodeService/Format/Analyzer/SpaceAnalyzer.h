@@ -26,13 +26,12 @@ public:
     void SpaceIgnore(LuaSyntaxNode &n, const LuaSyntaxTree &t);
 
 private:
-    std::optional<std::size_t> GetLeftSpace(LuaSyntaxNode &n) const;
+//    std::optional<std::size_t> GetLeftSpace(LuaSyntaxNode &n) const;
 
     std::optional<std::size_t> GetRightSpace(LuaSyntaxNode &n) const;
 
     std::size_t ProcessSpace(const LuaSyntaxTree &t, LuaSyntaxNode &left, LuaSyntaxNode &right);
 
-    std::unordered_map<std::size_t, std::size_t> _leftSpaces;
     std::unordered_map<std::size_t, std::size_t> _rightSpaces;
     std::unordered_set<std::size_t> _ignoreSpace;
 

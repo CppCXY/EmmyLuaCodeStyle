@@ -20,12 +20,12 @@ enum class CallArgParentheses : int {
     //UnambiguousRemoveStringOnly
 };
 
-enum class AlignCallArgs {
-    None,
-    Normal,
-//    OnlyAfterMoreIndentionStatement,
-//    OnlyNotExistCrossExpression,
-};
+//enum class AlignCallArgs {
+//    None,
+//    Normal,
+////    OnlyAfterMoreIndentionStatement,
+////    OnlyNotExistCrossExpression,
+//};
 
 enum class TableSeparatorStyle {
     None,
