@@ -316,3 +316,111 @@ p("456")
 p { 1231 }
 )", style));
 }
+
+TEST(FormatByStyleOption, detect_end_of_line_no_test_case) {
+}
+
+TEST(FormatByStyleOption, insert_final_newline_no_test_case) {
+}
+
+TEST(FormatByStyleOption, space_around_table_field_list) {
+    LuaStyle style;
+
+    style.space_around_table_field_list = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = { aaa }
+local t2 = {
+}
+local t3 = {}
+)",
+            R"(
+local t = { aaa }
+local t2 = {
+}
+local t3 = {}
+)", style));
+    style.space_around_table_field_list = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = { aaa }
+local t2 = {
+}
+local t3 = {}
+)",
+            R"(
+local t = {aaa}
+local t2 = {
+}
+local t3 = {}
+)", style));
+}
+
+TEST(FormatByStyleOption, space_before_attribute) {
+    LuaStyle style;
+
+    style.space_before_attribute = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t <const> = 123
+local t2 <close> = {}
+)",
+            R"(
+local t <const> = 123
+local t2 <close> = {}
+)", style));
+    style.space_before_attribute = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t <const> = 123
+local t2 <close> = {}
+)",
+            R"(
+local t<const> = 123
+local t2<close> = {}
+)", style));
+}
+
+TEST(FormatByStyleOption, space_before_function_open_parenthesis) {
+    LuaStyle style;
+
+    style.space_before_function_open_parenthesis = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f() end
+)",
+            R"(
+function f ()
+end
+)", style));
+    style.space_before_function_open_parenthesis = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f() end
+)",
+            R"(
+function f()
+end
+)", style));
+}
+
+TEST(FormatByStyleOption, space_before_function_call_open_parenthesis) {
+    LuaStyle style;
+
+    style.space_before_function_call_open_parenthesis = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+print(1, 2, 3)
+)",
+            R"(
+print (1, 2, 3)
+)", style));
+    style.space_before_function_call_open_parenthesis = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+print(1, 2, 3)
+)",
+            R"(
+print(1, 2, 3)
+)", style));
+}

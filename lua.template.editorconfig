@@ -40,11 +40,17 @@ space_before_attribute = true
 
 space_before_function_open_parenthesis = false
 
+space_before_function_call_open_parenthesis = false
+
+space_before_closure_open_parenthesis = true
+
+space_before_function_call_single_arg = true
+
+space_before_open_square_bracket = false
+
 space_inside_function_call_parentheses = false
 
 space_inside_function_param_list_parentheses = false
-
-space_before_open_square_bracket = false
 
 space_inside_square_brackets = false
 

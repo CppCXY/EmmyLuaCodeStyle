@@ -135,8 +135,6 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                             auto rightBrace = syntaxNode.GetChildToken(')', t);
                             SpaceRight(leftBrace, t, 1);
                             SpaceLeft(rightBrace, t, 1);
-                        } else {
-                            SpaceLeft(syntaxNode, t, 0);
                         }
                         if (f.GetStyle().ignore_spaces_inside_function_call) {
                             auto exprList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
@@ -147,8 +145,17 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                                 }
                             }
                         }
+                        if (f.GetStyle().space_before_function_call_open_parenthesis) {
+                            SpaceLeft(leftBrace, t, 1);
+                        } else {
+                            SpaceLeft(leftBrace, t, 0);
+                        }
                     } else {
-                        SpaceLeft(syntaxNode, t, 1);
+                        if (f.GetStyle().space_before_function_call_single_arg) {
+                            SpaceLeft(syntaxNode, t, 1);
+                        } else {
+                            SpaceLeft(syntaxNode, t, 0);
+                        }
                     }
                     break;
                 }
@@ -228,12 +235,19 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                 }
                 case LuaSyntaxNodeKind::FunctionBody: {
                     auto leftBrace = syntaxNode.GetChildToken('(', t);
-                    if (f.GetStyle().space_before_function_open_parenthesis) {
-                        SpaceLeft(leftBrace, t, 1);
+                    if (syntaxNode.GetParent(t).GetSyntaxKind(t) == LuaSyntaxNodeKind::ClosureExpression) {
+                        if (f.GetStyle().space_before_closure_open_parenthesis) {
+                            SpaceLeft(leftBrace, t, 1);
+                        } else {
+                            SpaceLeft(leftBrace, t, 0);
+                        }
                     } else {
-                        SpaceLeft(leftBrace, t, 0);
+                        if (f.GetStyle().space_before_function_open_parenthesis) {
+                            SpaceLeft(leftBrace, t, 1);
+                        } else {
+                            SpaceLeft(leftBrace, t, 0);
+                        }
                     }
-
                     if (f.GetStyle().space_inside_function_param_list_parentheses) {
                         auto next = leftBrace.GetNextToken(t);
                         if (next.GetTokenKind(t) != ')') {

@@ -103,13 +103,9 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
 
     NUMBER_OPTION(continuation_indent)
 
-    if (configMap.count("detect_end_of_line")) {
-        detect_end_of_line = configMap.at("detect_end_of_line") == "true";
-    }
+    BOOL_OPTION(detect_end_of_line)
 
-    if (configMap.count("insert_final_newline")) {
-        insert_final_newline = configMap.at("insert_final_newline") == "true";
-    }
+    BOOL_OPTION(insert_final_newline)
 
     BOOL_OPTION(space_around_table_field_list)
 
@@ -117,11 +113,17 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
 
     BOOL_OPTION(space_before_function_open_parenthesis)
 
+    BOOL_OPTION(space_before_function_call_open_parenthesis)
+
+    BOOL_OPTION(space_before_closure_open_parenthesis)
+
+    BOOL_OPTION(space_before_function_call_single_arg)
+
+    BOOL_OPTION(space_before_open_square_bracket)
+
     BOOL_OPTION(space_inside_function_call_parentheses)
 
     BOOL_OPTION(space_inside_function_param_list_parentheses)
-
-    BOOL_OPTION(space_before_open_square_bracket)
 
     BOOL_OPTION(space_inside_square_brackets)
 

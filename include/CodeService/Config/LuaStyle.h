@@ -57,11 +57,17 @@ public:
 
     bool space_before_function_open_parenthesis = false;
 
+    bool space_before_function_call_open_parenthesis = false;
+
+    bool space_before_closure_open_parenthesis = false;
+
+    bool space_before_function_call_single_arg = true;
+
+    bool space_before_open_square_bracket = false;
+
     bool space_inside_function_call_parentheses = false;
 
     bool space_inside_function_param_list_parentheses = false;
-
-    bool space_before_open_square_bracket = false;
 
     bool space_inside_square_brackets = false;
 
