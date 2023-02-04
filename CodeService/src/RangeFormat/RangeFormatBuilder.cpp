@@ -2,7 +2,7 @@
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 
 RangeFormatBuilder::RangeFormatBuilder(LuaStyle &style, FormatRange &range)
-        : FormatBuilder(style), _range(range), _validRange(false) {
+        : FormatBuilder(style), _validRange(false), _range(range) {
 
 }
 

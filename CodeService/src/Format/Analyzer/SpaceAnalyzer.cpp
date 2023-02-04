@@ -314,23 +314,23 @@ void SpaceAnalyzer::SpaceRight(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::si
     _rightSpaces[token.GetIndex()] = space;
 }
 
-std::optional<std::size_t> SpaceAnalyzer::GetRightSpace(LuaSyntaxNode &n) const {
+SpaceAnalyzer::OptionalInt SpaceAnalyzer::GetRightSpace(LuaSyntaxNode &n) const {
     if (_ignoreSpace.count(n.GetIndex())) {
-        return {};
+        return OptionalInt();
     }
 
     auto it = _rightSpaces.find(n.GetIndex());
     if (it == _rightSpaces.end()) {
-        return {};
+        return OptionalInt();
     }
-    return it->second;
+    return OptionalInt(it->second);
 }
 
 std::size_t
 SpaceAnalyzer::ProcessSpace(const LuaSyntaxTree &t, LuaSyntaxNode &left, LuaSyntaxNode &right) {
     auto rightSpaceOfLeftToken = GetRightSpace(left);
-    if (rightSpaceOfLeftToken.has_value()) {
-        return rightSpaceOfLeftToken.value();
+    if (rightSpaceOfLeftToken.HasValue) {
+        return rightSpaceOfLeftToken.Value;
     }
     if (!right.IsNull(t)) {
         return t.GetStartOffset(right.GetIndex()) - t.GetEndOffset(left.GetIndex()) - 1;
