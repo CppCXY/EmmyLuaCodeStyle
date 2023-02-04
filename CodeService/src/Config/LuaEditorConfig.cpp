@@ -6,7 +6,6 @@
 #include <regex>
 
 #include "Util/StringUtil.h"
-#include "Util/Url.h"
 
 std::shared_ptr<LuaEditorConfig> LuaEditorConfig::LoadFromFile(const std::string &path) {
     std::fstream fin(path, std::ios::in);
@@ -56,8 +55,7 @@ void LuaEditorConfig::Parse() {
     }
 }
 
-LuaStyle &LuaEditorConfig::Generate(std::string_view fileUri) {
-    auto filePath = url::UrlToFilePath(fileUri);
+LuaStyle &LuaEditorConfig::Generate(std::string_view filePath) {
 
     std::vector<std::size_t> patternSection;
     for (std::size_t i = 0; i != _sections.size(); i++) {

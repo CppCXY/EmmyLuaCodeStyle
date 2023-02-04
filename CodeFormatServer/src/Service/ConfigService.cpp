@@ -4,6 +4,7 @@
 #include "CodeService/Config/LanguageTranslator.h"
 #include "LanguageServer.h"
 #include "DiagnosticService.h"
+#include "Util/Url.h"
 
 ConfigService::ConfigService(LanguageServer *owner)
         : Service(owner) {
@@ -23,7 +24,8 @@ LuaStyle &ConfigService::GetLuaStyle(std::string_view fileUri) {
     }
 
     if (editorConfig) {
-        return editorConfig->Generate(fileUri);
+        auto filePath = url::UrlToFilePath(fileUri);
+        return editorConfig->Generate(filePath);
     }
     return _defaultStyle;
 }
