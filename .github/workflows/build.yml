@@ -33,7 +33,7 @@ jobs:
       run: | 
         mkdir build
         cd build
-        cmake .. -DCMAKE_USER_MAKE_RULES_OVERRIDE="${{ github.workspace }}/cmake/flags_override.cmake"
+        cmake .. -DCMAKE_USER_MAKE_RULES_OVERRIDE="${{ github.workspace }}/cmake/flags_override.cmake" -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF
         cmake --build . --config Release
         ctest -V -C Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
@@ -42,7 +42,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake ..
+        cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF
         cmake --build . --config Release
         ctest -V -C Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
@@ -52,9 +52,9 @@ jobs:
         mkdir build
         cd build
         if [[ "${{ matrix.platform }}" = darwin-arm64 ]]; then
-          cmake .. -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+          cmake .. -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF
         else
-          cmake ..
+          cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF
         fi
         cmake --build . --config Release
         ctest -V -C Release
