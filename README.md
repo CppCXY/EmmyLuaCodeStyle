@@ -2,19 +2,16 @@
 
 [English doc](README_EN.md)
 
-## BreakChange
-
-整个项目被重写了, 文档以后再写
-
 ## 项目介绍
 
-该项目是基于C++的lua代码解析\格式化\代码诊断算法库和语言服务实例
+该项目是基于C++实现的lua代码解析\格式化\代码诊断算法库和语言服务实例
 
 该项目主要追求的是合理的格式化，多样的代码风格诊断
 
 该项目除了提供语言服务实例，也提供独立的命令行工具CodeFormat，他能用于批量的代码格式化和代码风格检查。
 ## Feature
 
+* 支持lua5.1, lua5.2, lua5.3, lua5.4, luajit
 * 文档格式化
 * 范围格式化
 * 代码格式检查
@@ -27,7 +24,7 @@
 
 ## 文档
 
-* [格式化行为介绍](docs/old_version_doc/format_action.md)
+* [格式化行为介绍](docs/format_action.md)
 * [如何配置格式化](docs/old_version_doc/format_config.md)
 * [代码诊断配置](docs/old_version_doc/diagnosis_config.md)
 
