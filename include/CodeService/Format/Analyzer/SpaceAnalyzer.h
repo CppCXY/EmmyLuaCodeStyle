@@ -1,6 +1,5 @@
 #pragma once
 
-#include <optional>
 #include <unordered_set>
 #include <unordered_map>
 #include "CodeService/Format/Analyzer/FormatAnalyzer.h"
@@ -8,6 +7,16 @@
 class SpaceAnalyzer : public FormatAnalyzer {
 public:
     DECLARE_FORMAT_ANALYZER(SpaceAnalyzer)
+
+    // workaround for mac 10.13
+    struct OptionalInt {
+        OptionalInt() : HasValue(false), Value(0) {}
+
+        explicit OptionalInt(std::size_t value) : HasValue(true), Value(value) {}
+
+        bool HasValue;
+        std::size_t Value;
+    };
 
     SpaceAnalyzer();
 
@@ -26,9 +35,7 @@ public:
     void SpaceIgnore(LuaSyntaxNode &n, const LuaSyntaxTree &t);
 
 private:
-//    std::optional<std::size_t> GetLeftSpace(LuaSyntaxNode &n) const;
-
-    std::optional<std::size_t> GetRightSpace(LuaSyntaxNode &n) const;
+    OptionalInt GetRightSpace(LuaSyntaxNode &n) const;
 
     std::size_t ProcessSpace(const LuaSyntaxTree &t, LuaSyntaxNode &left, LuaSyntaxNode &right);
 

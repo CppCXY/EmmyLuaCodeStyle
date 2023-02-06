@@ -13,6 +13,7 @@
 #include "LuaParser/Parse/LuaParser.h"
 #include "CodeService/Diagnostic/DiagnosticBuilder.h"
 #include "Util/FileFinder.h"
+#include "Util/Url.h"
 
 LuaFormat::LuaFormat() {
     _diagnosticStyle.name_style_check = false;

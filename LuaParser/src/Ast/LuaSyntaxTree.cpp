@@ -64,11 +64,12 @@ void LuaSyntaxTree::BuildTree(LuaParser &p) {
 
     FinishNode(p);
 
-    _syntaxNodes.reserve(_nodeOrTokens.size() - 1);
-    for (auto i = 0; i != _nodeOrTokens.size() - 1; i++) {
-        _syntaxNodes.emplace_back(i + 1);
+    if (!_nodeOrTokens.empty()) {
+        _syntaxNodes.reserve(_nodeOrTokens.size() - 1);
+        for (std::size_t i = 0; i != _nodeOrTokens.size() - 1; i++) {
+            _syntaxNodes.emplace_back(i + 1);
+        }
     }
-
 }
 
 void LuaSyntaxTree::StartNode(LuaSyntaxNodeKind kind, LuaParser &p) {
@@ -368,8 +369,8 @@ std::size_t LuaSyntaxTree::GetNextToken(std::size_t index) const {
         }
     }
 
-    if(tokenNodeIndex != 0) {
-        auto& token = _nodeOrTokens[tokenNodeIndex];
+    if (tokenNodeIndex != 0) {
+        auto &token = _nodeOrTokens[tokenNodeIndex];
         if (token.Data.TokenIndex + 1 < _tokens.size()) {
             return _tokens[token.Data.TokenIndex + 1].NodeIndex;
         }
