@@ -13,7 +13,6 @@ std::shared_ptr<LuaEditorConfig> LuaEditorConfig::LoadFromFile(const std::string
         std::stringstream s;
         s << fin.rdbuf();
         auto editorConfig = std::make_shared<LuaEditorConfig>(s.str());
-        editorConfig->Parse();
         return editorConfig;
     }
 

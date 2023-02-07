@@ -73,7 +73,7 @@ std::string string_util::Replace(std::string_view source, std::string_view oldSt
 	}
 
 	std::string result;
-	// ����ֻ��һ���滻
+
 	result.reserve(source.size() - oldString.size() + newString.size());
 
 	while (true)
@@ -191,7 +191,7 @@ bool string_util::FileWildcardMatch(std::string_view sourceFile, std::string_vie
 	return match;
 }
 
-// glibc ����
+// glibc
 int __strncasecmp(const char* s1, const char* s2, int n)
 {
 	if (n && s1 != s2)
