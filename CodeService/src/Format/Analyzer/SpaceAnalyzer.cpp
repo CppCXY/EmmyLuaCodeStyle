@@ -146,10 +146,17 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                                 }
                             }
                         }
-                        if (f.GetStyle().space_before_function_call_open_parenthesis) {
-                            SpaceLeft(leftBrace, t, 1);
+
+                        auto leftToken = leftBrace.GetPrevToken(t);
+                        if (leftToken.GetTokenKind(t) != TK_STRING
+                            && leftToken.GetTokenKind(t) != '}') {
+                            if (f.GetStyle().space_before_function_call_open_parenthesis) {
+                                SpaceLeft(leftBrace, t, 1);
+                            } else {
+                                SpaceLeft(leftBrace, t, 0);
+                            }
                         } else {
-                            SpaceLeft(leftBrace, t, 0);
+                            SpaceLeft(leftBrace, t, 1);
                         }
                     } else {
                         if (f.GetStyle().space_before_function_call_single_arg) {
