@@ -25,8 +25,7 @@
 ## 文档
 
 * [格式化行为介绍](docs/format_action.md)
-* [如何配置格式化](docs/old_version_doc/format_config.md)
-* [代码诊断配置](docs/old_version_doc/diagnosis_config.md)
+* [如何配置格式化](docs/format_config.md)
 
 # Contribute
 

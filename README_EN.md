@@ -19,17 +19,12 @@ In addition to providing language service examples, the project also provides an
 * Can be used as a lua library/cli tool/C++ parsing lua library/language server
 
 ## RoadMap
-* reimplement range formatting[0%]
-* reimplement type formatting[0%]
 * plugin[0%]
 
 ## Document
-* [Usage](docs/usage_EN.md)
-* [Introduction to formatting behavior](docs/old_version_doc/format_action_EN.md)
-* [How to configure formatting](docs/old_version_doc/format_config_EN.md)
-* [Code diagnosis configuration](docs/old_version_doc/diagnosis_config_EN.md)
-* [Disable format](docs/old_version_doc/disable_format_EN.md)
-* [auto import configuration](docs/old_version_doc/auto_import_config_EN.md)
+
+* [Introduction to formatting behavior](docs/format_action_EN.md)
+* [How to configure formatting](docs/format_config_EN.md)
 ## Contribute
 Any pr or issue are welcome 
 
@@ -53,6 +48,9 @@ cmake --build .
 
 **Contributors**
 
+[**@obszczymucha**](https://github.com/obszczymucha)
+
+[**@Rainer Poisel**](https://github.com/rpoisel)
 
 ## License
 
