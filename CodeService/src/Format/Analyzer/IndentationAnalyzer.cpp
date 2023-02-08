@@ -108,7 +108,7 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                             ));
                         } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::CallExpression) {
                             auto prevSibling = expr.GetPrevSibling(t);
-                            if(prevSibling.GetSyntaxKind(t) != LuaSyntaxNodeKind::NameExpression) {
+                            if (prevSibling.GetSyntaxKind(t) != LuaSyntaxNodeKind::NameExpression) {
                                 Indenter(expr, t, IndentData(
                                         IndentType::WhenPrevIndent,
                                         f.GetStyle().continuation_indent
@@ -147,7 +147,13 @@ void IndentationAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprLis
             || syntaxKind == LuaSyntaxNodeKind::StringLiteralExpression) {
             return;
         }
-//        if()
+        if (syntaxKind == LuaSyntaxNodeKind::SuffixedExpression) {
+            auto callExpr = expr.GetChildSyntaxNode(LuaSyntaxNodeKind::CallExpression, t);
+            if (callExpr.IsNode(t)
+                && (callExpr.GetPrevToken(t).GetStartLine(t) == expr.GetPrevToken(t).GetStartLine(t))) {
+                return;
+            }
+        }
     }
     Indenter(exprList, t, IndentData(
             IndentType::Standard,
