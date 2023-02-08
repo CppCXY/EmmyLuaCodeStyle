@@ -19,7 +19,7 @@ target_sources(CodeService
         ${CodeService_SOURCE_DIR}/src/Config/LuaEditorConfig.cpp
         ${CodeService_SOURCE_DIR}/src/Config/LuaDiagnosticStyle.cpp
         ${CodeService_SOURCE_DIR}/src/Config/LanguageTranslator.cpp
-        ${CodeService_SOURCE_DIR}/src/Config/LanguageTranslator.cpp
+        ${CodeService_SOURCE_DIR}/src/Config/EditorconfigPattern.cpp
 
         # format
         ${CodeService_SOURCE_DIR}/src/Format/FormatBuilder.cpp
@@ -40,10 +40,10 @@ target_sources(CodeService
         ${CodeService_SOURCE_DIR}/src/TypeFormat/LuaTypeFormatOptions.cpp
         # diagnostic
         ${CodeService_SOURCE_DIR}/src/Diagnostic/DiagnosticBuilder.cpp
-#        # diagnostic/nameStyle
+        # diagnostic/nameStyle
         ${CodeService_SOURCE_DIR}/src/Diagnostic/NameStyle/NameStyleChecker.cpp
         ${CodeService_SOURCE_DIR}/src/Diagnostic/NameStyle/NameStyleRuleMatcher.cpp
-#        # diagnostic/spell
+        # diagnostic/spell
         ${CodeService_SOURCE_DIR}/src/Diagnostic/Spell/CodeSpellChecker.cpp
         ${CodeService_SOURCE_DIR}/src/Diagnostic/Spell/IdentifyParser.cpp
         ${CodeService_SOURCE_DIR}/src/Diagnostic/Spell/TextParser.cpp

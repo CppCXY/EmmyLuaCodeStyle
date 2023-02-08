@@ -25,6 +25,8 @@ public:
     std::string_view GetSaveText() const;
 
     void ResetBuffer();
+
+    bool IsEof() const;
 private:
     std::string_view _text;
 
@@ -32,6 +34,6 @@ private:
     std::size_t _buffStart;
     std::size_t _buffIndex;
 
-    bool _hasEoz;
+    bool _isEof;
     std::size_t _currentIndex;
 };

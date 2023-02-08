@@ -87,3 +87,10 @@ LuaParser TestHelper::GetParser(std::string input) {
     return std::move(p);
 }
 
+bool TestHelper::TestPattern(std::string_view pattern, std::string_view path) {
+    EditorconfigPattern p;
+    p.Compile(pattern);
+
+    return p.Match(path);
+}
+

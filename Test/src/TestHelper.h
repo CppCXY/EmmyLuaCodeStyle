@@ -29,6 +29,8 @@ public:
     static void
     CollectLuaFile(std::filesystem::path directoryPath, std::vector<std::string> &paths, std::filesystem::path &root);
 
+    static bool TestPattern(std::string_view pattern, std::string_view path);
+
     static std::string ScriptBase;
 
     static LuaStyle DefaultStyle;

@@ -61,11 +61,11 @@ LuaStyle &LuaEditorConfig::Generate(std::string_view filePath) {
         auto &pattern = _sections[i].Pattern;
 
         // [*] [*.lua]
-        if (pattern == "*" || pattern == "*.lua") {
+        if (pattern.GetPattern() == "*" || pattern.GetPattern() == "*.lua") {
             patternSection.push_back(i);
         }
             // [{test.lua,lib.lua}]
-        else if (string_util::FileWildcardMatch(filePath, pattern)) {
+        else if (pattern.Match(filePath)) {
             patternSection.push_back(i);
         }
     }

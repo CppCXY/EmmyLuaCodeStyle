@@ -6,7 +6,7 @@ TextReader::TextReader(std::string_view text)
         : _text(text),
           _hasSaveText(false),
           _buffStart(0), _buffIndex(0),
-          _hasEoz(false),
+          _isEof(false),
           _currentIndex(0) {
 }
 
@@ -23,7 +23,7 @@ void TextReader::SaveAndNext() {
     Save();
     int ch = NextChar();
     if (ch == EOZ) {
-        _hasEoz = true;
+        _isEof = true;
     }
 }
 
@@ -36,7 +36,7 @@ void TextReader::Save() {
 }
 
 int TextReader::GetCurrentChar() {
-    if (!_hasEoz && _currentIndex < _text.size()) {
+    if (!_isEof && _currentIndex < _text.size()) {
         unsigned char ch = _text[_currentIndex];
         return ch;
     }
@@ -82,4 +82,8 @@ std::string_view TextReader::GetSaveText() const {
         return _text.substr(_buffStart, _buffIndex - _buffStart + 1);
     }
     return _text.substr(_buffStart, 0);
+}
+
+bool TextReader::IsEof() const {
+    return _isEof;
 }

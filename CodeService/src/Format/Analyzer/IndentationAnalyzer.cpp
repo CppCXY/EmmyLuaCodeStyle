@@ -147,6 +147,7 @@ void IndentationAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprLis
             || syntaxKind == LuaSyntaxNodeKind::StringLiteralExpression) {
             return;
         }
+//        if()
     }
     Indenter(exprList, t, IndentData(
             IndentType::Standard,
