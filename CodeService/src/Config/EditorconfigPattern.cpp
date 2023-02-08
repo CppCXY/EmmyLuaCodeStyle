@@ -45,6 +45,9 @@ void EditorconfigPattern::Compile(std::string_view pattern) {
                 }
                 break;
             }
+            default: {
+                break;
+            }
         }
     }
 }
