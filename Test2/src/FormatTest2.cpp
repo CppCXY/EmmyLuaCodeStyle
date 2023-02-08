@@ -7,8 +7,10 @@
 
 int main() {
     std::string buffer = R"(
-local t = a.b.c.setmetatable(f, function ()
-end)
+local t = switch(a)
+    :case(function()
+    end)
+
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));

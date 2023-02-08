@@ -148,9 +148,13 @@ void IndentationAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprLis
             return;
         }
         if (syntaxKind == LuaSyntaxNodeKind::SuffixedExpression) {
-            auto callExpr = expr.GetChildSyntaxNode(LuaSyntaxNodeKind::CallExpression, t);
-            if (callExpr.IsNode(t)
-                && (callExpr.GetPrevToken(t).GetStartLine(t) == expr.GetPrevToken(t).GetStartLine(t))) {
+            auto subExprs = expr.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
+            auto symbolLine = expr.GetPrevToken(t).GetEndLine(t);
+            bool sameLine = true;
+            for (auto subExpr: subExprs) {
+                sameLine = sameLine && subExpr.GetStartLine(t) == symbolLine;
+            }
+            if (sameLine) {
                 return;
             }
         }
