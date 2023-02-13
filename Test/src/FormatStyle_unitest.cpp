@@ -175,18 +175,12 @@ if a
     or c then
 
 end
-table.insert(t, {
-    aaa = 123
-})
 )",
             R"(
 if a
         or c then
 
 end
-table.insert(t, {
-        aaa = 123
-})
 )", style));
 }
 

@@ -61,7 +61,8 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                             for (auto expr: exprList.GetChildren(t)) {
                                 Indenter(expr, t, IndentData(
                                         IndentType::WhenLineBreak,
-                                        f.GetStyle().continuation_indent
+                                        f.GetStyle().indent_style == IndentStyle::Space ?
+                                        f.GetStyle().indent_size : f.GetStyle().tab_width
                                 ));
                             }
                         }
@@ -123,7 +124,8 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     for (auto field: tableFieldList.GetChildren(t)) {
                         Indenter(field, t, IndentData(
                                 IndentType::WhenLineBreak,
-                                f.GetStyle().continuation_indent
+                                f.GetStyle().indent_style == IndentStyle::Space ?
+                                f.GetStyle().indent_size : f.GetStyle().tab_width
                         ));
                     }
 
