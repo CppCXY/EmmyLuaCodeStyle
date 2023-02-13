@@ -20,3 +20,21 @@ struct LuaDiagnosticInfo {
     std::string Message;
     std::string Data;
 };
+
+enum class ResultType {
+    Ok,
+    Err
+};
+
+template<class T>
+class Result {
+public:
+    Result(T &&d)
+            : Data(d) {}
+
+    Result(ResultType type)
+            : Type(type) {}
+
+    ResultType Type;
+    T Data;
+};

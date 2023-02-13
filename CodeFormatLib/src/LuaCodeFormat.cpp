@@ -59,13 +59,17 @@ void LuaCodeFormat::LoadSpellDictionaryFromBuffer(const std::string &buffer) {
     _spellChecker.LoadDictionaryFromBuffer(buffer);
 }
 
-std::string LuaCodeFormat::Reformat(const std::string &uri, std::string &&text, ConfigMap &configMap) {
+Result<std::string> LuaCodeFormat::Reformat(const std::string &uri, std::string &&text, ConfigMap &configMap) {
     auto file = std::make_shared<LuaFile>(std::move(text));
     LuaLexer luaLexer(file);
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
     p.Parse();
+
+    if (p.HasError()) {
+        return ResultType::Err;
+    }
 
     LuaSyntaxTree t;
     t.BuildTree(p);
@@ -78,15 +82,19 @@ std::string LuaCodeFormat::Reformat(const std::string &uri, std::string &&text, 
     return f.GetFormatResult(t);
 }
 
-std::string LuaCodeFormat::RangeFormat(const std::string &uri, FormatRange &range,
-                                       std::string &&text,
-                                       ConfigMap &configMap) {
+Result<std::string> LuaCodeFormat::RangeFormat(const std::string &uri, FormatRange &range,
+                                               std::string &&text,
+                                               ConfigMap &configMap) {
     auto file = std::make_shared<LuaFile>(std::move(text));
     LuaLexer luaLexer(file);
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
     p.Parse();
+
+    if (p.HasError()) {
+        return ResultType::Err;
+    }
 
     LuaSyntaxTree t;
     t.BuildTree(p);
@@ -101,7 +109,7 @@ std::string LuaCodeFormat::RangeFormat(const std::string &uri, FormatRange &rang
     return formattedText;
 }
 
-std::vector<LuaTypeFormat::Result>
+Result<std::vector<LuaTypeFormat::Result>>
 LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t character, std::string &&text,
                           ConfigMap &configMap, ConfigMap &stringTypeOptions) {
     auto file = std::make_shared<LuaFile>(std::move(text));
@@ -110,6 +118,10 @@ LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t 
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
     p.Parse();
+
+    if (p.HasError()) {
+        return ResultType::Err;
+    }
 
     LuaSyntaxTree t;
     t.BuildTree(p);
@@ -124,13 +136,17 @@ LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t 
     return tf.GetResult();
 }
 
-std::vector<LuaDiagnosticInfo> LuaCodeFormat::Diagnostic(const std::string &uri, std::string &&text) {
+Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::Diagnostic(const std::string &uri, std::string &&text) {
     auto file = std::make_shared<LuaFile>(std::move(text));
     LuaLexer luaLexer(file);
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
     p.Parse();
+
+    if (p.HasError()) {
+        return ResultType::Err;
+    }
 
     LuaSyntaxTree t;
     t.BuildTree(p);
@@ -142,14 +158,18 @@ std::vector<LuaDiagnosticInfo> LuaCodeFormat::Diagnostic(const std::string &uri,
     return MakeDiagnosticInfo(diagnosticBuilder.GetDiagnosticResults(t), file);
 }
 
-std::vector<LuaDiagnosticInfo> LuaCodeFormat::SpellCheck(const std::string &uri, std::string &&text,
-                                                         const CodeSpellChecker::CustomDictionary &tempDict) {
+Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::SpellCheck(const std::string &uri, std::string &&text,
+                                                                 const CodeSpellChecker::CustomDictionary &tempDict) {
     auto file = std::make_shared<LuaFile>(std::move(text));
     LuaLexer luaLexer(file);
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
     p.Parse();
+
+    if (p.HasError()) {
+        return ResultType::Err;
+    }
 
     LuaSyntaxTree t;
     t.BuildTree(p);
@@ -163,13 +183,17 @@ std::vector<LuaDiagnosticInfo> LuaCodeFormat::SpellCheck(const std::string &uri,
     return MakeDiagnosticInfo(diagnosticBuilder.GetDiagnosticResults(t), file);
 }
 
-std::vector<LuaDiagnosticInfo> LuaCodeFormat::NameStyleCheck(const std::string &uri, std::string &&text) {
+Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::NameStyleCheck(const std::string &uri, std::string &&text) {
     auto file = std::make_shared<LuaFile>(std::move(text));
     LuaLexer luaLexer(file);
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
     p.Parse();
+
+    if (p.HasError()) {
+        return ResultType::Err;
+    }
 
     LuaSyntaxTree t;
     t.BuildTree(p);
@@ -247,8 +271,8 @@ void LuaCodeFormat::CalculateTempStyle(LuaStyle &style, ConfigMap &configMap) {
 
     if (configMap.count("insertSpaces")) {
         style.indent_style = configMap.at("insertSpaces") == "true"
-                                   ? IndentStyle::Space
-                                   : IndentStyle::Tab;
+                             ? IndentStyle::Space
+                             : IndentStyle::Tab;
     }
     if (configMap.count("tabSize")) {
         if (style.indent_style == IndentStyle::Tab) {

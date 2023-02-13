@@ -33,20 +33,20 @@ public:
 
     void LoadSpellDictionaryFromBuffer(const std::string &buffer);
 
-    std::string Reformat(const std::string &uri, std::string &&text, ConfigMap &configMap);
+    Result<std::string> Reformat(const std::string &uri, std::string &&text, ConfigMap &configMap);
 
-    std::string RangeFormat(const std::string &uri, FormatRange &range, std::string &&text, ConfigMap &configMap);
+    Result<std::string> RangeFormat(const std::string &uri, FormatRange &range, std::string &&text, ConfigMap &configMap);
 
-    std::vector<LuaTypeFormat::Result>
+    Result<std::vector<LuaTypeFormat::Result>>
     TypeFormat(const std::string &uri, std::size_t line, std::size_t character, std::string &&text,
                ConfigMap &configMap, ConfigMap &stringTypeOptions);
 
-    std::vector<LuaDiagnosticInfo> Diagnostic(const std::string &uri, std::string &&text);
+    Result<std::vector<LuaDiagnosticInfo>> Diagnostic(const std::string &uri, std::string &&text);
 
-    std::vector<LuaDiagnosticInfo> SpellCheck(const std::string &uri, std::string &&text,
+    Result<std::vector<LuaDiagnosticInfo>> SpellCheck(const std::string &uri, std::string &&text,
                                           const CodeSpellChecker::CustomDictionary &tempDict);
 
-    std::vector<LuaDiagnosticInfo> NameStyleCheck(const std::string &uri, std::string &&text);
+    Result<std::vector<LuaDiagnosticInfo>> NameStyleCheck(const std::string &uri, std::string &&text);
 
     std::vector<SuggestItem> SpellCorrect(const std::string &word);
 

@@ -75,11 +75,12 @@ int format(lua_State *L) {
                 }
             }
 
-            auto formattedText = LuaCodeFormat::GetInstance().Reformat(filename, std::move(text), configMap);
-            if (formattedText.empty()) {
+            auto formattedTextResult = LuaCodeFormat::GetInstance().Reformat(filename, std::move(text), configMap);
+            if (formattedTextResult.Type == ResultType::Err) {
                 lua_pushboolean(L, false);
                 return 1;
             }
+            auto &formattedText = formattedTextResult.Data;
             lua_pushboolean(L, true);
             lua_pushlstring(L, formattedText.c_str(), formattedText.size());
             return 2;
@@ -138,11 +139,13 @@ int range_format(lua_State *L) {
             }
 
             FormatRange range(static_cast<std::size_t>(startLine), static_cast<std::size_t>(endLine));
-            auto formattedText = LuaCodeFormat::GetInstance().RangeFormat(filename, range, std::move(text), configMap);
-            if (formattedText.empty()) {
+            auto formattedTextResult = LuaCodeFormat::GetInstance().RangeFormat(filename, range, std::move(text),
+                                                                                configMap);
+            if (formattedTextResult.Type == ResultType::Err) {
                 lua_pushboolean(L, false);
                 return 1;
             }
+            auto &formattedText = formattedTextResult.Data;
             lua_pushboolean(L, true);
             lua_pushlstring(L, formattedText.c_str(), formattedText.size());
             lua_pushinteger(L, range.StartLine);
@@ -217,13 +220,14 @@ int type_format(lua_State *L) {
                                 static_cast<std::size_t>(line), static_cast<std::size_t>(character),
                                 std::move(text), configMap, stringTypeOptions);
 
-            if (typeFormatResult.empty()) {
+            if (typeFormatResult.Type == ResultType::Err) {
                 lua_pushboolean(L, false);
                 return 1;
             } else {
                 lua_pushboolean(L, true);
-                if (!typeFormatResult.empty()) {
-                    auto &result = typeFormatResult.front();
+                auto &typeFormats = typeFormatResult.Data;
+                if (!typeFormats.empty()) {
+                    auto &result = typeFormats.front();
                     // 结果
                     lua_newtable(L);
 
@@ -393,14 +397,15 @@ int diagnose_file(lua_State *L) {
         try {
             std::string filename = lua_tostring(L, 1);
             std::string text = lua_tostring(L, 2);
-            auto results = LuaCodeFormat::GetInstance().Diagnostic(filename, std::move(text));
-            if (!results.empty()) {
+            auto diagnosticResult = LuaCodeFormat::GetInstance().Diagnostic(filename, std::move(text));
+            if (diagnosticResult.Type == ResultType::Err) {
                 lua_pushboolean(L, false);
                 return 1;
             }
 
+            auto& diagnostics = diagnosticResult.Data;
             lua_pushboolean(L, true);
-            PushDiagnosticToLua(L, results);
+            PushDiagnosticToLua(L, diagnostics);
 
             return 2;
         }
@@ -551,10 +556,15 @@ int spell_analysis(lua_State *L) {
                 }
             }
 
-            auto results = LuaCodeFormat::GetInstance().SpellCheck(filename, std::move(text), tempDict);
+            auto spellResult = LuaCodeFormat::GetInstance().SpellCheck(filename, std::move(text), tempDict);
+            if(spellResult.Type == ResultType::Err){
+                lua_pushboolean(L, false);
+                return 1;
+            }
 
+            auto& diagnostics = spellResult.Data;
             lua_pushboolean(L, true);
-            PushDiagnosticToLua(L, results);
+            PushDiagnosticToLua(L, diagnostics);
 
             return 2;
         }
@@ -581,10 +591,15 @@ int name_style_analysis(lua_State *L) {
             std::string filename = lua_tostring(L, 1);
             std::string text = lua_tostring(L, 2);
 
-            auto results = LuaCodeFormat::GetInstance().NameStyleCheck(filename, std::move(text));
+            auto nameStyleResult = LuaCodeFormat::GetInstance().NameStyleCheck(filename, std::move(text));
+            if(nameStyleResult.Type == ResultType::Err){
+                lua_pushboolean(L, false);
+                return 1;
+            }
 
+            auto& diagnostics = nameStyleResult.Data;
             lua_pushboolean(L, true);
-            PushDiagnosticToLua(L, results);
+            PushDiagnosticToLua(L, diagnostics);
 
             return 2;
         }
