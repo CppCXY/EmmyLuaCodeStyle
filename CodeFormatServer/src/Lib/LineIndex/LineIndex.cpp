@@ -6,6 +6,7 @@ LineIndex::LineIndex() {
 }
 
 void LineIndex::Parse(std::string &text) {
+    _newLines.clear();
     _newLines.resize(1, LineOffset(0));
     for (std::size_t i = 0; i < text.size();) {
         char c = text[i];

@@ -8,7 +8,7 @@ add_dependencies(CodeFormatServer CodeService)
 
 target_include_directories(CodeFormatServer PUBLIC
         ${LuaCodeStyle_SOURCE_DIR}/include
-        ${LuaCodeStyle_SOURCE_DIR}/3rd/asio-1.20.0/include
+        ${LuaCodeStyle_SOURCE_DIR}/3rd/asio-1.24.0/include
         ${LuaCodeStyle_SOURCE_DIR}/3rd/nlohmann_json/include
         ${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.3/include
         src
