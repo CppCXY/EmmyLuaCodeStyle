@@ -207,7 +207,7 @@ LuaStyle LuaFormat::GetStyle(std::string_view path) {
     std::size_t matchProcess = 0;
     for (auto &config: _configs) {
         if (string_util::StartWith(path, config.Workspace)) {
-            if (config.Workspace.size() > matchProcess) {
+            if (config.Workspace.size() >= matchProcess) {
                 matchProcess = config.Workspace.size();
                 editorConfig = config.Editorconfig;
             }
