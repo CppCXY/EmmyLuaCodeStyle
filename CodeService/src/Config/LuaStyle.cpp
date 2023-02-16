@@ -117,7 +117,19 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
 
     BOOL_OPTION(space_before_closure_open_parenthesis)
 
-    BOOL_OPTION(space_before_function_call_single_arg)
+    if (configMap.count("space_before_function_call_single_arg")) {
+        auto & value = configMap.at("space_before_function_call_single_arg");
+        if (value == "true" || value == "always") {
+            space_before_function_call_single_arg = FunctionSingleArgSpace::Always;
+        } else if (value == "only_string") {
+            space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyString;
+        } else if (value == "only_table") {
+            space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyTable;
+        } else if (value == "false" || value == "none") {
+            space_before_function_call_single_arg = FunctionSingleArgSpace::None;
+        }
+    }
+
 
     BOOL_OPTION(space_before_open_square_bracket)
 

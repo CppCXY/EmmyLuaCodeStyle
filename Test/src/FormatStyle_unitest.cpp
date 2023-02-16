@@ -447,21 +447,45 @@ end
 TEST(FormatByStyleOption, space_before_function_call_single_arg) {
     LuaStyle style;
 
-    style.space_before_function_call_single_arg = true;
+    style.space_before_function_call_single_arg = FunctionSingleArgSpace::Always;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local f = p { a = 123 }
+p "aaa"
 )",
             R"(
 local f = p { a = 123 }
+p "aaa"
 )", style));
-    style.space_before_function_call_single_arg = false;
+    style.space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyString;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local f = p { a = 123 }
+p "aaa"
 )",
             R"(
 local f = p{ a = 123 }
+p "aaa"
+)", style));
+    style.space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyTable;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local f = p { a = 123 }
+p "aaa"
+)",
+            R"(
+local f = p { a = 123 }
+p"aaa"
+)", style));
+    style.space_before_function_call_single_arg = FunctionSingleArgSpace::None;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local f = p { a = 123 }
+p "aaa"
+)",
+            R"(
+local f = p{ a = 123 }
+p"aaa"
 )", style));
 }
 

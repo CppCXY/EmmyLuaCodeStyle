@@ -57,3 +57,10 @@ struct LineSpace {
     LineSpaceType Type;
     std::size_t Space;
 };
+
+enum class FunctionSingleArgSpace {
+    None,
+    Always, // true
+    OnlyTable,
+    OnlyString
+};

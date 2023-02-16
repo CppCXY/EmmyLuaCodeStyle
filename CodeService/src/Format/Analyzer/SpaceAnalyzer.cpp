@@ -159,10 +159,37 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                             SpaceLeft(leftBrace, t, 1);
                         }
                     } else {
-                        if (f.GetStyle().space_before_function_call_single_arg) {
-                            SpaceLeft(syntaxNode, t, 1);
-                        } else {
-                            SpaceLeft(syntaxNode, t, 0);
+                        switch (f.GetStyle().space_before_function_call_single_arg) {
+                            case FunctionSingleArgSpace::None: {
+                                SpaceLeft(syntaxNode, t, 0);
+                                break;
+                            }
+                            case FunctionSingleArgSpace::Always: {
+                                SpaceLeft(syntaxNode, t, 1);
+                                break;
+                            }
+                            case FunctionSingleArgSpace::OnlyString: {
+                                auto firstToken = syntaxNode.GetFirstToken(t);
+                                if (firstToken.GetTokenKind(t) == TK_STRING
+                                    || firstToken.GetTokenKind(t) == TK_LONG_STRING) {
+                                    SpaceLeft(syntaxNode, t, 1);
+                                } else {
+                                    SpaceLeft(syntaxNode, t, 0);
+                                }
+                                break;
+                            }
+                            case FunctionSingleArgSpace::OnlyTable: {
+                                auto firstChild = syntaxNode.GetFirstChild(t);
+                                if (firstChild.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
+                                    SpaceLeft(syntaxNode, t, 1);
+                                } else {
+                                    SpaceLeft(syntaxNode, t, 0);
+                                }
+                                break;
+                            }
+                            default: {
+                                break;
+                            }
                         }
                     }
                     break;
