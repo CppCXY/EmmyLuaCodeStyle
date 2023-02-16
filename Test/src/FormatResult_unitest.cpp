@@ -625,7 +625,7 @@ local t = nil, {
 )",
             R"(
 local t = nil, {
-    sql = true,
+    sql = true
 }
 )"));
 }
