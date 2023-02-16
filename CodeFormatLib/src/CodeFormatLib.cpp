@@ -223,58 +223,60 @@ int type_format(lua_State *L) {
             if (typeFormatResult.Type == ResultType::Err) {
                 lua_pushboolean(L, false);
                 return 1;
-            } else {
-                lua_pushboolean(L, true);
-                auto &typeFormats = typeFormatResult.Data;
-                if (!typeFormats.empty()) {
-                    auto &result = typeFormats.front();
-                    // 结果
-                    lua_newtable(L);
-
-                    //message
-                    {
-                        lua_pushstring(L, "newText");
-                        lua_pushlstring(L, result.Text.c_str(), result.Text.size());
-                        lua_rawset(L, -3);
-                    }
-
-                    // range
-                    {
-                        lua_pushstring(L, "range");
-                        //range table
-                        lua_newtable(L);
-
-                        lua_pushstring(L, "start");
-                        // start table
-                        lua_newtable(L);
-                        lua_pushstring(L, "line");
-                        lua_pushinteger(L, result.Range.StartLine);
-                        lua_rawset(L, -3);
-
-                        lua_pushstring(L, "character");
-                        lua_pushinteger(L, result.Range.StartCol);
-                        lua_rawset(L, -3);
-
-                        lua_rawset(L, -3); // set start = {}
-
-                        lua_pushstring(L, "end");
-                        // end table
-                        lua_newtable(L);
-                        lua_pushstring(L, "line");
-                        lua_pushinteger(L, result.Range.EndLine);
-                        lua_rawset(L, -3);
-
-                        lua_pushstring(L, "character");
-                        lua_pushinteger(L, result.Range.EndCol);
-                        lua_rawset(L, -3);
-
-                        lua_rawset(L, -3); // set end = {}
-
-                        lua_rawset(L, -3); // set range = {}
-                    }
-                }
-                return 2;
             }
+            auto &typeFormats = typeFormatResult.Data;
+            if (typeFormats.empty()) {
+                lua_pushboolean(L, false);
+                return 1;
+            }
+
+            lua_pushboolean(L, true);
+            auto &result = typeFormats.front();
+            // 结果
+            lua_newtable(L);
+
+            //message
+            {
+                lua_pushstring(L, "newText");
+                lua_pushlstring(L, result.Text.c_str(), result.Text.size());
+                lua_rawset(L, -3);
+            }
+
+            // range
+            {
+                lua_pushstring(L, "range");
+                //range table
+                lua_newtable(L);
+
+                lua_pushstring(L, "start");
+                // start table
+                lua_newtable(L);
+                lua_pushstring(L, "line");
+                lua_pushinteger(L, result.Range.StartLine);
+                lua_rawset(L, -3);
+
+                lua_pushstring(L, "character");
+                lua_pushinteger(L, result.Range.StartCol);
+                lua_rawset(L, -3);
+
+                lua_rawset(L, -3); // set start = {}
+
+                lua_pushstring(L, "end");
+                // end table
+                lua_newtable(L);
+                lua_pushstring(L, "line");
+                lua_pushinteger(L, result.Range.EndLine);
+                lua_rawset(L, -3);
+
+                lua_pushstring(L, "character");
+                lua_pushinteger(L, result.Range.EndCol);
+                lua_rawset(L, -3);
+
+                lua_rawset(L, -3); // set end = {}
+
+                lua_rawset(L, -3); // set range = {}
+            }
+            return 2;
         }
         catch (std::exception &e) {
             std::string err = e.what();
@@ -403,7 +405,7 @@ int diagnose_file(lua_State *L) {
                 return 1;
             }
 
-            auto& diagnostics = diagnosticResult.Data;
+            auto &diagnostics = diagnosticResult.Data;
             lua_pushboolean(L, true);
             PushDiagnosticToLua(L, diagnostics);
 
@@ -557,12 +559,12 @@ int spell_analysis(lua_State *L) {
             }
 
             auto spellResult = LuaCodeFormat::GetInstance().SpellCheck(filename, std::move(text), tempDict);
-            if(spellResult.Type == ResultType::Err){
+            if (spellResult.Type == ResultType::Err) {
                 lua_pushboolean(L, false);
                 return 1;
             }
 
-            auto& diagnostics = spellResult.Data;
+            auto &diagnostics = spellResult.Data;
             lua_pushboolean(L, true);
             PushDiagnosticToLua(L, diagnostics);
 
@@ -592,12 +594,12 @@ int name_style_analysis(lua_State *L) {
             std::string text = lua_tostring(L, 2);
 
             auto nameStyleResult = LuaCodeFormat::GetInstance().NameStyleCheck(filename, std::move(text));
-            if(nameStyleResult.Type == ResultType::Err){
+            if (nameStyleResult.Type == ResultType::Err) {
                 lua_pushboolean(L, false);
                 return 1;
             }
 
-            auto& diagnostics = nameStyleResult.Data;
+            auto &diagnostics = nameStyleResult.Data;
             lua_pushboolean(L, true);
             PushDiagnosticToLua(L, diagnostics);
 
