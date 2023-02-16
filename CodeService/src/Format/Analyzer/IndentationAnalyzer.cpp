@@ -160,7 +160,17 @@ void IndentationAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprLis
                 return;
             }
         }
+    } else {
+        auto symbolLine = exprList.GetPrevToken(t).GetEndLine(t);
+        bool sameLine = true;
+        for (auto expr: exprs) {
+            sameLine = sameLine && expr.GetStartLine(t) == symbolLine;
+        }
+        if (sameLine) {
+            return;
+        }
     }
+
     Indenter(exprList, t, IndentData(
             IndentType::Standard,
             f.GetStyle().continuation_indent

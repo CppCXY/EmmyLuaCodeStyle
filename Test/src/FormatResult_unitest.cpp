@@ -590,3 +590,31 @@ else
 end
 )"));
 }
+
+TEST(Format, sumenko_1915) {
+    LuaStyle s;
+    s.indent_size = 2;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+return nil, {
+  sql = true,
+  fields = true,
+  field_names = true,
+  extends = true,
+  mixins = true,
+  __index = true,
+  admin = true
+}
+)",
+            R"(
+return nil, {
+  sql = true,
+  fields = true,
+  field_names = true,
+  extends = true,
+  mixins = true,
+  __index = true,
+  admin = true
+}
+)", s));
+}
