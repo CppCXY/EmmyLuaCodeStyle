@@ -617,4 +617,15 @@ return nil, {
   admin = true
 }
 )", s));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = nil, {
+    sql = true
+}
+)",
+            R"(
+local t = nil, {
+    sql = true,
+}
+)"));
 }
