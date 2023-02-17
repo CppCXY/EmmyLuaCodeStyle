@@ -74,60 +74,14 @@ VirtualFileSystem::UpdateFile(std::string_view uri, std::vector<lsp::TextDocumen
         return;
     }
     auto fileId = opFileId.value();
-    auto opSourceText = _fileDB.Query(fileId);
-    if (!opSourceText.has_value()) {
-        return;
-    }
-    auto &sourceText = *opSourceText.value();
 
-    auto vFile = VirtualFile(fileId);
-    auto lineIndex = vFile.GetLineIndex(*this);
-    if (!lineIndex) {
-        return;
-    }
-
-    std::string text;
-    auto totalSize = sourceText.size();
-    std::vector<std::pair<TextRange, std::string>> textChanges;
     for (auto &change: changeEvent) {
         if (!change.range.has_value()) {
             return;
         }
         auto range = change.range.value();
-        auto &content = change.text;
-        auto startOffset = lineIndex->GetOffset(LineCol(range.start.line, range.start.character));
-        auto endOffset = lineIndex->GetOffset(LineCol(range.end.line, range.end.character));
-        textChanges.emplace_back(TextRange(startOffset, endOffset), std::move(content));
-        totalSize += content.size() - (endOffset - startOffset);
+        UpdateFile(fileId, range, std::move(change.text));
     }
-
-    std::stable_sort(textChanges.begin(), textChanges.end(), [](auto &x, auto &y) -> bool {
-        return x.first.StartOffset < y.first.StartOffset;
-    });
-
-    if (totalSize > 0) {
-        text.reserve(totalSize);
-        std::size_t start = 0;
-        for (std::size_t index = 0; index != textChanges.size(); index++) {
-            auto textRange = textChanges[index].first;
-            if (start < textRange.StartOffset) {
-                text.append(sourceText.begin() + start, sourceText.begin() + textRange.StartOffset);
-            }
-
-            auto &content = textChanges[index].second;
-
-            text.append(content);
-
-            start = textChanges[index].first.EndOffset;
-        }
-
-        if (start < sourceText.size()) {
-            text.append(sourceText.begin() + start, sourceText.end());
-        }
-    }
-
-    lineIndex->Parse(text);
-    _fileDB.ApplyFileUpdate(fileId, std::move(text));
 }
 
 void VirtualFileSystem::ClearFile(std::string_view uri) {
