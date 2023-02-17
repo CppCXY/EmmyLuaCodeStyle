@@ -629,3 +629,15 @@ local t = nil, {
 }
 )"));
 }
+
+TEST(Format, sumenko_1921) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+p(-1)
+t[-1] = -1
+)",
+            R"(
+p(-1)
+t[-1] = -1
+)"));
+}

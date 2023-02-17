@@ -50,8 +50,9 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     if (p.IsNode(t) && p.GetSyntaxKind(t) == LuaSyntaxNodeKind::BinaryExpression) {
                         SpaceAround(syntaxNode, t, f.GetStyle().space_around_math_operator ? 1 : 0);
                     } else {
-                        SpaceLeft(syntaxNode, t);
                         SpaceRight(syntaxNode, t, 0);
+                        auto rightSiblingKind = syntaxNode.GetNextSibling(t).GetSyntaxKind(t);
+                        SpaceRight(syntaxNode, t, rightSiblingKind == LuaSyntaxNodeKind::UnaryExpression ? 1 : 0);
                     }
                     break;
                 }
