@@ -169,6 +169,10 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
                         AddInvertIndent(traverse.Node, indent);
                         break;
                     }
+                    case IndentStrategy::Absolute: {
+                        AddAbsoluteIndent(traverse.Node, indent);
+                        break;
+                    }
                     default: {
                         break;
                     }
@@ -181,6 +185,21 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
             if (GetCurrentIndent().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
                 RecoverIndent();
             }
+        }
+    }
+}
+
+void FormatState::AddAbsoluteIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
+    switch (_formatStyle.indent_style) {
+        case IndentStyle::Space: {
+            _indentStack.emplace(syntaxNoe, indent, 0);
+            break;
+        }
+        case IndentStyle::Tab: {
+            auto tabIndent = indent / _formatStyle.tab_width;
+            auto spaceIndent = indent % _formatStyle.tab_width;
+            _indentStack.emplace(syntaxNoe, spaceIndent, tabIndent);
+            break;
         }
     }
 }

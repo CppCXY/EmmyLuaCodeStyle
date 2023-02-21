@@ -34,8 +34,17 @@ void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 }
                 case LuaSyntaxNodeKind::CallExpression: {
                     if (f.GetStyle().align_call_args) {
-                        auto exprlist = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
-                        AnalyzeExpressionList(f, exprlist, t);
+                        auto exprList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+                        auto exprs = exprList.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
+                        auto symbolLine = exprList.GetPrevToken(t).GetEndLine(t);
+                        bool sameLine = true;
+                        for (auto expr: exprs) {
+                            sameLine = sameLine && expr.GetStartLine(t) == symbolLine;
+                        }
+                        if (sameLine) {
+                            break;
+                        }
+                        AnalyzeExpressionList(f, exprList, t);
                     }
                     break;
                 }
@@ -79,7 +88,7 @@ void AlignAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSy
                 break;
             }
             case AlignStrategy::AlignToFirst: {
-                resolve.SetAlign(alignGroup.AlignPos);
+                resolve.SetIndent(alignGroup.AlignPos, IndentStrategy::Absolute);
                 break;
             }
             default: {
@@ -335,9 +344,7 @@ AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGr
                 auto width = f.GetCurrentWidth();
                 group.AlignPos = width;
                 for (auto i: group.SyntaxGroup) {
-                    auto node = LuaSyntaxNode(i);
-                    auto leftToken = node.GetFirstToken(t);
-                    _resolveGroupIndex[leftToken.GetIndex()] = groupIndex;
+                    _resolveGroupIndex[i] = groupIndex;
                 }
             }
             break;
@@ -411,7 +418,7 @@ void AlignAnalyzer::AnalyzeIfStatement(FormatState &f, LuaSyntaxNode &syntaxNode
     // 若有 elseif
 
     auto spaceAfterIf = if_.GetNextToken(t).GetStartCol(t) - if_.GetStartCol(t);
-    if(spaceAfterIf == 3 && ifAlignPos == 0){
+    if (spaceAfterIf == 3 && ifAlignPos == 0) {
         group.clear();
         logicOps.clear();
     }

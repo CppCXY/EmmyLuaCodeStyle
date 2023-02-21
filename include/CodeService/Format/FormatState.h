@@ -28,6 +28,8 @@ public:
 
     std::size_t &GetCurrentWidth();
 
+    void AddAbsoluteIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
+
     void AddRelativeIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
 
     void AddInvertIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
