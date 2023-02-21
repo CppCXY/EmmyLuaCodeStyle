@@ -105,11 +105,12 @@ struct LineBreakData {
 enum class AlignStrategy {
     Normal,
     AlignToEq,
-    AlignToFirst
+    AlignToFirst,
+    AlignComment,
 };
 
 struct AlignGroup {
-    AlignGroup(AlignStrategy strategy, std::vector<std::size_t> &group)
+    AlignGroup(AlignStrategy strategy, const std::vector<std::size_t> &group)
             : Strategy(strategy), SyntaxGroup(group), Resolve(false), AlignPos(0) {}
 
     AlignStrategy Strategy;

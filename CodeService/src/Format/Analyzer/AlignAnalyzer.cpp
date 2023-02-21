@@ -63,7 +63,23 @@ void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     break;
                 }
             }
+        } else {
+            switch (syntaxNode.GetTokenKind(t)) {
+                case TK_SHORT_COMMENT: {
+                    if (f.GetStyle().align_continuous_inline_comment) {
+                        AnalyzeInlineComment(f, syntaxNode, t);
+                    }
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
         }
+    }
+
+    for (auto &group: _inlineCommentGroup) {
+        PushAlignGroup(AlignStrategy::AlignComment, group);
     }
 }
 
@@ -89,6 +105,10 @@ void AlignAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSy
             }
             case AlignStrategy::AlignToFirst: {
                 resolve.SetIndent(alignGroup.AlignPos, IndentStrategy::Absolute);
+                break;
+            }
+            case AlignStrategy::AlignComment: {
+                resolve.SetAlign(alignGroup.AlignPos);
                 break;
             }
             default: {
@@ -349,6 +369,23 @@ AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGr
             }
             break;
         }
+        case AlignStrategy::AlignComment: {
+            std::size_t maxDis = 0;
+            auto &file = t.GetFile();
+            for (auto i: group.SyntaxGroup) {
+                auto comment = LuaSyntaxNode(i);
+                if (comment.IsToken(t)) {
+                    auto prev = comment.GetPrevToken(t);
+                    auto newPos =
+                            file.GetColumn(prev.GetTextRange(t).EndOffset) + f.GetStyle().space_before_inline_comment + 1;
+                    if (newPos > maxDis) {
+                        maxDis = newPos;
+                    }
+                    _resolveGroupIndex[comment.GetIndex()] = groupIndex;
+                }
+            }
+            group.AlignPos = maxDis;
+        }
         default: {
             break;
         }
@@ -458,4 +495,32 @@ void AlignAnalyzer::PushNormalAlignGroup(std::size_t alignPos, std::vector<std::
 void
 AlignAnalyzer::AnalyzeContinuousSimilarCallArgs(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
 
+}
+
+void AlignAnalyzer::AnalyzeInlineComment(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    auto prevToken = syntaxNode.GetPrevToken(t);
+    if (prevToken.IsNull(t)) {
+        return;
+    }
+    auto currentLine = syntaxNode.GetStartLine(t);
+    if (prevToken.GetEndLine(t) != currentLine) {
+        return;
+    }
+    // now it is inline comment
+    if (_inlineCommentGroup.empty()) {
+        _inlineCommentGroup.emplace_back();
+    }
+    auto &topGroup = _inlineCommentGroup.back();
+    if (topGroup.empty()) {
+        topGroup.push_back(syntaxNode.GetIndex());
+        return;
+    }
+
+    auto lastComment = LuaSyntaxNode(topGroup.back());
+    if (currentLine - lastComment.GetEndLine(t) > 2) {
+        auto &newTopGroup = _inlineCommentGroup.emplace_back();
+        newTopGroup.push_back(syntaxNode.GetIndex());
+    } else {
+        topGroup.push_back(syntaxNode.GetIndex());
+    }
 }

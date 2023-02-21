@@ -37,7 +37,11 @@ private:
 
     void AnalyzeContinuousSimilarCallArgs(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
+    void AnalyzeInlineComment(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
+
     std::vector<AlignGroup> _alignGroup;
     std::unordered_map<std::size_t, std::size_t> _startNodeToGroupIndex;
     std::unordered_map<std::size_t, std::size_t> _resolveGroupIndex;
+
+    std::vector<std::vector<std::size_t>> _inlineCommentGroup;
 };

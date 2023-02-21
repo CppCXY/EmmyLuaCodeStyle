@@ -1160,3 +1160,76 @@ p(1,2,3,)
 p(1, 2, 3)
 )", style));
 }
+
+TEST(FormatByStyleOption, align_continuous_inline_comment){
+    LuaStyle style;
+
+    style.align_continuous_inline_comment = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f() --hello world
+    local t = 132 --1313
+end
+
+local t = {
+    { 11111, 2,   3333333333333 }, --hello
+    { 123,   345, 46 }, --yes
+    { 1,     2,   3 }, --hh
+}
+
+local t = {
+    aa = 1, -- e1
+    bbaa = 2, --bb
+}
+)",
+            R"(
+function f() --hello world
+    local t = 132 --1313
+end
+
+local t = {
+    { 11111, 2,   3333333333333 }, --hello
+    { 123,   345, 46 }, --yes
+    { 1,     2,   3 }, --hh
+}
+
+local t = {
+    aa = 1, -- e1
+    bbaa = 2, --bb
+}
+)", style));
+    style.align_continuous_inline_comment = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f() --hello world
+    local t = 132 --1313
+end
+
+local t = {
+    { 11111, 2,   3333333333333 }, --hello
+    { 123,   345, 46 }, --yes
+    { 1,     2,   3 }, --hh
+}
+
+local t = {
+    aa = 1, -- e1
+    bbaa = 2, --bb
+}
+)",
+            R"(
+function f()      --hello world
+    local t = 132 --1313
+end
+
+local t = {
+    { 11111, 2,   3333333333333 }, --hello
+    { 123,   345, 46 },            --yes
+    { 1,     2,   3 },             --hh
+}
+
+local t = {
+    aa = 1,   -- e1
+    bbaa = 2, --bb
+}
+)", style));
+}
