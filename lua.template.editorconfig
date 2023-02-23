@@ -86,6 +86,8 @@ align_if_branch = false
 
 align_array_table = true
 
+align_continuous_inline_comment = true
+
 # [indent]
 
 never_indent_before_if_condition = false

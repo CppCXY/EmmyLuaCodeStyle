@@ -37,10 +37,12 @@ private:
     void ClearDiagnostic(std::size_t leftIndex);
 
     void ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNode &next,
-                                const LuaSyntaxTree &t,
-                                size_t shouldSpace);
+                                size_t shouldSpace,
+                                const LuaSyntaxTree &t);
 
     std::string GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxNode &right, const LuaSyntaxTree &t);
+
+    void ProcessIndentDiagnostic(LuaSyntaxNode &node, IndentData indentData, const LuaSyntaxTree &t);
 
     FormatState _state;
     std::map<std::size_t, LuaDiagnostic> _nextDiagnosticMap;

@@ -100,7 +100,7 @@ public:
     // not implement now
     bool align_continuous_similar_call_args = false;
 
-    bool align_continuous_inline_comment = false;
+    bool align_continuous_inline_comment = true;
 
     bool align_array_table = true;
 

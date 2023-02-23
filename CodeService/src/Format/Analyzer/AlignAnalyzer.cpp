@@ -2,6 +2,7 @@
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/FormatState.h"
 #include "SyntaxNodeHelper.h"
+#include "Util/StringUtil.h"
 
 
 AlignAnalyzer::AlignAnalyzer() {
@@ -377,7 +378,8 @@ AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGr
                 if (comment.IsToken(t)) {
                     auto prev = comment.GetPrevToken(t);
                     auto newPos =
-                            file.GetColumn(prev.GetTextRange(t).EndOffset) + f.GetStyle().space_before_inline_comment + 1;
+                            file.GetColumn(prev.GetTextRange(t).EndOffset) + f.GetStyle().space_before_inline_comment +
+                            1;
                     if (newPos > maxDis) {
                         maxDis = newPos;
                     }
@@ -506,6 +508,12 @@ void AlignAnalyzer::AnalyzeInlineComment(FormatState &f, LuaSyntaxNode &syntaxNo
     if (prevToken.GetEndLine(t) != currentLine) {
         return;
     }
+
+    auto text = syntaxNode.GetText(t);
+    if (string_util::StartWith(text, "---@")) {
+        return;
+    }
+
     // now it is inline comment
     if (_inlineCommentGroup.empty()) {
         _inlineCommentGroup.emplace_back();

@@ -88,39 +88,20 @@ void DiagnosticBuilder::SpellCheck(const LuaSyntaxTree &t, CodeSpellChecker &spe
 void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (syntaxNode.IsToken(t)) {
         auto textRange = syntaxNode.GetTextRange(t);
-//        auto &file = t.GetFile();
+//        auto prevToken = syntaxNode.GetPrevToken(t);
+//        if (prevToken.GetEndLine(t) != syntaxNode.GetStartLine(t)) {
+//            auto &file = t.GetFile();
+//            auto indent = _state.GetCurrentIndent();
+//            auto currentIndent = file.GetIndentString(textRange.StartOffset);
+//
+//        }
+
         switch (resolve.GetPrevSpaceStrategy()) {
             case PrevSpaceStrategy::AlignPos: {
-//                auto pos = resolve.GetAlign();
-//                if (pos != file.GetLineOffset(textRange.StartOffset)) {
-//                    PushDiagnostic(DiagnosticType::Align,
-//                                   syntaxNode.GetPrevToken(t).GetIndex(),
-//                                   textRange,
-//                                   util::format(LText("should align to {}"),
-//                                                file.GetColumn(pos)
-//                                   )
-//                    );
-//                } else {
-//                    ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
-//                }
                 ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
                 break;
             }
             case PrevSpaceStrategy::AlignRelativeIndent: {
-//                auto relativePos = resolve.GetAlign();
-//                auto indentState = _state.GetCurrentIndent();
-//                auto pos = relativePos + indentState.SpaceSize + indentState.TabSize * _state.GetStyle().tab_width;
-//                if (pos != file.GetLineOffset(textRange.StartOffset)) {
-//                    PushDiagnostic(DiagnosticType::Align,
-//                                   syntaxNode.GetPrevToken(t).GetIndex(),
-//                                   textRange,
-//                                   util::format(LText("should align to {}"),
-//                                                file.GetColumn(pos)
-//                                   )
-//                    );
-//                } else {
-//                    ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
-//                }
                 ClearDiagnostic(syntaxNode.GetPrevToken(t).GetIndex());
                 break;
             }
@@ -167,7 +148,7 @@ void DiagnosticBuilder::DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaS
                 auto nextToken = syntaxNode.GetNextToken(t);
                 if (nextToken.IsToken(t)
                     && nextToken.GetStartLine(t) == syntaxNode.GetEndLine(t)) {
-                    ProcessSpaceDiagnostic(syntaxNode, nextToken, t, resolve.GetNextSpace());
+                    ProcessSpaceDiagnostic(syntaxNode, nextToken, resolve.GetNextSpace(), t);
                 }
                 break;
             }
@@ -247,8 +228,8 @@ std::string DiagnosticBuilder::GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxN
     }
 }
 
-void DiagnosticBuilder::ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNode &next, const LuaSyntaxTree &t,
-                                               size_t shouldSpace) {
+void DiagnosticBuilder::ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNode &next, size_t shouldSpace,
+                                               const LuaSyntaxTree &t) {
     auto leftOffset = node.GetTextRange(t).EndOffset;
     auto rightOffset = next.GetTextRange(t).StartOffset;
     int diff = static_cast<int>(rightOffset - leftOffset) - 1;
