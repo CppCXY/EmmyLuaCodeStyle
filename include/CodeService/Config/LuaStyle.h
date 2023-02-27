@@ -104,9 +104,6 @@ public:
 
     bool align_array_table = true;
 
-    // not implement now
-    bool align_trailing_comments = false;
-
     // [Indent]
 
 	/*

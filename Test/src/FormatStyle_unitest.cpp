@@ -283,11 +283,23 @@ p("456")
 p(123)
 p "12313"
 p("456")
+local t = {
+    a({
+        a = 123
+    }),
+    d = 123
+}
 )",
             R"(
 p(123)
 p "12313"
 p "456"
+local t = {
+    a {
+        a = 123
+    },
+    d = 123
+}
 )", style));
     style.call_arg_parentheses = CallArgParentheses::RemoveStringOnly;
     EXPECT_TRUE(TestHelper::TestFormatted(

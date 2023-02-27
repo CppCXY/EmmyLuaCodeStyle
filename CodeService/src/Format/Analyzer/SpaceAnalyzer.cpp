@@ -2,6 +2,7 @@
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/FormatState.h"
 #include "CodeService/Config/LanguageTranslator.h"
+#include "CodeService/Format/Analyzer/TokenAnalyzer.h"
 
 
 SpaceAnalyzer::SpaceAnalyzer() {
@@ -154,7 +155,10 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                             if (f.GetStyle().space_before_function_call_open_parenthesis) {
                                 SpaceLeft(leftBrace, t, 1);
                             } else {
-                                SpaceLeft(leftBrace, t, 0);
+                                auto tokenAnalyzer = f.GetAnalyzer<TokenAnalyzer>();
+                                if (!tokenAnalyzer->IsRemove(leftBrace, t)) {
+                                    SpaceLeft(leftBrace, t, 0);
+                                }
                             }
                         } else {
                             SpaceLeft(leftBrace, t, 1);

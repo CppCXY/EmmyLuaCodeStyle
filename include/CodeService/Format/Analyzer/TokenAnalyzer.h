@@ -14,6 +14,8 @@ public:
     void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
     void Mark(LuaSyntaxNode &n, const LuaSyntaxTree &t, TokenStrategy strategy);
+
+    bool IsRemove(LuaSyntaxNode &n, const LuaSyntaxTree &t) const;
 private:
     void TableFieldAddSep(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t);
 

@@ -7,10 +7,9 @@
 
 int main() {
     std::string buffer = R"(
-local t = switch(a)
-    :case(function()
-    end)
+p({
 
+})
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
