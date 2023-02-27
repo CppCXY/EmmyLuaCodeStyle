@@ -165,6 +165,7 @@ void LuaTypeFormat::FormatLine(std::size_t line, std::size_t character, const Lu
     auto &file = t.GetFile();
     auto offset = file.GetOffset(line, character);
     auto prevToken = t.GetTokenBeforeOffset(offset);
+    auto tempStyle = style;
     switch (prevToken.GetTokenKind(t)) {
         case TK_END: {
             auto parent = prevToken.GetParent(t);
@@ -177,15 +178,14 @@ void LuaTypeFormat::FormatLine(std::size_t line, std::size_t character, const Lu
             formatRange.EndLine = line - 1;
 
             if (_typeOptions.auto_complete_table_sep) {
-                LuaStyle tempStyle = style;
                 tempStyle.trailing_table_separator = TrailingTableSeparator::Smart;
-                return FormatByRange(formatRange, t, tempStyle);
             }
 
             break;
         }
     }
-    return FormatByRange(formatRange, t, style);
+    tempStyle.call_arg_parentheses = CallArgParentheses::Keep;
+    return FormatByRange(formatRange, t, tempStyle);
 }
 
 void LuaTypeFormat::FixIndent(std::size_t line, std::size_t character, const LuaSyntaxTree &t, LuaStyle &style) {

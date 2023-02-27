@@ -641,3 +641,105 @@ p(-1)
 t[-1] = -1
 )"));
 }
+
+TEST(Format, codestyle_89) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = {
+    a = cond
+    and "is true"
+    or "is not true"
+}
+
+
+local s = ("%s")
+    :format("text")
+
+
+print(("%s")
+    :format("text"))
+
+
+print("s1"
+    .. "s2")
+
+
+local f1 = function()
+    print("test")
+end
+
+
+local f2 = cond or function()
+    print("test")
+end
+)",
+            R"(
+local t = {
+    a = cond
+    and "is true"
+    or "is not true"
+}
+
+
+local s = ("%s")
+    :format("text")
+
+
+print(("%s")
+    :format("text"))
+
+
+print("s1"
+    .. "s2")
+
+
+local f1 = function()
+    print("test")
+end
+
+
+local f2 = cond or function()
+    print("test")
+end
+)"));
+}
+
+TEST(Format, codestyle_90) {
+    LuaStyle style;
+    style.call_arg_parentheses = CallArgParentheses::Remove;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+null_ls.setup {
+    sources = {
+        null_ls.builtins.formatting.prettierd.with {
+            disabled_filetypes = { 'html' },
+        },
+        null_ls.builtins.formatting.autopep8.with {
+            extra_args = {
+                '--indent-size=2'
+            }
+        },
+        null_ls.builtins.formatting.xmlformat.with {
+
+        },
+    }
+}
+)",
+            R"(
+null_ls.setup {
+    sources = {
+        null_ls.builtins.formatting.prettierd.with {
+            disabled_filetypes = { 'html' },
+        },
+        null_ls.builtins.formatting.autopep8.with {
+            extra_args = {
+                '--indent-size=2'
+            }
+        },
+        null_ls.builtins.formatting.xmlformat.with {
+
+        },
+    }
+}
+)", style));
+}

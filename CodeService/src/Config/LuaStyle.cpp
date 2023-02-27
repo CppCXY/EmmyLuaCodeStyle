@@ -224,4 +224,8 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
     BOOL_OPTION(ignore_space_after_colon)
 
     BOOL_OPTION(remove_call_expression_list_finish_comma)
+
+    BOOL_OPTION(table_use_continuation_indent)
+
+    BOOL_OPTION(function_call_use_continuation_indent)
 }
