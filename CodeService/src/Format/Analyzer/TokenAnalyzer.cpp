@@ -195,12 +195,10 @@ LuaSyntaxNode GetSingleArgStringOrTable(LuaSyntaxNode &syntaxNode, const LuaSynt
 
 void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
     if (IsSingleTableOrStringArg(syntaxNode, t)) {
-        bool parenthesesFounded = false;
         switch (f.GetStyle().call_arg_parentheses) {
             case CallArgParentheses::Remove: {
                 auto lbrace = syntaxNode.GetChildToken('(', t);
                 if(lbrace.IsToken(t)){
-                    parenthesesFounded = true;
                     Mark(lbrace, t, TokenStrategy::Remove);
                     auto rbrace = syntaxNode.GetChildToken(')', t);
                     Mark(rbrace, t, TokenStrategy::Remove);
@@ -214,7 +212,6 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxN
                     || node.GetTokenKind(t) == TK_LONG_STRING) {
                     auto lbrace = syntaxNode.GetChildToken('(', t);
                     if(lbrace.IsToken(t)) {
-                        parenthesesFounded = true;
                         Mark(lbrace, t, TokenStrategy::Remove);
                         auto rbrace = syntaxNode.GetChildToken(')', t);
                         Mark(rbrace, t, TokenStrategy::Remove);
@@ -228,7 +225,6 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxN
                 if (node.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
                     auto lbrace = syntaxNode.GetChildToken('(', t);
                     if(lbrace.IsToken(t)) {
-                        parenthesesFounded = true;
                         Mark(lbrace, t, TokenStrategy::Remove);
                         auto rbrace = syntaxNode.GetChildToken(')', t);
                         Mark(rbrace, t, TokenStrategy::Remove);
