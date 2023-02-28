@@ -676,8 +676,8 @@ end
             R"(
 local t = {
     a = cond
-    and "is true"
-    or "is not true"
+        and "is true"
+        or "is not true"
 }
 
 

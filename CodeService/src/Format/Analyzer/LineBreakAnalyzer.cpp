@@ -149,6 +149,13 @@ void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
 
                     break;
                 }
+                case LuaSyntaxNodeKind::TableField: {
+                    auto expr = syntaxNode.GetChildSyntaxNode(LuaSyntaxMultiKind::Expression, t);
+                    if (expr.IsNode(t)) {
+                        AnalyzeExpr(f, expr, t);
+                    }
+                    break;
+                }
                 case LuaSyntaxNodeKind::ExpressionStatement: {
                     auto suffixedExpression = syntaxNode.GetChildSyntaxNode(NodeKind::SuffixedExpression, t);
                     if (suffixedExpression.IsNode(t)) {

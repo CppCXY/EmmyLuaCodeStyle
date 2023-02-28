@@ -33,6 +33,8 @@ private:
 
     void AnalyzeCallExprList(FormatState &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t);
 
+    void AnalyzeTableFieldKeyValuePairExpr(FormatState &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t);
+
     bool IsExprShouldIndent(LuaSyntaxNode &expr, const LuaSyntaxTree &t);
 
     std::unordered_map<std::size_t, IndentData> _indent;
