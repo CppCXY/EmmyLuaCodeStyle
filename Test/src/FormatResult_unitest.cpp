@@ -743,3 +743,23 @@ null_ls.setup {
 }
 )", style));
 }
+
+TEST(Format, sumneko_1969) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+Garbage = {
+	    ["BahamaFrontDesk"] = {
+		Coords = vector3( -1382.54, -592.77, 29.91),
+		--Prop = "",
+	}
+}
+)",
+            R"(
+Garbage = {
+    ["BahamaFrontDesk"] = {
+        Coords = vector3(-1382.54, -592.77, 29.91),
+        --Prop = "",
+    }
+}
+)"));
+}

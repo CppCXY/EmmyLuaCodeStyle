@@ -47,6 +47,8 @@ public:
 
     void ToNext(const LuaSyntaxTree &t);
 
+    void ToPrev(const LuaSyntaxTree &t);
+
     bool IsNull(const LuaSyntaxTree &t) const;
 
     bool IsEmpty(const LuaSyntaxTree &t) const;
@@ -60,6 +62,10 @@ public:
     LuaSyntaxNode GetChildSyntaxNode(LuaSyntaxNodeKind kind, const LuaSyntaxTree &t) const;
 
     LuaSyntaxNode GetChildSyntaxNode(LuaSyntaxMultiKind kind, const LuaSyntaxTree &t) const;
+
+    LuaSyntaxNode GetLastChildSyntaxNode(LuaSyntaxNodeKind kind, const LuaSyntaxTree &t) const;
+
+    LuaSyntaxNode GetLastChildSyntaxNode(LuaSyntaxMultiKind kind, const LuaSyntaxTree &t) const;
 
     LuaSyntaxNode GetChildToken(LuaTokenKind kind, const LuaSyntaxTree &t) const;
 

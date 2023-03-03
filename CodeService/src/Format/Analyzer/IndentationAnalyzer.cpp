@@ -141,7 +141,7 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 }
                 case LuaSyntaxNodeKind::TableField: {
                     if (syntaxNode.GetChildToken('=', t).IsToken(t)) {
-                        auto expr = syntaxNode.GetChildSyntaxNode(LuaSyntaxMultiKind::Expression, t);
+                        auto expr = syntaxNode.GetLastChildSyntaxNode(LuaSyntaxMultiKind::Expression, t);
                         AnalyzeTableFieldKeyValuePairExpr(f, expr, t);
                     }
                         // suffix expr
