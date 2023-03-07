@@ -251,7 +251,7 @@ std::vector<LuaDiagnosticInfo> LuaCodeFormat::MakeDiagnosticInfo(const std::vect
                                                                  std::shared_ptr<LuaFile> file) {
     std::vector<LuaDiagnosticInfo> results;
     for (auto &diagnostic: diagnostics) {
-        auto result = results.emplace_back();
+        auto& result = results.emplace_back();
         result.Type = diagnostic.Type;
         result.Message = diagnostic.Message;
         result.Data = diagnostic.Data;
