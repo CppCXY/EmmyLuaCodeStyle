@@ -145,4 +145,6 @@ public:
 
     // not implement now
     bool leading_comma_style = false;
+
+    bool table_list_special_continue_indent = true;
 };

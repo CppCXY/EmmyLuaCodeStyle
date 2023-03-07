@@ -58,20 +58,6 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     if (syntaxNode.GetChildToken('(', t).IsToken(t)) {
                         auto exprList = syntaxNode.GetChildSyntaxNode(NodeKind::ExpressionList, t);
                         if (exprList.IsNode(t)) {
-//                            for (auto expr: exprList.GetChildren(t)) {
-//                                if (f.GetStyle().function_call_use_continuation_indent) {
-//                                    Indenter(expr, t, IndentData(
-//                                            IndentType::WhenLineBreak,
-//                                            f.GetStyle().continuation_indent
-//                                    ));
-//                                } else {
-//                                    Indenter(expr, t, IndentData(
-//                                            IndentType::WhenLineBreak,
-//                                            f.GetStyle().indent_style == IndentStyle::Space ?
-//                                            f.GetStyle().indent_size : f.GetStyle().tab_width
-//                                    ));
-//                                }
-//                            }
                             AnalyzeCallExprList(f, exprList, t);
                         }
                     }
@@ -296,7 +282,7 @@ bool IndentationAnalyzer::IsExprShouldIndent(LuaSyntaxNode &expr, const LuaSynta
         case LuaSyntaxNodeKind::SuffixedExpression: {
             auto subExprs = expr.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
             for (auto subExpr: subExprs) {
-                if (subExpr.GetStartLine(t) != symbolLine) {
+                if (IsExprShouldIndent(subExpr, t)) {
                     return true;
                 }
             }

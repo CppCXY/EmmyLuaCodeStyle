@@ -763,3 +763,35 @@ Garbage = {
 }
 )"));
 }
+
+TEST(Format, codestyle_93) {
+    LuaStyle s;
+    s.indent_size = 2;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local context = {
+  form_field_token = utils.trunk(form_field_token, 2):map(function(e)
+    local form_item_token, widget = e[1], e[2]
+    return format(form_item_token, widget)
+  end):join('\n'),
+}
+local a = aaa.p(function()
+end):okok()
+local a2 = aaa.p(function()
+    end)
+    :okok()
+)",
+            R"(
+local context = {
+  form_field_token = utils.trunk(form_field_token, 2):map(function(e)
+    local form_item_token, widget = e[1], e[2]
+    return format(form_item_token, widget)
+  end):join('\n'),
+}
+local a = aaa.p(function()
+end):okok()
+local a2 = aaa.p(function()
+    end)
+    :okok()
+)", s));
+}
