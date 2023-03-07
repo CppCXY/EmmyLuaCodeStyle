@@ -142,7 +142,7 @@ void CodeSpellChecker::IdentifyAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &toke
         if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item) && customDict.count(word.Item) == 0) {
             auto tokenRange = token.GetTextRange(t);
             auto range = TextRange(tokenRange.StartOffset + word.Range.Start,
-                                   tokenRange.StartOffset + word.Range.Start + word.Range.Count - 1
+                                   word.Range.Count
             );
             std::string originText(text.substr(word.Range.Start, word.Range.Count));
             d.PushDiagnostic(DiagnosticType::Spell, range,
@@ -186,8 +186,7 @@ void CodeSpellChecker::TextAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &token, c
             if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item) && customDict.count(word.Item) == 0) {
                 auto tokenRange = token.GetTextRange(t);
                 auto range = TextRange(tokenRange.StartOffset + identifier.Range.Start + word.Range.Start,
-                                       tokenRange.StartOffset + identifier.Range.Start + word.Range.Start
-                                       + word.Range.Count - 1
+                                       word.Range.Count - 1
                 );
                 std::string originText(
                         token.GetText(t).substr(identifier.Range.Start + word.Range.Start, word.Range.Count));

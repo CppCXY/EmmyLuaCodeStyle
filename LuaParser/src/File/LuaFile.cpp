@@ -2,6 +2,7 @@
 
 #include "Util/Utf8.h"
 
+
 LuaFile::LuaFile(std::string &&fileText)
         : _source(fileText),
           _linenumber(0),
@@ -104,6 +105,13 @@ std::string_view LuaFile::Slice(std::size_t startOffset, std::size_t endOffset) 
     return source.substr(startOffset, endOffset - startOffset + 1);
 }
 
+std::string_view LuaFile::Slice(TextRange range) const {
+    if (range.Length == 0) {
+        return "";
+    }
+    return Slice(range.StartOffset, range.GetEndOffset());
+}
+
 void LuaFile::SetTotalLine(std::size_t line) {
     _linenumber = line;
 }
@@ -173,7 +181,7 @@ std::size_t LuaFile::GetLineRestCharacter(std::size_t offset) {
     }
 }
 
-std::string_view LuaFile::GetIndentString(std::size_t offset) const {
+TextRange LuaFile::GetIndentRange(std::size_t offset) const {
     std::string_view source = GetSource();
     auto line = GetLine(offset);
     const auto start = GetOffset(line, 0);
@@ -182,11 +190,11 @@ std::string_view LuaFile::GetIndentString(std::size_t offset) const {
     for (; index < offset; index++) {
         auto ch = source[index];
         if (ch != '\t' && ch != ' ') {
-            return source.substr(start, static_cast<std::size_t>(index - start));
+            return TextRange(start, index - start);
         }
     }
 
-    return source.substr(start, static_cast<std::size_t>(index - start));
+    return TextRange(start, index - start);
 }
 
 bool LuaFile::IsEmptyLine(std::size_t line) const {
@@ -212,6 +220,4 @@ bool LuaFile::IsEmptyLine(std::size_t line) const {
 
     return true;
 }
-
-
 

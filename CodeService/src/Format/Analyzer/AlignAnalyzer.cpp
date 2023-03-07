@@ -335,7 +335,7 @@ AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGr
                 auto node = LuaSyntaxNode(i);
                 auto eq = node.GetChildToken('=', t);
                 if (eq.IsToken(t)) {
-                    auto diff = eq.GetTextRange(t).StartOffset - eq.GetPrevToken(t).GetTextRange(t).EndOffset;
+                    auto diff = eq.GetTextRange(t).StartOffset - eq.GetPrevToken(t).GetTextRange(t).GetEndOffset();
                     if (diff > 2) {
                         allowAlign = true;
                         break;
@@ -349,7 +349,7 @@ AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGr
                     auto eq = node.GetChildToken('=', t);
                     if (eq.IsToken(t)) {
                         auto prev = eq.GetPrevToken(t);
-                        auto newPos = prev.GetTextRange(t).EndOffset + 2 - node.GetTextRange(t).StartOffset;
+                        auto newPos = prev.GetTextRange(t).GetEndOffset() + 2 - node.GetTextRange(t).StartOffset;
                         if (newPos > maxDis) {
                             maxDis = newPos;
                         }
@@ -378,7 +378,8 @@ AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGr
                 if (comment.IsToken(t)) {
                     auto prev = comment.GetPrevToken(t);
                     auto newPos =
-                            file.GetColumn(prev.GetTextRange(t).EndOffset) + f.GetStyle().space_before_inline_comment +
+                            file.GetColumn(prev.GetTextRange(t).GetEndOffset()) +
+                            f.GetStyle().space_before_inline_comment +
                             1;
                     if (newPos > maxDis) {
                         maxDis = newPos;

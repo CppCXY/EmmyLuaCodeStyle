@@ -107,7 +107,7 @@ void LuaSyntaxTree::EatInlineComment(LuaParser &p) {
             case TK_LONG_COMMENT:
             case TK_SHEBANG: {
                 auto prevToken = tokens[index - 1];
-                if (_file->GetLine(prevToken.Range.EndOffset)
+                if (_file->GetLine(prevToken.Range.GetEndOffset())
                     == _file->GetLine(tokens[index].Range.StartOffset)) {
                     EatToken(p);
                 }
@@ -258,6 +258,17 @@ std::size_t LuaSyntaxTree::GetEndOffset(std::size_t index) const {
     }
 
     return 0;
+}
+
+TextRange LuaSyntaxTree::GetTokenRange(std::size_t index) const {
+    if (index < _nodeOrTokens.size()) {
+        auto &n = _nodeOrTokens[index];
+        if(n.Type == NodeOrTokenType::Token) {
+            auto &token = _tokens[n.Data.TokenIndex];
+            return TextRange(token.Start, token.Length);
+        }
+    }
+    return TextRange();
 }
 
 std::size_t LuaSyntaxTree::GetNextSibling(std::size_t index) const {
@@ -538,3 +549,5 @@ bool LuaSyntaxTree::IsEatAllComment(LuaSyntaxNodeKind kind) const {
 const std::vector<LuaParseError> &LuaSyntaxTree::GetErrors() const {
     return _errors;
 }
+
+

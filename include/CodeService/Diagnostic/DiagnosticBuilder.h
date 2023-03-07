@@ -1,11 +1,11 @@
 #pragma once
 
-#include "CodeService/Config/LuaStyle.h"
 #include "CodeService/Config/LuaDiagnosticStyle.h"
-#include "CodeService/Format/FormatState.h"
 #include "DiagnosticType.h"
 #include "CodeService/Diagnostic/Spell/CodeSpellChecker.h"
 #include "CodeService/Diagnostic/NameStyle/NameStyleChecker.h"
+#include "CodeService/Config/LuaStyle.h"
+#include "CodeService/Format/FormatState.h"
 
 class DiagnosticBuilder {
 public:
@@ -30,20 +30,13 @@ public:
                         std::string_view message,
                         std::string_view data = "");
 
-    FormatState& GetState();
-private:
-    void DoDiagnosticResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
 
     void ClearDiagnostic(std::size_t leftIndex);
 
-    void ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNode &next,
-                                size_t shouldSpace,
-                                const LuaSyntaxTree &t);
+    FormatState& GetState();
+private:
 
-    std::string GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxNode &right, const LuaSyntaxTree &t);
-
-    void ProcessIndentDiagnostic(LuaSyntaxNode &node, IndentData indentData, const LuaSyntaxTree &t);
-
+    LuaDiagnosticStyle _diagnosticStyle;
     FormatState _state;
     std::map<std::size_t, LuaDiagnostic> _nextDiagnosticMap;
     std::vector<LuaDiagnostic> _diagnostics;

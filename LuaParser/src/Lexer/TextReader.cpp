@@ -68,7 +68,7 @@ std::size_t TextReader::GetPos() {
 }
 
 TextRange TextReader::GetTokenRange() {
-    return TextRange(_buffStart, _buffIndex);
+    return TextRange(_buffStart, _buffIndex - _buffStart + 1);
 }
 
 void TextReader::ResetBuffer() {

@@ -257,8 +257,8 @@ std::vector<LuaDiagnosticInfo> LuaCodeFormat::MakeDiagnosticInfo(const std::vect
         result.Data = diagnostic.Data;
         result.Start.Line = file->GetLine(diagnostic.Range.StartOffset);
         result.Start.Col = file->GetColumn(diagnostic.Range.StartOffset);
-        result.End.Line = file->GetLine(diagnostic.Range.EndOffset);
-        result.End.Col = file->GetColumn(diagnostic.Range.EndOffset);
+        result.End.Line = file->GetLine(diagnostic.Range.GetEndOffset());
+        result.End.Col = file->GetColumn(diagnostic.Range.GetEndOffset());
     }
 
     return results;

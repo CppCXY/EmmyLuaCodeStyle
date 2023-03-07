@@ -7,9 +7,7 @@
 
 int main() {
     std::string buffer = R"(
-p({
-
-})
+local t = 123
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));

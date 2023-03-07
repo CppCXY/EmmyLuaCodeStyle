@@ -47,6 +47,8 @@ target_sources(CodeService
         ${CodeService_SOURCE_DIR}/src/Diagnostic/Spell/CodeSpellChecker.cpp
         ${CodeService_SOURCE_DIR}/src/Diagnostic/Spell/IdentifyParser.cpp
         ${CodeService_SOURCE_DIR}/src/Diagnostic/Spell/TextParser.cpp
+        # diagnostic/codestyle
+        ${CodeService_SOURCE_DIR}/src/Diagnostic/CodeStyle/CodeStyleChecker.cpp
         )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

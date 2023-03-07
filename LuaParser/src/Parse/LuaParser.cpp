@@ -38,7 +38,7 @@ bool LuaParser::Parse() {
     }
     catch (LuaParseException &e) {
         auto text = _file->GetSource();
-        _errors.emplace_back(e.what(), TextRange(text.size(), text.size()));
+        _errors.emplace_back(e.what(), TextRange(text.size(), 0));
     }
 
     if (_tokenIndex < _tokens.size()) {
@@ -849,7 +849,7 @@ std::string_view LuaParser::CheckName() {
     if (Current() == TK_NAME) {
         auto range = _tokens[_tokenIndex].Range;
         Next();
-        return _file->GetSource().substr(range.StartOffset, range.EndOffset - range.StartOffset + 1);
+        return _file->GetSource().substr(range.StartOffset, range.GetEndOffset() - range.StartOffset + 1);
     }
 
     LuaExpectedError("expected <name>");

@@ -34,7 +34,7 @@ DiagnosticService::Diagnostic(std::size_t fileId,
         auto &diag = diagnostics.emplace_back();
         diag.message = result.Message;
         auto startLC = lineIndex->GetLineCol(result.Range.StartOffset);
-        auto endLC = lineIndex->GetLineCol(result.Range.EndOffset);
+        auto endLC = lineIndex->GetLineCol(result.Range.GetEndOffset());
         diag.range = lsp::Range(
                 lsp::Position(startLC.Line, startLC.Col),
                 lsp::Position(endLC.Line, endLC.Col + 1)

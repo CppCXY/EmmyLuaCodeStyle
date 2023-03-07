@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "LuaParser/Types/EndOfLineType.h"
+#include "LuaParser/Types/TextRange.h"
 
 class LuaFile
 {
@@ -26,6 +27,8 @@ public:
 
     std::string_view Slice(std::size_t startOffset, std::size_t endOffset) const;
 
+    std::string_view Slice(TextRange range) const;
+
 	void SetTotalLine(std::size_t line);
 
 	void UpdateLineInfo(std::size_t startLine = 0);
@@ -38,7 +41,7 @@ public:
 
 	std::size_t GetLineRestCharacter(std::size_t offset);
 
-	std::string_view GetIndentString(std::size_t offset) const;
+	TextRange GetIndentRange(std::size_t offset) const;
 
     bool IsEmptyLine(std::size_t line) const;
 protected:

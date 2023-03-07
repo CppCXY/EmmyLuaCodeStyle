@@ -13,7 +13,7 @@ struct IncrementalToken {
     IncrementalToken(LuaToken &token, std::size_t nodeIndex)
             : Kind(token.TokenType),
               Start(token.Range.StartOffset),
-              Length(token.Range.EndOffset - token.Range.StartOffset + 1),
+              Length(token.Range.Length),
               NodeIndex(nodeIndex) {
     }
 

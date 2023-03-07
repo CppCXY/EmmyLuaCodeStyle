@@ -24,7 +24,7 @@ void FunctionOption::Parse(std::string_view option) {
                     return;
                 }
                 _key = std::string(
-                        virtualFile->Slice(token.Range.StartOffset, token.Range.EndOffset));
+                        virtualFile->Slice(token.Range.StartOffset, token.Range.GetEndOffset()));
                 state = ParseState::Key;
                 break;
             }
@@ -37,7 +37,7 @@ void FunctionOption::Parse(std::string_view option) {
             }
             case ParseState::ExpectParam: {
                 if (token.TokenType == TK_NAME || token.TokenType == TK_NUMBER || token.TokenType == TK_STRING) {
-                    _params.emplace_back(virtualFile->Slice(token.Range.StartOffset, token.Range.EndOffset));
+                    _params.emplace_back(virtualFile->Slice(token.Range.StartOffset, token.Range.GetEndOffset()));
                     state = ParseState::ExpectCommaOrFinish;
                 } else if (token.TokenType == ')') {
                     return;

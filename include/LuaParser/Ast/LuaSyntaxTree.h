@@ -21,6 +21,8 @@ public:
 
     std::size_t GetEndOffset(std::size_t index) const;
 
+    TextRange GetTokenRange(std::size_t index) const;
+
     std::size_t GetNextSibling(std::size_t index) const;
 
     std::size_t GetPrevSibling(std::size_t index) const;

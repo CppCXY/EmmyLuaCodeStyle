@@ -148,7 +148,7 @@ LuaTokenKind LuaLexer::Lex() {
                     return TK_LONG_STRING;
                 } else if (sep == 0) {
                     TokenError("invalid long string delimiter",
-                               TextRange(_reader.GetPos(), _reader.GetPos()));
+                               TextRange(_reader.GetPos(), 0));
                     return TK_LONG_STRING;
                 }
                 return '[';
@@ -360,7 +360,7 @@ void LuaLexer::ReadLongString(std::size_t sep) {
     for (;;) {
         switch (_reader.GetCurrentChar()) {
             case EOZ: {
-                TokenError("unfinished long string starting", TextRange(_reader.GetPos(), _reader.GetPos()));
+                TokenError("unfinished long string starting", TextRange(_reader.GetPos(), 0));
                 return;
             }
             case ']': {
@@ -390,7 +390,7 @@ void LuaLexer::ReadString(int del) {
             case EOZ:
             case '\n':
             case '\r': {
-                TokenError("unfinished string", TextRange(_reader.GetPos(), _reader.GetPos()));
+                TokenError("unfinished string", TextRange(_reader.GetPos(), 0));
                 return;
             }
             case '\\': {
@@ -398,7 +398,7 @@ void LuaLexer::ReadString(int del) {
 
                 switch (_reader.GetCurrentChar()) {
                     case EOZ:
-                        TokenError("unfinished string", TextRange(_reader.GetPos(), _reader.GetPos()));
+                        TokenError("unfinished string", TextRange(_reader.GetPos(), 0));
                         return;
                     case 'z': {
                         _reader.SaveAndNext();

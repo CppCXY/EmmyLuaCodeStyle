@@ -175,8 +175,8 @@ void LuaFormat::DiagnosticInspection(std::string_view message, TextRange range, 
                                      std::string_view path) {
     auto startLine = file->GetLine(range.StartOffset);
     auto startChar = file->GetColumn(range.StartOffset);
-    auto endLine = file->GetLine(range.EndOffset);
-    auto endChar = file->GetColumn(range.EndOffset);
+    auto endLine = file->GetLine(range.GetEndOffset());
+    auto endChar = file->GetColumn(range.GetEndOffset());
     std::cerr << util::format("\t{}({}:{} to {}:{}): {}", path, startLine + 1, startChar, endLine + 1, endChar,
                               message) << std::endl;
 }

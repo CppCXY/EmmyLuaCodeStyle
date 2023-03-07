@@ -92,11 +92,13 @@ void LuaTypeFormat::CompleteMissToken(std::size_t line,
             }
 
             bool nextBrace = false;
-            auto indentString = file.GetIndentString(keyOffset);
+            auto indentRange = file.GetIndentRange(keyOffset);
+            auto indentString = file.Slice(indentRange);
             auto nextToken = beforeToken.GetNextToken(t);
             if (nextToken.GetTokenKind(t) == TK_END) {
                 // 依据缩进判断是否该填补end
-                auto endIndentString = file.GetIndentString(nextToken.GetTextRange(t).StartOffset);
+                auto endIndentRange = file.GetIndentRange(nextToken.GetTextRange(t).StartOffset);
+                auto endIndentString = file.Slice(endIndentRange);
                 if (indentString == endIndentString) {
                     return;
                 }
