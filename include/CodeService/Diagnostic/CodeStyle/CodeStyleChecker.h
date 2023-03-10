@@ -39,4 +39,5 @@ private:
     std::string GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxNode &right, const LuaSyntaxTree &t);
 
     void EndWithNewLine(DiagnosticBuilder &d, const LuaSyntaxTree &t);
+
 };

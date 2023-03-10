@@ -2,6 +2,7 @@
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/Analyzer/AlignAnalyzer.h"
 #include "CodeService/Format/Analyzer/IndentationAnalyzer.h"
+#include "Util/StringUtil.h"
 
 
 FormatBuilder::FormatBuilder(LuaStyle &style) {
@@ -39,21 +40,6 @@ void FormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTr
             _formattedText.append(text);
         }
     }
-}
-
-bool ExistDel(char del, std::string_view text) {
-    text = text.substr(1, text.size() - 2);
-    char ch = '\0';
-    for (std::size_t i = 0; i < text.size(); ++i) {
-        ch = text[i];
-        if (ch == del) {
-            return true;
-        } else if (ch == '\\') {
-            ++i;
-        }
-    }
-
-    return false;
 }
 
 void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
@@ -104,7 +90,7 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                     auto del = '\'';
                     if (text.size() >= 2
                         && text.front() == '\"'
-                        && !ExistDel(del, text)) {
+                        && !string_util::ExistDel(del, text)) {
                         WriteChar(del);
                         WriteText(text.substr(1, text.size() - 2));
                         WriteChar(del);
@@ -121,7 +107,7 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                     auto del = '\"';
                     if (text.size() >= 2
                         && text.front() == '\''
-                        && !ExistDel(del, text)) {
+                        && !string_util::ExistDel(del, text)) {
                         WriteChar(del);
                         WriteText(text.substr(1, text.size() - 2));
                         WriteChar(del);

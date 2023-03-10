@@ -47,15 +47,21 @@ enum class LineSpaceType {
     Min
 };
 
+enum class LineBreakReason {
+    None,
+    ExceedMaxLine
+};
+
 struct LineSpace {
-    explicit LineSpace(std::size_t space = 1)
-            : Type(LineSpaceType::Fixed), Space(space) {}
+    explicit LineSpace(std::size_t space = 1, LineBreakReason reason = LineBreakReason::None)
+            : Type(LineSpaceType::Fixed), Space(space), Reason(reason) {}
 
     explicit LineSpace(LineSpaceType type, std::size_t space = 0)
-            : Type(type), Space(space) {}
+            : Type(type), Space(space), Reason(LineBreakReason::None) {}
 
     LineSpaceType Type;
     std::size_t Space;
+    LineBreakReason Reason;
 };
 
 enum class FunctionSingleArgSpace {

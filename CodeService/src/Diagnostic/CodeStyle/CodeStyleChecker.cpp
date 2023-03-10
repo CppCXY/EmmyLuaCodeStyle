@@ -80,7 +80,8 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
                 if (syntaxNode.GetTokenKind(t) == TK_STRING) {
                     auto text = syntaxNode.GetText(t);
                     if (text.size() >= 2
-                        && text.front() == '\"') {
+                        && text.front() == '\"'
+                        && !string_util::ExistDel('\'', text)) {
                         d.PushDiagnostic(DiagnosticType::StringQuote, textRange,
                                          LText("\" should be \' ")
                         );
@@ -93,7 +94,8 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
                 if (syntaxNode.GetTokenKind(t) == TK_STRING) {
                     auto text = syntaxNode.GetText(t);
                     if (text.size() >= 2
-                        && text.front() == '\'') {
+                        && text.front() == '\''
+                        && !string_util::ExistDel('\"', text)) {
                         d.PushDiagnostic(DiagnosticType::StringQuote, textRange,
                                          LText("\' should be \" ")
                         );
