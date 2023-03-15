@@ -3,6 +3,7 @@
 #include "CodeService/Config/LanguageTranslator.h"
 #include "Util/format.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
+#include "CodeService/Format/Analyzer/IndentationAnalyzer.h"
 
 CodeStyleChecker::CodeStyleChecker() {
 
@@ -217,6 +218,11 @@ void CodeStyleChecker::ProcessIndentDiagnostic(LuaSyntaxNode &node, const LuaSyn
     auto textRange = node.GetTextRange(t);
     auto &state = d.GetState();
     auto &file = t.GetFile();
+
+    auto indentAnalyzer = state.GetAnalyzer<IndentationAnalyzer>();
+    if (indentAnalyzer) {
+        indentAnalyzer->MarkIndent(node, t);
+    }
 
     auto indent = state.GetCurrentIndent();
     auto currentIndentRange = file.GetIndentRange(textRange.StartOffset);
