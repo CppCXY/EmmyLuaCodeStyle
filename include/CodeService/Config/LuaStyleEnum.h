@@ -20,12 +20,11 @@ enum class CallArgParentheses : int {
     //UnambiguousRemoveStringOnly
 };
 
-//enum class AlignCallArgs {
-//    None,
-//    Normal,
-////    OnlyAfterMoreIndentionStatement,
-////    OnlyNotExistCrossExpression,
-//};
+enum class ContinuousAlign {
+    None,
+    WhenExtraSpace,
+    Always
+};
 
 enum class TableSeparatorStyle {
     None,
@@ -69,4 +68,10 @@ enum class FunctionSingleArgSpace {
     Always, // true
     OnlyTable,
     OnlyString
+};
+
+enum class AlignArrayTable {
+    None,
+    Normal,
+    ContainCurly
 };

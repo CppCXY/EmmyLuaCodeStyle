@@ -350,7 +350,7 @@ void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const L
             if (forceBreak) {
                 BreakAfter(expr.GetChildToken('{', t), t);
                 for (auto field: fields) {
-                    BreakAfter(field, t);
+                    BreakAfter(field, t, LineSpace(LineSpaceType::Keep));
                 }
             } else {
                 for (auto field: fields) {

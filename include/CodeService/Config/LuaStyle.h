@@ -92,9 +92,9 @@ public:
 
     bool align_function_params = true;
 
-    bool align_continuous_assign_statement = true;
+    ContinuousAlign align_continuous_assign_statement = ContinuousAlign::WhenExtraSpace;
 
-    bool align_continuous_rect_table_field = true;
+    ContinuousAlign align_continuous_rect_table_field = ContinuousAlign::WhenExtraSpace;
 
     bool align_if_branch = false;
     // not implement now
@@ -102,7 +102,7 @@ public:
 
     bool align_continuous_inline_comment = true;
 
-    bool align_array_table = true;
+    AlignArrayTable align_array_table = AlignArrayTable::Normal;
 
     // [Indent]
 

@@ -840,7 +840,7 @@ end
 TEST(FormatByStyleOption, align_continuous_assign_statement) {
     LuaStyle style;
 
-    style.align_continuous_assign_statement = false;
+    style.align_continuous_assign_statement = ContinuousAlign::None;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t  = 123
@@ -850,10 +850,20 @@ local dddd = 456
 local t = 123
 local dddd = 456
 )", style));
-    style.align_continuous_assign_statement = true;
+    style.align_continuous_assign_statement = ContinuousAlign::WhenExtraSpace;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t  = 123
+local dddd = 456
+)",
+            R"(
+local t    = 123
+local dddd = 456
+)", style));
+    style.align_continuous_assign_statement = ContinuousAlign::Always;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = 123
 local dddd = 456
 )",
             R"(
@@ -865,7 +875,7 @@ local dddd = 456
 TEST(FormatByStyleOption, align_continuous_rect_table_field) {
     LuaStyle style;
 
-    style.align_continuous_rect_table_field = false;
+    style.align_continuous_rect_table_field = ContinuousAlign::None;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = {
@@ -879,11 +889,25 @@ local t = {
     bbbbbbbb = 456
 }
 )", style));
-    style.align_continuous_rect_table_field = true;
+    style.align_continuous_rect_table_field = ContinuousAlign::WhenExtraSpace;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = {
     aaa  = 123,
+    bbbbbbbb = 456
+}
+)",
+            R"(
+local t = {
+    aaa      = 123,
+    bbbbbbbb = 456
+}
+)", style));
+    style.align_continuous_rect_table_field = ContinuousAlign::Always;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = {
+    aaa = 123,
     bbbbbbbb = 456
 }
 )",
@@ -956,7 +980,7 @@ end
 TEST(FormatByStyleOption, align_array_table) {
     LuaStyle style;
 
-    style.align_array_table = false;
+    style.align_array_table = AlignArrayTable::None;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = {
@@ -974,7 +998,7 @@ local t = {
     { 1, 2, 3 },
 }
 )", style));
-    style.align_array_table = true;
+    style.align_array_table = AlignArrayTable::Normal;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = {
@@ -990,6 +1014,24 @@ local t = {
     { "fwfw",  fjwofw,        wngjwoigw },
     { a,       b,             c,        d },
     { 1,       2,             3 },
+}
+)", style));
+    style.align_array_table = AlignArrayTable::ContainCurly;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = {
+    { "fwfwf", njqoifjiowiof, 121313 },
+    { "fwfw", fjwofw, wngjwoigw },
+    { a, b, c, d },
+    { 1, 2, 3 },
+}
+)",
+            R"(
+local t = {
+    { "fwfwf", njqoifjiowiof, 121313      },
+    { "fwfw",  fjwofw,        wngjwoigw   },
+    { a,       b,             c,        d },
+    { 1,       2,             3           },
 }
 )", style));
 }

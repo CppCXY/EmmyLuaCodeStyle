@@ -118,7 +118,7 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
     BOOL_OPTION(space_before_closure_open_parenthesis)
 
     if (configMap.count("space_before_function_call_single_arg")) {
-        auto & value = configMap.at("space_before_function_call_single_arg");
+        auto &value = configMap.at("space_before_function_call_single_arg");
         if (value == "true" || value == "always") {
             space_before_function_call_single_arg = FunctionSingleArgSpace::Always;
         } else if (value == "only_string") {
@@ -157,13 +157,43 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
 
     BOOL_OPTION(align_function_params)
 
-    BOOL_OPTION(align_continuous_assign_statement)
+    if (configMap.count("align_continuous_assign_statement")) {
+        if (configMap.at("align_continuous_assign_statement") == "true"
+            || configMap.at("align_continuous_assign_statement") == "when_extra_space") {
+            align_continuous_assign_statement = ContinuousAlign::WhenExtraSpace;
+        } else if (configMap.at("align_continuous_assign_statement") == "always") {
+            align_continuous_assign_statement = ContinuousAlign::Always;
+        } else if (configMap.at("align_continuous_assign_statement") == "false"
+                   || configMap.at("align_continuous_assign_statement") == "none") {
+            align_continuous_assign_statement = ContinuousAlign::None;
+        }
+    }
 
-    BOOL_OPTION(align_continuous_rect_table_field)
+    if (configMap.count("align_continuous_rect_table_field")) {
+        if (configMap.at("align_continuous_rect_table_field") == "true"
+            || configMap.at("align_continuous_rect_table_field") == "when_extra_space") {
+            align_continuous_rect_table_field = ContinuousAlign::WhenExtraSpace;
+        } else if (configMap.at("align_continuous_rect_table_field") == "always") {
+            align_continuous_rect_table_field = ContinuousAlign::Always;
+        } else if (configMap.at("align_continuous_rect_table_field") == "false"
+                   || configMap.at("align_continuous_rect_table_field") == "none") {
+            align_continuous_rect_table_field = ContinuousAlign::None;
+        }
+    }
 
     BOOL_OPTION(align_if_branch)
 
-    BOOL_OPTION(align_array_table)
+    if (configMap.count("align_array_table")) {
+        if (configMap.at("align_array_table") == "true"
+            || configMap.at("align_array_table") == "normal") {
+            align_array_table = AlignArrayTable::Normal;
+        } else if (configMap.at("align_array_table") == "contain_curly") {
+            align_array_table = AlignArrayTable::ContainCurly;
+        } else if (configMap.at("align_array_table") == "false"
+                   || configMap.at("align_array_table") == "none") {
+            align_array_table = AlignArrayTable::None;
+        }
+    }
 
     BOOL_OPTION(align_continuous_inline_comment)
 
@@ -195,22 +225,19 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
 
             if (option.GetKey() == "keep") {
                 lineOption.second = LineSpace(LineSpaceType::Keep);
-            }
-            else if(option.GetKey() == "min") {
+            } else if (option.GetKey() == "min") {
                 auto p1 = option.GetParam(0);
-                if(!p1.empty() && IsNumber(p1)) {
+                if (!p1.empty() && IsNumber(p1)) {
                     lineOption.second = LineSpace(LineSpaceType::Min, std::stoi(p1));
                 }
-            }
-            else if(option.GetKey() == "fixed") {
+            } else if (option.GetKey() == "fixed") {
                 auto p1 = option.GetParam(0);
-                if(!p1.empty() && IsNumber(p1)) {
+                if (!p1.empty() && IsNumber(p1)) {
                     lineOption.second = LineSpace(LineSpaceType::Fixed, std::stoi(p1));
                 }
-            }
-            else if(option.GetKey() == "max") {
+            } else if (option.GetKey() == "max") {
                 auto p1 = option.GetParam(0);
-                if(!p1.empty() && IsNumber(p1)) {
+                if (!p1.empty() && IsNumber(p1)) {
                     lineOption.second = LineSpace(LineSpaceType::Max, std::stoi(p1));
                 }
             }

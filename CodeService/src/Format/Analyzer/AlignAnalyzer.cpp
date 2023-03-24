@@ -15,7 +15,7 @@ void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
         if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {
                 case LuaSyntaxNodeKind::Block: {
-                    if (f.GetStyle().align_continuous_assign_statement) {
+                    if (f.GetStyle().align_continuous_assign_statement != ContinuousAlign::None) {
                         AnalyzeContinuousLocalOrAssign(f, syntaxNode, t);
                     }
                     if (f.GetStyle().align_continuous_similar_call_args) {
@@ -25,10 +25,10 @@ void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case LuaSyntaxNodeKind::TableFieldList: {
-                    if (f.GetStyle().align_continuous_rect_table_field) {
+                    if (f.GetStyle().align_continuous_rect_table_field != ContinuousAlign::None) {
                         AnalyzeContinuousRectField(f, syntaxNode, t);
                     }
-                    if (f.GetStyle().align_array_table) {
+                    if (f.GetStyle().align_array_table != AlignArrayTable::None) {
                         AnalyzeContinuousArrayTableField(f, syntaxNode, t);
                     }
                     break;
@@ -100,7 +100,8 @@ void AlignAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSy
         auto &alignGroup = _alignGroup[alignGroupIndex];
         switch (alignGroup.Strategy) {
             case AlignStrategy::Normal:
-            case AlignStrategy::AlignToEq: {
+            case AlignStrategy::AlignToEqWhenExtraSpace:
+            case AlignStrategy::AlignToEqAlways: {
                 resolve.SetRelativeIndentAlign(alignGroup.AlignPos);
                 break;
             }
@@ -133,6 +134,11 @@ AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syn
     auto children = syntaxNode.GetChildren(t);
     std::size_t lastLine = 0;
     std::vector<std::size_t> group;
+    auto strategy = AlignStrategy::AlignToEqWhenExtraSpace;
+    if (f.GetStyle().align_continuous_assign_statement == ContinuousAlign::Always) {
+        strategy = AlignStrategy::AlignToEqAlways;
+    }
+
     for (auto stmt: children) {
         auto kind = stmt.GetSyntaxKind(t);
         if (group.empty()) {
@@ -148,7 +154,7 @@ AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syn
             auto line = stmt.GetStartLine(t);
             if (line - lastLine > 2) {
                 if (group.size() > 1) {
-                    PushAlignGroup(AlignStrategy::AlignToEq, group);
+                    PushAlignGroup(strategy, group);
                 }
                 group.clear();
             } else {
@@ -164,7 +170,7 @@ AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syn
                 group.push_back(stmt.GetIndex());
             } else {
                 if (group.size() > 1) {
-                    PushAlignGroup(AlignStrategy::AlignToEq, group);
+                    PushAlignGroup(strategy, group);
                 }
                 group.clear();
                 group.push_back(stmt.GetIndex());
@@ -172,7 +178,7 @@ AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syn
 
             lastLine = stmt.GetEndLine(t);
         } else if (group.size() > 1) {
-            PushAlignGroup(AlignStrategy::AlignToEq, group);
+            PushAlignGroup(strategy, group);
             group.clear();
         } else {
             group.clear();
@@ -180,7 +186,7 @@ AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syn
     }
 
     if (group.size() > 1) {
-        PushAlignGroup(AlignStrategy::AlignToEq, group);
+        PushAlignGroup(strategy, group);
     }
 }
 
@@ -193,6 +199,11 @@ void AlignAnalyzer::AnalyzeContinuousRectField(FormatState &f, LuaSyntaxNode &sy
     auto children = syntaxNode.GetChildren(t);
     std::size_t lastLine = 0;
     std::vector<std::size_t> group;
+    auto strategy = AlignStrategy::AlignToEqWhenExtraSpace;
+    if (f.GetStyle().align_continuous_rect_table_field == ContinuousAlign::Always) {
+        strategy = AlignStrategy::AlignToEqAlways;
+    }
+
     for (auto field: children) {
         auto line = field.GetStartLine(t);
         if (line < lastLine) {
@@ -211,7 +222,7 @@ void AlignAnalyzer::AnalyzeContinuousRectField(FormatState &f, LuaSyntaxNode &sy
             if (tokenKind == TK_SHORT_COMMENT) {
                 if (line - lastLine > 2) {
                     if (group.size() > 1) {
-                        PushAlignGroup(AlignStrategy::AlignToEq, group);
+                        PushAlignGroup(strategy, group);
                     }
                     group.clear();
                 } else {
@@ -230,7 +241,7 @@ void AlignAnalyzer::AnalyzeContinuousRectField(FormatState &f, LuaSyntaxNode &sy
                 group.push_back(field.GetIndex());
             } else {
                 if (group.size() > 1) {
-                    PushAlignGroup(AlignStrategy::AlignToEq, group);
+                    PushAlignGroup(strategy, group);
                 }
                 group.clear();
                 group.push_back(field.GetIndex());
@@ -238,7 +249,7 @@ void AlignAnalyzer::AnalyzeContinuousRectField(FormatState &f, LuaSyntaxNode &sy
 
             lastLine = field.GetEndLine(t);
         } else if (group.size() > 1) {
-            PushAlignGroup(AlignStrategy::AlignToEq, group);
+            PushAlignGroup(strategy, group);
             group.clear();
         } else {
             group.clear();
@@ -246,7 +257,7 @@ void AlignAnalyzer::AnalyzeContinuousRectField(FormatState &f, LuaSyntaxNode &sy
     }
 
     if (group.size() > 1) {
-        PushAlignGroup(AlignStrategy::AlignToEq, group);
+        PushAlignGroup(strategy, group);
     }
 }
 
@@ -318,18 +329,32 @@ AlignAnalyzer::AnalyzeArrayTableAlign(FormatState &f, std::vector<LuaSyntaxNode>
         }
         PushNormalAlignGroup(alignPos, group);
         alignPos += elementLength;
-        if (f.GetStyle().space_after_comma) {
-            alignPos++;
+        if (i + 1 == maxAlign) {
+            if (f.GetStyle().space_around_table_field_list) {
+                alignPos++;
+            }
+        } else {
+            if (f.GetStyle().space_after_comma) {
+                alignPos++;
+            }
         }
+
         elementLength = 0;
         group.clear();
+    }
+
+    if (f.GetStyle().align_array_table == AlignArrayTable::ContainCurly) {
+        for (auto table: arrayTable) {
+            group.push_back(table.GetChildToken('}', t).GetIndex());
+        }
+        PushNormalAlignGroup(alignPos, group);
     }
 }
 
 void
 AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGroup &group, const LuaSyntaxTree &t) {
     switch (group.Strategy) {
-        case AlignStrategy::AlignToEq: {
+        case AlignStrategy::AlignToEqWhenExtraSpace: {
             bool allowAlign = false;
             for (auto i: group.SyntaxGroup) {
                 auto node = LuaSyntaxNode(i);
@@ -358,6 +383,23 @@ AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGr
                 }
                 group.AlignPos = maxDis;
             }
+            break;
+        }
+        case AlignStrategy::AlignToEqAlways: {
+            std::size_t maxDis = 0;
+            for (auto i: group.SyntaxGroup) {
+                auto node = LuaSyntaxNode(i);
+                auto eq = node.GetChildToken('=', t);
+                if (eq.IsToken(t)) {
+                    auto prev = eq.GetPrevToken(t);
+                    auto newPos = prev.GetTextRange(t).GetEndOffset() + 2 - node.GetTextRange(t).StartOffset;
+                    if (newPos > maxDis) {
+                        maxDis = newPos;
+                    }
+                    _resolveGroupIndex[eq.GetIndex()] = groupIndex;
+                }
+            }
+            group.AlignPos = maxDis;
             break;
         }
         case AlignStrategy::AlignToFirst: {
