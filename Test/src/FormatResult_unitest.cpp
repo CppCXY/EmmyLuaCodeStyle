@@ -795,3 +795,33 @@ local a2 = aaa.p(function()
     :okok()
 )", s));
 }
+
+TEST(Format, codestyle_98) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local function t(entry, item)
+    item.dup = ({
+        aa = 0
+    })[entry.name] or 0
+
+    item.dup2 = ({
+        aa = 0,
+    })[entry.name]
+
+    return item
+end
+)",
+            R"(
+local function t(entry, item)
+    item.dup = ({
+        aa = 0
+    })[entry.name] or 0
+
+    item.dup2 = ({
+        aa = 0,
+    })[entry.name]
+
+    return item
+end
+)"));
+}

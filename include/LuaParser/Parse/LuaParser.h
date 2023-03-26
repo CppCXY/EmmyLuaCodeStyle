@@ -13,6 +13,8 @@
 class LuaParser
 {
 public:
+    static BinOpr GetBinaryOperator(LuaTokenKind op);
+
 	LuaParser(std::shared_ptr<LuaFile> luaFile, std::vector<LuaToken>&& tokens);
 
     bool Parse();
@@ -28,7 +30,6 @@ public:
 	std::shared_ptr<LuaFile> GetLuaFile();
 
     Marker Mark();
-
 private:
     void Next();
 
@@ -126,7 +127,7 @@ private:
 
 	UnOpr GetUnaryOperator(LuaTokenKind op);
 
-	BinOpr GetBinaryOperator(LuaTokenKind op);
+
 
 	/*
 	 * 他是检查当前token的type是否与c相同

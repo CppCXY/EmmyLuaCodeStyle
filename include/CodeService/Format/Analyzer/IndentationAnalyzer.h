@@ -23,7 +23,7 @@ public:
 
     void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
-    void Indenter(LuaSyntaxNode &n, const LuaSyntaxTree &t, IndentData indentData = IndentData());
+    void AddIndenter(LuaSyntaxNode &n, const LuaSyntaxTree &t, IndentData indentData = IndentData());
 
     // 在格式化过程中标记Token缩进
     void MarkIndent(LuaSyntaxNode &n, const LuaSyntaxTree &t);

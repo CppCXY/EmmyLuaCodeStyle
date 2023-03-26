@@ -7,10 +7,10 @@
 
 int main() {
     std::string buffer = R"(
-local t = {
-    aaa = 123,
-    bbbbbbbb = 456
-}
+(
+aa
+).aa =123
+
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -25,7 +25,6 @@ local t = {
     std::cout << t.GetDebugView() << std::endl;
 
     LuaStyle s;
-    s.align_continuous_rect_table_field = ContinuousAlign::Always;
     FormatBuilder b(s);
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;
