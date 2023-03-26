@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 
 project(CodeFormat)
 
-add_executable(CodeFormat)
+add_executable(CodeFormat ../include/CodeService/Format/Analyzer/FormatDocAnalyze.h)
 
 add_dependencies(CodeFormat CodeService Util)
 

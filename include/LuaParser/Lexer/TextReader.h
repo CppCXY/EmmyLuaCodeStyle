@@ -1,5 +1,6 @@
 #pragma once
 #include <string_view>
+#include <functional>
 #include "LuaParser/Types/TextRange.h"
 
 class TextReader {
@@ -25,6 +26,10 @@ public:
     std::string_view GetSaveText() const;
 
     void ResetBuffer();
+
+    std::size_t EatWhen(int ch);
+
+    std::size_t EatWhile(const std::function<bool(int ch)>& fn);
 
     bool IsEof() const;
 private:

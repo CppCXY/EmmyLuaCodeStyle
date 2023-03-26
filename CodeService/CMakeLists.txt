@@ -2,7 +2,7 @@
 
 project(CodeService)
 
-add_library(CodeService STATIC)
+add_library(CodeService STATIC src/Format/Analyzer/FormatDocAnalyze.cpp)
 
 add_dependencies(CodeService LuaParser Util)
 
@@ -28,6 +28,7 @@ target_sources(CodeService
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/SpaceAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/IndentationAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/LineBreakAnalyzer.cpp
+        ${CodeService_SOURCE_DIR}/src/Format/Analyzer/FormatDocAnalyze.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/AlignAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/TokenAnalyzer.cpp
         ${CodeService_SOURCE_DIR}/src/Format/Analyzer/FormatResolve.cpp

@@ -78,7 +78,7 @@ void TextReader::ResetBuffer() {
 }
 
 std::string_view TextReader::GetSaveText() const {
-    if(_hasSaveText) {
+    if (_hasSaveText) {
         return _text.substr(_buffStart, _buffIndex - _buffStart + 1);
     }
     return _text.substr(_buffStart, 0);
@@ -86,4 +86,22 @@ std::string_view TextReader::GetSaveText() const {
 
 bool TextReader::IsEof() const {
     return _isEof;
+}
+
+std::size_t TextReader::EatWhen(int ch) {
+    std::size_t count = 0;
+    while (!IsEof() && GetCurrentChar() == ch) {
+        SaveAndNext();
+        count++;
+    }
+    return count;
+}
+
+std::size_t TextReader::EatWhile(const std::function<bool(int)> &fn) {
+    std::size_t count = 0;
+    while (!IsEof() && fn(GetCurrentChar())) {
+        SaveAndNext();
+        count++;
+    }
+    return count;
 }

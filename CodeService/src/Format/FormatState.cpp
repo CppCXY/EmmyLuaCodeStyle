@@ -4,6 +4,7 @@
 #include "CodeService/Format/Analyzer/LineBreakAnalyzer.h"
 #include "CodeService/Format/Analyzer/AlignAnalyzer.h"
 #include "CodeService/Format/Analyzer/TokenAnalyzer.h"
+#include "CodeService/Format/Analyzer/FormatDocAnalyze.h"
 
 FormatState::FormatState()
         : _currentWidth(0) {
@@ -44,6 +45,7 @@ void FormatState::Analyze(const LuaSyntaxTree &t) {
     AddAnalyzer<LineBreakAnalyzer>();
     AddAnalyzer<AlignAnalyzer>();
     AddAnalyzer<TokenAnalyzer>();
+    AddAnalyzer<FormatDocAnalyze>();
 
     _fileEndOfLine = t.GetFile().GetEndOfLine();
     for (const auto &analyzer: _analyzers) {
