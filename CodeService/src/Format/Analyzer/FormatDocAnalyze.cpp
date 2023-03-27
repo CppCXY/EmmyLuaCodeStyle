@@ -25,7 +25,6 @@ void FormatDocAnalyze::Analyze(FormatState &f, const LuaSyntaxTree &t) {
 }
 
 void FormatDocAnalyze::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
-    FormatAnalyzer::ComplexAnalyze(f, t);
 }
 
 void

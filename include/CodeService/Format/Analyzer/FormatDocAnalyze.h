@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include "FormatAnalyzer.h"
 #include "CodeService/Format/Types.h"
 
