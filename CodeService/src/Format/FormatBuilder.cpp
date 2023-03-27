@@ -36,7 +36,7 @@ void FormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTr
             break;
         }
         default: {
-            _state.GetCurrentWidth() += text.size();
+            _state.CurrentWidth() += text.size();
             _formattedText.append(text);
         }
     }
@@ -44,7 +44,7 @@ void FormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTr
 
 void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (syntaxNode.IsToken(t)) {
-        if (_state.IsNewLine()) {
+        if (_state.IsNewLine(syntaxNode, t)) {
             WriteIndent();
             auto indentAnalyzer = _state.GetAnalyzer<IndentationAnalyzer>();
             if (indentAnalyzer) {
@@ -55,8 +55,8 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
         switch (resolve.GetPrevSpaceStrategy()) {
             case PrevSpaceStrategy::AlignPos: {
                 auto pos = resolve.GetAlign();
-                if (pos > _state.GetCurrentWidth()) {
-                    auto space = pos - _state.GetCurrentWidth();
+                if (pos > _state.CurrentWidth()) {
+                    auto space = pos - _state.CurrentWidth();
                     WriteSpace(space);
                 }
                 break;
@@ -65,8 +65,8 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 auto relativePos = resolve.GetAlign();
                 auto indentState = _state.GetCurrentIndent();
                 auto pos = relativePos + indentState.SpaceSize + indentState.TabSize * _state.GetStyle().tab_width;
-                if (pos > _state.GetCurrentWidth()) {
-                    auto space = pos - _state.GetCurrentWidth();
+                if (pos > _state.CurrentWidth()) {
+                    auto space = pos - _state.CurrentWidth();
                     WriteSpace(space);
                 }
                 break;
@@ -219,7 +219,7 @@ void FormatBuilder::WriteSpace(std::size_t space) {
         auto size = _formattedText.size();
         _formattedText.resize(size + space, ' ');
     }
-    _state.GetCurrentWidth() += space;
+    _state.CurrentWidth() += space;
 }
 
 void FormatBuilder::WriteLine(std::size_t line) {
@@ -272,7 +272,7 @@ void FormatBuilder::WriteLine(std::size_t line) {
             break;
         }
     }
-    _state.GetCurrentWidth() = 0;
+    _state.CurrentWidth() = 0;
 }
 
 void FormatBuilder::WriteIndent() {
@@ -297,11 +297,11 @@ void FormatBuilder::WriteIndent() {
             break;
         }
     }
-    _state.GetCurrentWidth() += topLevelIndent.SpaceSize + topLevelIndent.TabSize * _state.GetStyle().tab_width;
+    _state.CurrentWidth() += topLevelIndent.SpaceSize + topLevelIndent.TabSize * _state.GetStyle().tab_width;
 }
 
 void FormatBuilder::WriteChar(char ch) {
-    _state.GetCurrentWidth()++;
+    _state.CurrentWidth()++;
     _formattedText.push_back(ch);
 }
 
@@ -324,7 +324,7 @@ void FormatBuilder::WriteText(std::string_view text) {
     }
 
     if (text.size() > last) {
-        _state.GetCurrentWidth() += text.size() - last;
+        _state.CurrentWidth() += text.size() - last;
         if (last != 0) {
             _formattedText.append(text.substr(last));
         } else {

@@ -5,7 +5,8 @@
 #include "CodeService/Diagnostic/CodeStyle/CodeStyleChecker.h"
 
 DiagnosticBuilder::DiagnosticBuilder(LuaStyle &style, LuaDiagnosticStyle &diagnosticStyle)
-        : _diagnosticStyle(diagnosticStyle) {
+        : _diagnosticStyle(diagnosticStyle),
+          _state(FormatState::Mode::Diagnostic) {
     _state.SetFormatStyle(style);
     _state.SetDiagnosticStyle(diagnosticStyle);
 }

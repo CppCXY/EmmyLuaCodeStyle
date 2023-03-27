@@ -6,11 +6,12 @@
 #include "CodeService/Format/Analyzer/TokenAnalyzer.h"
 #include "CodeService/Format/Analyzer/FormatDocAnalyze.h"
 
-FormatState::FormatState()
-        : _currentWidth(0) {
+FormatState::FormatState(Mode mode)
+        : _currentWidth(0),
+          _mode(mode) {
 }
 
-std::size_t &FormatState::GetCurrentWidth() {
+std::size_t &FormatState::CurrentWidth() {
     return _currentWidth;
 }
 
@@ -35,8 +36,13 @@ const LuaDiagnosticStyle &FormatState::GetDiagnosticStyle() const {
     return _diagnosticStyle;
 }
 
-bool FormatState::IsNewLine() const {
-    return _currentWidth == 0;
+bool FormatState::IsNewLine(LuaSyntaxNode &n, const LuaSyntaxTree &t) const {
+    if (_mode == Mode::Format) {
+        return _currentWidth == 0;
+    } else {
+        auto prev = n.GetPrevToken(t);
+        return prev.IsNull(t) || n.GetPrevToken(t).GetEndLine(t) != n.GetStartLine(t);
+    }
 }
 
 void FormatState::Analyze(const LuaSyntaxTree &t) {
