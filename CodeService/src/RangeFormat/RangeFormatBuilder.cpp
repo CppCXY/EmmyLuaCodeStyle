@@ -53,7 +53,7 @@ void RangeFormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyn
                 break;
             }
             default: {
-                _state.GetCurrentWidth() += text.size();
+                _state.CurrentWidth() += text.size();
             }
         }
     }
@@ -63,7 +63,7 @@ void RangeFormatBuilder::WriteSpace(std::size_t space) {
     if (_validRange) {
         return FormatBuilder::WriteSpace(space);
     } else {
-        _state.GetCurrentWidth() += space;
+        _state.CurrentWidth() += space;
     }
 }
 
@@ -71,7 +71,7 @@ void RangeFormatBuilder::WriteLine(std::size_t line) {
     if (_validRange) {
         return FormatBuilder::WriteLine(line);
     } else {
-        _state.GetCurrentWidth() = 0;
+        _state.CurrentWidth() = 0;
     }
 }
 
@@ -80,7 +80,7 @@ void RangeFormatBuilder::WriteIndent() {
         return FormatBuilder::WriteIndent();
     } else {
         auto topLevelIndent = _state.GetCurrentIndent();
-        _state.GetCurrentWidth() += topLevelIndent.SpaceSize + topLevelIndent.TabSize * _state.GetStyle().tab_width;
+        _state.CurrentWidth() += topLevelIndent.SpaceSize + topLevelIndent.TabSize * _state.GetStyle().tab_width;
     }
 }
 
@@ -88,7 +88,7 @@ void RangeFormatBuilder::WriteChar(char ch) {
     if (_validRange) {
         return FormatBuilder::WriteChar(ch);
     } else {
-        _state.GetCurrentWidth()++;
+        _state.CurrentWidth()++;
     }
 }
 
@@ -100,7 +100,7 @@ void RangeFormatBuilder::WriteText(std::string_view text) {
         for (std::size_t i = 0; i != text.size(); i++) {
             char ch = text[i];
             if (ch == '\n' || ch == '\r') {
-                _state.GetCurrentWidth() = 0;
+                _state.CurrentWidth() = 0;
                 if (ch == '\r'
                     && (i + 1 < text.size())
                     && (text[i + 1] == '\n')) {
@@ -111,7 +111,7 @@ void RangeFormatBuilder::WriteText(std::string_view text) {
         }
 
         if (text.size() > last) {
-            _state.GetCurrentWidth() += text.size() - last;
+            _state.CurrentWidth() += text.size() - last;
         }
     }
 }

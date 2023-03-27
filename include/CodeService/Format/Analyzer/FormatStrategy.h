@@ -27,7 +27,9 @@ enum class TokenStrategy {
     TableSepComma,
     TableAddSep,
 
-    RemoveCommentTrailSpace
+    RemoveCommentTrailSpace,
+
+    OriginRange
 };
 
 enum class IndentStrategy {

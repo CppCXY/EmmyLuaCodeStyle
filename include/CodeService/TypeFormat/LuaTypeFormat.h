@@ -2,7 +2,6 @@
 
 #include "CodeService/Format/FormatBuilder.h"
 #include "LuaTypeFormatOptions.h"
-#include "CodeService/Format/Types.h"
 
 class LuaTypeFormat {
 public:

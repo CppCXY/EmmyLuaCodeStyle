@@ -34,6 +34,7 @@ void FormatResolve::Reset() {
     _indentStrategy = IndentStrategy::None;
     _nextSpaceData = NextData();
     _prevSpaceData = PrevData();
+    _range = IndexRange();
     _indent = 0;
 }
 
@@ -80,5 +81,14 @@ void FormatResolve::SetRelativeIndentAlign(std::size_t align) {
 
 void FormatResolve::SetTokenStrategy(TokenStrategy strategy) {
     _tokenStrategy = strategy;
+}
+
+void FormatResolve::SetOriginRange(IndexRange range) {
+    _tokenStrategy = TokenStrategy::OriginRange;
+    _range = range;
+}
+
+IndexRange FormatResolve::GetOriginRange() const {
+    return _range;
 }
 

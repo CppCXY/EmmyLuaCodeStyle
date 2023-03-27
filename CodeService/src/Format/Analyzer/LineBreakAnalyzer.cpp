@@ -202,7 +202,7 @@ LineBreakAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyn
                 break;
             }
             case LineBreakStrategy::WhenMayExceed: {
-                auto lineWidth = f.GetCurrentWidth();
+                auto lineWidth = f.CurrentWidth();
                 auto &style = f.GetStyle();
                 auto relationNode = LuaSyntaxNode(lineBreakData.Data.Index);
                 auto guessLineWidth = lineWidth + syntaxNode.GetFirstLineWidth(t) + relationNode.GetFirstLineWidth(t);

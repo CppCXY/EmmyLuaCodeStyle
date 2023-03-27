@@ -2,26 +2,26 @@
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "Util/StringUtil.h"
 #include "LuaParser/Lexer/TextReader.h"
+#include "CodeService/Format/FormatState.h"
 
 FormatDocAnalyze::FormatDocAnalyze() {
 
 }
 
 void FormatDocAnalyze::Analyze(FormatState &f, const LuaSyntaxTree &t) {
-//    for (auto syntaxNode: t.GetSyntaxNodes()) {
-//        switch (syntaxNode.GetTokenKind(t)) {
-//            case TK_SHORT_COMMENT: {
-//                if (syntaxNode.GetParent(t).GetSyntaxKind(t) == LuaSyntaxNodeKind::Block) {
-//
-//
-//                    break;
-//                }
-//            }
-//            default: {
-//
-//            }
-//        }
-//    }
+    for (auto syntaxNode: t.GetSyntaxNodes()) {
+        switch (syntaxNode.GetTokenKind(t)) {
+            case TK_SHORT_COMMENT: {
+                if (syntaxNode.GetParent(t).GetSyntaxKind(t) == LuaSyntaxNodeKind::Block) {
+                    AnalyzeDocFormat(syntaxNode, f, t);
+                    break;
+                }
+            }
+            default: {
+                break;
+            }
+        }
+    }
 }
 
 void FormatDocAnalyze::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
@@ -30,7 +30,13 @@ void FormatDocAnalyze::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
 
 void
 FormatDocAnalyze::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+    auto it = _ignores.find(syntaxNode.GetIndex());
+    if (it == _ignores.end()) {
+        return;
+    }
 
+    f.AddIgnore(it->second);
+    resolve.SetOriginRange(it->second);
 }
 
 bool IsWhiteSpaces(int c) {
@@ -91,9 +97,21 @@ void FormatDocAnalyze::AnalyzeDocFormat(LuaSyntaxNode n, FormatState &f, const L
                     textReader.EatWhile(ActionContinue);
                     auto action = textReader.GetSaveText();
                     if (action == "disable") {
-
+                        auto block = n.GetParent(t);
+                        auto lastChild = block.GetLastToken(t);
+                        AddIgnoreRange(IndexRange(n.GetIndex(), lastChild.GetIndex()), t);
+                        break;
                     } else if (action == "disable-next") {
+                        auto nextNode = n.GetNextSibling(t);
+                        while (!nextNode.IsNull(t)
+                               && !detail::multi_match::StatementMatch(nextNode.GetSyntaxKind(t))) {
+                            nextNode.ToNext(t);
+                        }
+                        if (nextNode.IsNode(t)) {
+                            AddIgnoreRange(IndexRange(n.GetIndex(), nextNode.GetIndex()), t);
+                        }
 
+                        break;
                     } else if (action == "on") {
                         state = ParseState::List;
                         // todo
@@ -101,7 +119,6 @@ void FormatDocAnalyze::AnalyzeDocFormat(LuaSyntaxNode n, FormatState &f, const L
                     } else if (action == "on-next") {
                         state = ParseState::List;
                         // todo
-
                         break;
                     }
                 }
@@ -113,4 +130,10 @@ void FormatDocAnalyze::AnalyzeDocFormat(LuaSyntaxNode n, FormatState &f, const L
             }
         }
     }
+}
+
+void FormatDocAnalyze::AddIgnoreRange(const IndexRange &range, const LuaSyntaxTree &t) {
+    auto startIndex = LuaSyntaxNode(range.StartIndex).GetFirstToken(t).GetIndex();
+    auto endIndex = LuaSyntaxNode(range.EndIndex).GetLastToken(t).GetIndex();
+    _ignores[startIndex] = IndexRange(startIndex, endIndex);
 }

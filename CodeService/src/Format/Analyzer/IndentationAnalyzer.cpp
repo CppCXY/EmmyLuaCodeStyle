@@ -185,7 +185,7 @@ IndentationAnalyzer::Query(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree
                 break;
             }
             case IndentType::WhenLineBreak: {
-                if (f.IsNewLine()) {
+                if (f.IsNewLine(n, t)) {
                     resolve.SetIndent(indentData.Indent);
                 }
                 break;

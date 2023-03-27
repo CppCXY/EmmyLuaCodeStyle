@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FormatStrategy.h"
+#include "CodeService/Format/Types.h"
 #include <cinttypes>
 
 class FormatResolve {
@@ -35,6 +36,10 @@ public:
 
     std::size_t GetAlign() const;
 
+    void SetOriginRange(IndexRange range);
+
+    IndexRange GetOriginRange() const;
+
     void Reset();
 
 private:
@@ -55,4 +60,5 @@ private:
     } _prevSpaceData;
 
     std::size_t _indent;
+    IndexRange _range;
 };

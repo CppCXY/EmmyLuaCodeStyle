@@ -825,3 +825,50 @@ local function t(entry, item)
 end
 )"));
 }
+
+TEST(Format, feature_format_disable) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f()
+---@format disable
+local t=123
+
+
+okoko=-123
+end
+local t =123
+)",
+            R"(
+function f()
+    ---@format disable
+local t=123
+
+
+okoko=-123
+end
+
+local t = 123
+)"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f()
+---@format disable-next
+local t=123
+
+
+okoko=-123
+end
+local t =123
+)",
+            R"(
+function f()
+    ---@format disable-next
+local t=123
+
+
+    okoko = -123
+end
+
+local t = 123
+)"));
+}

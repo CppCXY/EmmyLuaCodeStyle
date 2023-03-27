@@ -8,11 +8,16 @@
 
 class FormatState {
 public:
+    enum class Mode {
+        Format,
+        Diagnostic
+    };
+
     using FormatHandle = std::function<void(LuaSyntaxNode &syntaxNode,
                                             const LuaSyntaxTree &t,
                                             FormatResolve &resolve)>;
 
-    FormatState();
+    explicit FormatState(Mode mode = Mode::Format);
 
     void SetFormatStyle(LuaStyle &style);
 
@@ -24,9 +29,9 @@ public:
 
     EndOfLine GetEndOfLine() const;
 
-    bool IsNewLine() const;
+    bool IsNewLine(LuaSyntaxNode &n, const LuaSyntaxTree &t) const;
 
-    std::size_t &GetCurrentWidth();
+    std::size_t &CurrentWidth();
 
     void AddAbsoluteIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
 
@@ -37,6 +42,8 @@ public:
     void RecoverIndent();
 
     IndentState GetCurrentIndent() const;
+
+    void AddIgnore(IndexRange range);
 
     template<class T>
     void AddAnalyzer() {
@@ -66,6 +73,7 @@ private:
     EndOfLine _fileEndOfLine;
     std::size_t _currentWidth;
     std::stack<IndentState> _indentStack;
-
+    Mode _mode;
+    IndexRange _ignoreRange;
     std::array<std::unique_ptr<FormatAnalyzer>, static_cast<std::size_t>(FormatAnalyzerType::Count)> _analyzers;
 };

@@ -8,7 +8,6 @@
 #include "LuaParser/Ast/LuaSyntaxNode.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
 #include "CodeService/Config/LuaStyle.h"
-#include "Types.h"
 #include "FormatState.h"
 
 class FormatBuilder {

@@ -57,8 +57,7 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
                                     DiagnosticBuilder &d) {
     if (syntaxNode.IsToken(t)) {
         auto textRange = syntaxNode.GetTextRange(t);
-        auto prevToken = syntaxNode.GetPrevToken(t);
-        if (prevToken.GetEndLine(t) != syntaxNode.GetStartLine(t) || prevToken.IsNull(t)) {
+        if (d.GetState().IsNewLine(syntaxNode, t)) {
             ProcessIndentDiagnostic(syntaxNode, t, d);
         }
 

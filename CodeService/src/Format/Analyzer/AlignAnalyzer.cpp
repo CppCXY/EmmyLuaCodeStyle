@@ -403,8 +403,12 @@ AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGr
             break;
         }
         case AlignStrategy::AlignToFirst: {
-            if (!f.IsNewLine()) {
-                auto width = f.GetCurrentWidth();
+            if(group.SyntaxGroup.empty()){
+                return ;
+            }
+            LuaSyntaxNode firstNode(group.SyntaxGroup.front());
+            if (!f.IsNewLine(firstNode, t)) {
+                auto width = f.CurrentWidth();
                 group.AlignPos = width;
                 for (auto i: group.SyntaxGroup) {
                     _resolveGroupIndex[i] = groupIndex;

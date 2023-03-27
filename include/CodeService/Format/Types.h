@@ -2,6 +2,7 @@
 
 #include "CodeService/Config/LuaStyleEnum.h"
 #include "LuaParser/Types/TextRange.h"
+#include "LuaParser/Ast/LuaSyntaxNode.h"
 
 struct IndentState {
     IndentState(LuaSyntaxNode node, std::size_t space, std::size_t tab)
@@ -41,4 +42,14 @@ struct FormatRange {
 
     std::size_t EndLine;
     std::size_t EndCol;
+};
+
+struct IndexRange {
+    explicit IndexRange(std::size_t startIndex = 0, std::size_t endIndex = 0)
+            : StartIndex(startIndex),
+              EndIndex(endIndex) {}
+
+
+    std::size_t StartIndex;
+    std::size_t EndIndex;
 };

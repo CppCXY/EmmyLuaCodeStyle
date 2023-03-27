@@ -4,13 +4,11 @@
 #include "LuaParser/Ast/LuaSyntaxTree.h"
 #include "CodeService/Format/FormatBuilder.h"
 #include "CodeService/Config/EditorconfigPattern.h"
+#include "CodeService/Diagnostic/DiagnosticBuilder.h"
 
 int main() {
     std::string buffer = R"(
-(
-aa
-).aa =123
-
+local t = { aaa, bbb, ccc }
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -25,14 +23,14 @@ aa
     std::cout << t.GetDebugView() << std::endl;
 
     LuaStyle s;
+    s.trailing_table_separator = TrailingTableSeparator::Always;
     FormatBuilder b(s);
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;
-
 //    LuaDiagnosticStyle style;
-//    StyleDiagnostic d(style);
-//    b.Diagnostic(d, t);
-//    for (auto &diag: d.GetDiagnosticResults()) {
+//    DiagnosticBuilder dd(s, style);
+//    dd.CodeStyleCheck(t);
+//    for (auto &diag: dd.GetDiagnosticResults(t)) {
 //        std::cout << diag.Message << std::endl;
 //    }
     return 0;
