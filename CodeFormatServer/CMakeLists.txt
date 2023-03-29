@@ -10,7 +10,7 @@ target_include_directories(CodeFormatServer PUBLIC
         ${LuaCodeStyle_SOURCE_DIR}/include
         ${LuaCodeStyle_SOURCE_DIR}/3rd/asio-1.24.0/include
         ${LuaCodeStyle_SOURCE_DIR}/3rd/nlohmann_json/include
-        ${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.3/include
+        ${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.9/include
         src
         )
 
@@ -57,7 +57,7 @@ target_sources(CodeFormatServer
         ${CodeFormatServer_SOURCE_DIR}/src/Service/ConfigService.cpp
 
         # mimalloc
-        ${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.3/src/static.c
+        ${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.9/src/static.c
         )
 
 target_link_libraries(CodeFormatServer PUBLIC CodeService)

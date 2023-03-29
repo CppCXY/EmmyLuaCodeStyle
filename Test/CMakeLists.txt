@@ -8,7 +8,7 @@ add_dependencies(CodeFormatTest CodeService Util)
 
 target_include_directories(CodeFormatTest PUBLIC
         ${LuaCodeStyle_SOURCE_DIR}/include
-        ${LuaCodeStyle_SOURCE_DIR}/3rd/googletest-1.12.1/googletest/include
+        ${LuaCodeStyle_SOURCE_DIR}/3rd/googletest-1.13.0/googletest/include
         src
         )
 
