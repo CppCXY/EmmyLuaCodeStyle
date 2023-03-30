@@ -1,11 +1,10 @@
 #include "CodeService/Format/Analyzer/FormatDocAnalyze.h"
-#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
-#include "Util/StringUtil.h"
-#include "LuaParser/Lexer/TextReader.h"
 #include "CodeService/Format/FormatState.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
+#include "LuaParser/Lexer/TextReader.h"
+#include "Util/StringUtil.h"
 
 FormatDocAnalyze::FormatDocAnalyze() {
-
 }
 
 void FormatDocAnalyze::Analyze(FormatState &f, const LuaSyntaxTree &t) {
@@ -27,8 +26,7 @@ void FormatDocAnalyze::Analyze(FormatState &f, const LuaSyntaxTree &t) {
 void FormatDocAnalyze::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
 }
 
-void
-FormatDocAnalyze::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+void FormatDocAnalyze::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     auto it = _ignores.find(syntaxNode.GetIndex());
     if (it == _ignores.end()) {
         return;
@@ -102,8 +100,7 @@ void FormatDocAnalyze::AnalyzeDocFormat(LuaSyntaxNode n, FormatState &f, const L
                         break;
                     } else if (action == "disable-next") {
                         auto nextNode = n.GetNextSibling(t);
-                        while (!nextNode.IsNull(t)
-                               && !detail::multi_match::StatementMatch(nextNode.GetSyntaxKind(t))) {
+                        while (!nextNode.IsNull(t) && !detail::multi_match::StatementMatch(nextNode.GetSyntaxKind(t))) {
                             nextNode.ToNext(t);
                         }
                         if (nextNode.IsNode(t)) {
@@ -124,7 +121,7 @@ void FormatDocAnalyze::AnalyzeDocFormat(LuaSyntaxNode n, FormatState &f, const L
 
                 return;
             }
-            case ParseState::List : {
+            case ParseState::List: {
                 return;
             }
         }
@@ -135,4 +132,12 @@ void FormatDocAnalyze::AddIgnoreRange(const IndexRange &range, const LuaSyntaxTr
     auto startIndex = LuaSyntaxNode(range.StartIndex).GetFirstToken(t).GetIndex();
     auto endIndex = LuaSyntaxNode(range.EndIndex).GetLastToken(t).GetIndex();
     _ignores[startIndex] = IndexRange(startIndex, endIndex);
+}
+
+std::vector<IndexRange> FormatDocAnalyze::GetIgnores() const {
+    std::vector<IndexRange> result;
+    for (auto p: _ignores) {
+        result.push_back(p.second);
+    }
+    return result;
 }

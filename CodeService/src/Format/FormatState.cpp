@@ -1,14 +1,15 @@
 #include "CodeService/Format/FormatState.h"
-#include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
+#include "CodeService/Format/Analyzer/AlignAnalyzer.h"
+#include "CodeService/Format/Analyzer/FormatDocAnalyze.h"
 #include "CodeService/Format/Analyzer/IndentationAnalyzer.h"
 #include "CodeService/Format/Analyzer/LineBreakAnalyzer.h"
-#include "CodeService/Format/Analyzer/AlignAnalyzer.h"
+#include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
 #include "CodeService/Format/Analyzer/TokenAnalyzer.h"
-#include "CodeService/Format/Analyzer/FormatDocAnalyze.h"
 
 FormatState::FormatState(Mode mode)
-        : _currentWidth(0),
-          _mode(mode) {
+    : _currentWidth(0),
+      _mode(mode),
+      _foreachContinue(true) {
 }
 
 std::size_t &FormatState::CurrentWidth() {
@@ -16,8 +17,8 @@ std::size_t &FormatState::CurrentWidth() {
 }
 
 EndOfLine FormatState::GetEndOfLine() const {
-    return _formatStyle.detect_end_of_line ?
-           _fileEndOfLine : _formatStyle.end_of_line;;
+    return _formatStyle.detect_end_of_line ? _fileEndOfLine : _formatStyle.end_of_line;
+    ;
 }
 
 void FormatState::SetFormatStyle(LuaStyle &style) {
@@ -141,6 +142,7 @@ void FormatState::AddIgnore(IndexRange range) {
 void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
                              const LuaSyntaxTree &t,
                              const FormatState::FormatHandle &enterHandle) {
+    _foreachContinue = true;
     std::vector<Traverse> traverseStack;
     for (auto it = startNodes.rbegin(); it != startNodes.rend(); it++) {
         traverseStack.emplace_back(*it, TraverseEvent::Enter);
@@ -155,7 +157,7 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
             traverseStack.back().Event = TraverseEvent::Exit;
             if (_ignoreRange.EndIndex != 0) {
                 auto index = traverse.Node.GetIndex();
-                if(index >= _ignoreRange.StartIndex && index <= _ignoreRange.EndIndex){
+                if (index >= _ignoreRange.StartIndex && index <= _ignoreRange.EndIndex) {
                     continue;
                 }
             }
@@ -198,6 +200,9 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
             }
 
             enterHandle(traverse.Node, t, resolve);
+            if (!_foreachContinue) {
+                return;
+            }
         } else {
             traverseStack.pop_back();
             if (GetCurrentIndent().SyntaxNode.GetIndex() == traverse.Node.GetIndex()) {
@@ -222,5 +227,6 @@ void FormatState::AddAbsoluteIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent
     }
 }
 
-
-
+void FormatState::StopDfsForeach() {
+    _foreachContinue = false;
+}

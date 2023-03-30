@@ -67,6 +67,8 @@ public:
                     const FormatHandle &enterHandle
     );
 
+    void StopDfsForeach();
+
 private:
     LuaStyle _formatStyle;
     LuaDiagnosticStyle _diagnosticStyle;
@@ -75,5 +77,6 @@ private:
     std::stack<IndentState> _indentStack;
     Mode _mode;
     IndexRange _ignoreRange;
+    bool _foreachContinue;
     std::array<std::unique_ptr<FormatAnalyzer>, static_cast<std::size_t>(FormatAnalyzerType::Count)> _analyzers;
 };

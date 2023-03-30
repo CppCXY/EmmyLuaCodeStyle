@@ -1,36 +1,35 @@
 #include "CodeService/RangeFormat/RangeFormatBuilder.h"
+#include "CodeService/Format/Analyzer/FormatDocAnalyze.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 
 RangeFormatBuilder::RangeFormatBuilder(LuaStyle &style, FormatRange &range)
-        : FormatBuilder(style), _validRange(false), _range(range) {
-
+    : FormatBuilder(style), _validRange(Valid::Init), _range(range) {
 }
 
 std::string RangeFormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
     _state.Analyze(t);
-    auto root = t.GetRootNode();
-    std::vector<LuaSyntaxNode> startNodes;
-    for (auto child: root.GetChildren(t)) {
-        auto childEndLine = child.GetEndLine(t);
-        if (childEndLine >= _range.StartLine) {
-            startNodes.push_back(child);
-        }
-        if (childEndLine > _range.EndLine) {
-            break;
+
+    auto formatDoc = _state.GetAnalyzer<FormatDocAnalyze>();
+    if (formatDoc) {
+        auto ignores = formatDoc->GetIgnores();
+        for (auto &ignore: ignores) {
+            auto ignoreStartLine = LuaSyntaxNode(ignore.StartIndex).GetStartLine(t);
+            auto ignoreEndLine = LuaSyntaxNode(ignore.EndIndex).GetEndLine(t);
+            if ((_range.StartLine >= ignoreStartLine && _range.StartLine <= ignoreEndLine) || (_range.EndLine >= ignoreStartLine && _range.StartLine < ignoreStartLine)) {
+                return "";
+            }
         }
     }
 
-    LuaSyntaxNode n;
-    _state.AddRelativeIndent(n, 0);
+    auto root = t.GetRootNode();
+    std::vector<LuaSyntaxNode> startNodes = {root};
 
-    _state.DfsForeach(startNodes, t, [this](LuaSyntaxNode &syntaxNode,
-                                            const LuaSyntaxTree &t,
-                                            FormatResolve &resolve) {
-        CheckRange(syntaxNode, t);
+    _state.DfsForeach(startNodes, t, [this](LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+        CheckRange(syntaxNode, t, resolve);
         DoResolve(syntaxNode, t, resolve);
     });
 
-    _validRange = true;
+    _validRange = Valid::Process;
     DealEndWithNewLine(true);
     return _formattedText;
 }
@@ -40,7 +39,7 @@ FormatRange RangeFormatBuilder::GetReplaceRange() const {
 }
 
 void RangeFormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
-    if (_validRange) {
+    if (_validRange == Valid::Process) {
         return FormatBuilder::WriteSyntaxNode(syntaxNode, t);
     } else {
         auto text = syntaxNode.GetText(t);
@@ -60,7 +59,7 @@ void RangeFormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyn
 }
 
 void RangeFormatBuilder::WriteSpace(std::size_t space) {
-    if (_validRange) {
+    if (_validRange == Valid::Process) {
         return FormatBuilder::WriteSpace(space);
     } else {
         _state.CurrentWidth() += space;
@@ -68,7 +67,7 @@ void RangeFormatBuilder::WriteSpace(std::size_t space) {
 }
 
 void RangeFormatBuilder::WriteLine(std::size_t line) {
-    if (_validRange) {
+    if (_validRange == Valid::Process) {
         return FormatBuilder::WriteLine(line);
     } else {
         _state.CurrentWidth() = 0;
@@ -76,7 +75,7 @@ void RangeFormatBuilder::WriteLine(std::size_t line) {
 }
 
 void RangeFormatBuilder::WriteIndent() {
-    if (_validRange) {
+    if (_validRange == Valid::Process) {
         return FormatBuilder::WriteIndent();
     } else {
         auto topLevelIndent = _state.GetCurrentIndent();
@@ -85,7 +84,7 @@ void RangeFormatBuilder::WriteIndent() {
 }
 
 void RangeFormatBuilder::WriteChar(char ch) {
-    if (_validRange) {
+    if (_validRange == Valid::Process) {
         return FormatBuilder::WriteChar(ch);
     } else {
         _state.CurrentWidth()++;
@@ -93,7 +92,7 @@ void RangeFormatBuilder::WriteChar(char ch) {
 }
 
 void RangeFormatBuilder::WriteText(std::string_view text) {
-    if (_validRange) {
+    if (_validRange == Valid::Process) {
         return FormatBuilder::WriteText(text);
     } else {
         std::size_t last = 0;
@@ -101,9 +100,7 @@ void RangeFormatBuilder::WriteText(std::string_view text) {
             char ch = text[i];
             if (ch == '\n' || ch == '\r') {
                 _state.CurrentWidth() = 0;
-                if (ch == '\r'
-                    && (i + 1 < text.size())
-                    && (text[i + 1] == '\n')) {
+                if (ch == '\r' && (i + 1 < text.size()) && (text[i + 1] == '\n')) {
                     i++;
                 }
                 last = i + 1;
@@ -116,26 +113,46 @@ void RangeFormatBuilder::WriteText(std::string_view text) {
     }
 }
 
-void RangeFormatBuilder::CheckRange(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+void RangeFormatBuilder::CheckRange(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (syntaxNode.IsToken(t)) {
-        auto tokenEndLine = syntaxNode.GetEndLine(t);
-        if (tokenEndLine < _range.StartLine) {
-            _validRange = false;
-            return;
-        }
-        auto tokenStartLine = syntaxNode.GetStartLine(t);
-        if (tokenStartLine > _range.EndLine) {
-            _validRange = false;
-            return;
+        LuaSyntaxNode startNode = syntaxNode;
+        LuaSyntaxNode endNode = syntaxNode;
+        if (resolve.GetTokenStrategy() == TokenStrategy::OriginRange) {
+            auto r = resolve.GetOriginRange();
+            startNode = LuaSyntaxNode(r.StartIndex);
+            endNode = LuaSyntaxNode(r.EndIndex);
         }
 
-        if (tokenStartLine < _range.StartLine) {
-            _range.StartLine = tokenStartLine;
-            _range.StartCol = syntaxNode.GetStartCol(t);
+        switch (_validRange) {
+            case Valid::Init: {
+                auto tokenEndLine = endNode.GetEndLine(t);
+                if (tokenEndLine >= _range.StartLine) {
+                    _validRange = Valid::Process;
+                    auto tokenStartLine = startNode.GetStartLine(t);
+                    if (tokenStartLine < _range.StartLine) {
+                        _range.StartLine = tokenStartLine;
+                        _range.StartCol = startNode.GetStartCol(t);
+                    }
+                }
+                break;
+            }
+            case Valid::Process: {
+                auto tokenStartLine = startNode.GetStartLine(t);
+                if (tokenStartLine > _range.EndLine) {
+                    _validRange = Valid::Finish;
+                    _state.StopDfsForeach();
+                } else {
+                    auto tokenEndLine = endNode.GetEndLine(t);
+                    if (tokenEndLine > _range.EndLine) {
+                        _range.EndLine = tokenEndLine;
+                    }
+                }
+
+                break;
+            }
+            default: {
+                break;
+            }
         }
-        if (tokenEndLine > _range.EndLine) {
-            _range.EndLine = tokenEndLine;
-        }
-        _validRange = true;
     }
 }

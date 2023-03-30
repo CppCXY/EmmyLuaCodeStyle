@@ -231,6 +231,10 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnRangeFormatting(
     range.EndLine = params->range.end.line;
 
     auto newText = _server->GetService<FormatService>()->RangeFormat(syntaxTree, luaStyle, range);
+    if(newText.empty()){
+        result->hasError = true;
+        return result;
+    }
 
     auto &edit = result->edits.emplace_back();
     edit.newText = std::move(newText);

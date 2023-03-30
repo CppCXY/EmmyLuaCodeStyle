@@ -146,6 +146,11 @@ int range_format(lua_State *L) {
                 return 1;
             }
             auto &formattedText = formattedTextResult.Data;
+            if(formattedText.empty()){
+                lua_pushboolean(L, false);
+                return 1;
+            }
+
             lua_pushboolean(L, true);
             lua_pushlstring(L, formattedText.c_str(), formattedText.size());
             lua_pushinteger(L, range.StartLine);

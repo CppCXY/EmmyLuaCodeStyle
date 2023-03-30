@@ -1,17 +1,16 @@
 ﻿#include "CodeService/TypeFormat/LuaTypeFormat.h"
-#include <algorithm>
+#include "CodeService/RangeFormat/RangeFormatBuilder.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "Util/StringUtil.h"
 #include "Util/format.h"
-#include "CodeService/RangeFormat/RangeFormatBuilder.h"
+#include <algorithm>
 
 std::vector<LuaTypeFormat::Result> LuaTypeFormat::GetResult() {
     return _results;
 }
 
 LuaTypeFormat::LuaTypeFormat(LuaTypeFormatOptions &typeOptions)
-        : _typeOptions(typeOptions) {
-
+    : _typeOptions(typeOptions) {
 }
 
 void LuaTypeFormat::Analyze(std::string_view trigger,
@@ -191,16 +190,17 @@ void LuaTypeFormat::FormatLine(std::size_t line, std::size_t character, const Lu
 }
 
 void LuaTypeFormat::FixIndent(std::size_t line, std::size_t character, const LuaSyntaxTree &t, LuaStyle &style) {
-
 }
 
 void LuaTypeFormat::FixEndIndent(std::size_t line, std::size_t character) {
-
 }
 
 void LuaTypeFormat::FormatByRange(FormatRange range, const LuaSyntaxTree &t, LuaStyle &style) {
     RangeFormatBuilder f(style, range);
     auto newText = f.GetFormatResult(t);
+    if (newText.empty()) {
+        return;
+    }
     range = f.GetReplaceRange();
     auto &result = _results.emplace_back();
     result.Text = newText;

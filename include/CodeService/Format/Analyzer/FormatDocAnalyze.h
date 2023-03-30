@@ -24,6 +24,7 @@ public:
 
     void AddIgnoreRange(const IndexRange& range, const LuaSyntaxTree &t);
 
+    std::vector<IndexRange> GetIgnores() const;
 private:
 
     void AnalyzeDocFormat(LuaSyntaxNode n, FormatState &f, const LuaSyntaxTree &t);
