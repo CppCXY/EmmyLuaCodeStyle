@@ -1,13 +1,12 @@
 #include "CodeService/Format/Analyzer/LineBreakAnalyzer.h"
-#include <algorithm>
-#include "CodeService/Format/FormatState.h"
 #include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
+#include "CodeService/Format/FormatState.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
+#include <algorithm>
 
 using NodeKind = LuaSyntaxNodeKind;
 
 LineBreakAnalyzer::LineBreakAnalyzer() {
-
 }
 
 void LineBreakAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
@@ -88,6 +87,14 @@ void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                                     break;
                                 }
                             }
+
+                            if (stmt.GetChildToken(';', t).IsToken(t)) {
+                                auto nextStmt = stmt.GetNextSibling(t);
+                                if (nextStmt.GetStartLine(t) == stmt.GetEndLine(t)) {
+                                    CancelBreakAfter(stmt, t);
+                                }
+                            }
+
                         } else {
                             switch (stmt.GetTokenKind(t)) {
                                 case TK_SHORT_COMMENT:
@@ -171,16 +178,14 @@ void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
     }
 }
 
-void
-LineBreakAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+void LineBreakAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     auto it = _lineBreaks.find(syntaxNode.GetIndex());
     bool collapse = false;
     if (it != _lineBreaks.end()) {
         collapse = it->second.Strategy == LineBreakStrategy::NotBreak;
     }
     if (syntaxNode.IsToken(t) && !collapse) {
-        if (resolve.GetNextSpaceStrategy() == NextSpaceStrategy::None
-            || resolve.GetNextSpaceStrategy() == NextSpaceStrategy::Space) {
+        if (resolve.GetNextSpaceStrategy() == NextSpaceStrategy::None || resolve.GetNextSpaceStrategy() == NextSpaceStrategy::Space) {
             auto nextToken = syntaxNode.GetNextToken(t);
             if (nextToken.IsToken(t)) {
                 auto currentLine = syntaxNode.GetEndLine(t);
@@ -308,6 +313,13 @@ void LineBreakAnalyzer::MarkNotBreak(LuaSyntaxNode n, const LuaSyntaxTree &t) {
     }
 }
 
+void LineBreakAnalyzer::CancelBreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t) {
+    auto token = n.GetLastToken(t);
+    if (token.IsToken(t)) {
+        _lineBreaks[token.GetIndex()] = LineBreakData(LineBreakStrategy::NotBreak, n.GetIndex());
+    }
+}
+
 void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
     switch (expr.GetSyntaxKind(t)) {
         case LuaSyntaxNodeKind::BinaryExpression: {
@@ -341,11 +353,10 @@ void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const L
             }
             bool forceBreak = f.GetStyle().break_all_list_when_line_exceed && CanBreakAll(f, tableFieldList, t);
             if (!forceBreak) {
-                forceBreak = tableFieldList.GetStartLine(t) != tableFieldList.GetEndLine(t)
-                             && std::any_of(fields.begin(), fields.end(),
-                                            [&](LuaSyntaxNode &node) {
-                                                return node.GetChildToken('=', t).IsToken(t);
-                                            });
+                forceBreak = tableFieldList.GetStartLine(t) != tableFieldList.GetEndLine(t) && std::any_of(fields.begin(), fields.end(),
+                                                                                                           [&](LuaSyntaxNode &node) {
+                                                                                                               return node.GetChildToken('=', t).IsToken(t);
+                                                                                                           });
             }
             if (forceBreak) {
                 BreakAfter(expr.GetChildToken('{', t), t);
@@ -413,7 +424,7 @@ bool LineBreakAnalyzer::CanCollapseLines(FormatState &f, LuaSyntaxNode &n, const
                 if (tokenKind == ',') {
                     lineWidth++;// ', '
                 } else if (tokenKind == TK_SHORT_COMMENT || tokenKind == TK_LONG_COMMENT) {
-                    return false; // 若有注释禁止塌缩
+                    return false;// 若有注释禁止塌缩
                 }
                 lineWidth += child.GetText(t).size();
             }

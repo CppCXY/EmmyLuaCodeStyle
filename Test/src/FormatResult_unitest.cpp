@@ -872,3 +872,30 @@ end
 local t = 123
 )"));
 }
+
+TEST(Format, feature_102) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t; Init(v)
+)",
+            R"(
+local t; Init(v)
+)"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t; Init(v)
+aaa = 123; pppp(aaa);
+
+ddd = 123;
+
+pcall(f, 1, 2, 3); do return true end
+)",
+            R"(
+local t; Init(v)
+aaa = 123; pppp(aaa);
+
+ddd = 123;
+
+pcall(f, 1, 2, 3); do return true end
+)"));
+}
