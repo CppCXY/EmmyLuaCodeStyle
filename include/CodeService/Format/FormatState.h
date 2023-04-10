@@ -1,10 +1,10 @@
 #pragma once
 
-#include <array>
-#include "CodeService/Config/LuaStyle.h"
 #include "CodeService/Config/LuaDiagnosticStyle.h"
+#include "CodeService/Config/LuaStyle.h"
 #include "CodeService/Format/Analyzer/FormatAnalyzer.h"
 #include "Types.h"
+#include <array>
 
 class FormatState {
 public:
@@ -64,10 +64,11 @@ public:
     // 深度优先处理格式
     void DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
                     const LuaSyntaxTree &t,
-                    const FormatHandle &enterHandle
-    );
+                    const FormatHandle &enterHandle);
 
     void StopDfsForeach();
+
+    Mode GetMode() const;
 
 private:
     LuaStyle _formatStyle;

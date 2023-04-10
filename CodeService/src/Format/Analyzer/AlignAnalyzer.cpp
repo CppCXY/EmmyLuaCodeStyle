@@ -409,6 +409,10 @@ AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGr
             LuaSyntaxNode firstNode(group.SyntaxGroup.front());
             if (!f.IsNewLine(firstNode, t)) {
                 auto width = f.CurrentWidth();
+                if(f.GetMode() == FormatState::Mode::Diagnostic){
+                    width = firstNode.GetStartCol(t);
+                }
+
                 group.AlignPos = width;
                 for (auto i: group.SyntaxGroup) {
                     _resolveGroupIndex[i] = groupIndex;

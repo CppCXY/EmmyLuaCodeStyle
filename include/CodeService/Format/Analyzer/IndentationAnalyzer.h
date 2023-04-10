@@ -1,12 +1,12 @@
 #pragma once
 
-#include <stack>
-#include <optional>
-#include <unordered_set>
-#include <unordered_map>
-#include "CodeService/Format/Analyzer/FormatAnalyzer.h"
 #include "CodeService/Config/LuaStyleEnum.h"
+#include "CodeService/Format/Analyzer/FormatAnalyzer.h"
 #include "CodeService/Format/Types.h"
+#include <optional>
+#include <stack>
+#include <unordered_map>
+#include <unordered_set>
 
 /*
  * 缩进的复杂性在于, 除了正常的语句缩进, 在普遍的审美里面,
@@ -23,10 +23,10 @@ public:
 
     void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
-    void AddIndenter(LuaSyntaxNode &n, const LuaSyntaxTree &t, IndentData indentData = IndentData());
+    void AddIndenter(LuaSyntaxNode n, const LuaSyntaxTree &t, IndentData indentData = IndentData());
 
     // 在格式化过程中标记Token缩进
-    void MarkIndent(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+    void MarkIndent(LuaSyntaxNode n, const LuaSyntaxTree &t);
 
 private:
     void AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t);
@@ -40,6 +40,3 @@ private:
     std::unordered_map<std::size_t, IndentData> _indent;
     std::unordered_set<std::size_t> _indentMark;
 };
-
-
-

@@ -1,4 +1,5 @@
 #include "CodeService/Format/Analyzer/LineBreakAnalyzer.h"
+#include "CodeService/Format/Analyzer/IndentationAnalyzer.h"
 #include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
 #include "CodeService/Format/FormatState.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
@@ -435,4 +436,3 @@ bool LineBreakAnalyzer::CanCollapseLines(FormatState &f, LuaSyntaxNode &n, const
         }
     }
 }
-

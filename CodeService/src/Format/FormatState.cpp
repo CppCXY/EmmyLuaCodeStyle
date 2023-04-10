@@ -18,7 +18,6 @@ std::size_t &FormatState::CurrentWidth() {
 
 EndOfLine FormatState::GetEndOfLine() const {
     return _formatStyle.detect_end_of_line ? _fileEndOfLine : _formatStyle.end_of_line;
-    ;
 }
 
 void FormatState::SetFormatStyle(LuaStyle &style) {
@@ -229,4 +228,8 @@ void FormatState::AddAbsoluteIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent
 
 void FormatState::StopDfsForeach() {
     _foreachContinue = false;
+}
+
+FormatState::Mode FormatState::GetMode() const {
+    return _mode;
 }

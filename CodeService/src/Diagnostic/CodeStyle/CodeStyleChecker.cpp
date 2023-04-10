@@ -1,12 +1,11 @@
 #include "CodeService/Diagnostic/CodeStyle/CodeStyleChecker.h"
-#include "CodeService/Diagnostic/DiagnosticBuilder.h"
 #include "CodeService/Config/LanguageTranslator.h"
-#include "Util/format.h"
-#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
+#include "CodeService/Diagnostic/DiagnosticBuilder.h"
 #include "CodeService/Format/Analyzer/IndentationAnalyzer.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
+#include "Util/format.h"
 
 CodeStyleChecker::CodeStyleChecker() {
-
 }
 
 void CodeStyleChecker::Analyze(DiagnosticBuilder &d, const LuaSyntaxTree &t) {
@@ -21,9 +20,7 @@ void CodeStyleChecker::BasicStyleCheck(DiagnosticBuilder &d, const LuaSyntaxTree
     auto root = t.GetRootNode();
     std::vector<LuaSyntaxNode> startNodes = {root};
 
-    state.DfsForeach(startNodes, t, [this, &d](LuaSyntaxNode &syntaxNode,
-                                               const LuaSyntaxTree &t,
-                                               FormatResolve &resolve) {
+    state.DfsForeach(startNodes, t, [this, &d](LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
         BasicResolve(syntaxNode, t, resolve, d);
     });
 }
@@ -37,8 +34,7 @@ void CodeStyleChecker::EndWithNewLine(DiagnosticBuilder &d, const LuaSyntaxTree 
             if (text.back() != '\n' && text.back() != '\r') {
                 d.PushDiagnostic(DiagnosticType::EndWithNewLine,
                                  TextRange(text.size(), 0),
-                                 LText("must end with new line")
-                );
+                                 LText("must end with new line"));
             }
         }
     } else {
@@ -46,8 +42,7 @@ void CodeStyleChecker::EndWithNewLine(DiagnosticBuilder &d, const LuaSyntaxTree 
             if (text.back() == '\n' || text.back() == '\r') {
                 d.PushDiagnostic(DiagnosticType::EndWithNewLine,
                                  TextRange(text.size(), 0),
-                                 LText("can not end with new line")
-                );
+                                 LText("can not end with new line"));
             }
         }
     }
@@ -79,12 +74,9 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
             case TokenStrategy::StringSingleQuote: {
                 if (syntaxNode.GetTokenKind(t) == TK_STRING) {
                     auto text = syntaxNode.GetText(t);
-                    if (text.size() >= 2
-                        && text.front() == '\"'
-                        && !string_util::ExistDel('\'', text)) {
+                    if (text.size() >= 2 && text.front() == '\"' && !string_util::ExistDel('\'', text)) {
                         d.PushDiagnostic(DiagnosticType::StringQuote, textRange,
-                                         LText("\" should be \' ")
-                        );
+                                         LText("\" should be \' "));
                         break;
                     }
                 }
@@ -93,12 +85,9 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
             case TokenStrategy::StringDoubleQuote: {
                 if (syntaxNode.GetTokenKind(t) == TK_STRING) {
                     auto text = syntaxNode.GetText(t);
-                    if (text.size() >= 2
-                        && text.front() == '\''
-                        && !string_util::ExistDel('\"', text)) {
+                    if (text.size() >= 2 && text.front() == '\'' && !string_util::ExistDel('\"', text)) {
                         d.PushDiagnostic(DiagnosticType::StringQuote, textRange,
-                                         LText("\' should be \" ")
-                        );
+                                         LText("\' should be \" "));
                         break;
                     }
                 }
@@ -113,8 +102,7 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
         switch (resolve.GetNextSpaceStrategy()) {
             case NextSpaceStrategy::Space: {
                 auto nextToken = syntaxNode.GetNextToken(t);
-                if (nextToken.IsToken(t)
-                    && nextToken.GetStartLine(t) == syntaxNode.GetEndLine(t)) {
+                if (nextToken.IsToken(t) && nextToken.GetStartLine(t) == syntaxNode.GetEndLine(t)) {
                     ProcessSpaceDiagnostic(syntaxNode, nextToken, resolve.GetNextSpace(), t, d);
                 }
                 break;
@@ -147,8 +135,7 @@ void CodeStyleChecker::ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNode
             d.PushDiagnostic(DiagnosticType::Space,
                              node.GetIndex(),
                              TextRange(leftOffset + 1, diff),
-                             util::format(LText("unnecessary whitespace {}"), additional)
-            );
+                             util::format(LText("unnecessary whitespace {}"), additional));
             break;
         }
         case 1: {
@@ -156,14 +143,12 @@ void CodeStyleChecker::ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNode
                 d.PushDiagnostic(DiagnosticType::Space,
                                  node.GetIndex(),
                                  TextRange(leftOffset, 2),
-                                 util::format(LText("missing whitespace {}"), additional)
-                );
+                                 util::format(LText("missing whitespace {}"), additional));
             } else {
                 d.PushDiagnostic(DiagnosticType::Space,
                                  node.GetIndex(),
                                  TextRange(leftOffset + 1, diff),
-                                 util::format(LText("multiple spaces {}"), additional)
-                );
+                                 util::format(LText("multiple spaces {}"), additional));
             }
             break;
         }
@@ -172,14 +157,12 @@ void CodeStyleChecker::ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNode
                 d.PushDiagnostic(DiagnosticType::Space, node.GetIndex(),
                                  TextRange(leftOffset, diff + 1),
                                  util::format(LText("expected {} whitespace, found {} {}"),
-                                              shouldSpace, diff, additional)
-                );
+                                              shouldSpace, diff, additional));
             } else {
                 d.PushDiagnostic(DiagnosticType::Space, node.GetIndex(),
                                  TextRange(leftOffset + 1, diff),
                                  util::format(LText("expected {} whitespace, found {} {}"),
-                                              shouldSpace, diff, additional)
-                );
+                                              shouldSpace, diff, additional));
             }
         }
     }
@@ -252,7 +235,6 @@ void CodeStyleChecker::ProcessIndentDiagnostic(LuaSyntaxNode &node, const LuaSyn
                 checkIndent.Space++;
             }
         }
-
     }
 
     if (indent.TabSize != checkIndent.Tab || indent.SpaceSize != checkIndent.Space) {
@@ -260,8 +242,7 @@ void CodeStyleChecker::ProcessIndentDiagnostic(LuaSyntaxNode &node, const LuaSyn
                          currentIndentRange,
                          util::format("{}, found {} whitespace, {} tab",
                                       GetIndentNote(indent, state.GetStyle().indent_style),
-                                      checkIndent.Space, checkIndent.Tab
-                         ));
+                                      checkIndent.Space, checkIndent.Tab));
     }
 }
 
