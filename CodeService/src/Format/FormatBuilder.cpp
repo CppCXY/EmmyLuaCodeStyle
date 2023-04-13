@@ -1,7 +1,7 @@
 #include "CodeService/Format/FormatBuilder.h"
-#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/Analyzer/AlignAnalyzer.h"
 #include "CodeService/Format/Analyzer/IndentationAnalyzer.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "Util/StringUtil.h"
 
 
@@ -15,9 +15,7 @@ std::string FormatBuilder::GetFormatResult(const LuaSyntaxTree &t) {
     auto root = t.GetRootNode();
     std::vector<LuaSyntaxNode> startNodes = {root};
 
-    _state.DfsForeach(startNodes, t, [this](LuaSyntaxNode &syntaxNode,
-                                            const LuaSyntaxTree &t,
-                                            FormatResolve &resolve) {
+    _state.DfsForeach(startNodes, t, [this](LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
         DoResolve(syntaxNode, t, resolve);
     });
 
@@ -88,9 +86,7 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 if (syntaxNode.GetTokenKind(t) == TK_STRING) {
                     auto text = syntaxNode.GetText(t);
                     auto del = '\'';
-                    if (text.size() >= 2
-                        && text.front() == '\"'
-                        && !string_util::ExistDel(del, text)) {
+                    if (text.size() >= 2 && text.front() == '\"' && !string_util::ExistDel(del, text)) {
                         WriteChar(del);
                         WriteText(text.substr(1, text.size() - 2));
                         WriteChar(del);
@@ -105,9 +101,7 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 if (syntaxNode.GetTokenKind(t) == TK_STRING) {
                     auto text = syntaxNode.GetText(t);
                     auto del = '\"';
-                    if (text.size() >= 2
-                        && text.front() == '\''
-                        && !string_util::ExistDel(del, text)) {
+                    if (text.size() >= 2 && text.front() == '\'' && !string_util::ExistDel(del, text)) {
                         WriteChar(del);
                         WriteText(text.substr(1, text.size() - 2));
                         WriteChar(del);
@@ -334,9 +328,7 @@ void FormatBuilder::WriteText(std::string_view text) {
                 _formattedText.append(text.substr(last, i - last));
             }
             WriteLine(1);
-            if (ch == '\r'
-                && (i + 1 < text.size())
-                && (text[i + 1] == '\n')) {
+            if (ch == '\r' && (i + 1 < text.size()) && (text[i + 1] == '\n')) {
                 i++;
             }
             last = i + 1;
@@ -360,8 +352,7 @@ void FormatBuilder::DealEndWithNewLine(bool newLine) {
         if (endChar == '\r' || endChar == '\n') {
             auto lastIndex = _formattedText.size();
             std::size_t reduce = 0;
-            while (_formattedText[lastIndex - reduce - 1] == '\r'
-                   || _formattedText[lastIndex - reduce - 1] == '\n') {
+            while (_formattedText[lastIndex - reduce - 1] == '\r' || _formattedText[lastIndex - reduce - 1] == '\n') {
                 reduce++;
                 if (lastIndex <= reduce + 1) {
                     break;

@@ -37,6 +37,7 @@ enum class IndentStrategy {
     Relative,
     InvertRelative,
     Absolute,
+    Same
 };
 
 enum class IndentType {
@@ -44,7 +45,6 @@ enum class IndentType {
     Standard,
     InvertIndentation,
     WhenLineBreak,
-    WhenInternalBreak,
     WhenPrevIndent
 };
 

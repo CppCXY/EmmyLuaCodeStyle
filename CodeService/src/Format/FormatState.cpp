@@ -67,7 +67,7 @@ void FormatState::Analyze(const LuaSyntaxTree &t) {
     }
 }
 
-void FormatState::AddRelativeIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
+void FormatState::AddRelativeIndent(LuaSyntaxNode syntaxNoe, std::size_t indent) {
     if (_indentStack.empty()) {
         _indentStack.emplace(syntaxNoe, 0, 0);
         return;
@@ -87,7 +87,7 @@ void FormatState::AddRelativeIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent
     }
 }
 
-void FormatState::AddInvertIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
+void FormatState::AddInvertIndent(LuaSyntaxNode syntaxNoe, std::size_t indent) {
     if (_indentStack.empty()) {
         _indentStack.emplace(syntaxNoe, 0, 0);
         return;
@@ -192,6 +192,10 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
                         AddAbsoluteIndent(traverse.Node, indent);
                         break;
                     }
+                    case IndentStrategy::Same: {
+                        AddSameIndent(traverse.Node);
+                        break;
+                    }
                     default: {
                         break;
                     }
@@ -211,7 +215,7 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
     }
 }
 
-void FormatState::AddAbsoluteIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent) {
+void FormatState::AddAbsoluteIndent(LuaSyntaxNode syntaxNoe, std::size_t indent) {
     switch (_formatStyle.indent_style) {
         case IndentStyle::Space: {
             _indentStack.emplace(syntaxNoe, indent, 0);
@@ -224,6 +228,15 @@ void FormatState::AddAbsoluteIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent
             break;
         }
     }
+}
+
+void FormatState::AddSameIndent(LuaSyntaxNode syntaxNode) {
+    if (_indentStack.empty()) {
+        _indentStack.emplace(syntaxNode, 0, 0);
+        return;
+    }
+    auto top = _indentStack.top();
+    _indentStack.emplace(syntaxNode, top.SpaceSize, top.TabSize);
 }
 
 void FormatState::StopDfsForeach() {

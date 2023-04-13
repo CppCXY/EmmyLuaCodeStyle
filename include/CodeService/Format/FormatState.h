@@ -33,11 +33,13 @@ public:
 
     std::size_t &CurrentWidth();
 
-    void AddAbsoluteIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
+    void AddAbsoluteIndent(LuaSyntaxNode syntaxNoe, std::size_t indent);
 
-    void AddRelativeIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
+    void AddRelativeIndent(LuaSyntaxNode syntaxNoe, std::size_t indent);
 
-    void AddInvertIndent(LuaSyntaxNode &syntaxNoe, std::size_t indent);
+    void AddInvertIndent(LuaSyntaxNode syntaxNoe, std::size_t indent);
+
+    void AddSameIndent(LuaSyntaxNode syntaxNode);
 
     void RecoverIndent();
 
@@ -69,6 +71,7 @@ public:
     void StopDfsForeach();
 
     Mode GetMode() const;
+
 
 private:
     LuaStyle _formatStyle;

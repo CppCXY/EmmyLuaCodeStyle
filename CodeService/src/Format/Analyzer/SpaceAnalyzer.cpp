@@ -1,12 +1,11 @@
 #include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
-#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
-#include "CodeService/Format/FormatState.h"
 #include "CodeService/Config/LanguageTranslator.h"
 #include "CodeService/Format/Analyzer/TokenAnalyzer.h"
+#include "CodeService/Format/FormatState.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 
 
 SpaceAnalyzer::SpaceAnalyzer() {
-
 }
 
 void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
@@ -100,9 +99,16 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 }
                 case '.':
                 case ':':
-                case '[':
                 case ']': {
                     SpaceAround(syntaxNode, t, 0);
+                }
+                case '[': {
+                    auto prevKind = syntaxNode.GetPrevToken(t).GetTokenKind(t);
+                    if (prevKind == ',' || prevKind == ';') {
+                        SpaceRight(syntaxNode, t, 0);
+                    } else {
+                        SpaceAround(syntaxNode, t, 0);
+                    }
                     break;
                 }
                 case '(': {
@@ -133,8 +139,7 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                 case LuaSyntaxNodeKind::CallExpression: {
                     auto leftBrace = syntaxNode.GetChildToken('(', t);
                     if (leftBrace.IsToken(t)) {
-                        if (f.GetStyle().space_inside_function_call_parentheses
-                            && leftBrace.GetNextToken(t).GetTokenKind(t) != ')') {
+                        if (f.GetStyle().space_inside_function_call_parentheses && leftBrace.GetNextToken(t).GetTokenKind(t) != ')') {
                             auto rightBrace = syntaxNode.GetChildToken(')', t);
                             SpaceRight(leftBrace, t, 1);
                             SpaceLeft(rightBrace, t, 1);
@@ -150,8 +155,7 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                         }
 
                         auto leftToken = leftBrace.GetPrevToken(t);
-                        if (leftToken.GetTokenKind(t) != TK_STRING
-                            && leftToken.GetTokenKind(t) != '}') {
+                        if (leftToken.GetTokenKind(t) != TK_STRING && leftToken.GetTokenKind(t) != '}') {
                             if (f.GetStyle().space_before_function_call_open_parenthesis) {
                                 SpaceLeft(leftBrace, t, 1);
                             } else {
@@ -175,8 +179,7 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                             }
                             case FunctionSingleArgSpace::OnlyString: {
                                 auto firstToken = syntaxNode.GetFirstToken(t);
-                                if (firstToken.GetTokenKind(t) == TK_STRING
-                                    || firstToken.GetTokenKind(t) == TK_LONG_STRING) {
+                                if (firstToken.GetTokenKind(t) == TK_STRING || firstToken.GetTokenKind(t) == TK_LONG_STRING) {
                                     SpaceLeft(syntaxNode, t, 1);
                                 } else {
                                     SpaceLeft(syntaxNode, t, 0);
@@ -201,8 +204,7 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                 }
                 case LuaSyntaxNodeKind::TableExpression: {
                     auto leftCurly = syntaxNode.GetChildToken('{', t);
-                    if (leftCurly.GetNextToken(t).GetTokenKind(t) != '}'
-                        && f.GetStyle().space_around_table_field_list) {
+                    if (leftCurly.GetNextToken(t).GetTokenKind(t) != '}' && f.GetStyle().space_around_table_field_list) {
                         SpaceRight(leftCurly, t, 1);
                         auto rightCurly = syntaxNode.GetChildToken('}', t);
                         SpaceLeft(rightCurly, t, 1);
@@ -227,10 +229,7 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                         } else {
                             auto tokenKindAfterSquareBracket = leftSquareBracket.GetNextToken(t).GetTokenKind(t);
                             auto tokenKindBeforeSquareBracket = rightSquareBracket.GetPrevToken(t).GetTokenKind(t);
-                            if (tokenKindAfterSquareBracket == TK_LONG_STRING
-                                || tokenKindAfterSquareBracket == TK_LONG_COMMENT
-                                || tokenKindBeforeSquareBracket == TK_LONG_COMMENT
-                                || tokenKindBeforeSquareBracket == TK_LONG_STRING) {
+                            if (tokenKindAfterSquareBracket == TK_LONG_STRING || tokenKindAfterSquareBracket == TK_LONG_COMMENT || tokenKindBeforeSquareBracket == TK_LONG_COMMENT || tokenKindBeforeSquareBracket == TK_LONG_STRING) {
                                 SpaceRight(leftSquareBracket, t, 1);
                                 SpaceLeft(rightSquareBracket, t, 1);
                             }
@@ -245,10 +244,7 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                                     if (exprs.size() == 2) {
                                         auto leftExpr = exprs[0];
                                         auto rightExpr = exprs[1];
-                                        if (leftExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::UnaryExpression
-                                            && leftExpr.GetChildToken('#', t).IsToken(t)
-                                            && rightExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::LiteralExpression
-                                            && rightExpr.GetText(t) == "1") {
+                                        if (leftExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::UnaryExpression && leftExpr.GetChildToken('#', t).IsToken(t) && rightExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::LiteralExpression && rightExpr.GetText(t) == "1") {
                                             SpaceAround(plus, t, 0);
                                         }
                                     }
