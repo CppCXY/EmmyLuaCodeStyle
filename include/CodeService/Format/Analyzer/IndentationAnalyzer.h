@@ -21,13 +21,14 @@ public:
 
     void Analyze(FormatState &f, const LuaSyntaxTree &t) override;
 
-    void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
+    void Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
     void AddIndenter(LuaSyntaxNode n, const LuaSyntaxTree &t, IndentData indentData = IndentData());
 
     // 在格式化过程中标记Token缩进
     void MarkIndent(LuaSyntaxNode n, const LuaSyntaxTree &t);
 
+    void OnFormatMessage(FormatState& f, FormatEvent event, LuaSyntaxNode syntaxNode, const LuaSyntaxTree& t) override;
 private:
     void AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t);
 

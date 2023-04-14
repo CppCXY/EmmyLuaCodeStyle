@@ -72,6 +72,7 @@ public:
 
     Mode GetMode() const;
 
+    void Notify(FormatEvent event, LuaSyntaxNode n, const LuaSyntaxTree &t);
 
 private:
     LuaStyle _formatStyle;

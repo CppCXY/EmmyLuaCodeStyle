@@ -53,3 +53,7 @@ struct IndexRange {
     std::size_t StartIndex;
     std::size_t EndIndex;
 };
+
+enum class FormatEvent {
+    NodeExceedLinebreak
+};

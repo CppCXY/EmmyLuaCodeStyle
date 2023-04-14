@@ -68,7 +68,7 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     if (expr.IsNode(t) && IsExprShouldIndent(expr, t)) {
                         AddIndenter(expr, t);
                     } else {
-                        AddIndenter(expr, t, IndentData(IndentType::WhenLineBreak));
+                        AddIndenter(expr, t, IndentData(IndentType::WhenNewLine));
                     }
                 }
                 case LuaSyntaxNodeKind::LocalStatement:
@@ -115,7 +115,7 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case LuaSyntaxNodeKind::TableExpression: {
                     auto tableFieldList = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldList, t);
                     for (auto field: tableFieldList.GetChildren(t)) {
-                        AddIndenter(field, t, IndentData(IndentType::WhenLineBreak, f.GetStyle().indent_style == IndentStyle::Space ? f.GetStyle().indent_size : f.GetStyle().tab_width));
+                        AddIndenter(field, t, IndentData(IndentType::WhenNewLine, f.GetStyle().indent_style == IndentStyle::Space ? f.GetStyle().indent_size : f.GetStyle().tab_width));
                     }
 
                     break;
@@ -150,7 +150,7 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
     }
 }
 
-void IndentationAnalyzer::Query(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t, FormatResolve &resolve) {
+void IndentationAnalyzer::Query(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t, FormatResolve &resolve) {
     auto it = _indent.find(n.GetIndex());
     if (it != _indent.end()) {
         auto &indentData = it->second;
@@ -163,7 +163,7 @@ void IndentationAnalyzer::Query(FormatState &f, LuaSyntaxNode &n, const LuaSynta
                 resolve.SetIndent(indentData.Indent, IndentStrategy::InvertRelative);
                 break;
             }
-            case IndentType::WhenLineBreak: {
+            case IndentType::WhenNewLine: {
                 if (f.IsNewLine(n, t)) {
                     resolve.SetIndent(indentData.Indent);
                 }
@@ -193,6 +193,18 @@ void IndentationAnalyzer::MarkIndent(LuaSyntaxNode n, const LuaSyntaxTree &t) {
     while (p.GetSyntaxKind(t) != LuaSyntaxNodeKind::Block && !detail::multi_match::StatementMatch(p.GetSyntaxKind(t)) && !p.IsNull(t)) {
         _indentMark.insert(p.GetIndex());
         p = p.GetParent(t);
+    }
+}
+
+void IndentationAnalyzer::OnFormatMessage(FormatState &f, FormatEvent event, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t) {
+    switch (event) {
+        case FormatEvent::NodeExceedLinebreak: {
+
+            break;
+        }
+        default: {
+            break;
+        }
     }
 }
 

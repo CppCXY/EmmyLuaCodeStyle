@@ -246,3 +246,9 @@ void FormatState::StopDfsForeach() {
 FormatState::Mode FormatState::GetMode() const {
     return _mode;
 }
+
+void FormatState::Notify(FormatEvent event, LuaSyntaxNode n, const LuaSyntaxTree &t) {
+    for (auto &a: _analyzers) {
+        a->OnFormatMessage(*this, event, n, t);
+    }
+}

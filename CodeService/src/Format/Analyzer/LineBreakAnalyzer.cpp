@@ -179,7 +179,7 @@ void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
     }
 }
 
-void LineBreakAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+void LineBreakAnalyzer::Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     auto it = _lineBreaks.find(syntaxNode.GetIndex());
     bool collapse = false;
     if (it != _lineBreaks.end()) {

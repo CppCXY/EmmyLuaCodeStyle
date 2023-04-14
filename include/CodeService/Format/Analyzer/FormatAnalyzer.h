@@ -19,5 +19,7 @@ public:
 
     virtual void ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {};
 
-    virtual void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) = 0;
+    virtual void Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) = 0;
+
+    virtual void OnFormatMessage(FormatState& f, FormatEvent event, LuaSyntaxNode syntaxNode, const LuaSyntaxTree& t) {};
 };

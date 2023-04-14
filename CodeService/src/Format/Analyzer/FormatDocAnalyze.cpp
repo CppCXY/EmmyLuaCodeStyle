@@ -26,7 +26,7 @@ void FormatDocAnalyze::Analyze(FormatState &f, const LuaSyntaxTree &t) {
 void FormatDocAnalyze::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
 }
 
-void FormatDocAnalyze::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+void FormatDocAnalyze::Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     auto it = _ignores.find(syntaxNode.GetIndex());
     if (it == _ignores.end()) {
         return;

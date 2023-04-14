@@ -1,10 +1,9 @@
 #include "CodeService/Format/Analyzer/TokenAnalyzer.h"
-#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
-#include "CodeService/Format/FormatState.h"
 #include "CodeService/Format/Analyzer/SpaceAnalyzer.h"
+#include "CodeService/Format/FormatState.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 
 TokenAnalyzer::TokenAnalyzer() {
-
 }
 
 void TokenAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
@@ -58,7 +57,7 @@ void TokenAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
     }
 }
 
-void TokenAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+void TokenAnalyzer::Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (syntaxNode.IsToken(t)) {
         auto it = _tokenStrategies.find(syntaxNode.GetIndex());
         if (it != _tokenStrategies.end()) {
@@ -73,7 +72,7 @@ void TokenAnalyzer::Mark(LuaSyntaxNode &n, const LuaSyntaxTree &t, TokenStrategy
 
 bool TokenAnalyzer::IsRemove(LuaSyntaxNode &n, const LuaSyntaxTree &t) const {
     auto it = _tokenStrategies.find(n.GetIndex());
-    if(it == _tokenStrategies.end()){
+    if (it == _tokenStrategies.end()) {
         return false;
     }
     return it->second == TokenStrategy::Remove;
@@ -83,8 +82,7 @@ void TokenAnalyzer::TableFieldAddSep(FormatState &f, LuaSyntaxNode &n, const Lua
     auto sep = n.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
     if (!sep.IsNode(t)) {
         auto lastToken = n.GetLastToken(t);
-        if (lastToken.GetTokenKind(t) == TK_SHORT_COMMENT
-            || lastToken.GetTokenKind(t) == TK_LONG_COMMENT) {
+        if (lastToken.GetTokenKind(t) == TK_SHORT_COMMENT || lastToken.GetTokenKind(t) == TK_LONG_COMMENT) {
             lastToken = lastToken.GetPrevToken(t);
         }
         Mark(lastToken, t, TokenStrategy::TableAddSep);
@@ -108,8 +106,7 @@ void TokenAnalyzer::AnalyzeTableField(FormatState &f, LuaSyntaxNode &syntaxNode,
 
     if (f.GetStyle().trailing_table_separator != TrailingTableSeparator::Keep) {
         auto nextToken = syntaxNode.GetNextToken(t);
-        while (nextToken.GetTokenKind(t) == TK_SHORT_COMMENT
-               || nextToken.GetTokenKind(t) == TK_LONG_COMMENT) {
+        while (nextToken.GetTokenKind(t) == TK_SHORT_COMMENT || nextToken.GetTokenKind(t) == TK_LONG_COMMENT) {
             nextToken = nextToken.GetNextToken(t);
         }
         // the last table field
@@ -147,9 +144,7 @@ void TokenAnalyzer::AnalyzeTableField(FormatState &f, LuaSyntaxNode &syntaxNode,
 bool IsSingleTableOrStringArg(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
     auto children = syntaxNode.GetChildren(t);
     for (auto child: children) {
-        if (child.GetTokenKind(t) == TK_STRING
-            || child.GetTokenKind(t) == TK_LONG_STRING
-            || child.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
+        if (child.GetTokenKind(t) == TK_STRING || child.GetTokenKind(t) == TK_LONG_STRING || child.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
             return true;
         } else if (
                 child.GetSyntaxKind(t) == LuaSyntaxNodeKind::ExpressionList) {
@@ -170,9 +165,7 @@ bool IsSingleTableOrStringArg(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t)
 LuaSyntaxNode GetSingleArgStringOrTable(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
     auto children = syntaxNode.GetChildren(t);
     for (auto child: children) {
-        if (child.GetTokenKind(t) == TK_STRING
-            || child.GetTokenKind(t) == TK_LONG_STRING
-            || child.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
+        if (child.GetTokenKind(t) == TK_STRING || child.GetTokenKind(t) == TK_LONG_STRING || child.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
             return syntaxNode;
         } else if (child.GetSyntaxKind(t) == LuaSyntaxNodeKind::ExpressionList) {
             auto exprs = child.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
@@ -182,8 +175,7 @@ LuaSyntaxNode GetSingleArgStringOrTable(LuaSyntaxNode &syntaxNode, const LuaSynt
                     return expr;
                 } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::StringLiteralExpression) {
                     auto firstToken = expr.GetFirstToken(t);
-                    if (firstToken.GetTokenKind(t) == TK_STRING
-                        || firstToken.GetTokenKind(t) == TK_LONG_STRING) {
+                    if (firstToken.GetTokenKind(t) == TK_STRING || firstToken.GetTokenKind(t) == TK_LONG_STRING) {
                         return firstToken;
                     }
                 }
@@ -198,7 +190,7 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxN
         switch (f.GetStyle().call_arg_parentheses) {
             case CallArgParentheses::Remove: {
                 auto lbrace = syntaxNode.GetChildToken('(', t);
-                if(lbrace.IsToken(t)){
+                if (lbrace.IsToken(t)) {
                     Mark(lbrace, t, TokenStrategy::Remove);
                     auto rbrace = syntaxNode.GetChildToken(')', t);
                     Mark(rbrace, t, TokenStrategy::Remove);
@@ -208,10 +200,9 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxN
             }
             case CallArgParentheses::RemoveStringOnly: {
                 auto node = GetSingleArgStringOrTable(syntaxNode, t);
-                if (node.GetTokenKind(t) == TK_STRING
-                    || node.GetTokenKind(t) == TK_LONG_STRING) {
+                if (node.GetTokenKind(t) == TK_STRING || node.GetTokenKind(t) == TK_LONG_STRING) {
                     auto lbrace = syntaxNode.GetChildToken('(', t);
-                    if(lbrace.IsToken(t)) {
+                    if (lbrace.IsToken(t)) {
                         Mark(lbrace, t, TokenStrategy::Remove);
                         auto rbrace = syntaxNode.GetChildToken(')', t);
                         Mark(rbrace, t, TokenStrategy::Remove);
@@ -224,7 +215,7 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxN
                 auto node = GetSingleArgStringOrTable(syntaxNode, t);
                 if (node.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
                     auto lbrace = syntaxNode.GetChildToken('(', t);
-                    if(lbrace.IsToken(t)) {
+                    if (lbrace.IsToken(t)) {
                         Mark(lbrace, t, TokenStrategy::Remove);
                         auto rbrace = syntaxNode.GetChildToken(')', t);
                         Mark(rbrace, t, TokenStrategy::Remove);
@@ -251,8 +242,7 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxN
                 }
                 case FunctionSingleArgSpace::OnlyString: {
                     auto firstToken = syntaxNode.GetFirstToken(t);
-                    if (firstToken.GetTokenKind(t) == TK_STRING
-                        || firstToken.GetTokenKind(t) == TK_LONG_STRING) {
+                    if (firstToken.GetTokenKind(t) == TK_STRING || firstToken.GetTokenKind(t) == TK_LONG_STRING) {
                         spaceAnalyzer->SpaceLeft(syntaxNode, t, 1);
                     } else {
                         spaceAnalyzer->SpaceLeft(syntaxNode, t, 0);
@@ -275,5 +265,3 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxN
         }
     }
 }
-
-

@@ -44,7 +44,7 @@ enum class IndentType {
     None,
     Standard,
     InvertIndentation,
-    WhenLineBreak,
+    WhenNewLine,
     WhenPrevIndent
 };
 

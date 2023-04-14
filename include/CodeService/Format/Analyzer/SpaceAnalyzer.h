@@ -24,7 +24,7 @@ public:
 
     void ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) override;
 
-    void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
+    void Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
     void SpaceAround(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::size_t space = 1);
 

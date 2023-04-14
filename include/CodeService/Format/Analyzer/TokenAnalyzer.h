@@ -11,7 +11,7 @@ public:
 
     void Analyze(FormatState &f, const LuaSyntaxTree &t) override;
 
-    void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
+    void Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
     void Mark(LuaSyntaxNode &n, const LuaSyntaxTree &t, TokenStrategy strategy);
 
