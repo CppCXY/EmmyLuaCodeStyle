@@ -45,7 +45,8 @@ enum class IndentType {
     Standard,
     InvertIndentation,
     WhenNewLine,
-    WhenPrevIndent
+    WhenPrevIndent,
+    WhenExceedLinebreak
 };
 
 struct IndentData {

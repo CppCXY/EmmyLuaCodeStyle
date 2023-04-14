@@ -17,6 +17,12 @@ class IndentationAnalyzer : public FormatAnalyzer {
 public:
     DECLARE_FORMAT_ANALYZER(IndentationAnalyzer)
 
+    struct WaitLinebreakGroup {
+        std::vector<LuaSyntaxNode> TriggerNodes;
+        std::size_t Indent = 0;
+        LuaSyntaxNode Parent;
+    };
+
     IndentationAnalyzer();
 
     void Analyze(FormatState &f, const LuaSyntaxTree &t) override;
@@ -25,10 +31,13 @@ public:
 
     void AddIndenter(LuaSyntaxNode n, const LuaSyntaxTree &t, IndentData indentData = IndentData());
 
+    void AddLinebreakGroup(LuaSyntaxNode parent, std::vector<LuaSyntaxNode> &group, const LuaSyntaxTree &t, std::size_t indent);
+
     // 在格式化过程中标记Token缩进
     void MarkIndent(LuaSyntaxNode n, const LuaSyntaxTree &t);
 
-    void OnFormatMessage(FormatState& f, FormatEvent event, LuaSyntaxNode syntaxNode, const LuaSyntaxTree& t) override;
+    void OnFormatMessage(FormatState &f, FormatEvent event, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t) override;
+
 private:
     void AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t);
 
@@ -38,6 +47,11 @@ private:
 
     bool IsExprShouldIndent(LuaSyntaxNode &expr, const LuaSyntaxTree &t);
 
+    void ProcessExceedLinebreak(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t);
+
     std::unordered_map<std::size_t, IndentData> _indent;
     std::unordered_set<std::size_t> _indentMark;
+
+    std::unordered_map<std::size_t, std::size_t> _waitLinebreak;
+    std::vector<WaitLinebreakGroup> _waitLinebreakGroups;
 };

@@ -187,6 +187,18 @@ void IndentationAnalyzer::AddIndenter(LuaSyntaxNode n, const LuaSyntaxTree &t, I
     _indent[n.GetIndex()] = indentData;
 }
 
+void IndentationAnalyzer::AddLinebreakGroup(LuaSyntaxNode parent, std::vector<LuaSyntaxNode> &group, const LuaSyntaxTree &t, std::size_t indent) {
+    auto pos = _waitLinebreakGroups.size();
+    WaitLinebreakGroup g;
+    g.Indent = indent;
+    g.TriggerNodes = group;
+    g.Parent = parent;
+    _waitLinebreakGroups.emplace_back(g);
+    for (auto n: group) {
+        _waitLinebreak.insert({n.GetIndex(), pos});
+    }
+}
+
 void IndentationAnalyzer::MarkIndent(LuaSyntaxNode n, const LuaSyntaxTree &t) {
     _indentMark.insert(n.GetIndex());
     auto p = n.GetParent(t);
@@ -199,7 +211,7 @@ void IndentationAnalyzer::MarkIndent(LuaSyntaxNode n, const LuaSyntaxTree &t) {
 void IndentationAnalyzer::OnFormatMessage(FormatState &f, FormatEvent event, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t) {
     switch (event) {
         case FormatEvent::NodeExceedLinebreak: {
-
+            ProcessExceedLinebreak(f, syntaxNode, t);
             break;
         }
         default: {
@@ -210,6 +222,7 @@ void IndentationAnalyzer::OnFormatMessage(FormatState &f, FormatEvent event, Lua
 
 void IndentationAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t) {
     auto exprs = exprList.GetChildSyntaxNodes(MultiKind::Expression, t);
+    bool shouldIndent = true;
     if (exprs.size() == 1) {
         auto expr = exprs.front();
         auto syntaxKind = expr.GetSyntaxKind(t);
@@ -219,24 +232,24 @@ void IndentationAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprLis
         }
 
         if (!IsExprShouldIndent(expr, t)) {
-            return;
+            shouldIndent = false;
         }
-
     } else {
-        bool shouldIndent = false;
+        shouldIndent = false;
         for (auto expr: exprs) {
             if (IsExprShouldIndent(expr, t)) {
                 shouldIndent = true;
                 break;
             }
         }
-
-        if (!shouldIndent) {
-            return;
-        }
     }
 
-    AddIndenter(exprList, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent));
+    if (shouldIndent) {
+        AddIndenter(exprList, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent));
+    } else {
+        std::vector<LuaSyntaxNode> group = exprList.GetChildren(t);
+        AddLinebreakGroup(exprList, group, t, f.GetStyle().continuation_indent);
+    }
 }
 
 void IndentationAnalyzer::AnalyzeCallExprList(FormatState &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t) {
@@ -252,6 +265,9 @@ void IndentationAnalyzer::AnalyzeCallExprList(FormatState &f, LuaSyntaxNode &exp
 
     if (shouldIndent) {
         AddIndenter(exprList, t, IndentData(IndentType::Standard));
+    } else {
+        std::vector<LuaSyntaxNode> group = exprList.GetChildren(t);
+        AddLinebreakGroup(exprList, group, t, 0);
     }
 }
 
@@ -316,5 +332,25 @@ void IndentationAnalyzer::AnalyzeTableFieldKeyValuePairExpr(FormatState &f, LuaS
 
     if (IsExprShouldIndent(expr, t)) {
         AddIndenter(expr, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent));
+    }
+}
+
+void IndentationAnalyzer::ProcessExceedLinebreak(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t) {
+    auto it = _waitLinebreak.find(syntaxNode.GetIndex());
+    if (it == _waitLinebreak.end()) {
+        return;
+    }
+    auto pos = it->second;
+    if (_waitLinebreakGroups.size() <= pos) {
+        return;
+    }
+
+    auto &group = _waitLinebreakGroups[pos];
+    for (auto n: group.TriggerNodes) {
+        _waitLinebreak.erase(n.GetIndex());
+    }
+
+    for (auto c: group.Parent.GetChildren(t)) {
+        AddIndenter(c, t, IndentData(IndentType::WhenNewLine, group.Indent));
     }
 }
