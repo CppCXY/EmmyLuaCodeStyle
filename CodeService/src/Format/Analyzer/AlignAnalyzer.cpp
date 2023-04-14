@@ -84,7 +84,7 @@ void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
     }
 }
 
-void AlignAnalyzer::Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
+void AlignAnalyzer::Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (_startNodeToGroupIndex.count(syntaxNode.GetIndex())) {
         auto alignGroupIndex = _startNodeToGroupIndex[syntaxNode.GetIndex()];
         auto &alignGroup = _alignGroup[alignGroupIndex];

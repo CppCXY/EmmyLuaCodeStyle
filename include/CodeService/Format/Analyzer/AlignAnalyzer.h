@@ -12,7 +12,7 @@ public:
 
     void Analyze(FormatState &f, const LuaSyntaxTree &t) override;
 
-    void Query(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
+    void Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
 private:
     void PushAlignGroup(AlignStrategy strategy, std::vector<std::size_t> &data);
