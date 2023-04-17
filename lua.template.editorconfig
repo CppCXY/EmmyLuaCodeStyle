@@ -82,6 +82,8 @@ align_continuous_assign_statement = true
 
 align_continuous_rect_table_field = true
 
+align_continuous_line_space = 2
+
 align_if_branch = false
 
 align_array_table = true
