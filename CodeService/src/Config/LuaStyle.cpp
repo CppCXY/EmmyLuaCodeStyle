@@ -181,6 +181,8 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
         }
     }
 
+    NUMBER_OPTION(align_continuous_line_space)
+
     BOOL_OPTION(align_if_branch)
 
     if (configMap.count("align_array_table")) {

@@ -152,7 +152,7 @@ AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syn
 
         if (stmt.GetTokenKind(t) == TK_SHORT_COMMENT) {
             auto line = stmt.GetStartLine(t);
-            if (line - lastLine > 2) {
+            if (line - lastLine > f.GetStyle().align_continuous_line_space) {
                 if (group.size() > 1) {
                     PushAlignGroup(strategy, group);
                 }
@@ -166,7 +166,7 @@ AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syn
         if (kind == LuaSyntaxNodeKind::LocalStatement
             || kind == LuaSyntaxNodeKind::AssignStatement) {
             auto line = stmt.GetStartLine(t);
-            if (line - lastLine <= 2) {
+            if (line - lastLine <= f.GetStyle().align_continuous_line_space) {
                 group.push_back(stmt.GetIndex());
             } else {
                 if (group.size() > 1) {
@@ -220,7 +220,7 @@ void AlignAnalyzer::AnalyzeContinuousRectField(FormatState &f, LuaSyntaxNode &sy
         auto tokenKind = field.GetTokenKind(t);
         if (tokenKind != 0) {
             if (tokenKind == TK_SHORT_COMMENT) {
-                if (line - lastLine > 2) {
+                if (line - lastLine > f.GetStyle().align_continuous_line_space) {
                     if (group.size() > 1) {
                         PushAlignGroup(strategy, group);
                     }
@@ -237,7 +237,7 @@ void AlignAnalyzer::AnalyzeContinuousRectField(FormatState &f, LuaSyntaxNode &sy
                 group.clear();
                 lastLine++;
                 continue;
-            } else if (line - lastLine <= 2) {
+            } else if (line - lastLine <= f.GetStyle().align_continuous_line_space) {
                 group.push_back(field.GetIndex());
             } else {
                 if (group.size() > 1) {

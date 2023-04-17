@@ -68,7 +68,7 @@ jobs:
   release:
     name: Upload Release
     needs: [build]
-    runs-on: [ubuntu-18.04]
+    runs-on: [ubuntu-latest]
     steps:
       - name: Download
         uses: actions/download-artifact@v2

@@ -96,6 +96,8 @@ public:
 
     ContinuousAlign align_continuous_rect_table_field = ContinuousAlign::WhenExtraSpace;
 
+    std::size_t align_continuous_line_space = 2;
+
     bool align_if_branch = false;
     // not implement now
     bool align_continuous_similar_call_args = false;
