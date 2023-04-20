@@ -14,6 +14,8 @@ public:
 
     TokenStrategy GetTokenStrategy() const;
 
+    TokenAddStrategy GetTokenAddStrategy() const;
+
     IndentStrategy GetIndentStrategy() const;
 
     void SetNextSpace(std::size_t space);
@@ -27,6 +29,8 @@ public:
     void SetRelativeIndentAlign(std::size_t align);
 
     void SetTokenStrategy(TokenStrategy strategy);
+
+    void SetTokenAddStrategy(TokenAddStrategy strategy);
 
     std::size_t GetNextSpace();
 
@@ -46,6 +50,7 @@ private:
     NextSpaceStrategy _nextSpaceStrategy;
     PrevSpaceStrategy _prevSpaceStrategy;
     TokenStrategy _tokenStrategy;
+    TokenAddStrategy _tokenAddStrategy;
     IndentStrategy _indentStrategy;
 
     union NextData {

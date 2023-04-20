@@ -1,8 +1,8 @@
 #pragma once
 
+#include "CodeService/Config/LuaStyleEnum.h"
 #include <cstdlib>
 #include <vector>
-#include "CodeService/Config/LuaStyleEnum.h"
 
 enum class NextSpaceStrategy {
     None,
@@ -22,14 +22,14 @@ enum class TokenStrategy {
     Remove,
     StringSingleQuote,
     StringDoubleQuote,
-
     TableSepSemicolon,
     TableSepComma,
-    TableAddSep,
-
-    RemoveCommentTrailSpace,
-
     OriginRange
+};
+
+enum class TokenAddStrategy {
+    None,
+    TableAddSep,
 };
 
 enum class IndentStrategy {
@@ -51,7 +51,7 @@ enum class IndentType {
 
 struct IndentData {
     IndentData(IndentType type = IndentType::Standard, std::size_t size = 0)
-            : Type(type), Indent(size) {}
+        : Type(type), Indent(size) {}
 
     IndentType Type;
     std::size_t Indent;
@@ -68,37 +68,33 @@ struct LineBreakData {
     }
 
     explicit LineBreakData(std::size_t line)
-            : Strategy(LineBreakStrategy::Standard),
-              Data(LineSpace(LineSpaceType::Fixed, line)) {
+        : Strategy(LineBreakStrategy::Standard),
+          Data(LineSpace(LineSpaceType::Fixed, line)) {
     }
 
     explicit LineBreakData(LineSpace lineSpace)
-            : Strategy(LineBreakStrategy::Standard),
-              Data(lineSpace) {
+        : Strategy(LineBreakStrategy::Standard),
+          Data(lineSpace) {
     }
 
     LineBreakData(LineBreakStrategy strategy, std::size_t index)
-            : Strategy(strategy),
-              Data(index) {
+        : Strategy(strategy),
+          Data(index) {
     }
-
 
     LineBreakStrategy Strategy;
 
     union BreakData {
         BreakData()
-                : Line() {
-
+            : Line() {
         }
 
         explicit BreakData(LineSpace line)
-                : Line(line) {
-
+            : Line(line) {
         }
 
         explicit BreakData(std::size_t index)
-                : Index(index) {
-
+            : Index(index) {
         }
 
         LineSpace Line;
@@ -116,7 +112,7 @@ enum class AlignStrategy {
 
 struct AlignGroup {
     AlignGroup(AlignStrategy strategy, const std::vector<std::size_t> &group)
-            : Strategy(strategy), SyntaxGroup(group), Resolve(false), AlignPos(0) {}
+        : Strategy(strategy), SyntaxGroup(group), Resolve(false), AlignPos(0) {}
 
     AlignStrategy Strategy;
     std::vector<std::size_t> SyntaxGroup;

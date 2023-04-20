@@ -63,14 +63,23 @@ void TokenAnalyzer::Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyn
         if (it != _tokenStrategies.end()) {
             resolve.SetTokenStrategy(it->second);
         }
+
+        auto it2 = _tokenAddStrategies.find(syntaxNode.GetIndex());
+        if (it2 != _tokenAddStrategies.end()) {
+            resolve.SetTokenAddStrategy(it2->second);
+        }
     }
 }
 
-void TokenAnalyzer::Mark(LuaSyntaxNode &n, const LuaSyntaxTree &t, TokenStrategy strategy) {
+void TokenAnalyzer::Mark(LuaSyntaxNode n, const LuaSyntaxTree &t, TokenStrategy strategy) {
     _tokenStrategies[n.GetIndex()] = strategy;
 }
 
-bool TokenAnalyzer::IsRemove(LuaSyntaxNode &n, const LuaSyntaxTree &t) const {
+void TokenAnalyzer::MarkAdd(LuaSyntaxNode n, const LuaSyntaxTree &t, TokenAddStrategy strategy) {
+    _tokenAddStrategies[n.GetIndex()] = strategy;
+}
+
+bool TokenAnalyzer::IsRemove(LuaSyntaxNode n, const LuaSyntaxTree &t) const {
     auto it = _tokenStrategies.find(n.GetIndex());
     if (it == _tokenStrategies.end()) {
         return false;
@@ -78,14 +87,14 @@ bool TokenAnalyzer::IsRemove(LuaSyntaxNode &n, const LuaSyntaxTree &t) const {
     return it->second == TokenStrategy::Remove;
 }
 
-void TokenAnalyzer::TableFieldAddSep(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+void TokenAnalyzer::TableFieldAddSep(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t) {
     auto sep = n.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
     if (!sep.IsNode(t)) {
         auto lastToken = n.GetLastToken(t);
         if (lastToken.GetTokenKind(t) == TK_SHORT_COMMENT || lastToken.GetTokenKind(t) == TK_LONG_COMMENT) {
             lastToken = lastToken.GetPrevToken(t);
         }
-        Mark(lastToken, t, TokenStrategy::TableAddSep);
+        MarkAdd(lastToken, t, TokenAddStrategy::TableAddSep);
     }
 }
 

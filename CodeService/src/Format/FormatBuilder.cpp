@@ -120,15 +120,6 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 WriteChar(';');
                 break;
             }
-            case TokenStrategy::TableAddSep: {
-                WriteSyntaxNode(syntaxNode, t);
-                if (_state.GetStyle().table_separator_style == TableSeparatorStyle::Semicolon) {
-                    WriteChar(';');
-                } else {
-                    WriteChar(',');
-                }
-                break;
-            }
             case TokenStrategy::OriginRange: {
                 auto range = resolve.GetOriginRange();
                 LuaSyntaxNode startNode(range.StartIndex);
@@ -147,6 +138,20 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                     }
                 }
                 return;
+            }
+            default: {
+                break;
+            }
+        }
+
+        switch (resolve.GetTokenAddStrategy()) {
+            case TokenAddStrategy::TableAddSep: {
+                if (_state.GetStyle().table_separator_style == TableSeparatorStyle::Semicolon) {
+                    WriteChar(';');
+                } else {
+                    WriteChar(',');
+                }
+                break;
             }
             default: {
                 break;

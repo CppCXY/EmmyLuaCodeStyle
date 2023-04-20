@@ -4,6 +4,7 @@ FormatResolve::FormatResolve()
         : _nextSpaceStrategy(NextSpaceStrategy::None),
           _prevSpaceStrategy(PrevSpaceStrategy::None),
           _tokenStrategy(TokenStrategy::Origin),
+          _tokenAddStrategy(TokenAddStrategy::None),
           _indentStrategy(IndentStrategy::None),
           _nextSpaceData(),
           _prevSpaceData(),
@@ -23,12 +24,17 @@ TokenStrategy FormatResolve::GetTokenStrategy() const {
     return _tokenStrategy;
 }
 
+TokenAddStrategy FormatResolve::GetTokenAddStrategy() const {
+    return _tokenAddStrategy;
+}
+
 IndentStrategy FormatResolve::GetIndentStrategy() const {
     return _indentStrategy;
 }
 
 void FormatResolve::Reset() {
     _tokenStrategy = TokenStrategy::Origin;
+    _tokenAddStrategy = TokenAddStrategy::None;
     _nextSpaceStrategy = NextSpaceStrategy::None;
     _prevSpaceStrategy = PrevSpaceStrategy::None;
     _indentStrategy = IndentStrategy::None;
@@ -81,6 +87,10 @@ void FormatResolve::SetRelativeIndentAlign(std::size_t align) {
 
 void FormatResolve::SetTokenStrategy(TokenStrategy strategy) {
     _tokenStrategy = strategy;
+}
+
+void FormatResolve::SetTokenAddStrategy(TokenAddStrategy strategy) {
+    _tokenAddStrategy = strategy;
 }
 
 void FormatResolve::SetOriginRange(IndexRange range) {
