@@ -2,6 +2,7 @@
 
 #include "InfoKind.h"
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 class InfoTree;
