@@ -77,3 +77,9 @@ enum class AlignArrayTable {
     Normal,
     ContainCurly
 };
+
+enum class AlignChainExpr {
+    None,
+    Always,
+    OnlyCallStmt
+};

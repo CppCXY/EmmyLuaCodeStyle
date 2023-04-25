@@ -1,12 +1,11 @@
 #include "CodeService/Format/Analyzer/AlignAnalyzer.h"
-#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeService/Format/FormatState.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "SyntaxNodeHelper.h"
 #include "Util/StringUtil.h"
 
 
 AlignAnalyzer::AlignAnalyzer() {
-
 }
 
 void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
@@ -58,6 +57,11 @@ void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case LuaSyntaxNodeKind::IfStatement: {
                     if (f.GetStyle().align_if_branch) {
                         AnalyzeIfStatement(f, syntaxNode, t);
+                    }
+                }
+                case LuaSyntaxNodeKind::SuffixedExpression: {
+                    if (f.GetStyle().align_chain_expr != AlignChainExpr::None) {
+                        AnalyzeChainExpr(f, syntaxNode, t);
                     }
                 }
                 default: {
@@ -129,8 +133,7 @@ void AlignAnalyzer::PushAlignGroup(AlignStrategy strategy, std::vector<std::size
     }
 }
 
-void
-AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+void AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
     auto children = syntaxNode.GetChildren(t);
     std::size_t lastLine = 0;
     std::vector<std::size_t> group;
@@ -142,8 +145,7 @@ AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syn
     for (auto stmt: children) {
         auto kind = stmt.GetSyntaxKind(t);
         if (group.empty()) {
-            if (kind == LuaSyntaxNodeKind::LocalStatement
-                || kind == LuaSyntaxNodeKind::AssignStatement) {
+            if (kind == LuaSyntaxNodeKind::LocalStatement || kind == LuaSyntaxNodeKind::AssignStatement) {
                 group.push_back(stmt.GetIndex());
                 lastLine = stmt.GetEndLine(t);
             }
@@ -163,8 +165,7 @@ AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syn
             continue;
         }
 
-        if (kind == LuaSyntaxNodeKind::LocalStatement
-            || kind == LuaSyntaxNodeKind::AssignStatement) {
+        if (kind == LuaSyntaxNodeKind::LocalStatement || kind == LuaSyntaxNodeKind::AssignStatement) {
             auto line = stmt.GetStartLine(t);
             if (line - lastLine <= f.GetStyle().align_continuous_line_space) {
                 group.push_back(stmt.GetIndex());
@@ -191,8 +192,7 @@ AlignAnalyzer::AnalyzeContinuousLocalOrAssign(FormatState &f, LuaSyntaxNode &syn
 }
 
 bool IsRectField(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
-    return syntaxNode.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableField
-           && !syntaxNode.GetChildToken('=', t).IsNull(t);
+    return syntaxNode.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableField && !syntaxNode.GetChildToken('=', t).IsNull(t);
 }
 
 void AlignAnalyzer::AnalyzeContinuousRectField(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
@@ -270,8 +270,7 @@ bool IsArrayTableField(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
     return expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression;
 }
 
-void
-AlignAnalyzer::AnalyzeContinuousArrayTableField(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+void AlignAnalyzer::AnalyzeContinuousArrayTableField(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
     auto children = syntaxNode.GetChildren(t);
     std::vector<LuaSyntaxNode> arrayTable;
     std::size_t lastLine = 0;
@@ -280,9 +279,7 @@ AlignAnalyzer::AnalyzeContinuousArrayTableField(FormatState &f, LuaSyntaxNode &s
             continue;
         }
 
-        if (IsArrayTableField(field, t)
-            && field.IsSingleLineNode(t)
-            && field.GetStartLine(t) > lastLine) {
+        if (IsArrayTableField(field, t) && field.IsSingleLineNode(t) && field.GetStartLine(t) > lastLine) {
             lastLine = field.GetStartLine(t);
             auto tableExpr = field.GetFirstChild(t);
             arrayTable.push_back(tableExpr);
@@ -297,8 +294,7 @@ AlignAnalyzer::AnalyzeContinuousArrayTableField(FormatState &f, LuaSyntaxNode &s
     }
 }
 
-void
-AlignAnalyzer::AnalyzeArrayTableAlign(FormatState &f, std::vector<LuaSyntaxNode> &arrayTable, const LuaSyntaxTree &t) {
+void AlignAnalyzer::AnalyzeArrayTableAlign(FormatState &f, std::vector<LuaSyntaxNode> &arrayTable, const LuaSyntaxTree &t) {
     std::vector<std::vector<LuaSyntaxNode>> arrayTableFieldVec;
     std::size_t maxAlign = 0;
     for (auto &table: arrayTable) {
@@ -351,8 +347,7 @@ AlignAnalyzer::AnalyzeArrayTableAlign(FormatState &f, std::vector<LuaSyntaxNode>
     }
 }
 
-void
-AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGroup &group, const LuaSyntaxTree &t) {
+void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGroup &group, const LuaSyntaxTree &t) {
     switch (group.Strategy) {
         case AlignStrategy::AlignToEqWhenExtraSpace: {
             bool allowAlign = false;
@@ -403,13 +398,13 @@ AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGr
             break;
         }
         case AlignStrategy::AlignToFirst: {
-            if(group.SyntaxGroup.empty()){
-                return ;
+            if (group.SyntaxGroup.empty()) {
+                return;
             }
             LuaSyntaxNode firstNode(group.SyntaxGroup.front());
             if (!f.IsNewLine(firstNode, t)) {
                 auto width = f.CurrentWidth();
-                if(f.GetMode() == FormatState::Mode::Diagnostic){
+                if (f.GetMode() == FormatState::Mode::Diagnostic) {
                     width = firstNode.GetStartCol(t);
                 }
 
@@ -535,6 +530,19 @@ void AlignAnalyzer::AnalyzeIfStatement(FormatState &f, LuaSyntaxNode &syntaxNode
     PushNormalAlignGroup(ifAlignPos, group);
 }
 
+void AlignAnalyzer::AnalyzeChainExpr(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    auto parent = syntaxNode.GetParent(t);
+    if (parent.GetSyntaxKind(t) != LuaSyntaxNodeKind::ExpressionStatement && f.GetStyle().align_chain_expr == AlignChainExpr::OnlyCallStmt) {
+        return;
+    }
+
+    std::vector<std::size_t> group;
+    for (auto indexExpr: syntaxNode.GetChildSyntaxNodes(LuaSyntaxNodeKind::IndexExpression, t)) {
+        group.push_back(indexExpr.GetFirstToken(t).GetIndex());
+    }
+    PushAlignGroup(AlignStrategy::AlignToFirst, group);
+}
+
 void AlignAnalyzer::PushNormalAlignGroup(std::size_t alignPos, std::vector<std::size_t> &data) {
     auto pos = _alignGroup.size();
     auto &alignGroup = _alignGroup.emplace_back(AlignStrategy::Normal, data);
@@ -545,9 +553,7 @@ void AlignAnalyzer::PushNormalAlignGroup(std::size_t alignPos, std::vector<std::
     }
 }
 
-void
-AlignAnalyzer::AnalyzeContinuousSimilarCallArgs(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
-
+void AlignAnalyzer::AnalyzeContinuousSimilarCallArgs(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
 }
 
 void AlignAnalyzer::AnalyzeInlineComment(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {

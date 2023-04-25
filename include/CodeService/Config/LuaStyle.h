@@ -106,6 +106,7 @@ public:
 
     AlignArrayTable align_array_table = AlignArrayTable::Normal;
 
+    AlignChainExpr align_chain_expr = AlignChainExpr::None;
     // [Indent]
 
 	/*

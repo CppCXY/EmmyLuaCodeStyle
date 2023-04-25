@@ -1,7 +1,7 @@
 #pragma once
 
-#include <unordered_map>
 #include "CodeService/Format/Analyzer/FormatAnalyzer.h"
+#include <unordered_map>
 
 
 class AlignAnalyzer : public FormatAnalyzer {
@@ -32,6 +32,8 @@ private:
     void AnalyzeParamList(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
     void AnalyzeIfStatement(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
+
+    void AnalyzeChainExpr(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
     void ResolveAlignGroup(FormatState &f, std::size_t groupIndex, AlignGroup &group, const LuaSyntaxTree &t);
 

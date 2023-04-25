@@ -1287,3 +1287,44 @@ local t = {
 }
 )", style));
 }
+
+TEST(FormatByStyleOption, align_chain_expr){
+    LuaStyle style;
+
+    style.align_chain_expr = AlignChainExpr::Always;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+return aaaaaaaaaaaa.wfgoiwjofjw()
+     .afjoajofjw + 123131 + 123131
+local t = aaaaaaaaaaaa.wfgoiwjofjw()
+     .afjoajofjw + 123131 + 123131
+aaaaaaaaaaaa.wfgoiwjofjw()
+     .afjoajofjw()
+)",
+            R"(
+return aaaaaaaaaaaa.wfgoiwjofjw()
+                   .afjoajofjw + 123131 + 123131
+local t = aaaaaaaaaaaa.wfgoiwjofjw()
+                      .afjoajofjw + 123131 + 123131
+aaaaaaaaaaaa.wfgoiwjofjw()
+            .afjoajofjw()
+)", style));
+    style.align_chain_expr = AlignChainExpr::OnlyCallStmt;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+return aaaaaaaaaaaa.wfgoiwjofjw()
+    .afjoajofjw + 123131 + 123131
+local t = aaaaaaaaaaaa.wfgoiwjofjw()
+    .afjoajofjw + 123131 + 123131
+aaaaaaaaaaaa.wfgoiwjofjw()
+     .afjoajofjw()
+)",
+            R"(
+return aaaaaaaaaaaa.wfgoiwjofjw()
+    .afjoajofjw + 123131 + 123131
+local t = aaaaaaaaaaaa.wfgoiwjofjw()
+    .afjoajofjw + 123131 + 123131
+aaaaaaaaaaaa.wfgoiwjofjw()
+            .afjoajofjw()
+)", style));
+}
