@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include <string>
 #include <map>
+#include <set>
+#include <string>
 #include <type_traits>
 #include <vector>
-#include <set>
 
 
 class CommandLine;
@@ -44,10 +44,8 @@ public:
         }
 
         _shortMap.insert({std::string(shortName), std::string(name)});
-        _args.insert({
-                             std::string(name),
-                             CommandLineOption{"", std::string(description), type, false}
-                     });
+        _args.insert({std::string(name),
+                      CommandLineOption{"", std::string(description), type, false}});
         return *this;
     }
 
@@ -124,4 +122,3 @@ private:
     std::vector<std::string> _errors;
     std::string _usage;
 };
-

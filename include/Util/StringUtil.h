@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include <vector>
-#include <string_view>
 #include <string>
+#include <string_view>
+#include <vector>
 
 /*
  * 字符串处理函数
@@ -31,4 +31,4 @@ struct CaseInsensitiveLess final {
 };
 
 bool ExistDel(char del, std::string_view text);
-}
+}// namespace string_util

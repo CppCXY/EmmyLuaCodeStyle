@@ -1,14 +1,17 @@
 #pragma once
 
+#include "LuaDiagnosticStyleEnum.h"
+#include "Util/InfoTree/InfoTree.h"
+#include <memory>
 #include <string>
 #include <string_view>
-#include <memory>
 #include <vector>
-#include "LuaDiagnosticStyleEnum.h"
 
 class LuaDiagnosticStyle {
 public:
     LuaDiagnosticStyle() = default;
+
+    void ParseTree(InfoTree& tree);
 
     bool code_style_check = true;
 
