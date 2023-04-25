@@ -899,3 +899,13 @@ ddd = 123;
 pcall(f, 1, 2, 3); do return true end
 )"));
 }
+
+TEST(Format, feature_106) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local empty = function () end
+)",
+            R"(
+local empty = function() end
+)"));
+}

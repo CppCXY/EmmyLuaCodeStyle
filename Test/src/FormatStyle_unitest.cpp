@@ -396,8 +396,7 @@ TEST(FormatByStyleOption, space_before_function_open_parenthesis) {
 function f() end
 )",
             R"(
-function f ()
-end
+function f () end
 )", style));
     style.space_before_function_open_parenthesis = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
@@ -405,8 +404,7 @@ end
 function f() end
 )",
             R"(
-function f()
-end
+function f() end
 )", style));
 }
 

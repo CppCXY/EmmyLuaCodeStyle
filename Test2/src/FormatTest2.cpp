@@ -8,10 +8,7 @@
 
 int main() {
     std::string buffer = R"(
-local t;     Init(v)
-
-
-local d =123
+local empty = function ()   end
 
 )";
 
