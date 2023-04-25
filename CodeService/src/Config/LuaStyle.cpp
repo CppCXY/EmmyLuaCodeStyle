@@ -197,6 +197,16 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
         }
     }
 
+    if (configMap.count("align_chain_expr")) {
+        if (configMap.at("align_chain_expr") == "none") {
+            align_chain_expr = AlignChainExpr::None;
+        } else if (configMap.at("align_chain_expr") == "always") {
+            align_chain_expr = AlignChainExpr::Always;
+        } else if (configMap.at("align_chain_expr") == "only_call_stmt") {
+            align_chain_expr = AlignChainExpr::OnlyCallStmt;
+        }
+    }
+
     BOOL_OPTION(align_continuous_inline_comment)
 
     BOOL_OPTION(never_indent_before_if_condition)
