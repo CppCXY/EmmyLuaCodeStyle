@@ -219,9 +219,9 @@ int type_format(lua_State *L) {
                 }
             }
             auto typeFormatResult = LuaCodeFormat::GetInstance()
-                                            .TypeFormat(filename,
-                                                        static_cast<std::size_t>(line), static_cast<std::size_t>(character),
-                                                        std::move(text), configMap, stringTypeOptions);
+                    .TypeFormat(filename,
+                                static_cast<std::size_t>(line), static_cast<std::size_t>(character),
+                                std::move(text), configMap, stringTypeOptions);
 
             if (typeFormatResult.Type == ResultType::Err) {
                 lua_pushboolean(L, false);
@@ -576,6 +576,42 @@ int spell_analysis(lua_State *L) {
     return 0;
 }
 
+InfoNode CreateFromLua(InfoTree &t, lua_State *L, int idx) {
+    if (lua_istable(L, idx)) {
+        // lua 不区分 数组和table, 太难了
+        auto len = luaL_len(L, idx);
+        if (len != 0) {
+            auto arr = t.CreateArray();
+            for (auto i = 0; i < len; i++) {
+                if (lua_geti(L, idx, i)) {
+                    arr.AddChild(CreateFromLua(t, L, -1));
+                }
+                lua_pop(L, 1);
+            }
+            return arr;
+        } else {
+            auto object = t.CreateObject();
+            lua_pushnil(L);
+            while (lua_next(L, idx) != 0) {
+                if (lua_isstring(L, -2)) {
+                    auto key = luaToString(L, -2);
+                    object.AddChild(key, CreateFromLua(t, L, -1));
+                }
+                lua_pop(L, 1);
+            }
+            return object;
+        }
+    } else if (lua_isnumber(L, idx)) {
+        return t.CreateNumber(lua_tonumber(L, idx));
+    } else if (lua_isstring(L, idx)) {
+        return t.CreateString(lua_tostring(L, idx));
+    } else if (lua_isboolean(L, idx)) {
+        return t.CreateBool(lua_toboolean(L, idx));
+    } else {
+        return t.CreateNone();
+    }
+}
+
 int update_name_style_config(lua_State *L) {
     int top = lua_gettop(L);
 
@@ -585,20 +621,18 @@ int update_name_style_config(lua_State *L) {
 
     if (lua_istable(L, 1)) {
         try {
+            InfoTree tree;
+            auto root = tree.GetRoot();
+            lua_pushnil(L);
+            while (lua_next(L, -2) != 0) {
+                if (lua_isstring(L, -2)) {
+                    auto key = luaToString(L, -2);
+                    root.AddChild(key, CreateFromLua(tree, L, -1));
+                }
+                lua_pop(L, 1);
+            }
 
-//            lua_pushnil(L);
-//            while (lua_next(L, -2) != 0) {
-//                auto key = luaToString(L, -2);
-//                auto value = luaToString(L, -1);
-//
-//                if (key != "nil") {
-//                    configMap.insert({key, value});
-//                }
-//
-//                lua_pop(L, 1);
-//            }
-//
-//            LuaCodeFormat::GetInstance().SetDefaultCodeStyle(configMap);
+            LuaCodeFormat::GetInstance().UpdateDiagnosticStyle(tree);
             lua_pushboolean(L, true);
             return 1;
         } catch (std::exception &e) {
@@ -685,20 +719,20 @@ int spell_suggest(lua_State *L) {
 }
 
 static const luaL_Reg lib[] = {
-        {"format",                            format                           },
-        {"range_format",                      range_format                     },
-        {"type_format",                       type_format                      },
-        {"update_config",                     update_config                    },
-        {"diagnose_file",                     diagnose_file                    },
-        {"set_default_config",                set_default_config               },
-        {"spell_load_dictionary_from_path",   spell_load_dictionary_from_path  },
+        {"format",                            format},
+        {"range_format",                      range_format},
+        {"type_format",                       type_format},
+        {"update_config",                     update_config},
+        {"diagnose_file",                     diagnose_file},
+        {"set_default_config",                set_default_config},
+        {"spell_load_dictionary_from_path",   spell_load_dictionary_from_path},
         {"spell_load_dictionary_from_buffer", spell_load_dictionary_from_buffer},
-        {"spell_analysis",                    spell_analysis                   },
-        {"spell_suggest",                     spell_suggest                    },
-        {"set_nonstandard_symbol",            set_nonstandard_symbol           },
-        {"name_style_analysis",               name_style_analysis              },
-        {"update_name_style_config",          update_name_style_config         },
-        {nullptr,                             nullptr                          }
+        {"spell_analysis",                    spell_analysis},
+        {"spell_suggest",                     spell_suggest},
+        {"set_nonstandard_symbol",            set_nonstandard_symbol},
+        {"name_style_analysis",               name_style_analysis},
+        {"update_name_style_config",          update_name_style_config},
+        {nullptr,                             nullptr}
 };
 
 extern "C" EXPORT int luaopen_code_format(lua_State *L) {

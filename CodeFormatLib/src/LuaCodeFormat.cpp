@@ -30,6 +30,13 @@ void LuaCodeFormat::UpdateCodeStyle(const std::string &workspaceUri, const std::
     config.Editorconfig->Parse();
 }
 
+void LuaCodeFormat::UpdateDiagnosticStyle(InfoTree &tree) {
+    _diagnosticStyle.ParseTree(tree);
+    _diagnosticStyle.code_style_check = true;
+    _diagnosticStyle.name_style_check = true;
+    _diagnosticStyle.spell_check = true;
+}
+
 void LuaCodeFormat::RemoveCodeStyle(const std::string &workspaceUri) {
     for (auto it = _configs.begin(); it != _configs.end(); it++) {
         if (it->Workspace == workspaceUri) {
@@ -282,3 +289,4 @@ void LuaCodeFormat::CalculateTempStyle(LuaStyle &style, ConfigMap &configMap) {
         }
     }
 }
+

@@ -23,6 +23,8 @@ public:
 
     void UpdateCodeStyle(const std::string &workspaceUri, const std::string &configPath);
 
+    void UpdateDiagnosticStyle(InfoTree& tree);
+
     void RemoveCodeStyle(const std::string &workspaceUri);
 
     void SetDefaultCodeStyle(ConfigMap &configMap);
