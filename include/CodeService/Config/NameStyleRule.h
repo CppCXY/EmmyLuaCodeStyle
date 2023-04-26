@@ -14,7 +14,7 @@ enum class NameStyleType {
 };
 
 struct NameStyleData {
-    virtual ~NameStyleData() {};
+    virtual ~NameStyleData(){};
 };
 
 struct NameStyleRule {
@@ -37,6 +37,12 @@ struct SameNameStyleData : public NameStyleData {
 
 struct PatternNameStyleData : public NameStyleData {
     struct Group {
+        Group()
+            : GroupId(0), Rule(NameStyleType::Off) {}
+
+        Group(std::size_t groupId, NameStyleType rule)
+            : GroupId(groupId), Rule(rule) {}
+
         std::size_t GroupId;
         NameStyleType Rule;
     };
