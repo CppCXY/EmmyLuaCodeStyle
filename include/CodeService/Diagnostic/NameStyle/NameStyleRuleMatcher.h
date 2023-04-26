@@ -1,25 +1,25 @@
 ﻿#pragma once
 
-#include <functional>
-#include <string_view>
-#include <memory>
+#include "CodeService/Config/NameStyleRule.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
-#include "CodeService/Config/LuaDiagnosticStyleEnum.h"
+#include <functional>
+#include <memory>
+#include <string_view>
 
 class NameStyleRuleMatcher {
 public:
     bool Match(LuaSyntaxNode &n, const LuaSyntaxTree &t, const std::vector<NameStyleRule> &rules);
 
 private:
-    static bool SnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+    static bool SnakeCase(std::string_view text);
 
-    static bool UpperSnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+    static bool UpperSnakeCase(std::string_view text);
 
-    static bool CamelCase(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+    static bool CamelCase(std::string_view text);
 
-    static bool PascalCase(LuaSyntaxNode &n, const LuaSyntaxTree &t);
+    static bool PascalCase(std::string_view text);
 
-    static bool Same(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::string_view param);
+    static bool Same(std::string_view text, std::string_view param);
 
-    static bool PatternMatch(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::string_view pattern);
+    static bool PatternMatch(std::string_view text, std::shared_ptr<PatternNameStyleData> data);
 };

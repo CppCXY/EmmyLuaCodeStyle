@@ -93,7 +93,7 @@ bool InfoNode::AsBool() const {
     return false;
 }
 
-std::vector<InfoNode> InfoNode::GetChildren() const {
+std::vector<InfoNode> InfoNode::AsArray() const {
     std::vector<InfoNode> result;
     if (_index < _tree->_nodeOrInfos.size()) {
         auto &node = _tree->_nodeOrInfos[_index];
@@ -104,6 +104,20 @@ std::vector<InfoNode> InfoNode::GetChildren() const {
         }
     }
     return result;
+}
+
+std::unordered_map<std::string, InfoNode> InfoNode::AsMap() const {
+    std::unordered_map<std::string, InfoNode> umap;
+    if (_index < _tree->_nodeOrInfos.size()) {
+        auto &node = _tree->_nodeOrInfos[_index];
+        if (node.Kind == InfoKind::Object) {
+            auto &innerUmap = _tree->_mapChildren[node.Data.ChildIndex];
+            for (auto &p: innerUmap) {
+                umap.insert({p.first, InfoNode(p.second, _tree)});
+            }
+        }
+    }
+    return umap;
 }
 
 InfoNode InfoNode::GetValue(std::string_view key) const {
@@ -120,4 +134,3 @@ InfoNode InfoNode::GetValue(std::string_view key) const {
     }
     return InfoNode(0, _tree);
 }
-

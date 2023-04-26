@@ -8,40 +8,49 @@ bool NameStyleRuleMatcher::Match(LuaSyntaxNode &n, const LuaSyntaxTree &t, const
     }
 
     for (auto &rule: rules) {
+        auto text = n.GetText(t);
         switch (rule.Type) {
             case NameStyleType::SnakeCase: {
-                if (SnakeCase(n, t)) {
+                if (SnakeCase(text)) {
                     return true;
                 }
                 break;
             }
             case NameStyleType::UpperSnakeCase: {
-                if (UpperSnakeCase(n, t)) {
+                if (UpperSnakeCase(text)) {
                     return true;
                 }
                 break;
             }
             case NameStyleType::CamelCase: {
-                if (CamelCase(n, t)) {
+                if (CamelCase(text)) {
                     return true;
                 }
                 break;
             }
             case NameStyleType::PascalCase: {
-                if (PascalCase(n, t)) {
+                if (PascalCase(text)) {
                     return true;
                 }
                 break;
             }
             case NameStyleType::Same: {
-                if (Same(n, t, rule.Param)) {
-                    return true;
+                auto data = rule.Data;
+                if (data) {
+                    auto sameData = std::dynamic_pointer_cast<SameNameStyleData>(data);
+                    if (Same(text, sameData->Param)) {
+                        return true;
+                    }
                 }
                 break;
             }
             case NameStyleType::Pattern: {
-                if (PatternMatch(n, t, rule.Param)) {
-                    return true;
+                auto data = rule.Data;
+                if (data) {
+                    auto patternData = std::dynamic_pointer_cast<PatternNameStyleData>(data);
+                    if (PatternMatch(text, patternData)) {
+                        return true;
+                    }
                 }
                 break;
             }
@@ -53,57 +62,7 @@ bool NameStyleRuleMatcher::Match(LuaSyntaxNode &n, const LuaSyntaxTree &t, const
     return false;
 }
 
-//void NameStyleRuleMatcher::ParseRule(std::string_view rule) {
-//    auto file = std::make_shared<LuaFile>("", std::string(rule));
-//    auto tokenParser = std::make_shared<LuaTokenParser>(file);
-//    tokenParser->Parse();
-//
-//    while (tokenParser->Current().TokenType != TK_EOS) {
-//        if (tokenParser->Current().TokenType == TK_NAME) {
-//            auto &lookAhead = tokenParser->LookAhead();
-//            if (lookAhead.TokenType == '(') {
-//                NameStyleType type = NameStyleType::Same;
-//                auto functionName = tokenParser->Current().Text;
-//                if (functionName != "same") {
-//                    type = NameStyleType::Custom;
-//                }
-//                std::vector<std::string> param;
-//                tokenParser->Next();
-//                while (tokenParser->Current().TokenType != ')' && tokenParser->Current().TokenType != TK_EOS) {
-//                    if (tokenParser->Current().TokenType == TK_NAME || tokenParser->Current().TokenType == TK_STRING) {
-//                        param.push_back(std::string(tokenParser->Current().Text));
-//                    }
-//                    tokenParser->Next();
-//                }
-//
-//                _rulers.emplace_back(type, param);
-//                tokenParser->Next();
-//            } else if (lookAhead.TokenType == TK_EOS || lookAhead.TokenType == '|') {
-//                auto currentText = tokenParser->Current().Text;
-//                if (currentText == "snake_case") {
-//                    _rulers.emplace_back(NameStyleType::SnakeCase);
-//                } else if (currentText == "camel_case") {
-//                    _rulers.emplace_back(NameStyleType::CamelCase);
-//                } else if (currentText == "pascal_case") {
-//                    _rulers.emplace_back(NameStyleType::PascalCase);
-//                } else if (currentText == "upper_snake_case") {
-//                    _rulers.emplace_back(NameStyleType::UpperSnakeCase);
-//                }
-//            }
-//
-//            if (lookAhead.TokenType == '|') {
-//                tokenParser->Next();
-//            }
-//        } else // 语法错误
-//        {
-//            break;
-//        }
-//
-//        tokenParser->Next();
-//    }
-//}
-
-bool NameStyleRuleMatcher::SnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+bool NameStyleRuleMatcher::SnakeCase(std::string_view source) {
     enum class ParseState {
         None,
         PrefixUnderscore,
@@ -113,7 +72,6 @@ bool NameStyleRuleMatcher::SnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
         EndDigit
     } state = ParseState::None;
 
-    auto source = n.GetText(t);
     for (std::size_t index = 0; index != source.size(); index++) {
         char ch = source[index];
         if (ch < 0) {
@@ -181,7 +139,7 @@ bool NameStyleRuleMatcher::SnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
     return true;
 }
 
-bool NameStyleRuleMatcher::UpperSnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+bool NameStyleRuleMatcher::UpperSnakeCase(std::string_view text) {
     enum class ParseState {
         None,
         Underscore,
@@ -189,7 +147,7 @@ bool NameStyleRuleMatcher::UpperSnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree 
         EndDigit
     } state = ParseState::None;
 
-    auto source = n.GetText(t);
+    auto source = text;
     for (std::size_t index = 0; index != source.size(); index++) {
         char ch = source[index];
         if (ch < 0) {
@@ -237,7 +195,7 @@ bool NameStyleRuleMatcher::UpperSnakeCase(LuaSyntaxNode &n, const LuaSyntaxTree 
     return true;
 }
 
-bool NameStyleRuleMatcher::CamelCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+bool NameStyleRuleMatcher::CamelCase(std::string_view text) {
     enum class ParseState {
         None,
         PrefixUnderscore,
@@ -246,7 +204,7 @@ bool NameStyleRuleMatcher::CamelCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
         UpperLetter
     } state = ParseState::None;
 
-    auto source = n.GetText(t);
+    auto source = text;
     for (std::size_t index = 0; index != source.size(); index++) {
         char ch = source[index];
         if (ch < 0) {
@@ -307,14 +265,14 @@ bool NameStyleRuleMatcher::CamelCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
     return true;
 }
 
-bool NameStyleRuleMatcher::PascalCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+bool NameStyleRuleMatcher::PascalCase(std::string_view text) {
     enum class ParseState {
         None,
         LowerLetter,
         UpperLetter
     } state = ParseState::None;
 
-    auto source = n.GetText(t);
+    auto source = text;
     for (std::size_t index = 0; index != source.size(); index++) {
         char ch = source[index];
         if (ch < 0) {
@@ -355,12 +313,53 @@ bool NameStyleRuleMatcher::PascalCase(LuaSyntaxNode &n, const LuaSyntaxTree &t) 
     return true;
 }
 
-bool NameStyleRuleMatcher::Same(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::string_view param) {
-    return n.GetText(t) == param;
+bool NameStyleRuleMatcher::Same(std::string_view text, std::string_view param) {
+    return text == param;
 }
 
-bool NameStyleRuleMatcher::PatternMatch(LuaSyntaxNode &n, const LuaSyntaxTree &t, std::string_view pattern) {
-    return string_util::FileWildcardMatch(n.GetText(t), pattern);
+bool NameStyleRuleMatcher::PatternMatch(std::string_view text, std::shared_ptr<PatternNameStyleData> data) {
+    std::match_results<std::string_view::const_iterator> mc;
+    if (!std::regex_match(text.begin(), text.end(), mc, data->Re)) {
+        return false;
+    }
+
+    for (auto group: data->GroupRules) {
+        if (group.GroupId < mc.size()) {
+            auto &subMatch = mc[group.GroupId];
+            switch (group.Rule) {
+                case NameStyleType::Off: {
+                    break;
+                }
+                case NameStyleType::CamelCase: {
+                    if (!CamelCase(subMatch.str())) {
+                        return false;
+                    }
+                    break;
+                }
+                case NameStyleType::PascalCase: {
+                    if (!PascalCase(subMatch.str())) {
+                        return false;
+                    }
+                    break;
+                }
+                case NameStyleType::SnakeCase: {
+                    if (!SnakeCase(subMatch.str())) {
+                        return false;
+                    }
+                    break;
+                }
+                case NameStyleType::UpperSnakeCase: {
+                    if (!UpperSnakeCase(subMatch.str())) {
+                        return false;
+                    }
+                    break;
+                }
+                default: {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }
-
-

@@ -15,6 +15,7 @@ AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: true
 AlwaysBreakAfterReturnType: None
 AlwaysBreakTemplateDeclarations: Yes
+AlignArrayOfStructures: Left
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel: false

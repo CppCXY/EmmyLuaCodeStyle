@@ -86,10 +86,11 @@ align_continuous_line_space = 2
 
 align_if_branch = false
 
+# option none / always / contain_curly/
 align_array_table = true
 
 align_continuous_inline_comment = true
-# none/ always / only_call_stmt
+# option none / always / only_call_stmt
 align_chain_expr = none
 
 # [indent]

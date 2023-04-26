@@ -1,21 +1,19 @@
 ﻿#include "CodeService/Diagnostic/NameStyle/NameStyleChecker.h"
-#include <algorithm>
-#include "CodeService/Diagnostic/DiagnosticBuilder.h"
-#include "Util/format.h"
 #include "CodeService/Config/LanguageTranslator.h"
+#include "CodeService/Diagnostic/DiagnosticBuilder.h"
 #include "CodeService/Diagnostic/NameStyle/NameStyleRuleMatcher.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
+#include "Util/format.h"
+#include <algorithm>
 
 std::set<std::string, std::less<>> NameStyleChecker::TableFieldSpecialName = {
         "__add", "__sub", "__mul", "__div", "__mod", "__pow",
         "__unm", "__idiv", "__band", "__bor", "__bxor", "__bnot", "__shl",
         "__shr", "__concat", "__len", "__eq", "__lt", "__index", "__newindex",
-        "__call", "__gc", "__close", "__mode", "__name"
-};
+        "__call", "__gc", "__close", "__mode", "__name"};
 
 std::set<std::string, std::less<>> NameStyleChecker::GlobalSpecialName = {
-        "_G", "_ENV"
-};
+        "_G", "_ENV"};
 
 NameStyleChecker::NameStyleChecker() {
 }
@@ -333,8 +331,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
                                      MakeDiagnosticInfo("LocalVariableName", n, t,
-                                                        state.GetDiagnosticStyle().local_name_style)
-                    );
+                                                        state.GetDiagnosticStyle().local_name_style));
                 }
                 break;
             }
@@ -343,8 +340,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
                                      MakeDiagnosticInfo("ModuleName", n, t,
-                                                        state.GetDiagnosticStyle().module_name_style)
-                    );
+                                                        state.GetDiagnosticStyle().module_name_style));
                 }
                 break;
             }
@@ -356,8 +352,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
                                      MakeDiagnosticInfo("LocalFunctionName", n, t,
-                                                        state.GetDiagnosticStyle().local_function_name_style)
-                    );
+                                                        state.GetDiagnosticStyle().local_function_name_style));
                 }
                 break;
             }
@@ -369,8 +364,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
                                      MakeDiagnosticInfo("GlobalVariableDefineName", n, t,
-                                                        state.GetDiagnosticStyle().global_variable_name_style)
-                    );
+                                                        state.GetDiagnosticStyle().global_variable_name_style));
                 }
                 break;
             }
@@ -379,8 +373,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
                                      MakeDiagnosticInfo("ParamName", n, t,
-                                                        state.GetDiagnosticStyle().function_param_name_style)
-                    );
+                                                        state.GetDiagnosticStyle().function_param_name_style));
                 }
                 break;
             }
@@ -389,8 +382,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
                                      MakeDiagnosticInfo("ImportModuleName", n, t,
-                                                        state.GetDiagnosticStyle().require_module_name_style)
-                    );
+                                                        state.GetDiagnosticStyle().require_module_name_style));
                 }
                 break;
             }
@@ -399,8 +391,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
                                      MakeDiagnosticInfo("ClassVariableName", n, t,
-                                                        state.GetDiagnosticStyle().class_name_style)
-                    );
+                                                        state.GetDiagnosticStyle().class_name_style));
                 }
                 break;
             }
@@ -413,8 +404,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
                                      MakeDiagnosticInfo("FunctionDefineName", n, t,
-                                                        state.GetDiagnosticStyle().function_name_style)
-                    );
+                                                        state.GetDiagnosticStyle().function_name_style));
                 }
                 break;
             }
@@ -427,8 +417,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
                                      MakeDiagnosticInfo("TableFieldDefineName", n, t,
-                                                        state.GetDiagnosticStyle().table_field_name_style)
-                    );
+                                                        state.GetDiagnosticStyle().table_field_name_style));
                 }
                 break;
             }
@@ -456,11 +445,11 @@ std::string NameStyleChecker::MakeDiagnosticInfo(std::string_view ruleName, LuaS
                 break;
             }
             case NameStyleType::Same: {
-                ruleMessage.append(util::format("same('{}')", rule.Param));
+                ruleMessage.append(util::format("same"));
                 break;
             }
             case NameStyleType::Pattern: {
-                ruleMessage.append(util::format("pattern('{}')", rule.Param));
+                ruleMessage.append(util::format("pattern"));
                 break;
             }
             case NameStyleType::UpperSnakeCase: {

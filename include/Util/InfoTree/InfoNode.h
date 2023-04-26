@@ -37,7 +37,9 @@ public:
 
     bool AsBool() const;
 
-    std::vector<InfoNode> GetChildren() const;
+    std::vector<InfoNode> AsArray() const;
+
+    std::unordered_map<std::string, InfoNode> AsMap() const;
 
     InfoNode GetValue(std::string_view key) const;
 private:

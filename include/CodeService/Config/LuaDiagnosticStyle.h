@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LuaDiagnosticStyleEnum.h"
+#include "NameStyleRule.h"
 #include "Util/InfoTree/InfoTree.h"
 #include <memory>
 #include <string>
@@ -35,7 +35,7 @@ public:
     };
 
     std::vector<NameStyleRule> module_name_style = {
-            NameStyleRule(NameStyleType::Same, "m"),
+            NameStyleRule(NameStyleType::Same, std::make_unique<SameNameStyleData>("m")),
             NameStyleRule(NameStyleType::SnakeCase)
     };
 

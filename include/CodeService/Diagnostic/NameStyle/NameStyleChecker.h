@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include <vector>
-#include <map>
-#include <string>
-#include <set>
-#include "NameDefineType.h"
+#include "CodeService/Config/NameStyleRule.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
-#include "CodeService/Config/LuaDiagnosticStyleEnum.h"
+#include "NameDefineType.h"
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
 
 class DiagnosticBuilder;
 
