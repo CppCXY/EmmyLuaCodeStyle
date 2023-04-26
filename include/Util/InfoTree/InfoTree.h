@@ -23,11 +23,17 @@ public:
 
     InfoNode GetRoot();
 
+    InfoNode CreateNone();
+
     InfoNode CreateObject();
 
     InfoNode CreateArray();
 
     InfoNode CreateString(std::string_view s);
+
+    InfoNode CreateBool(bool b);
+
+    InfoNode CreateNumber(double d);
 
     friend InfoNode;
 private:

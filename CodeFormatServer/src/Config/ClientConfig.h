@@ -1,12 +1,11 @@
 #pragma once
 #include "LSP/LSP.h"
+#include "Util/InfoTree/InfoTree.h"
 
 class ClientConfig : lsp::Serializable {
 public:
-   bool emmylua_lint_codeStyle = true;
-   bool emmylua_lint_nameStyle = false;
-   bool emmylua_spell_enable = false;
-   std::vector<std::string> emmylua_spell_dict;
+    std::vector<std::string> emmylua_spell_dict;
+    InfoTree configTree;
 
-   void Deserialize(nlohmann::json json) override;
+    void Deserialize(nlohmann::json json) override;
 };

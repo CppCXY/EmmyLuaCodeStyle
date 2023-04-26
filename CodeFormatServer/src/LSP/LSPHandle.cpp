@@ -91,9 +91,6 @@ std::shared_ptr<lsp::InitializeResult> LSPHandle::OnInitialize(std::shared_ptr<l
         _server->GetService<ConfigService>()->LoadLanguageTranslator(localePath.string());
     }
 
-    ClientConfig clientConfig;
-    clientConfig.Deserialize(params->initializationOptions.vscodeConfig);
-    _server->GetService<ConfigService>()->UpdateClientConfig(clientConfig);
 
 //    if (!param->initializationOptions.extensionChars.empty()) {
 //        for (auto &c: param->initializationOptions.extensionChars) {

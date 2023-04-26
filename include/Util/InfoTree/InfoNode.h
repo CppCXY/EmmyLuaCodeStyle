@@ -27,7 +27,19 @@ public:
 
     void AddChild(InfoNode n);
 
+    void AddChild(std::string_view s);
+
+    void AddChild(bool b);
+
+    void AddChild(double d);
+
     void AddChild(std::string_view key, InfoNode n);
+
+    void AddChild(std::string_view key, std::string_view s);
+
+    void AddChild(std::string_view key, bool b);
+
+    void AddChild(std::string_view key, double d);
 
     std::string AsString() const;
 

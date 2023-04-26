@@ -45,6 +45,21 @@ void InfoNode::AddChild(InfoNode n) {
     }
 }
 
+void InfoNode::AddChild(std::string_view s) {
+    auto c = _tree->CreateString(s);
+    AddChild(c);
+}
+
+void InfoNode::AddChild(bool b) {
+    auto c = _tree->CreateBool(b);
+    AddChild(c);
+}
+
+void InfoNode::AddChild(double d) {
+    auto c = _tree->CreateNumber(d);
+    AddChild(c);
+}
+
 void InfoNode::AddChild(std::string_view key, InfoNode n) {
     if (_index < _tree->_nodeOrInfos.size()) {
         auto node = _tree->_nodeOrInfos[_index];
@@ -52,6 +67,21 @@ void InfoNode::AddChild(std::string_view key, InfoNode n) {
             _tree->_mapChildren[node.Data.ChildIndex].insert({std::string(key), n._index});
         }
     }
+}
+
+void InfoNode::AddChild(std::string_view key, std::string_view s) {
+    auto c = _tree->CreateString(s);
+    AddChild(key, c);
+}
+
+void InfoNode::AddChild(std::string_view key, bool b) {
+    auto c = _tree->CreateBool(b);
+    AddChild(key, c);
+}
+
+void InfoNode::AddChild(std::string_view key, double d) {
+    auto c = _tree->CreateNumber(d);
+    AddChild(key, c);
 }
 
 std::string InfoNode::AsString() const {

@@ -44,6 +44,7 @@ NameStyleRule MakeNameStyle(InfoNode n) {
                     auto patternString = paramNode.AsString();
                     try {
                         patternData->Re = std::regex(patternString, std::regex_constants::ECMAScript);
+                        patternData->PatternString = patternString;
                         for (auto pair: n.AsMap()) {
                             if (string_util::StartWith(pair.first, "$")) {
                                 auto istr = pair.first.substr(1);

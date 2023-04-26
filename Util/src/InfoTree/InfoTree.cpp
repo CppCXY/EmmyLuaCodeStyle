@@ -7,6 +7,17 @@ InfoTree::InfoTree() {
     _nodeOrInfos.push_back(n);
 }
 
+InfoNode InfoTree::CreateNone() {
+    auto nodeIndex = _nodeOrInfos.size();
+
+    InfoOrNode n;
+    n.Kind = InfoKind::None;
+    n.Data.ChildIndex = 0;
+    _nodeOrInfos.push_back(n);
+
+    return InfoNode(nodeIndex, this);
+}
+
 InfoNode InfoTree::CreateObject() {
     auto nodeIndex = _nodeOrInfos.size();
     auto childIndex = _mapChildren.size();
@@ -36,11 +47,31 @@ InfoNode InfoTree::CreateArray() {
 InfoNode InfoTree::CreateString(std::string_view s) {
     auto nodeIndex = _nodeOrInfos.size();
     auto valueIndex = _stringValues.size();
-    _arrayChildren.emplace_back();
+    _stringValues.emplace_back(s);
 
     InfoOrNode n;
     n.Kind = InfoKind::String;
     n.Data.StringIndex = valueIndex;
+    _nodeOrInfos.push_back(n);
+
+    return InfoNode(nodeIndex, this);
+}
+
+InfoNode InfoTree::CreateBool(bool b) {
+    auto nodeIndex = _nodeOrInfos.size();
+    InfoOrNode n;
+    n.Kind = InfoKind::Bool;
+    n.Data.BoolValue = b;
+    _nodeOrInfos.push_back(n);
+
+    return InfoNode(nodeIndex, this);
+}
+
+InfoNode InfoTree::CreateNumber(double d) {
+    auto nodeIndex = _nodeOrInfos.size();
+    InfoOrNode n;
+    n.Kind = InfoKind::Bool;
+    n.Data.NumberValue = d;
     _nodeOrInfos.push_back(n);
 
     return InfoNode(nodeIndex, this);

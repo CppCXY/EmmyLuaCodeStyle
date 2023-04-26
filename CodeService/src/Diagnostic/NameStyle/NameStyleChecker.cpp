@@ -445,11 +445,20 @@ std::string NameStyleChecker::MakeDiagnosticInfo(std::string_view ruleName, LuaS
                 break;
             }
             case NameStyleType::Same: {
-                ruleMessage.append(util::format("same"));
+                auto data = rule.Data;
+                if (data) {
+                    auto sameData = std::dynamic_pointer_cast<SameNameStyleData>(data);
+                    ruleMessage.append(util::format("'{}'", sameData->Param));
+                }
+
                 break;
             }
             case NameStyleType::Pattern: {
-                ruleMessage.append(util::format("pattern"));
+                auto data = rule.Data;
+                if (data) {
+                    auto patternData = std::dynamic_pointer_cast<PatternNameStyleData>(data);
+                    ruleMessage.append(util::format("match \'{}\'", patternData->PatternString));
+                }
                 break;
             }
             case NameStyleType::UpperSnakeCase: {

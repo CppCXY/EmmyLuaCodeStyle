@@ -1,14 +1,13 @@
 #include "ConfigService.h"
+#include "CodeService/Config/LanguageTranslator.h"
+#include "DiagnosticService.h"
+#include "LanguageServer.h"
+#include "Util/Url.h"
 #include <fstream>
 #include <sstream>
-#include "CodeService/Config/LanguageTranslator.h"
-#include "LanguageServer.h"
-#include "DiagnosticService.h"
-#include "Util/Url.h"
 
 ConfigService::ConfigService(LanguageServer *owner)
-        : Service(owner) {
-
+    : Service(owner) {
 }
 
 LuaStyle &ConfigService::GetLuaStyle(std::string_view fileUri) {
@@ -41,8 +40,7 @@ void ConfigService::LoadEditorconfig(std::string_view workspace, std::string_vie
     }
 
     auto &config = _styleConfigs.emplace_back(
-            std::string(workspace)
-    );
+            std::string(workspace));
     config.Editorconfig = LuaEditorConfig::LoadFromFile(path);
     config.Editorconfig->Parse();
 }
@@ -78,9 +76,10 @@ void ConfigService::RemoveEditorconfig(std::string_view workspace) {
 }
 
 void ConfigService::UpdateClientConfig(ClientConfig clientConfig) {
-    _diagnosticStyle.code_style_check = clientConfig.emmylua_lint_codeStyle;
-    _diagnosticStyle.name_style_check = clientConfig.emmylua_lint_nameStyle;
-    _diagnosticStyle.spell_check = clientConfig.emmylua_spell_enable;
+
+    LuaDiagnosticStyle diagnosticStyle;
+    diagnosticStyle.ParseTree(clientConfig.configTree);
+    _diagnosticStyle = diagnosticStyle;
 
     CodeSpellChecker::CustomDictionary dictionary(clientConfig.emmylua_spell_dict.begin(),
                                                   clientConfig.emmylua_spell_dict.end());
@@ -91,5 +90,3 @@ void ConfigService::UpdateClientConfig(ClientConfig clientConfig) {
 LuaDiagnosticStyle &ConfigService::GetDiagnosticStyle() {
     return _diagnosticStyle;
 }
-
-

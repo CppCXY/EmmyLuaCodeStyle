@@ -48,5 +48,6 @@ struct PatternNameStyleData : public NameStyleData {
     };
 
     std::regex Re;
+    std::string PatternString;
     std::vector<Group> GroupRules;
 };

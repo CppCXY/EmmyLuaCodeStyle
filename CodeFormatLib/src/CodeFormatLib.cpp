@@ -1,10 +1,10 @@
-﻿#include "lua.hpp"
-#include "LuaCodeFormat.h"
+﻿#include "LuaCodeFormat.h"
+#include "lua.hpp"
 
 #ifdef _MSC_VER
-#define EXPORT    __declspec(dllexport)
+#define EXPORT __declspec(dllexport)
 #else
-#define EXPORT   
+#define EXPORT
 #endif
 
 std::string luaToString(lua_State *L, int idx) {
@@ -84,8 +84,7 @@ int format(lua_State *L) {
             lua_pushboolean(L, true);
             lua_pushlstring(L, formattedText.c_str(), formattedText.size());
             return 2;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception &e) {
             std::string err = e.what();
             lua_settop(L, top);
             lua_pushboolean(L, false);
@@ -146,7 +145,7 @@ int range_format(lua_State *L) {
                 return 1;
             }
             auto &formattedText = formattedTextResult.Data;
-            if(formattedText.empty()){
+            if (formattedText.empty()) {
                 lua_pushboolean(L, false);
                 return 1;
             }
@@ -157,8 +156,7 @@ int range_format(lua_State *L) {
             lua_pushinteger(L, range.EndLine);
 
             return 4;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception &e) {
             std::string err = e.what();
             lua_settop(L, top);
             lua_pushboolean(L, false);
@@ -221,9 +219,9 @@ int type_format(lua_State *L) {
                 }
             }
             auto typeFormatResult = LuaCodeFormat::GetInstance()
-                    .TypeFormat(filename,
-                                static_cast<std::size_t>(line), static_cast<std::size_t>(character),
-                                std::move(text), configMap, stringTypeOptions);
+                                            .TypeFormat(filename,
+                                                        static_cast<std::size_t>(line), static_cast<std::size_t>(character),
+                                                        std::move(text), configMap, stringTypeOptions);
 
             if (typeFormatResult.Type == ResultType::Err) {
                 lua_pushboolean(L, false);
@@ -264,7 +262,7 @@ int type_format(lua_State *L) {
                 lua_pushinteger(L, result.Range.StartCol);
                 lua_rawset(L, -3);
 
-                lua_rawset(L, -3); // set start = {}
+                lua_rawset(L, -3);// set start = {}
 
                 lua_pushstring(L, "end");
                 // end table
@@ -277,13 +275,12 @@ int type_format(lua_State *L) {
                 lua_pushinteger(L, result.Range.EndCol);
                 lua_rawset(L, -3);
 
-                lua_rawset(L, -3); // set end = {}
+                lua_rawset(L, -3);// set end = {}
 
-                lua_rawset(L, -3); // set range = {}
+                lua_rawset(L, -3);// set range = {}
             }
             return 2;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception &e) {
             std::string err = e.what();
             lua_settop(L, top);
             lua_pushboolean(L, false);
@@ -321,8 +318,7 @@ int update_config(lua_State *L) {
 
             lua_pushboolean(L, true);
             return 1;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception &e) {
             std::string err = e.what();
             lua_settop(L, top);
             lua_pushboolean(L, false);
@@ -369,7 +365,7 @@ void PushDiagnosticToLua(lua_State *L, std::vector<LuaDiagnosticInfo> &diagnosti
             lua_pushinteger(L, diagnosticInfo.Start.Col);
             lua_rawset(L, -3);
 
-            lua_rawset(L, -3); // set start = {}
+            lua_rawset(L, -3);// set start = {}
 
             lua_pushstring(L, "end");
             // end table
@@ -382,9 +378,9 @@ void PushDiagnosticToLua(lua_State *L, std::vector<LuaDiagnosticInfo> &diagnosti
             lua_pushinteger(L, diagnosticInfo.End.Col);
             lua_rawset(L, -3);
 
-            lua_rawset(L, -3); // set end = {}
+            lua_rawset(L, -3);// set end = {}
 
-            lua_rawset(L, -3); // set range = {}
+            lua_rawset(L, -3);// set range = {}
         }
 
         // 不确认lua会不会把他改成宏，所以不要在这里用++count
@@ -415,8 +411,7 @@ int diagnose_file(lua_State *L) {
             PushDiagnosticToLua(L, diagnostics);
 
             return 2;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception &e) {
             std::string err = e.what();
             lua_settop(L, top);
             lua_pushboolean(L, false);
@@ -453,8 +448,7 @@ int set_default_config(lua_State *L) {
             LuaCodeFormat::GetInstance().SetDefaultCodeStyle(configMap);
             lua_pushboolean(L, true);
             return 1;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception &e) {
             std::string err = e.what();
             lua_settop(L, top);
             lua_pushboolean(L, false);
@@ -473,8 +467,7 @@ int set_nonstandard_symbol(lua_State *L) {
         LuaCodeFormat::GetInstance().SupportNonStandardSymbol();
         lua_pushboolean(L, true);
         return 1;
-    }
-    catch (std::exception &e) {
+    } catch (std::exception &e) {
         std::string err = e.what();
         lua_settop(L, top);
         lua_pushboolean(L, false);
@@ -499,8 +492,7 @@ int spell_load_dictionary_from_path(lua_State *L) {
 
             lua_pushboolean(L, true);
             return 1;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception &e) {
             std::string err = e.what();
             lua_settop(L, top);
             lua_pushboolean(L, false);
@@ -527,8 +519,7 @@ int spell_load_dictionary_from_buffer(lua_State *L) {
 
             lua_pushboolean(L, true);
             return 1;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception &e) {
             std::string err = e.what();
             lua_settop(L, top);
             lua_pushboolean(L, false);
@@ -574,8 +565,7 @@ int spell_analysis(lua_State *L) {
             PushDiagnosticToLua(L, diagnostics);
 
             return 2;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception &e) {
             std::string err = e.what();
             lua_settop(L, top);
             lua_pushboolean(L, false);
@@ -583,6 +573,43 @@ int spell_analysis(lua_State *L) {
             return 2;
         }
     }
+    return 0;
+}
+
+int update_name_style_config(lua_State *L) {
+    int top = lua_gettop(L);
+
+    if (top != 1) {
+        return 0;
+    }
+
+    if (lua_istable(L, 1)) {
+        try {
+
+//            lua_pushnil(L);
+//            while (lua_next(L, -2) != 0) {
+//                auto key = luaToString(L, -2);
+//                auto value = luaToString(L, -1);
+//
+//                if (key != "nil") {
+//                    configMap.insert({key, value});
+//                }
+//
+//                lua_pop(L, 1);
+//            }
+//
+//            LuaCodeFormat::GetInstance().SetDefaultCodeStyle(configMap);
+            lua_pushboolean(L, true);
+            return 1;
+        } catch (std::exception &e) {
+            std::string err = e.what();
+            lua_settop(L, top);
+            lua_pushboolean(L, false);
+            lua_pushlstring(L, err.c_str(), err.size());
+            return 2;
+        }
+    }
+
     return 0;
 }
 
@@ -609,8 +636,7 @@ int name_style_analysis(lua_State *L) {
             PushDiagnosticToLua(L, diagnostics);
 
             return 2;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception &e) {
             std::string err = e.what();
             lua_settop(L, top);
             lua_pushboolean(L, false);
@@ -647,8 +673,7 @@ int spell_suggest(lua_State *L) {
             }
 
             return 2;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception &e) {
             std::string err = e.what();
             lua_settop(L, top);
             lua_pushboolean(L, false);
@@ -660,23 +685,23 @@ int spell_suggest(lua_State *L) {
 }
 
 static const luaL_Reg lib[] = {
-        {"format",                            format},
-        {"range_format",                      range_format},
-        {"type_format",                       type_format},
-        {"update_config",                     update_config},
-        {"diagnose_file",                     diagnose_file},
-        {"set_default_config",                set_default_config},
-        {"spell_load_dictionary_from_path",   spell_load_dictionary_from_path},
+        {"format",                            format                           },
+        {"range_format",                      range_format                     },
+        {"type_format",                       type_format                      },
+        {"update_config",                     update_config                    },
+        {"diagnose_file",                     diagnose_file                    },
+        {"set_default_config",                set_default_config               },
+        {"spell_load_dictionary_from_path",   spell_load_dictionary_from_path  },
         {"spell_load_dictionary_from_buffer", spell_load_dictionary_from_buffer},
-        {"spell_analysis",                    spell_analysis},
-        {"spell_suggest",                     spell_suggest},
-        {"set_nonstandard_symbol",            set_nonstandard_symbol},
-        {"name_style_analysis",               name_style_analysis},
-        {nullptr,                             nullptr}
+        {"spell_analysis",                    spell_analysis                   },
+        {"spell_suggest",                     spell_suggest                    },
+        {"set_nonstandard_symbol",            set_nonstandard_symbol           },
+        {"name_style_analysis",               name_style_analysis              },
+        {"update_name_style_config",          update_name_style_config         },
+        {nullptr,                             nullptr                          }
 };
 
-extern "C"
-EXPORT int luaopen_code_format(lua_State *L) {
+extern "C" EXPORT int luaopen_code_format(lua_State *L) {
     luaL_newlibtable(L, lib);
     luaL_setfuncs(L, lib, 0);
     return 1;
