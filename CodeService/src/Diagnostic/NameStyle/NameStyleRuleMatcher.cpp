@@ -4,9 +4,9 @@
 
 bool NameStyleRuleMatcher::Match(LuaSyntaxNode &n, const LuaSyntaxTree &t, const std::vector<NameStyleRule> &rules) {
     if (rules.empty()) {
-        return false;
+        return true;
     }
-
+    
     for (auto &rule: rules) {
         auto text = n.GetText(t);
         switch (rule.Type) {

@@ -448,7 +448,7 @@ std::string NameStyleChecker::MakeDiagnosticInfo(std::string_view ruleName, LuaS
                 auto data = rule.Data;
                 if (data) {
                     auto sameData = std::dynamic_pointer_cast<SameNameStyleData>(data);
-                    ruleMessage.append(util::format("'{}'", sameData->Param));
+                    ruleMessage.append(util::format("same '{}'", sameData->Param));
                 }
 
                 break;
