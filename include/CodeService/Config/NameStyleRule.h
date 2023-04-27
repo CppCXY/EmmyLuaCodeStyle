@@ -2,6 +2,7 @@
 
 #include <regex>
 #include <string>
+#include <set>
 
 enum class NameStyleType {
     Off,
@@ -9,7 +10,7 @@ enum class NameStyleType {
     PascalCase,
     SnakeCase,
     UpperSnakeCase,
-    Same,
+    Ignore,
     Pattern,
 };
 
@@ -29,10 +30,10 @@ struct NameStyleRule {
     std::shared_ptr<NameStyleData> Data;
 };
 
-struct SameNameStyleData : public NameStyleData {
-    explicit SameNameStyleData(std::string_view param)
-        : NameStyleData(), Param(param) {}
-    std::string Param;
+struct IgnoreNameStyleData : public NameStyleData {
+    explicit IgnoreNameStyleData(const std::set<std::string>& param)
+        : NameStyleData(), Param(param.begin(), param.end()) {}
+    std::set<std::string, std::less<>> Param;
 };
 
 struct PatternNameStyleData : public NameStyleData {

@@ -35,7 +35,6 @@ public:
     };
 
     std::vector<NameStyleRule> module_name_style = {
-            NameStyleRule(NameStyleType::Same, std::make_unique<SameNameStyleData>("m")),
             NameStyleRule(NameStyleType::SnakeCase)
     };
 

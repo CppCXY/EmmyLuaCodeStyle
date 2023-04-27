@@ -19,7 +19,5 @@ private:
 
     static bool PascalCase(std::string_view text);
 
-    static bool Same(std::string_view text, std::string_view param);
-
     static bool PatternMatch(std::string_view text, std::shared_ptr<PatternNameStyleData> data);
 };

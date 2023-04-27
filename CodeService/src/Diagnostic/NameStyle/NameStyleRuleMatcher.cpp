@@ -34,11 +34,11 @@ bool NameStyleRuleMatcher::Match(LuaSyntaxNode &n, const LuaSyntaxTree &t, const
                 }
                 break;
             }
-            case NameStyleType::Same: {
+            case NameStyleType::Ignore: {
                 auto data = rule.Data;
                 if (data) {
-                    auto sameData = std::dynamic_pointer_cast<SameNameStyleData>(data);
-                    if (Same(text, sameData->Param)) {
+                    auto ignoreData = std::dynamic_pointer_cast<IgnoreNameStyleData>(data);
+                    if (ignoreData->Param.count(text)){
                         return true;
                     }
                 }
@@ -311,10 +311,6 @@ bool NameStyleRuleMatcher::PascalCase(std::string_view text) {
         }
     }
     return true;
-}
-
-bool NameStyleRuleMatcher::Same(std::string_view text, std::string_view param) {
-    return text == param;
 }
 
 bool NameStyleRuleMatcher::PatternMatch(std::string_view text, std::shared_ptr<PatternNameStyleData> data) {

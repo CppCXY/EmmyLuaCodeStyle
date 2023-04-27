@@ -31,11 +31,21 @@ NameStyleRule MakeNameStyle(InfoNode n) {
                 return NameStyleRule(NameStyleType::PascalCase);
             } else if (type == "camel_case") {
                 return NameStyleRule(NameStyleType::CamelCase);
-            } else if (type == "same") {
+            } else if (type == "ignore") {
                 auto paramNode = n.GetValue("param");
+                std::set<std::string> ignores;
                 if (paramNode.IsString()) {
-                    return NameStyleRule(NameStyleType::Same, std::make_shared<SameNameStyleData>(paramNode.AsString()));
+                    ignores.insert(paramNode.AsString());
+                } else if (paramNode.IsArray()) {
+                    auto arr = paramNode.AsArray();
+                    for(auto item : arr){
+                        if(item.IsString()) {
+                            ignores.insert(item.AsString());
+                        }
+                    }
                 }
+
+                return NameStyleRule(NameStyleType::Ignore, std::make_shared<IgnoreNameStyleData>(ignores));
             } else if (type == "pattern") {
                 auto paramNode = n.GetValue("param");
                 if (paramNode.IsString()) {
