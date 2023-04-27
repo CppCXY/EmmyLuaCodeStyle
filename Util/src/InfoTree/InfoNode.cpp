@@ -45,7 +45,7 @@ void InfoNode::AddChild(InfoNode n) {
     }
 }
 
-void InfoNode::AddChild(std::string_view s) {
+void InfoNode::AddChild(std::string s) {
     auto c = _tree->CreateString(s);
     AddChild(c);
 }
@@ -69,7 +69,7 @@ void InfoNode::AddChild(std::string_view key, InfoNode n) {
     }
 }
 
-void InfoNode::AddChild(std::string_view key, std::string_view s) {
+void InfoNode::AddChild(std::string_view key, std::string s) {
     auto c = _tree->CreateString(s);
     AddChild(key, c);
 }

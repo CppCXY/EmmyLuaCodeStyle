@@ -27,7 +27,7 @@ public:
 
     void AddChild(InfoNode n);
 
-    void AddChild(std::string_view s);
+    void AddChild(std::string s);
 
     void AddChild(bool b);
 
@@ -35,7 +35,7 @@ public:
 
     void AddChild(std::string_view key, InfoNode n);
 
-    void AddChild(std::string_view key, std::string_view s);
+    void AddChild(std::string_view key, std::string s);
 
     void AddChild(std::string_view key, bool b);
 
