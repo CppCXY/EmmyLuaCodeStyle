@@ -466,10 +466,10 @@ std::string NameStyleChecker::MakeDiagnosticInfo(std::string_view ruleName, LuaS
                 break;
             }
             default: {
-                break;
+                continue;
             }
         }
-        if (index != rules.size() - 1) {
+        if (index + 1 < rules.size()) {
             ruleMessage.append(" | ");
         }
     }

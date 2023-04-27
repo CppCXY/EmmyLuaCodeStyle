@@ -6,7 +6,7 @@ bool NameStyleRuleMatcher::Match(LuaSyntaxNode &n, const LuaSyntaxTree &t, const
     if (rules.empty()) {
         return true;
     }
-    
+
     for (auto &rule: rules) {
         auto text = n.GetText(t);
         switch (rule.Type) {
