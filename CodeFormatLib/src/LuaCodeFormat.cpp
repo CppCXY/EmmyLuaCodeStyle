@@ -183,8 +183,7 @@ Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::SpellCheck(const std::stri
 
     LuaStyle style = GetStyle(uri);
 
-    LuaDiagnosticStyle diagnosticStyle;
-    DiagnosticBuilder diagnosticBuilder(style, diagnosticStyle);
+    DiagnosticBuilder diagnosticBuilder(style, _diagnosticStyle);
     _spellChecker.SetCustomDictionary(tempDict);
     diagnosticBuilder.SpellCheck(t, _spellChecker);
     return MakeDiagnosticInfo(diagnosticBuilder.GetDiagnosticResults(t), file);
@@ -207,8 +206,7 @@ Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::NameStyleCheck(const std::
 
     LuaStyle style = GetStyle(uri);
 
-    LuaDiagnosticStyle diagnosticStyle;
-    DiagnosticBuilder diagnosticBuilder(style, diagnosticStyle);
+    DiagnosticBuilder diagnosticBuilder(style, _diagnosticStyle);
 
     diagnosticBuilder.NameStyleCheck(t);
     return MakeDiagnosticInfo(diagnosticBuilder.GetDiagnosticResults(t), file);
