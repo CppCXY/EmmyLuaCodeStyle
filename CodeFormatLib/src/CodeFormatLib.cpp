@@ -582,7 +582,7 @@ InfoNode CreateFromLua(InfoTree &t, lua_State *L) {
         auto len = luaL_len(L, -1);
         if (len != 0) {
             auto arr = t.CreateArray();
-            for (auto i = 0; i < len; i++) {
+            for (auto i = 1; i <= len; i++) {
                 if (lua_geti(L, -1, i)) {
                     arr.AddChild(CreateFromLua(t, L));
                 }
