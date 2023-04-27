@@ -44,7 +44,7 @@ InfoNode InfoTree::CreateArray() {
     return InfoNode(nodeIndex, this);
 }
 
-InfoNode InfoTree::CreateString(std::string_view s) {
+InfoNode InfoTree::CreateString(std::string s) {
     auto nodeIndex = _nodeOrInfos.size();
     auto valueIndex = _stringValues.size();
     _stringValues.emplace_back(s);

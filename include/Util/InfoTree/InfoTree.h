@@ -29,7 +29,7 @@ public:
 
     InfoNode CreateArray();
 
-    InfoNode CreateString(std::string_view s);
+    InfoNode CreateString(std::string s);
 
     InfoNode CreateBool(bool b);
 
