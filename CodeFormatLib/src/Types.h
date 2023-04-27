@@ -2,7 +2,7 @@
 
 struct LuaConfig {
     explicit LuaConfig(std::string_view workspace)
-            : Workspace(workspace), Editorconfig(nullptr) {}
+        : Workspace(workspace), Editorconfig(nullptr) {}
 
     std::string Workspace;
     std::shared_ptr<LuaEditorConfig> Editorconfig;
@@ -30,10 +30,10 @@ template<class T>
 class Result {
 public:
     Result(T &&d)
-            : Data(d) {}
+        : Type(ResultType::Ok), Data(d) {}
 
     Result(ResultType type)
-            : Type(type) {}
+        : Type(type) {}
 
     ResultType Type;
     T Data;
