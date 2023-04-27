@@ -31,6 +31,7 @@ void LuaCodeFormat::UpdateCodeStyle(const std::string &workspaceUri, const std::
 }
 
 void LuaCodeFormat::UpdateDiagnosticStyle(InfoTree &tree) {
+    _diagnosticStyle = LuaDiagnosticStyle();
     _diagnosticStyle.ParseTree(tree);
     _diagnosticStyle.code_style_check = true;
     _diagnosticStyle.name_style_check = true;
