@@ -26,6 +26,7 @@
 
 * [格式化行为介绍](docs/format_action.md)
 * [如何配置格式化](docs/format_config.md)
+* [如何配置命名风格检查](docs/name_style.md)
 
 # Contribute
 

@@ -1,8 +1,75 @@
 # Change Log
 
+## 1.1.3
+
+`NEW` 功能 `命名风格检查` 正式支持配置.
+
+`CHANGE` `local empty = function() end` 格式化时不会再换行
+
+`NEW` 支持形如 `local d; Init()` 的排版方式
+
+`NEW` 支持链式表达式对齐
+
+## 1.1.2
+
+`NEW` 新选项 `align_continuous_line_space`
+
+`NEW` 还有其他更新, 但是我忘了
+
+## 1.1.1
+
+`NEW` 优化type format
+
+`FIX` type format 不会清理`---@format disable` 和`---@format disable-next`之下的内容了
+
+## 1.1.0
+
+`FIX` 修复许多BUG 
+
+
+`NEW` 重新支持`---@format disable` 和 `---@format disable-next`
+
+## 1.0.9
+
+`FIX` 修复缩进检查的一些BUG
+
+## 1.0.8
+
+`NEW` 支持缩进检查
+
+`NEW` 修复一些BUG
+
+## 1.0.7
+
+`FIX` fix #89 #90
+
+## 1.0.6
+
+`NEW` 支持内联注释对齐
+
+## 1.0.5
+
+`FIX` 修复文件增量更新算法的BUG
+
+## 1.0.4
+
+`Upgrade` 试图修复vscode-languageclient带来的依赖错误
+
+## 1.0.3
+
+`Upgrade` 试图修复插件无法激活的问题, 更新所有依赖库
+
+`FIX` 修复一个格式化行为.
+
+`NEW` 选项`space_before_function_call_single_arg`支持其他值always/only_string/only_table/none
+
+## 1.0.2
+
+`FIX` 修复lineIndex错误导致的Unicode字符BUG
+
 ## 1.0.0
 
-`EmmyLuaCodeStyle`经过一年的更新现在进入正式版
+`EmmyLuaCodeStyle` 经过一年的更新现在进入正式版
 
 `Refactor` 大部分代码重写, 数据结构重新设计
 

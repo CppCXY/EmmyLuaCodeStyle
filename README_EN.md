@@ -25,6 +25,8 @@ In addition to providing language service examples, the project also provides an
 
 * [Introduction to formatting behavior](docs/format_action_EN.md)
 * [How to configure formatting](docs/format_config_EN.md)
+* [How to configure naming style checking](docs/name_style_EN.md)
+
 ## Contribute
 Any pr or issue are welcome 
 
