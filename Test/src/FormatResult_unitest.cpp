@@ -909,3 +909,19 @@ local empty = function () end
 local empty = function() end
 )"));
 }
+
+TEST(Format, issue_109) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+--[[]]
+
+
+local t = 13 + 123
+)",
+            R"(
+--[[]]
+
+
+local t = 13 + 123
+)"));
+}

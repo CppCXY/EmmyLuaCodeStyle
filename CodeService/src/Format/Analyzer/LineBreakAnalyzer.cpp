@@ -99,7 +99,7 @@ void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                         } else {
                             switch (stmt.GetTokenKind(t)) {
                                 case TK_SHORT_COMMENT:
-                                case TK_LONG_STRING:
+                                case TK_LONG_COMMENT:
                                 case TK_SHEBANG: {
                                     BreakAfter(stmt, t, style.line_space_after_comment);
                                     break;
