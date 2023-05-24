@@ -1,25 +1,19 @@
 #include "CodeService/Diagnostic/Spell/TextParser.h"
-#include "CodeService/Diagnostic/Spell/IdentifyParser.h"
-
 using namespace spell;
 
 bool IsIdentifier(char ch) {
     return ch > 0 && (std::isalnum(ch) || ch == '_');
 }
 
-TextParser::TextParser(std::string_view source)
-        : _source(source) {
-}
-
-void TextParser::Parse() {
+std::vector<Word> TextParser::ParseToWords(std::string_view source) {
     enum class ParseState {
         Unknown,
         Identify
     } state = ParseState::Unknown;
-
+    std::vector<Word> words;
     std::size_t start = 0;
-    for (std::size_t i = 0; i != _source.size(); i++) {
-        char ch = _source[i];
+    for (std::size_t i = 0; i != source.size(); i++) {
+        char ch = source[i];
         switch (state) {
             case ParseState::Unknown: {
                 if (IsIdentifier(ch)) {
@@ -31,26 +25,23 @@ void TextParser::Parse() {
             case ParseState::Identify: {
                 if (!IsIdentifier(ch)) {
                     state = ParseState::Unknown;
-                    PushIdentifier(WordRange(start, i - start));
+                    auto len = i - start;
+                    if (len <= 3) {
+                        break;
+                    }
+                    auto range = WordRange(start, len);
+                    words.emplace_back(range, source.substr(start, len));
                 }
                 break;
             }
         }
     }
     if (state == ParseState::Identify) {
-        PushIdentifier(WordRange(start, _source.size() - start));
+        auto len = source.size() - start;
+        if (len > 3) {
+            auto range = WordRange(start, len);
+            words.emplace_back(range, source.substr(start, len));
+        }
     }
-}
-
-std::vector<Word> &TextParser::GetIdentifiers() {
-    return _identifiers;
-}
-
-void TextParser::PushIdentifier(spell::WordRange range) {
-    if (range.Count <= 3) {
-        return;
-    }
-
-    std::string_view identifyView = _source.substr(range.Start, range.Count);
-    _identifiers.emplace_back(range, std::string(identifyView));
+    return words;
 }

@@ -152,9 +152,7 @@ void CodeSpellChecker::IdentifyAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &toke
 }
 
 void CodeSpellChecker::TextAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &token, const LuaSyntaxTree &t) {
-    std::shared_ptr<spell::TextParser> parser = std::make_shared<spell::TextParser>(token.GetText(t));
-    parser->Parse();
-    auto &identifiers = parser->GetIdentifiers();
+    auto identifiers = spell::TextParser::ParseToWords(token.GetText(t));
     if (identifiers.empty()) {
         return;
     }
@@ -182,16 +180,16 @@ void CodeSpellChecker::TextAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &token, c
             continue;
         }
 
+        auto tokenRange = token.GetTextRange(t);
         for (auto &word: words) {
             if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item) && customDict.count(word.Item) == 0) {
-                auto tokenRange = token.GetTextRange(t);
                 auto range = TextRange(tokenRange.StartOffset + identifier.Range.Start + word.Range.Start,
-                                       word.Range.Count - 1
+                                       word.Range.Count
                 );
                 std::string originText(
                         token.GetText(t).substr(identifier.Range.Start + word.Range.Start, word.Range.Count));
                 d.PushDiagnostic(DiagnosticType::Spell, range,
-                                 util::format("Typo in identifier '{}'", originText), originText);
+                                 util::format("Typo in string '{}'", originText), originText);
             }
         }
     }

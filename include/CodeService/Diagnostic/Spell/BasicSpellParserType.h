@@ -2,6 +2,7 @@
 
 #include <cinttypes>
 #include <string>
+#include <string_view>
 
 namespace spell {
 struct WordRange {
@@ -18,7 +19,7 @@ struct Word {
     WordRange Range;
     std::string Item;
 
-    Word(const WordRange &range, const std::string &item)
+    Word(const WordRange &range, std::string_view item)
             : Range(range),
               Item(item) {
     }
