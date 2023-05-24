@@ -19,6 +19,7 @@ public:
 private:
     static std::set<std::string, std::less<>> TableFieldSpecialName;
     static std::set<std::string, std::less<>> GlobalSpecialName;
+    static std::set<std::string, std::less<>> LocalSpecialName;
 
     void Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t);
 

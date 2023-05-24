@@ -3,13 +3,14 @@
 #include "Util/Utf8.h"
 
 LuaSyntaxNode::LuaSyntaxNode(std::size_t index)
-        : _index(index) {
-
+    : _index(index) {
 }
 
 TextRange LuaSyntaxNode::GetTextRange(const LuaSyntaxTree &t) const {
     if (IsToken(t)) {
         return t.GetTokenRange(_index);
+    } else if (IsNull(t)) {
+        return TextRange(0, 0);
     }
 
     auto start = t.GetStartOffset(_index);
@@ -276,5 +277,3 @@ std::size_t LuaSyntaxNode::CountNodeChild(LuaSyntaxNodeKind kind, const LuaSynta
 bool LuaSyntaxNode::IsEmpty(const LuaSyntaxTree &t) const {
     return t.GetFirstChild(_index) == 0;
 }
-
-

@@ -15,6 +15,10 @@ std::set<std::string, std::less<>> NameStyleChecker::TableFieldSpecialName = {
 std::set<std::string, std::less<>> NameStyleChecker::GlobalSpecialName = {
         "_G", "_ENV"};
 
+std::set<std::string, std::less<>> NameStyleChecker::LocalSpecialName = {
+        "_", "_ENV"};
+
+
 NameStyleChecker::NameStyleChecker() {
 }
 
@@ -154,10 +158,15 @@ void NameStyleChecker::CheckInBody(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
                             defineExpr = defineExpr.GetChildToken(TK_NAME, t);
                         } else {
                             // table field define
-                            auto children = defineExpr.GetChildren(t);
-                            if (!children.empty()) {
-                                defineExpr = children.back().GetChildToken(TK_NAME, t);
+                            auto lastExpr = defineExpr.GetLastChildSyntaxNode(LuaSyntaxMultiKind::Expression, t);
+                            auto lastExprKind = lastExpr.GetSyntaxKind(t);
+                            if (lastExprKind == LuaSyntaxNodeKind::IndexExpression) {
+                                defineExpr = lastExpr.GetChildToken(TK_NAME, t);
                             }
+                        }
+
+                        if (defineExpr.IsNull(t)) {
+                            continue;
                         }
 
                         bool matchSpecialRule = false;
@@ -202,6 +211,7 @@ void NameStyleChecker::CheckInBody(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
                         auto nameList = forList.GetChildSyntaxNode(LuaSyntaxNodeKind::NameDefList, t);
                         for (auto name: nameList.GetChildTokens(TK_NAME, t)) {
                             RecordLocalVariable(name, t);
+                            PushStyleCheck(NameDefineType::LocalVariableName, name);
                         }
 
                         forBody = forList.GetChildSyntaxNode(LuaSyntaxNodeKind::ForBody, t);
@@ -327,6 +337,9 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
         auto n = LuaSyntaxNode(nameStyle.Index);
         switch (nameStyle.Type) {
             case NameDefineType::LocalVariableName: {
+                if (LocalSpecialName.count(n.GetText(t))) {
+                    continue;
+                }
                 if (!matcher.Match(n, t, state.GetDiagnosticStyle().local_name_style)) {
                     d.PushDiagnostic(DiagnosticType::NameStyle,
                                      n.GetTextRange(t),
@@ -346,7 +359,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
             }
             case NameDefineType::LocalFunctionName: {
                 if (TableFieldSpecialName.count(n.GetText(t))) {
-                    return;
+                    continue;
                 }
                 if (!matcher.Match(n, t, state.GetDiagnosticStyle().local_function_name_style)) {
                     d.PushDiagnostic(DiagnosticType::NameStyle,
@@ -358,7 +371,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
             }
             case NameDefineType::GlobalVariableDefineName: {
                 if (GlobalSpecialName.count(n.GetText(t))) {
-                    return;
+                    continue;
                 }
                 if (!matcher.Match(n, t, state.GetDiagnosticStyle().global_variable_name_style)) {
                     d.PushDiagnostic(DiagnosticType::NameStyle,
@@ -397,7 +410,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
             }
             case NameDefineType::FunctionDefineName: {
                 if (TableFieldSpecialName.count(n.GetText(t))) {
-                    return;
+                    continue;
                 }
 
                 if (!matcher.Match(n, t, state.GetDiagnosticStyle().function_name_style)) {
@@ -411,7 +424,7 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
             case NameDefineType::TableFieldDefineName: {
                 // 忽略元方法
                 if (TableFieldSpecialName.count(n.GetText(t))) {
-                    return;
+                    continue;
                 }
                 if (!matcher.Match(n, t, state.GetDiagnosticStyle().table_field_name_style)) {
                     d.PushDiagnostic(DiagnosticType::NameStyle,

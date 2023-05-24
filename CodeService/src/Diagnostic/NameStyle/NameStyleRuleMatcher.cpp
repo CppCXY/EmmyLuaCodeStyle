@@ -7,8 +7,11 @@ bool NameStyleRuleMatcher::Match(LuaSyntaxNode &n, const LuaSyntaxTree &t, const
         return true;
     }
 
+    auto text = n.GetText(t);
+    if (text.empty()) {
+        return true;
+    }
     for (auto &rule: rules) {
-        auto text = n.GetText(t);
         switch (rule.Type) {
             case NameStyleType::SnakeCase: {
                 if (SnakeCase(text)) {
@@ -38,7 +41,7 @@ bool NameStyleRuleMatcher::Match(LuaSyntaxNode &n, const LuaSyntaxTree &t, const
                 auto data = rule.Data;
                 if (data) {
                     auto ignoreData = std::dynamic_pointer_cast<IgnoreNameStyleData>(data);
-                    if (ignoreData->Param.count(text)){
+                    if (ignoreData->Param.count(text)) {
                         return true;
                     }
                 }
@@ -65,11 +68,8 @@ bool NameStyleRuleMatcher::Match(LuaSyntaxNode &n, const LuaSyntaxTree &t, const
 bool NameStyleRuleMatcher::SnakeCase(std::string_view source) {
     enum class ParseState {
         None,
-        PrefixUnderscore,
-        PrefixUnderscore2,
-        Underscore,
         Letter,
-        EndDigit
+        Underscore
     } state = ParseState::None;
 
     for (std::size_t index = 0; index != source.size(); index++) {
@@ -80,26 +80,6 @@ bool NameStyleRuleMatcher::SnakeCase(std::string_view source) {
 
         switch (state) {
             case ParseState::None: {
-                if (ch == '_') {
-                    state = ParseState::PrefixUnderscore;
-                } else if (::islower(ch)) {
-                    state = ParseState::Letter;
-                } else {
-                    return false;
-                }
-                break;
-            }
-            case ParseState::PrefixUnderscore: {
-                if (ch == '_') {
-                    state = ParseState::PrefixUnderscore2;
-                } else if (::islower(ch)) {
-                    state = ParseState::Letter;
-                } else {
-                    return false;
-                }
-                break;
-            }
-            case ParseState::PrefixUnderscore2: {
                 if (::islower(ch)) {
                     state = ParseState::Letter;
                 } else {
@@ -117,19 +97,11 @@ bool NameStyleRuleMatcher::SnakeCase(std::string_view source) {
                 break;
             }
             case ParseState::Letter: {
-                if (::islower(ch)) {
+                if (::islower(ch) || ::isdigit(ch)) {
                     // ignore
                 } else if (ch == '_') {
                     state = ParseState::Underscore;
-                } else if (::isdigit(ch)) {
-                    state = ParseState::EndDigit;
                 } else {
-                    return false;
-                }
-                break;
-            }
-            case ParseState::EndDigit: {
-                if (!::isdigit(ch)) {
                     return false;
                 }
                 break;
@@ -144,7 +116,6 @@ bool NameStyleRuleMatcher::UpperSnakeCase(std::string_view text) {
         None,
         Underscore,
         Letter,
-        EndDigit
     } state = ParseState::None;
 
     auto source = text;
@@ -173,19 +144,11 @@ bool NameStyleRuleMatcher::UpperSnakeCase(std::string_view text) {
                 break;
             }
             case ParseState::Letter: {
-                if (::isupper(ch)) {
+                if (::isupper(ch) || ::isdigit(ch)) {
                     // ignore
                 } else if (ch == '_') {
                     state = ParseState::Underscore;
-                } else if (::isdigit(ch)) {
-                    state = ParseState::EndDigit;
                 } else {
-                    return false;
-                }
-                break;
-            }
-            case ParseState::EndDigit: {
-                if (!::isdigit(ch)) {
                     return false;
                 }
                 break;
@@ -198,8 +161,6 @@ bool NameStyleRuleMatcher::UpperSnakeCase(std::string_view text) {
 bool NameStyleRuleMatcher::CamelCase(std::string_view text) {
     enum class ParseState {
         None,
-        PrefixUnderscore,
-        PrefixUnderscore2,
         LowerLetter,
         UpperLetter
     } state = ParseState::None;
@@ -213,26 +174,6 @@ bool NameStyleRuleMatcher::CamelCase(std::string_view text) {
 
         switch (state) {
             case ParseState::None: {
-                if (ch == '_') {
-                    state = ParseState::PrefixUnderscore;
-                } else if (::islower(ch)) {
-                    state = ParseState::LowerLetter;
-                } else {
-                    return false;
-                }
-                break;
-            }
-            case ParseState::PrefixUnderscore: {
-                if (ch == '_') {
-                    state = ParseState::PrefixUnderscore2;
-                } else if (::islower(ch)) {
-                    state = ParseState::LowerLetter;
-                } else {
-                    return false;
-                }
-                break;
-            }
-            case ParseState::PrefixUnderscore2: {
                 if (::islower(ch)) {
                     state = ParseState::LowerLetter;
                 } else {

@@ -8,8 +8,10 @@
 
 int main() {
     std::string buffer = R"(
-local empty = function ()   end
+--Some comment about the file
 
+
+tbl[i], tbl[j] = tbl[j], tbl[i]
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
