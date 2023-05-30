@@ -925,3 +925,19 @@ local t = 13 + 123
 local t = 13 + 123
 )"));
 }
+
+TEST(Format, feature_111) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local table = { -- My comment
+    elem1 = {},
+    elem2 = {}
+}
+)",
+            R"(
+local table = { -- My comment
+    elem1 = {},
+    elem2 = {}
+}
+)"));
+}

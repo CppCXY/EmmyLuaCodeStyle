@@ -8,10 +8,8 @@
 
 int main() {
     std::string buffer = R"(
---Some comment about the file
-
-
-tbl[i], tbl[j] = tbl[j], tbl[i]
+local t = { --131
+ }
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -26,7 +24,7 @@ tbl[i], tbl[j] = tbl[j], tbl[i]
     std::cout << t.GetDebugView() << std::endl;
 
     LuaStyle s;
-    s.trailing_table_separator = TrailingTableSeparator::Always;
+    s.break_all_list_when_line_exceed = true;
     FormatBuilder b(s);
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;

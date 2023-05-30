@@ -246,6 +246,13 @@ void LineBreakAnalyzer::BreakBefore(LuaSyntaxNode n, const LuaSyntaxTree &t, std
     }
 }
 
+void LineBreakAnalyzer::BreakBefore(LuaSyntaxNode n, const LuaSyntaxTree &t, LineSpace lineSpace) {
+    auto prev = n.GetPrevSibling(t);
+    if (!prev.IsNull(t)) {
+        BreakAfter(prev, t, lineSpace);
+    }
+}
+
 void LineBreakAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t) {
     auto exprs = exprList.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
     if (exprs.empty()) {
@@ -361,7 +368,13 @@ void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const L
                                                                                                            });
             }
             if (forceBreak) {
-                BreakAfter(expr.GetChildToken('{', t), t);
+                auto leftBrace = expr.GetChildToken('{', t);
+                if (leftBrace.GetNextSibling(t).GetTokenKind(t) == TK_SHORT_COMMENT || leftBrace.GetNextSibling(t).GetTokenKind(t) == TK_LONG_COMMENT) {
+                    BreakAfter(leftBrace.GetNextSibling(t), t, LineSpace(LineSpaceType::Keep));
+                } else {
+                    BreakAfter(leftBrace, t, LineSpace(LineSpaceType::Keep));
+                }
+
                 for (auto field: fields) {
                     BreakAfter(field, t, LineSpace(LineSpaceType::Keep));
                 }

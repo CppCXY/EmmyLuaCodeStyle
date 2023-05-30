@@ -23,6 +23,8 @@ public:
 
     void BreakBefore(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t line = 1);
 
+    void BreakBefore(LuaSyntaxNode n, const LuaSyntaxTree &t, LineSpace lineSpace);
+
     void MarkLazyBreak(LuaSyntaxNode n, const LuaSyntaxTree &t, LineBreakStrategy strategy);
 
     void MarkNotBreak(LuaSyntaxNode n, const LuaSyntaxTree &t);
