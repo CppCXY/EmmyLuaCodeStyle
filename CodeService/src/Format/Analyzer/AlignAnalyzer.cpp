@@ -554,6 +554,96 @@ void AlignAnalyzer::PushNormalAlignGroup(std::size_t alignPos, std::vector<std::
 }
 
 void AlignAnalyzer::AnalyzeContinuousSimilarCallArgs(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
+    auto exprStmts = syntaxNode.GetChildSyntaxNodes(LuaSyntaxNodeKind::ExpressionStatement, t);
+    std::size_t lastLine = 0;
+    std::size_t prefixLen = 0;
+    std::vector<LuaSyntaxNode> group;
+
+    for (auto stmt: exprStmts) {
+        auto suffix = stmt.GetChildSyntaxNode(LuaSyntaxNodeKind::SuffixedExpression, t);
+        auto callexpr = suffix.GetLastChildSyntaxNode(LuaSyntaxNodeKind::CallExpression, t);
+        auto isSimpleStmt = stmt.IsSingleLineNode(t);
+
+        if (group.empty() && isSimpleStmt) {
+            group.push_back(callexpr);
+            prefixLen = callexpr.GetStartCol(t) - stmt.GetStartCol(t);
+            lastLine = callexpr.GetEndLine(t);
+            continue;
+        }
+
+        if (isSimpleStmt) {
+            auto line = callexpr.GetStartLine(t);
+            auto stmtPrefixLen = callexpr.GetStartCol(t) - stmt.GetStartCol(t);
+            if (line - lastLine <= f.GetStyle().align_continuous_line_space && stmtPrefixLen == prefixLen) {
+                group.push_back(callexpr);
+            } else {
+                if (group.size() > 1) {
+                    AnalyzeSimilarCallAlign(f, group, prefixLen, t);
+                }
+                group.clear();
+                group.push_back(callexpr);
+            }
+            prefixLen = stmtPrefixLen;
+            lastLine = callexpr.GetEndLine(t);
+        } else if (group.size() > 1) {
+            AnalyzeSimilarCallAlign(f, group, prefixLen, t);
+            group.clear();
+        } else {
+            group.clear();
+        }
+    }
+
+    if (group.size() > 1) {
+        AnalyzeSimilarCallAlign(f, group, prefixLen, t);
+    }
+}
+
+void AlignAnalyzer::AnalyzeSimilarCallAlign(FormatState &f, std::vector<LuaSyntaxNode> &callExprs, std::size_t prefixLen, const LuaSyntaxTree &t) {
+    std::vector<std::vector<LuaSyntaxNode>> argsVec;
+    std::size_t maxAlign = 0;
+    for (auto &callExpr: callExprs) {
+        auto argExprList = callExpr.GetChildSyntaxNode(LuaSyntaxNodeKind::ExpressionList, t);
+        auto args = argExprList.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
+        if (args.size() > maxAlign) {
+            maxAlign = args.size();
+        }
+        argsVec.push_back(std::move(args));
+    }
+
+    std::vector<std::size_t> group;
+    std::size_t alignPos = prefixLen + 1;
+    if (f.GetStyle().space_inside_function_call_parentheses) {
+        alignPos++;
+    }
+
+    std::size_t elementLength = 0;
+    for (std::size_t i = 0; i < maxAlign; i++) {
+        for (auto &args: argsVec) {
+            if (i < args.size()) {
+                auto text = args[i].GetText(t);
+                if (elementLength < text.size()) {
+                    elementLength = text.size();
+                }
+                group.push_back(args[i].GetFirstToken(t).GetIndex());
+            }
+        }
+        PushNormalAlignGroup(alignPos, group);
+        alignPos += elementLength;
+        if (i + 1 == maxAlign) {
+            if (f.GetStyle().space_inside_function_call_parentheses) {
+                alignPos++;
+            }
+        } else {
+            if (f.GetStyle().space_after_comma) {
+                alignPos += 2;
+            } else {
+                alignPos++;
+            }
+        }
+
+        elementLength = 0;
+        group.clear();
+    }
 }
 
 void AlignAnalyzer::AnalyzeInlineComment(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {

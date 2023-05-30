@@ -99,7 +99,7 @@ public:
     std::size_t align_continuous_line_space = 2;
 
     bool align_if_branch = false;
-    // not implement now
+
     bool align_continuous_similar_call_args = false;
 
     bool align_continuous_inline_comment = true;

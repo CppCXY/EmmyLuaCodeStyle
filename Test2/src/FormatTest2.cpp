@@ -8,8 +8,8 @@
 
 int main() {
     std::string buffer = R"(
-local t = { --131
- }
+map(1231, 3131, 12331113131,1 )
+map(213112, 1, 12313131,1313113131)
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -24,7 +24,7 @@ local t = { --131
     std::cout << t.GetDebugView() << std::endl;
 
     LuaStyle s;
-    s.break_all_list_when_line_exceed = true;
+    s.align_continuous_similar_call_args = true;
     FormatBuilder b(s);
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;

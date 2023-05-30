@@ -39,6 +39,8 @@ private:
 
     void AnalyzeContinuousSimilarCallArgs(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
+    void AnalyzeSimilarCallAlign(FormatState &f, std::vector<LuaSyntaxNode> &callExprs, std::size_t prefixLen, const LuaSyntaxTree &t);
+
     void AnalyzeInlineComment(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
     std::vector<AlignGroup> _alignGroup;

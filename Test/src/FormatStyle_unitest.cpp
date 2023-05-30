@@ -1326,3 +1326,36 @@ aaaaaaaaaaaa.wfgoiwjofjw()
             .afjoajofjw()
 )", style));
 }
+
+TEST(FormatByStyleOption, align_continuous_similar_call_args){
+    LuaStyle style;
+
+    style.align_continuous_similar_call_args = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+map("n", "<C-j>", quickfix_step("below"), { buffer = true })
+map("n", "<C-k>", quickfix_step("above"), { buffer = true })
+map("n", "<Space>", "<CR><C-w>p", { buffer = true })
+map({ "n", "x" }, "<CR>", "<CR>", { buffer = true })
+)",
+            R"(
+map("n", "<C-j>", quickfix_step("below"), { buffer = true })
+map("n", "<C-k>", quickfix_step("above"), { buffer = true })
+map("n", "<Space>", "<CR><C-w>p", { buffer = true })
+map({ "n", "x" }, "<CR>", "<CR>", { buffer = true })
+)", style));
+    style.align_continuous_similar_call_args = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+map("n", "<C-j>", quickfix_step("below"), { buffer = true })
+map("n", "<C-k>", quickfix_step("above"), { buffer = true })
+map("n", "<Space>", "<CR><C-w>p", { buffer = true })
+map({ "n", "x" }, "<CR>", "<CR>", { buffer = true })
+)",
+            R"(
+map("n",          "<C-j>",   quickfix_step("below"), { buffer = true })
+map("n",          "<C-k>",   quickfix_step("above"), { buffer = true })
+map("n",          "<Space>", "<CR><C-w>p",           { buffer = true })
+map({ "n", "x" }, "<CR>",    "<CR>",                 { buffer = true })
+)", style));
+}

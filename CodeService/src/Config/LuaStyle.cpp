@@ -207,6 +207,8 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
         }
     }
 
+    BOOL_OPTION(align_continuous_similar_call_args)
+
     BOOL_OPTION(align_continuous_inline_comment)
 
     BOOL_OPTION(never_indent_before_if_condition)
