@@ -346,6 +346,13 @@ void PushDiagnosticToLua(lua_State *L, std::vector<LuaDiagnosticInfo> &diagnosti
             lua_pushstring(L, "type");
             lua_pushstring(L, GetDiagnosisString(diagnosticInfo.Type).c_str());
             lua_rawset(L, -3);
+
+            // data
+            if (!diagnosticInfo.Data.empty()) {
+                lua_pushstring(L, "data");
+                lua_pushlstring(L, diagnosticInfo.Data.c_str(), diagnosticInfo.Data.size());
+                lua_rawset(L, -3);
+            }
         }
 
         // range
