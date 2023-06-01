@@ -3,15 +3,15 @@
 #include <fstream>
 #include <sstream>
 #include "Util/format.h"
-#include "CodeService/Config/LuaEditorConfig.h"
+#include "CodeFormatCore/Config/LuaEditorConfig.h"
 #include "Util/StringUtil.h"
 #include "LuaParser/File/LuaFile.h"
 #include "LuaParser/Types/TextRange.h"
 #include "LuaParser/Lexer/LuaLexer.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
-#include "CodeService/Format/FormatBuilder.h"
+#include "CodeFormatCore/Format/FormatBuilder.h"
 #include "LuaParser/Parse/LuaParser.h"
-#include "CodeService/Diagnostic/DiagnosticBuilder.h"
+#include "CodeFormatCore/Diagnostic/DiagnosticBuilder.h"
 #include "Util/FileFinder.h"
 #include "Util/Url.h"
 

@@ -3,7 +3,7 @@
 #include <string_view>
 #include "LSP/LSP.h"
 #include "VirtualFile.h"
-#include "CodeService/Config/LuaStyle.h"
+#include "CodeFormatCore/Config/LuaStyle.h"
 #include "DB/FileDB.h"
 #include "DB/UriDB.h"
 #include "DB/LineIndexDB.h"

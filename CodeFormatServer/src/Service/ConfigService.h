@@ -3,9 +3,9 @@
 #include <vector>
 #include "LSP/LSP.h"
 #include "Service.h"
-#include "CodeService/Config/LuaEditorConfig.h"
+#include "CodeFormatCore/Config/LuaEditorConfig.h"
 #include "Config/ClientConfig.h"
-#include "CodeService/Config/LuaDiagnosticStyle.h"
+#include "CodeFormatCore/Config/LuaDiagnosticStyle.h"
 
 struct LuaConfig {
     explicit LuaConfig(std::string_view workspace)

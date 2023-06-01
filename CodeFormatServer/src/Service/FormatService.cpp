@@ -2,12 +2,12 @@
 
 //#include "CodeActionService.h"
 //#include "CommandService.h"
-//#include "CodeService/LuaFormatter.h"
-//#include "CodeService/FormatElement/DiagnosisContext.h"
-//#include "CodeService/NameStyle/NameStyleChecker.h"
+//#include "CodeFormatCore/LuaFormatter.h"
+//#include "CodeFormatCore/FormatElement/DiagnosisContext.h"
+//#include "CodeFormatCore/NameStyle/NameStyleChecker.h"
 #include "LanguageServer.h"
-#include "CodeService/Format/FormatBuilder.h"
-#include "CodeService/RangeFormat/RangeFormatBuilder.h"
+#include "CodeFormatCore/Format/FormatBuilder.h"
+#include "CodeFormatCore/RangeFormat/RangeFormatBuilder.h"
 
 
 FormatService::FormatService(LanguageServer *owner)

@@ -2,11 +2,11 @@
 
 #include "Service.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
-#include "CodeService/Config/LuaStyle.h"
-#include "CodeService/Config/LuaDiagnosticStyle.h"
+#include "CodeFormatCore/Config/LuaStyle.h"
+#include "CodeFormatCore/Config/LuaDiagnosticStyle.h"
 #include "LSP/LSP.h"
-#include "CodeService/Diagnostic/Spell/CodeSpellChecker.h"
-#include "CodeService/Diagnostic/NameStyle/NameStyleChecker.h"
+#include "CodeFormatCore/Diagnostic/Spell/CodeSpellChecker.h"
+#include "CodeFormatCore/Diagnostic/NameStyle/NameStyleChecker.h"
 
 class DiagnosticService : public Service {
 public:

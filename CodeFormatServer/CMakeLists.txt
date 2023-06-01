@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.14)
 
 project(CodeFormatServer)
 
@@ -6,55 +6,55 @@ add_executable(CodeFormatServer)
 
 add_dependencies(CodeFormatServer CodeService)
 
-target_include_directories(CodeFormatServer PUBLIC
-        ${LuaCodeStyle_SOURCE_DIR}/include
+target_include_directories(CodeFormatServer PRIVATE
+        include
         ${LuaCodeStyle_SOURCE_DIR}/3rd/asio-1.24.0/include
         ${LuaCodeStyle_SOURCE_DIR}/3rd/nlohmann_json/include
         ${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.9/include
         src
         )
 
-target_compile_options(CodeFormatServer PUBLIC -DASIO_STANDALONE)
+target_compile_options(CodeFormatServer PRIVATE -DASIO_STANDALONE)
 
 target_sources(CodeFormatServer
         PRIVATE
-        ${CodeFormatServer_SOURCE_DIR}/src/main.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/LanguageServer.cpp
+        src/main.cpp
+        src/LanguageServer.cpp
 
         #Config
-        ${CodeFormatServer_SOURCE_DIR}/src/Config/ClientConfig.cpp
+        src/Config/ClientConfig.cpp
 
         #LSP
-        ${CodeFormatServer_SOURCE_DIR}/src/LSP/LSP.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/LSP/LSPHandle.cpp
+        src/LSP/LSP.cpp
+        src/LSP/LSPHandle.cpp
         #Session
-        ${CodeFormatServer_SOURCE_DIR}/src/Session/IOSession.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/Session/SocketIOSession.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/Session/StandardIOSession.cpp
+        src/Session/IOSession.cpp
+        src/Session/SocketIOSession.cpp
+        src/Session/StandardIOSession.cpp
         #protocol
-        ${CodeFormatServer_SOURCE_DIR}/src/Session/Protocol/ProtocolParser.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/Session/Protocol/ProtocolBuffer.cpp
+        src/Session/Protocol/ProtocolParser.cpp
+        src/Session/Protocol/ProtocolBuffer.cpp
 
         #vfs
-        ${CodeFormatServer_SOURCE_DIR}/src/VFS/VirtualFile.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/VFS/VirtualFileSystem.cpp
+        src/VFS/VirtualFile.cpp
+        src/VFS/VirtualFileSystem.cpp
 
         #DB
-        ${CodeFormatServer_SOURCE_DIR}/src/DB/FileDB.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/DB/UriDB.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/DB/LineIndexDB.cpp
+        src/DB/FileDB.cpp
+        src/DB/UriDB.cpp
+        src/DB/LineIndexDB.cpp
 
         #lib
-        ${CodeFormatServer_SOURCE_DIR}/src/Lib/LineIndex/LineIndex.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/Lib/LineIndex/LineTypes.cpp
+        src/Lib/LineIndex/LineIndex.cpp
+        src/Lib/LineIndex/LineTypes.cpp
 
         #service
-        ${CodeFormatServer_SOURCE_DIR}/src/Service/Service.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/Service/FormatService.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/Service/DiagnosticService.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/Service/CommandService.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/Service/CodeActionService.cpp
-        ${CodeFormatServer_SOURCE_DIR}/src/Service/ConfigService.cpp
+        src/Service/Service.cpp
+        src/Service/FormatService.cpp
+        src/Service/DiagnosticService.cpp
+        src/Service/CommandService.cpp
+        src/Service/CodeActionService.cpp
+        src/Service/ConfigService.cpp
 
         # mimalloc
         ${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.9/src/static.c

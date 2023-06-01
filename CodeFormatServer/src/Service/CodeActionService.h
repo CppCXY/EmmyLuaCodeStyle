@@ -5,7 +5,7 @@
 
 #include "Service.h"
 #include "LSP/LSP.h"
-#include "CodeService/Diagnostic/DiagnosticType.h"
+#include "CodeFormatCore/Diagnostic/DiagnosticType.h"
 
 class CodeActionService : public Service {
 public:

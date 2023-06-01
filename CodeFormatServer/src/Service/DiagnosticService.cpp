@@ -1,6 +1,6 @@
 #include "DiagnosticService.h"
 #include "LanguageServer.h"
-#include "CodeService/Diagnostic/DiagnosticBuilder.h"
+#include "CodeFormatCore/Diagnostic/DiagnosticBuilder.h"
 #include "CodeActionService.h"
 #include "ConfigService.h"
 

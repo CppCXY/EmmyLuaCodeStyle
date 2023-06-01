@@ -2,7 +2,7 @@
 
 #include <string_view>
 #include <memory>
-#include "CodeService/Config/LuaEditorConfig.h"
+#include "CodeFormatCore/Config/LuaEditorConfig.h"
 
 
 struct LuaConfig {

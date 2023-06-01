@@ -5,11 +5,11 @@
 #include <filesystem>
 #include <cstring>
 #include <optional>
-#include "CodeService/Config/LuaStyle.h"
+#include "CodeFormatCore/Config/LuaStyle.h"
 #include "LuaParser/File/LuaFile.h"
 #include "LuaParser/Types/TextRange.h"
 #include "Types.h"
-#include "CodeService/Config/LuaDiagnosticStyle.h"
+#include "CodeFormatCore/Config/LuaDiagnosticStyle.h"
 
 class LuaFormat {
 public:

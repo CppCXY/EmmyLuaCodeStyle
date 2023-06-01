@@ -1,9 +1,9 @@
 #include "LuaCodeFormat.h"
 
-#include "CodeService/Config/LuaEditorConfig.h"
+#include "CodeFormatCore/Config/LuaEditorConfig.h"
 #include "Util/StringUtil.h"
 #include "LuaParser/Parse/LuaParser.h"
-#include "CodeService/RangeFormat/RangeFormatBuilder.h"
+#include "CodeFormatCore/RangeFormat/RangeFormatBuilder.h"
 
 LuaCodeFormat &LuaCodeFormat::GetInstance() {
     static LuaCodeFormat instance;

@@ -4,7 +4,7 @@
 #include <sstream>
 #include "nlohmann/json.hpp"
 #include "LSP.h"
-#include "CodeService/Config/LuaStyle.h"
+#include "CodeFormatCore/Config/LuaStyle.h"
 #include "LanguageServer.h"
 #include "Service/CodeActionService.h"
 #include "Service/FormatService.h"
@@ -13,7 +13,7 @@
 #include "Util/Url.h"
 #include "Util/format.h"
 #include "LanguageServer.h"
-#include "CodeService/Format/Types.h"
+#include "CodeFormatCore/Format/Types.h"
 #include "Service/DiagnosticService.h"
 #include "Config/ClientConfig.h"
 

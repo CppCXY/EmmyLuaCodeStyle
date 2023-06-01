@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.14)
 
 project(CodeFormatLib)
 
@@ -10,20 +10,19 @@ set_target_properties(CodeFormatLib PROPERTIES OUTPUT_NAME code_format)
 
 add_dependencies(CodeFormatLib CodeService lua54)
 
-target_include_directories(CodeFormatLib PRIVATE
-	${LuaCodeStyle_SOURCE_DIR}/include
+target_include_directories(CodeFormatLib PUBLIC
 	${LuaCodeStyle_SOURCE_DIR}/3rd/lua-5.4.3/src
 	src
 )
 
 target_sources(CodeFormatLib
 	PRIVATE
-	${CodeFormatLib_SOURCE_DIR}/src/CodeFormatLib.cpp
-	${CodeFormatLib_SOURCE_DIR}/src/LuaCodeFormat.cpp
+	src/CodeFormatLib.cpp
+	src/LuaCodeFormat.cpp
 )
 
 if(NOT WIN32)
     target_compile_options(CodeFormatLib PUBLIC -fPIC)
 endif()
 
-target_link_libraries(CodeFormatLib CodeService lua54)
+target_link_libraries(CodeFormatLib PUBLIC CodeService lua54)

@@ -1,5 +1,5 @@
 #include "ConfigService.h"
-#include "CodeService/Config/LanguageTranslator.h"
+#include "CodeFormatCore/Config/LanguageTranslator.h"
 #include "DiagnosticService.h"
 #include "LanguageServer.h"
 #include "Util/Url.h"

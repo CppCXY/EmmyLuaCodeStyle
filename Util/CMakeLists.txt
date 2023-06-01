@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.14)
 
 project(Util)
 
@@ -7,7 +7,7 @@ add_subdirectory(${LuaCodeStyle_SOURCE_DIR}/3rd/uriparser uriparser.out)
 add_library(Util STATIC)
 
 target_include_directories(Util PUBLIC
-        ${LuaCodeStyle_SOURCE_DIR}/include
+        include
         PRIVATE
         src
         ${LuaCodeStyle_SOURCE_DIR}/3rd/uriparser/include
@@ -15,24 +15,17 @@ target_include_directories(Util PUBLIC
         )
 
 target_sources(Util
-        PUBLIC
-        ${LuaCodeStyle_SOURCE_DIR}/include/Util/CommandLine.h
-        ${LuaCodeStyle_SOURCE_DIR}/include/Util/StringUtil.h
-        ${LuaCodeStyle_SOURCE_DIR}/include/Util/Utf8.h
-        ${LuaCodeStyle_SOURCE_DIR}/include/Util/Url.h
-        ${LuaCodeStyle_SOURCE_DIR}/include/Util/SymSpell/SymSpell.h
-
         PRIVATE
-        ${Util_SOURCE_DIR}/src/CommandLine.cpp
-        ${Util_SOURCE_DIR}/src/StringUtil.cpp
-        ${Util_SOURCE_DIR}/src/Utf8.cpp
-        ${Util_SOURCE_DIR}/src/Url.cpp
-        ${Util_SOURCE_DIR}/src/FileFinder.cpp
-        ${Util_SOURCE_DIR}/src/SymSpell/SymSpell.cpp
-        ${Util_SOURCE_DIR}/src/SymSpell/SuggestItem.cpp
-        ${Util_SOURCE_DIR}/src/SymSpell/EditDistance.cpp
-        ${Util_SOURCE_DIR}/src/InfoTree/InfoTree.cpp
-        ${Util_SOURCE_DIR}/src/InfoTree/InfoNode.cpp
+        src/CommandLine.cpp
+        src/StringUtil.cpp
+        src/Utf8.cpp
+        src/Url.cpp
+        src/FileFinder.cpp
+        src/SymSpell/SymSpell.cpp
+        src/SymSpell/SuggestItem.cpp
+        src/SymSpell/EditDistance.cpp
+        src/InfoTree/InfoTree.cpp
+        src/InfoTree/InfoNode.cpp
         )
 
 

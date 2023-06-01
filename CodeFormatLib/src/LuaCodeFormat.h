@@ -4,12 +4,12 @@
 #include <string>
 #include <string_view>
 
-#include "CodeService/Config/LuaStyle.h"
-#include "CodeService/Config/LuaEditorConfig.h"
-#include "CodeService/Format/FormatBuilder.h"
-#include "CodeService/Diagnostic/Spell/CodeSpellChecker.h"
-#include "CodeService/TypeFormat/LuaTypeFormat.h"
-#include "CodeService/Diagnostic/DiagnosticBuilder.h"
+#include "CodeFormatCore/Config/LuaStyle.h"
+#include "CodeFormatCore/Config/LuaEditorConfig.h"
+#include "CodeFormatCore/Format/FormatBuilder.h"
+#include "CodeFormatCore/Diagnostic/Spell/CodeSpellChecker.h"
+#include "CodeFormatCore/TypeFormat/LuaTypeFormat.h"
+#include "CodeFormatCore/Diagnostic/DiagnosticBuilder.h"
 #include "Types.h"
 
 

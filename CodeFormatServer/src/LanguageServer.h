@@ -6,7 +6,7 @@
 #include <asio/io_context.hpp>
 
 #include "Session/IOSession.h"
-#include "CodeService/Config/LuaEditorConfig.h"
+#include "CodeFormatCore/Config/LuaEditorConfig.h"
 #include "Service/ServiceType.h"
 #include "VFS/VirtualFile.h"
 #include "LSP/LSPHandle.h"

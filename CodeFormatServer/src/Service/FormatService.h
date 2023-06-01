@@ -6,10 +6,10 @@
 #include <map>
 #include "LSP/LSP.h"
 #include "Service.h"
-#include "CodeService/Config/LuaStyle.h"
+#include "CodeFormatCore/Config/LuaStyle.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
-#include "CodeService/Format/Types.h"
-#include "CodeService/TypeFormat/LuaTypeFormat.h"
+#include "CodeFormatCore/Format/Types.h"
+#include "CodeFormatCore/TypeFormat/LuaTypeFormat.h"
 
 class FormatService : public Service {
 public:
