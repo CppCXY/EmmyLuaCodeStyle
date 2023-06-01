@@ -2,9 +2,9 @@
 #include "LuaParser/Lexer/LuaLexer.h"
 #include "LuaParser/Parse/LuaParser.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
-#include "CodeService/Format/FormatBuilder.h"
-#include "CodeService/Config/EditorconfigPattern.h"
-#include "CodeService/Diagnostic/DiagnosticBuilder.h"
+#include "CodeFormatCore/Format/FormatBuilder.h"
+#include "CodeFormatCore/Config/EditorconfigPattern.h"
+#include "CodeFormatCore/Diagnostic/DiagnosticBuilder.h"
 
 int main() {
     std::string buffer = R"(

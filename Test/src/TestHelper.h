@@ -9,9 +9,9 @@
 #include "Util/format.h"
 #include "Util/CommandLine.h"
 #include "Util/StringUtil.h"
-#include "CodeService/Config/LuaEditorConfig.h"
+#include "CodeFormatCore/Config/LuaEditorConfig.h"
 #include "LuaParser/Parse/LuaParser.h"
-#include "CodeService/Format/FormatBuilder.h"
+#include "CodeFormatCore/Format/FormatBuilder.h"
 
 class TestHelper {
 public:
