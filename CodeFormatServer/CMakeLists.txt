@@ -60,13 +60,13 @@ target_sources(CodeFormatServer
         ${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.9/src/static.c
         )
 
-target_link_libraries(CodeFormatServer PUBLIC CodeService)
+target_link_libraries(CodeFormatServer CodeService)
 
 
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_compile_definitions(CodeFormatServer PUBLIC -D_WIN32_WINNT=0x0601)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    target_link_libraries(CodeFormatServer PUBLIC pthread -static-libstdc++ -static-libgcc)
+    target_link_libraries(CodeFormatServer pthread -static-libstdc++ -static-libgcc)
 endif ()
 
 install(

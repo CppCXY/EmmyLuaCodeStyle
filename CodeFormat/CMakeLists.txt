@@ -16,7 +16,7 @@ target_sources(CodeFormat
 	src/LuaFormat.cpp
 )
 
-target_link_libraries(CodeFormat PUBLIC CodeService Util)
+target_link_libraries(CodeFormat CodeService Util)
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 	target_link_libraries(CodeFormat -static-libstdc++ -static-libgcc)	
