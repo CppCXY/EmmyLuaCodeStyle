@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "../Ast/LuaSyntaxNode.h"
-#include "../Ast/LuaSyntaxTree.h"
-#include "../Lexer/LuaLexer.h"
+#include "LuaParser/Ast/LuaSyntaxNode.h"
+#include "LuaParser/Ast/LuaSyntaxTree.h"
+#include "LuaParser/Lexer/LuaLexer.h"
 #include "LuaAttribute.h"
 #include "LuaOperatorType.h"
 #include "LuaParseError.h"

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../Types/TextRange.h"
+#include "LuaParser/Types/TextRange.h"
 #include <string_view>
+#include <string>
 
 enum class LuaParserErrorKind {
     None,
