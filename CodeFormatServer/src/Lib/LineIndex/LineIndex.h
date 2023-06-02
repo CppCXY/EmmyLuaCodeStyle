@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-
+#include <string>
 #include "LineTypes.h"
 
 class LineIndex {

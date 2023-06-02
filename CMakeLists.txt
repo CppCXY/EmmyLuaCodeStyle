@@ -22,6 +22,7 @@ if(APPLE)
 endif ()
 
 add_subdirectory(LuaParser)
+add_subdirectory(LuaCompile)
 add_subdirectory(CodeFormatCore)
 add_subdirectory(Util)
 
