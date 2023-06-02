@@ -1,5 +1,5 @@
 ﻿#include "TestHelper.h"
-#include "CodeService/RangeFormat/RangeFormatBuilder.h"
+#include "CodeFormatCore/RangeFormat/RangeFormatBuilder.h"
 #include <filesystem>
 
 std::string TestHelper::ScriptBase = "";
