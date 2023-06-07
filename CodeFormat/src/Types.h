@@ -15,5 +15,6 @@ struct LuaConfig {
 
 enum class WorkMode {
     File,
+    Stdin,
     Workspace
 };

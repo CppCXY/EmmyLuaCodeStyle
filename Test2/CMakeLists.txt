@@ -4,7 +4,7 @@ project(FormatTest2)
 
 add_executable(FormatTest2)
 
-add_dependencies(FormatTest2 CodeService LuaParser  Util)
+add_dependencies(FormatTest2 CodeFormatCore LuaParser  Util)
 
 target_include_directories(FormatTest2 PUBLIC
         ${LuaCodeStyle_SOURCE_DIR}/include
@@ -16,4 +16,4 @@ target_sources(FormatTest2
         src/FormatTest2.cpp
         )
 
-target_link_libraries(FormatTest2 CodeService LuaParser Util)
+target_link_libraries(FormatTest2 CodeFormatCore LuaParser Util)

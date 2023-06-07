@@ -1,21 +1,25 @@
 #include "LuaFormat.h"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include "Util/format.h"
 #include "CodeFormatCore/Config/LuaEditorConfig.h"
-#include "Util/StringUtil.h"
-#include "LuaParser/File/LuaFile.h"
-#include "LuaParser/Types/TextRange.h"
-#include "LuaParser/Lexer/LuaLexer.h"
-#include "LuaParser/Ast/LuaSyntaxTree.h"
-#include "CodeFormatCore/Format/FormatBuilder.h"
-#include "LuaParser/Parse/LuaParser.h"
 #include "CodeFormatCore/Diagnostic/DiagnosticBuilder.h"
+#include "CodeFormatCore/Format/FormatBuilder.h"
+#include "CodeFormatCore/RangeFormat/RangeFormatBuilder.h"
+#include "LuaParser/Ast/LuaSyntaxTree.h"
+#include "LuaParser/File/LuaFile.h"
+#include "LuaParser/Lexer/LuaLexer.h"
+#include "LuaParser/Parse/LuaParser.h"
+#include "LuaParser/Types/TextRange.h"
 #include "Util/FileFinder.h"
+#include "Util/StringUtil.h"
 #include "Util/Url.h"
+#include "Util/format.h"
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
-LuaFormat::LuaFormat() {
+LuaFormat::LuaFormat()
+    : _mode(WorkMode::File),
+      _isRangeLine(false),
+      _isCompleteOutputRangeFormat(false) {
     _diagnosticStyle.name_style_check = false;
 }
 
@@ -23,9 +27,12 @@ void LuaFormat::SetWorkspace(std::string_view workspace) {
     _workspace = workspace;
 }
 
-bool LuaFormat::SetInputFile(std::string_view input) {
+void LuaFormat::SetInputFile(std::string_view input) {
     _inputPath = std::string(input);
-    auto opText = ReadFile(input);
+}
+
+bool LuaFormat::ReadFromInput() {
+    auto opText = ReadFile(_inputPath);
     if (opText.has_value()) {
         _inputFileText = std::move(opText.value());
         return true;
@@ -36,7 +43,6 @@ bool LuaFormat::SetInputFile(std::string_view input) {
 bool LuaFormat::ReadFromStdin() {
     std::stringstream buffer;
     buffer << std::cin.rdbuf();
-    _inputPath = "stdin";
     _inputFileText = std::move(buffer.str());
     return true;
 }
@@ -59,12 +65,28 @@ bool IsSubRelative(std::filesystem::path &path, std::filesystem::path base) {
 
 void LuaFormat::AutoDetectConfig() {
     if (_mode == WorkMode::File) {
-        if (_inputPath == "stdin") {
+        if (_workspace.empty()) {
+            _workspace = std::filesystem::current_path().string();
+        }
+        std::filesystem::path workspace(_workspace);
+        std::filesystem::path inputPath(_inputPath);
+        if (!IsSubRelative(inputPath, workspace)) {
             return;
         }
 
-        if (_workspace.empty()) {
-            _workspace = std::filesystem::current_path().string();
+        auto directory = absolute(inputPath.parent_path());
+        while (IsSubRelative(directory, workspace)) {
+            auto editorconfigPath = directory / ".editorconfig";
+            if (std::filesystem::exists(editorconfigPath)) {
+                SetConfigPath(editorconfigPath.string());
+                return;
+            }
+
+            directory = directory.parent_path();
+        }
+    } else if (_mode == WorkMode::Stdin) {
+        if (_workspace.empty() || _inputPath.empty()) {
+            return;
         }
         std::filesystem::path workspace(_workspace);
         std::filesystem::path inputPath(_inputPath);
@@ -112,14 +134,23 @@ void LuaFormat::SetConfigPath(std::string_view configPath) {
 }
 
 void LuaFormat::SetDefaultStyle(std::map<std::string, std::string, std::less<>> &keyValues) {
+    if (keyValues.empty()) {
+        return;
+    }
     _defaultStyle.ParseFromMap(keyValues);
 }
 
 bool LuaFormat::Reformat() {
-    if (_mode == WorkMode::File) {
-        return ReformatSingleFile(_inputPath, _outPath, std::move(_inputFileText));
+    switch (_mode) {
+        case WorkMode::File:
+        case WorkMode::Stdin: {
+            return ReformatSingleFile(_inputPath, _outPath, std::move(_inputFileText));
+        }
+        case WorkMode::Workspace: {
+            return ReformatWorkspace();
+        }
     }
-    return ReformatWorkspace();
+    return false;
 }
 
 bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view outPath, std::string &&sourceText) {
@@ -131,6 +162,7 @@ bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view 
     p.Parse();
 
     if (p.HasError()) {
+        std::cerr << "Exist Syntax Errors" << std::endl;
         return false;
     }
 
@@ -156,6 +188,61 @@ bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view 
     return true;
 }
 
+
+bool LuaFormat::RangeReformat() {
+    auto file = std::make_shared<LuaFile>(std::move(_inputFileText));
+    LuaLexer luaLexer(file);
+    luaLexer.Parse();
+
+    LuaParser p(file, std::move(luaLexer.GetTokens()));
+    p.Parse();
+
+    if (p.HasError()) {
+        std::cerr << "Exist Syntax Errors" << std::endl;
+        return false;
+    }
+
+    LuaSyntaxTree t;
+    t.BuildTree(p);
+
+    LuaStyle style = GetStyle(_inputPath);
+    style.detect_end_of_line = false;
+    style.end_of_line = EndOfLine::LF;
+    FormatRange range;
+
+    auto rangeVec = string_util::Split(_rangeStr, ":");
+    if (rangeVec.size() != 2) {
+        std::cerr << "Range param format error" << std::endl;
+        return false;
+    }
+    auto start = std::stoull(std::string(rangeVec[0]));
+    auto end = std::stoull(std::string(rangeVec[1]));
+    if (_isRangeLine) {
+        range.StartLine = start;
+        range.EndLine = end;
+        range.StartCol = 0;
+        range.EndCol = 0;
+    } else {
+        range.StartLine = file->GetLine(start);
+        range.EndLine = file->GetLine(end);
+    }
+
+    RangeFormatBuilder f(style, range);
+    auto formattedText = f.GetFormatResult(t);
+    auto replaceRange = f.GetReplaceRange();
+
+    if (_isCompleteOutputRangeFormat) {
+        start = file->GetOffset(replaceRange.StartLine, replaceRange.StartCol);
+        end = file->GetOffset(replaceRange.EndLine + 1, 0);
+        std::string source = std::string(file->GetSource());
+        source.replace(start, end - start, formattedText);
+        formattedText = source;
+    }
+
+    std::cout.write(formattedText.data(), formattedText.size());
+    return true;
+}
+
 bool LuaFormat::Check() {
     if (_mode == WorkMode::File) {
         if (_inputPath != "stdin") {
@@ -178,7 +265,8 @@ void LuaFormat::DiagnosticInspection(std::string_view message, TextRange range, 
     auto endLine = file->GetLine(range.GetEndOffset());
     auto endChar = file->GetColumn(range.GetEndOffset());
     std::cerr << util::format("\t{}({}:{} to {}:{}): {}", path, startLine + 1, startChar, endLine + 1, endChar,
-                              message) << std::endl;
+                              message)
+              << std::endl;
 }
 
 void LuaFormat::SetWorkMode(WorkMode mode) {
@@ -280,8 +368,7 @@ bool LuaFormat::CheckWorkspace() {
     for (auto &filePath: files) {
         auto opText = ReadFile(filePath);
         std::string displayPath = filePath;
-        if (!_workspace.empty())
-        {
+        if (!_workspace.empty()) {
             displayPath = string_util::GetFileRelativePath(_workspace, filePath);
         }
         if (opText.has_value()) {
@@ -331,8 +418,7 @@ bool LuaFormat::ReformatWorkspace() {
     for (auto &filePath: files) {
         auto opText = ReadFile(filePath);
         std::string displayPath = filePath;
-        if (!_workspace.empty())
-        {
+        if (!_workspace.empty()) {
             displayPath = string_util::GetFileRelativePath(_workspace, filePath);
         }
         if (opText.has_value()) {
@@ -352,4 +438,12 @@ void LuaFormat::SupportNameStyleCheck() {
     _diagnosticStyle.name_style_check = true;
 }
 
+void LuaFormat::SupportCompleteOutputRange() {
+    _isCompleteOutputRangeFormat = true;
+}
+
+void LuaFormat::SetFormatRange(bool rangeLine, std::string_view rangeStr) {
+    _isRangeLine = rangeLine;
+    _rangeStr = std::string(rangeStr);
+}
 

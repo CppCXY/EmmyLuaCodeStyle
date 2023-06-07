@@ -19,7 +19,9 @@ public:
 
     void SetWorkspace(std::string_view workspace);
 
-    bool SetInputFile(std::string_view input);
+    void SetInputFile(std::string_view input);
+
+    bool ReadFromInput();
 
     bool ReadFromStdin();
 
@@ -35,11 +37,18 @@ public:
 
     bool Check();
 
+    bool RangeReformat();
+
     void AddIgnoresByFile(std::string_view ignoreFile);
 
     void AddIgnores(std::string_view pattern);
 
     void SupportNameStyleCheck();
+
+    void SupportCompleteOutputRange();
+
+    void SetFormatRange(bool rangeLine, std::string_view rangeStr);
+
 private:
     std::optional<std::string> ReadFile(std::string_view path);
 
@@ -48,7 +57,7 @@ private:
     void DiagnosticInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file,
                               std::string_view path);
 
-    bool ReformatSingleFile(std::string_view inputPath, std::string_view outPath, std::string &&sourceText);
+    bool ReformatSingleFile(std::string_view inputPath, std::string_view outPath, std::string&& sourceText);
 
     bool ReformatWorkspace();
 
@@ -65,4 +74,8 @@ private:
     LuaStyle _defaultStyle;
     LuaDiagnosticStyle _diagnosticStyle;
     std::vector<std::string> _ignorePattern;
+    // for range format
+    bool _isCompleteOutputRangeFormat;
+    bool _isRangeLine;
+    std::string _rangeStr;
 };

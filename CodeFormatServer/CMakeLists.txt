@@ -4,7 +4,7 @@ project(CodeFormatServer)
 
 add_executable(CodeFormatServer)
 
-add_dependencies(CodeFormatServer CodeService)
+add_dependencies(CodeFormatServer CodeFormatCore)
 
 target_include_directories(CodeFormatServer PRIVATE
         include
@@ -60,7 +60,7 @@ target_sources(CodeFormatServer
         ${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.9/src/static.c
         )
 
-target_link_libraries(CodeFormatServer CodeService)
+target_link_libraries(CodeFormatServer CodeFormatCore)
 
 
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")

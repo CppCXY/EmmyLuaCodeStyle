@@ -1,19 +1,19 @@
 ﻿cmake_minimum_required(VERSION 3.14)
 
-project(CodeService)
+project(CodeFormatCore)
 
-add_library(CodeService STATIC)
+add_library(CodeFormatCore STATIC)
 
-add_dependencies(CodeService LuaParser Util)
+add_dependencies(CodeFormatCore LuaParser Util)
 
-target_include_directories(CodeService
+target_include_directories(CodeFormatCore
         PUBLIC
         include
         PRIVATE
         src
         )
 
-target_sources(CodeService
+target_sources(CodeFormatCore
         PRIVATE
         # config
         src/Config/FunctionOption.cpp
@@ -54,7 +54,7 @@ target_sources(CodeService
         )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(CodeService PUBLIC /utf-8)
+    target_compile_options(CodeFormatCore PUBLIC /utf-8)
 endif ()
 
-target_link_libraries(CodeService LuaParser Util)
+target_link_libraries(CodeFormatCore LuaParser Util)

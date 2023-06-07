@@ -8,7 +8,7 @@ add_subdirectory(${LuaCodeStyle_SOURCE_DIR}/3rd/lua-5.4.3 lua.out)
 
 set_target_properties(CodeFormatLib PROPERTIES OUTPUT_NAME code_format)
 
-add_dependencies(CodeFormatLib CodeService lua54)
+add_dependencies(CodeFormatLib CodeFormatCore lua54)
 
 target_include_directories(CodeFormatLib PUBLIC
 	${LuaCodeStyle_SOURCE_DIR}/3rd/lua-5.4.3/src
@@ -25,4 +25,4 @@ if(NOT WIN32)
     target_compile_options(CodeFormatLib PUBLIC -fPIC)
 endif()
 
-target_link_libraries(CodeFormatLib PUBLIC CodeService lua54)
+target_link_libraries(CodeFormatLib PUBLIC CodeFormatCore lua54)

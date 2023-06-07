@@ -4,7 +4,7 @@ project(CodeFormatTest)
 
 add_executable(CodeFormatTest)
 
-add_dependencies(CodeFormatTest CodeService Util)
+add_dependencies(CodeFormatTest CodeFormatCore Util)
 
 target_include_directories(CodeFormatTest PUBLIC
         ${LuaCodeStyle_SOURCE_DIR}/include
@@ -24,7 +24,7 @@ target_sources(CodeFormatTest
         src/FilePattern_unitest.cpp
         )
 
-target_link_libraries(CodeFormatTest CodeService Util gtest)
+target_link_libraries(CodeFormatTest CodeFormatCore Util gtest)
 if(WIN32)
     # see https://github.com/google/googletest/issues/4067
     if (CMAKE_BUILD_TYPE STREQUAL Debug)

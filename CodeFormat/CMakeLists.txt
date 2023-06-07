@@ -4,7 +4,7 @@ project(CodeFormat)
 
 add_executable(CodeFormat)
 
-add_dependencies(CodeFormat CodeService Util)
+add_dependencies(CodeFormat CodeFormatCore Util)
 
 target_include_directories(CodeFormat PRIVATE
 	src
@@ -16,7 +16,7 @@ target_sources(CodeFormat
 	src/LuaFormat.cpp
 )
 
-target_link_libraries(CodeFormat CodeService Util)
+target_link_libraries(CodeFormat CodeFormatCore Util)
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
 	target_link_libraries(CodeFormat -static-libstdc++ -static-libgcc)	
