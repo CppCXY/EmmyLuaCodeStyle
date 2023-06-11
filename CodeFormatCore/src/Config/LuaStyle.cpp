@@ -1,8 +1,11 @@
 #include "CodeFormatCore/Config/LuaStyle.h"
-#include <map>
 #include "FunctionOption.h"
+#include <map>
 
 bool IsNumber(std::string_view source) {
+    if (source.empty()) {
+        return false;
+    }
     for (auto c: source) {
         if (c > '9' || c < '0') {
             return false;
@@ -11,13 +14,15 @@ bool IsNumber(std::string_view source) {
     return true;
 }
 
-#define BOOL_OPTION(op) if (configMap.count(#op)) {\
-    op = configMap.at(#op) == "true";\
-}
+#define BOOL_OPTION(op)                   \
+    if (configMap.count(#op)) {           \
+        op = configMap.at(#op) == "true"; \
+    }
 
-#define NUMBER_OPTION(op) if (configMap.count(#op) && IsNumber(configMap.at(#op))) {\
-    op = std::stoi(configMap.at(#op));\
-}
+#define NUMBER_OPTION(op)                                      \
+    if (configMap.count(#op) && IsNumber(configMap.at(#op))) { \
+        op = std::stoi(configMap.at(#op));                     \
+    }
 
 void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &configMap) {
     if (configMap.count("indent_style")) {
@@ -158,25 +163,21 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
     BOOL_OPTION(align_function_params)
 
     if (configMap.count("align_continuous_assign_statement")) {
-        if (configMap.at("align_continuous_assign_statement") == "true"
-            || configMap.at("align_continuous_assign_statement") == "when_extra_space") {
+        if (configMap.at("align_continuous_assign_statement") == "true" || configMap.at("align_continuous_assign_statement") == "when_extra_space") {
             align_continuous_assign_statement = ContinuousAlign::WhenExtraSpace;
         } else if (configMap.at("align_continuous_assign_statement") == "always") {
             align_continuous_assign_statement = ContinuousAlign::Always;
-        } else if (configMap.at("align_continuous_assign_statement") == "false"
-                   || configMap.at("align_continuous_assign_statement") == "none") {
+        } else if (configMap.at("align_continuous_assign_statement") == "false" || configMap.at("align_continuous_assign_statement") == "none") {
             align_continuous_assign_statement = ContinuousAlign::None;
         }
     }
 
     if (configMap.count("align_continuous_rect_table_field")) {
-        if (configMap.at("align_continuous_rect_table_field") == "true"
-            || configMap.at("align_continuous_rect_table_field") == "when_extra_space") {
+        if (configMap.at("align_continuous_rect_table_field") == "true" || configMap.at("align_continuous_rect_table_field") == "when_extra_space") {
             align_continuous_rect_table_field = ContinuousAlign::WhenExtraSpace;
         } else if (configMap.at("align_continuous_rect_table_field") == "always") {
             align_continuous_rect_table_field = ContinuousAlign::Always;
-        } else if (configMap.at("align_continuous_rect_table_field") == "false"
-                   || configMap.at("align_continuous_rect_table_field") == "none") {
+        } else if (configMap.at("align_continuous_rect_table_field") == "false" || configMap.at("align_continuous_rect_table_field") == "none") {
             align_continuous_rect_table_field = ContinuousAlign::None;
         }
     }
@@ -186,13 +187,11 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
     BOOL_OPTION(align_if_branch)
 
     if (configMap.count("align_array_table")) {
-        if (configMap.at("align_array_table") == "true"
-            || configMap.at("align_array_table") == "normal") {
+        if (configMap.at("align_array_table") == "true" || configMap.at("align_array_table") == "normal") {
             align_array_table = AlignArrayTable::Normal;
         } else if (configMap.at("align_array_table") == "contain_curly") {
             align_array_table = AlignArrayTable::ContainCurly;
-        } else if (configMap.at("align_array_table") == "false"
-                   || configMap.at("align_array_table") == "none") {
+        } else if (configMap.at("align_array_table") == "false" || configMap.at("align_array_table") == "none") {
             align_array_table = AlignArrayTable::None;
         }
     }
@@ -220,15 +219,15 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
     BOOL_OPTION(never_indent_comment_on_if_branch)
 
     std::vector<std::pair<std::string, LineSpace &>> fieldList = {
-            {"line_space_after_if_statement",              line_space_after_if_statement},
-            {"line_space_after_do_statement",              line_space_after_do_statement},
-            {"line_space_after_while_statement",           line_space_after_while_statement},
-            {"line_space_after_repeat_statement",          line_space_after_repeat_statement},
-            {"line_space_after_for_statement",             line_space_after_for_statement},
+            {"line_space_after_if_statement",              line_space_after_if_statement             },
+            {"line_space_after_do_statement",              line_space_after_do_statement             },
+            {"line_space_after_while_statement",           line_space_after_while_statement          },
+            {"line_space_after_repeat_statement",          line_space_after_repeat_statement         },
+            {"line_space_after_for_statement",             line_space_after_for_statement            },
             {"line_space_after_local_or_assign_statement", line_space_after_local_or_assign_statement},
-            {"line_space_after_function_statement",        line_space_after_function_statement},
-            {"line_space_after_expression_statement",      line_space_after_expression_statement},
-            {"line_space_after_comment",                   line_space_after_comment}
+            {"line_space_after_function_statement",        line_space_after_function_statement       },
+            {"line_space_after_expression_statement",      line_space_after_expression_statement     },
+            {"line_space_after_comment",                   line_space_after_comment                  }
     };
 
     for (auto &lineOption: fieldList) {
