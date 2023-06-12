@@ -19,6 +19,15 @@ void LineBreakAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     BreakAfter(syntaxNode, t, LineSpace(LineSpaceType::Keep));
                     break;
                 }
+                case '{': {
+                    if (f.GetStyle().break_before_braces) {
+                        auto parent = syntaxNode.GetParent(t);
+                        if (parent.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression && !parent.IsSingleLineNode(t)) {
+                            BreakBefore(syntaxNode, t, LineSpace(LineSpaceType::Keep));
+                        }
+                    }
+                    break;
+                }
                 default: {
                     break;
                 }
@@ -240,14 +249,14 @@ void LineBreakAnalyzer::BreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t, Line
 }
 
 void LineBreakAnalyzer::BreakBefore(LuaSyntaxNode n, const LuaSyntaxTree &t, std::size_t line) {
-    auto prev = n.GetPrevSibling(t);
+    auto prev = n.GetPrevToken(t);
     if (!prev.IsNull(t)) {
         BreakAfter(prev, t, line);
     }
 }
 
 void LineBreakAnalyzer::BreakBefore(LuaSyntaxNode n, const LuaSyntaxTree &t, LineSpace lineSpace) {
-    auto prev = n.GetPrevSibling(t);
+    auto prev = n.GetPrevToken(t);
     if (!prev.IsNull(t)) {
         BreakAfter(prev, t, lineSpace);
     }

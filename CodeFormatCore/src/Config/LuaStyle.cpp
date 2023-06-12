@@ -263,6 +263,8 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
 
     BOOL_OPTION(auto_collapse_lines)
 
+    BOOL_OPTION(break_before_braces)
+
     BOOL_OPTION(ignore_space_after_colon)
 
     BOOL_OPTION(remove_call_expression_list_finish_comma)

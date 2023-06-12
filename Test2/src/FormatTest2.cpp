@@ -8,8 +8,9 @@
 
 int main() {
     std::string buffer = R"(
-map(1231, 3131, 12331113131,1 )
-map(213112, 1, 12313131,1313113131)
+local d = {
+    dddd = 23131;
+}
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -24,7 +25,7 @@ map(213112, 1, 12313131,1313113131)
     std::cout << t.GetDebugView() << std::endl;
 
     LuaStyle s;
-    s.align_continuous_similar_call_args = true;
+    s.break_before_braces = true;
     FormatBuilder b(s);
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;

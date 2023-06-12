@@ -141,6 +141,8 @@ public:
 
     bool auto_collapse_lines = false;
 
+    bool break_before_braces = false;
+
     // [preference]
 	bool ignore_space_after_colon = false;
 

@@ -1500,3 +1500,35 @@ map({ "n", "x" }, "<CR>",    "<CR>",                 { buffer = true })
 )",
             style));
 }
+
+TEST(FormatByStyleOption, break_before_braces) {
+    LuaStyle style;
+
+    style.break_before_braces = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = {
+    a = 123
+}
+)",
+            R"(
+local t = {
+    a = 123
+}
+)",
+            style));
+    style.break_before_braces = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = {
+    a = 123
+}
+)",
+            R"(
+local t =
+{
+    a = 123
+}
+)",
+            style));
+}
