@@ -2,9 +2,21 @@
 
 If possible, you can help me improve the English document 
 
+## Editor Support
+
+vscode:
+[vscode-EmmyLuaCodeStyle](https://marketplace.visualstudio.com/items?itemName=CppCXY.emmylua-codestyle)
+[vscode-Lua](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
+
+intellij:
+[intellij-EmmyLuaCodeStyle](https://plugins.jetbrains.com/plugin/21973-emmyluacodestyle)
+
+neovim:
+[Lua Language Server](https://github.com/LuaLS/lua-language-server)
+
 ## Project Introduction 
 
-This project is an example of Lua code analysis\formatting\code diagnosis algorithm library and language service based on C++
+The project `is not a specification for the Lua code format`, this project is an example of Lua code analysis\formatting\code diagnosis algorithm library and language service based on C++
 
 The main pursuit of this project is reasonable formatting and diagnosis of various code styles
 

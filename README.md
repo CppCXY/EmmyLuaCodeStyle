@@ -2,11 +2,23 @@
 
 [English doc](README_EN.md)
 
+## 编辑器支持
+
+vscode: 
+[vscode-EmmyLuaCodeStyle](https://marketplace.visualstudio.com/items?itemName=CppCXY.emmylua-codestyle) 
+[vscode-Lua](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
+
+intellij: 
+[intellij-EmmyLuaCodeStyle](https://plugins.jetbrains.com/plugin/21973-emmyluacodestyle)
+
+neovim:
+[Lua Language Server](https://github.com/LuaLS/lua-language-server)
+
 ## 项目介绍
 
-该项目是基于C++实现的lua代码解析\格式化\代码诊断算法库和语言服务实例
+该项目`不是lua代码格式的规范`, 而是基于C++实现的lua代码解析\格式化\代码诊断算法库和语言服务实例
 
-该项目主要追求的是合理的格式化，多样的代码风格诊断
+该项目主要追求的是合理的格式化，多样的代码风格
 
 该项目除了提供语言服务实例，也提供独立的命令行工具CodeFormat，他能用于批量的代码格式化和代码风格检查。
 ## Feature
@@ -14,6 +26,7 @@
 * 支持lua5.1, lua5.2, lua5.3, lua5.4, luajit
 * 文档格式化
 * 范围格式化
+* 命名风格检查
 * 代码格式检查
 * 代码拼写检查
 * 可以作为lua库/cli工具/C++解析lua库/语言服务使用
