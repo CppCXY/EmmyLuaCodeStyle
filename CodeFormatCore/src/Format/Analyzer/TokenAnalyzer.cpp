@@ -94,7 +94,20 @@ void TokenAnalyzer::TableFieldAddSep(FormatState &f, LuaSyntaxNode n, const LuaS
         if (lastToken.GetTokenKind(t) == TK_SHORT_COMMENT || lastToken.GetTokenKind(t) == TK_LONG_COMMENT) {
             lastToken = lastToken.GetPrevToken(t);
         }
-        MarkAdd(lastToken, t, TokenAddStrategy::TableAddSep);
+        switch (f.GetStyle().table_separator_style) {
+            case TableSeparatorStyle::Semicolon: {
+                return MarkAdd(lastToken, t, TokenAddStrategy::TableAddColon);
+            }
+            case TableSeparatorStyle::OnlyKVColon: {
+                if (n.GetChildToken('=', t).IsToken(t)) {
+                    return MarkAdd(lastToken, t, TokenAddStrategy::TableAddColon);
+                }
+                // fallthrough
+            }
+            default: {
+                return MarkAdd(lastToken, t, TokenAddStrategy::TableAddComma);
+            }
+        }
     }
 }
 
@@ -110,6 +123,20 @@ void TokenAnalyzer::AnalyzeTableField(FormatState &f, LuaSyntaxNode &syntaxNode,
         auto semicolon = sep.GetChildToken(';', t);
         if (semicolon.IsToken(t)) {
             Mark(semicolon, t, TokenStrategy::TableSepComma);
+        }
+    } else if (f.GetStyle().table_separator_style == TableSeparatorStyle::OnlyKVColon) {
+        if (syntaxNode.GetChildToken('=', t).IsToken(t)) {
+            auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
+            auto semicolon = sep.GetChildToken(',', t);
+            if (semicolon.IsToken(t)) {
+                Mark(semicolon, t, TokenStrategy::TableSepSemicolon);
+            }
+        } else {
+            auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
+            auto semicolon = sep.GetChildToken(';', t);
+            if (semicolon.IsToken(t)) {
+                Mark(semicolon, t, TokenStrategy::TableSepComma);
+            }
         }
     }
 

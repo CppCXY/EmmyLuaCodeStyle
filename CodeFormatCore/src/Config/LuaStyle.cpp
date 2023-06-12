@@ -53,6 +53,8 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
             table_separator_style = TableSeparatorStyle::Comma;
         } else if (style == "semicolon") {
             table_separator_style = TableSeparatorStyle::Semicolon;
+        } else if (style == "only_kv_colon") {
+            table_separator_style = TableSeparatorStyle::OnlyKVColon;
         }
     }
 

@@ -145,12 +145,12 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
         }
 
         switch (resolve.GetTokenAddStrategy()) {
-            case TokenAddStrategy::TableAddSep: {
-                if (_state.GetStyle().table_separator_style == TableSeparatorStyle::Semicolon) {
-                    WriteChar(';');
-                } else {
-                    WriteChar(',');
-                }
+            case TokenAddStrategy::TableAddComma: {
+                WriteChar(',');
+                break;
+            }
+            case TokenAddStrategy::TableAddColon: {
+                WriteChar(';');
                 break;
             }
             default: {

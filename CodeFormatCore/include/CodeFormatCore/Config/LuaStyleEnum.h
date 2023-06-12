@@ -31,7 +31,8 @@ enum class ContinuousAlign {
 enum class TableSeparatorStyle {
     None,
     Comma,
-    Semicolon
+    Semicolon,
+    OnlyKVColon
 };
 
 enum class TrailingTableSeparator {

@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include "TestHelper.h"
+#include <gtest/gtest.h>
 
 TEST(FormatByStyleOption, indent_style) {
     LuaStyle style;
@@ -23,7 +23,8 @@ local t = function()
         }
     end
 end
-)", style));
+)",
+            style));
 
     style.indent_style = IndentStyle::Tab;
     // next is tab
@@ -45,8 +46,8 @@ local t = function()
 		}
 	end
 end
-)", style));
-
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, indent_size) {
@@ -71,7 +72,8 @@ local t = function()
     }
   end
 end
-)", style));
+)",
+            style));
 
     style.indent_size = 3;
     EXPECT_TRUE(TestHelper::TestFormatted(
@@ -92,7 +94,8 @@ local t = function()
       }
    end
 end
-)", style));
+)",
+            style));
 
     style.indent_size = 4;
     EXPECT_TRUE(TestHelper::TestFormatted(
@@ -113,7 +116,8 @@ local t = function()
         }
     end
 end
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, quote_style) {
@@ -126,7 +130,8 @@ local t = "aaa" .. 'bbb' .. '\"\"' .. [[123]]
 )",
             R"(
 local t = "aaa" .. 'bbb' .. '\"\"' .. [[123]]
-)", style));
+)",
+            style));
     style.quote_style = QuoteStyle::Double;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -134,7 +139,8 @@ local t = "aaa" .. 'bbb' .. [[123]] .. '""'
 )",
             R"(
 local t = "aaa" .. "bbb" .. [[123]] .. '""'
-)", style));
+)",
+            style));
     style.quote_style = QuoteStyle::Single;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -142,7 +148,8 @@ local t = "aaa" .. 'bbb' .. '\"\"' .. [[123]] .. '""'
 )",
             R"(
 local t = 'aaa' .. 'bbb' .. '\"\"' .. [[123]] .. '""'
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, continuation_indent) {
@@ -167,7 +174,8 @@ end
 table.insert(t, {
     aaa = 123
 })
-)", style));
+)",
+            style));
     style.continuation_indent = 8;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -181,7 +189,8 @@ if a
         or c then
 
 end
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, max_line_length) {
@@ -199,7 +208,8 @@ function f(aaaaaaaaaaaaaaaaaaaaaaaa, bbbbbbbbbbbbbbbbbb,
            cccccccccccccccccccccccccccccc)
 
 end
-)", style));
+)",
+            style));
     style.max_line_length = 120;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -211,10 +221,64 @@ end
 function f(aaaaaaaaaaaaaaaaaaaaaaaa, bbbbbbbbbbbbbbbbbb, cccccccccccccccccccccccccccccc)
 
 end
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, end_of_line_not_test_case) {
+}
+
+TEST(FormatByStyleOption, table_separator_style) {
+    LuaStyle style;
+
+    style.table_separator_style = TableSeparatorStyle::None;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = { aaa, bbb, ccc; }
+)",
+            R"(
+local t = { aaa, bbb, ccc; }
+)",
+            style));
+    style.table_separator_style = TableSeparatorStyle::Comma;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = { aaa, bbb, ccc; }
+)",
+            R"(
+local t = { aaa, bbb, ccc, }
+)",
+            style));
+    style.table_separator_style = TableSeparatorStyle::Semicolon;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = { aaa, bbb, ccc; }
+)",
+            R"(
+local t = { aaa; bbb; ccc; }
+)",
+            style));
+    style.table_separator_style = TableSeparatorStyle::OnlyKVColon;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = { aaa, bbb, ccc; }
+local d = {
+    d = 123,
+    k = 456,
+    c,
+    e
+}
+)",
+            R"(
+local t = { aaa, bbb, ccc, }
+local d = {
+    d = 123;
+    k = 456;
+    c,
+    e
+}
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, trailing_table_separator) {
@@ -227,7 +291,8 @@ local t = { aaa, bbb, ccc, }
 )",
             R"(
 local t = { aaa, bbb, ccc, }
-)", style));
+)",
+            style));
     style.trailing_table_separator = TrailingTableSeparator::Never;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -235,7 +300,8 @@ local t = { aaa, bbb, ccc, }
 )",
             R"(
 local t = { aaa, bbb, ccc }
-)", style));
+)",
+            style));
     style.trailing_table_separator = TrailingTableSeparator::Always;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -243,7 +309,8 @@ local t = { aaa, bbb, ccc }
 )",
             R"(
 local t = { aaa, bbb, ccc, }
-)", style));
+)",
+            style));
     style.trailing_table_separator = TrailingTableSeparator::Smart;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -259,7 +326,8 @@ local d = {
     a = 123,
     b = 123,
 }
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, call_arg_parentheses) {
@@ -276,7 +344,8 @@ p("456")
 p(123)
 p "12313"
 p("456")
-)", style));
+)",
+            style));
     style.call_arg_parentheses = CallArgParentheses::Remove;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -300,7 +369,8 @@ local t = {
     },
     d = 123
 }
-)", style));
+)",
+            style));
     style.call_arg_parentheses = CallArgParentheses::RemoveStringOnly;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -310,7 +380,8 @@ p({1231})
             R"(
 p "456"
 p({ 1231 })
-)", style));
+)",
+            style));
     style.call_arg_parentheses = CallArgParentheses::RemoveTableOnly;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -320,7 +391,8 @@ p({1231})
             R"(
 p("456")
 p { 1231 }
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, detect_end_of_line_no_test_case) {
@@ -345,7 +417,8 @@ local t = { aaa }
 local t2 = {
 }
 local t3 = {}
-)", style));
+)",
+            style));
     style.space_around_table_field_list = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -359,7 +432,8 @@ local t = {aaa}
 local t2 = {
 }
 local t3 = {}
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_before_attribute) {
@@ -374,7 +448,8 @@ local t2 <close> = {}
             R"(
 local t <const> = 123
 local t2 <close> = {}
-)", style));
+)",
+            style));
     style.space_before_attribute = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -384,7 +459,8 @@ local t2 <close> = {}
             R"(
 local t<const> = 123
 local t2<close> = {}
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_before_function_open_parenthesis) {
@@ -397,7 +473,8 @@ function f() end
 )",
             R"(
 function f () end
-)", style));
+)",
+            style));
     style.space_before_function_open_parenthesis = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -405,7 +482,8 @@ function f() end
 )",
             R"(
 function f() end
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_before_function_call_open_parenthesis) {
@@ -418,7 +496,8 @@ print(1, 2, 3)
 )",
             R"(
 print (1, 2, 3)
-)", style));
+)",
+            style));
     style.space_before_function_call_open_parenthesis = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -426,7 +505,8 @@ print(1, 2, 3)
 )",
             R"(
 print(1, 2, 3)
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_before_closure_open_parenthesis) {
@@ -441,7 +521,8 @@ end
             R"(
 local f = function ()
 end
-)", style));
+)",
+            style));
     style.space_before_closure_open_parenthesis = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -451,7 +532,8 @@ end
             R"(
 local f = function()
 end
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_before_function_call_single_arg) {
@@ -466,7 +548,8 @@ p "aaa"
             R"(
 local f = p { a = 123 }
 p "aaa"
-)", style));
+)",
+            style));
     style.space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyString;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -476,7 +559,8 @@ p "aaa"
             R"(
 local f = p{ a = 123 }
 p "aaa"
-)", style));
+)",
+            style));
     style.space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyTable;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -486,7 +570,8 @@ p "aaa"
             R"(
 local f = p { a = 123 }
 p"aaa"
-)", style));
+)",
+            style));
     style.space_before_function_call_single_arg = FunctionSingleArgSpace::None;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -496,7 +581,8 @@ p "aaa"
             R"(
 local f = p{ a = 123 }
 p"aaa"
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_before_open_square_bracket) {
@@ -509,7 +595,8 @@ t [123] = 123
 )",
             R"(
 t [123] = 123
-)", style));
+)",
+            style));
     style.space_before_open_square_bracket = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -517,7 +604,8 @@ t [123] = 123
 )",
             R"(
 t[123] = 123
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_inside_function_call_parentheses) {
@@ -532,7 +620,8 @@ p()
             R"(
 p( 1, 2, 3 )
 p()
-)", style));
+)",
+            style));
     style.space_inside_function_call_parentheses = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -542,7 +631,8 @@ p()
             R"(
 p(1, 2, 3)
 p()
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_inside_function_param_list_parentheses) {
@@ -562,7 +652,8 @@ end
 
 function f2( a, b, c )
 end
-)", style));
+)",
+            style));
     style.space_inside_function_param_list_parentheses = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -578,7 +669,8 @@ end
 
 function f2(a, b, c)
 end
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_inside_square_brackets) {
@@ -593,7 +685,8 @@ t[1] = 456
             R"(
 local t = { [ 1 ] = 123 }
 t[ 1 ] = 456
-)", style));
+)",
+            style));
     style.space_inside_square_brackets = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -603,7 +696,8 @@ t[1] = 456
             R"(
 local t = { [1] = 123 }
 t[1] = 456
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_around_table_append_operator) {
@@ -616,7 +710,8 @@ t[#t+1] = 123
 )",
             R"(
 t[#t+1] = 123
-)", style));
+)",
+            style));
     style.space_around_table_append_operator = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -624,7 +719,8 @@ t[#t+1] = 123
 )",
             R"(
 t[#t + 1] = 123
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, ignore_spaces_inside_function_call) {
@@ -637,7 +733,8 @@ map('k',      123,      456)
 )",
             R"(
 map('k',      123,      456)
-)", style));
+)",
+            style));
     style.ignore_spaces_inside_function_call = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -645,7 +742,8 @@ map('k',      123,      456)
 )",
             R"(
 map('k', 123, 456)
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_before_inline_comment) {
@@ -658,7 +756,8 @@ local t = 123 --hello
 )",
             R"(
 local t = 123 --hello
-)", style));
+)",
+            style));
     style.space_before_inline_comment = 2;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -666,7 +765,8 @@ local t = 123 --hello
 )",
             R"(
 local t = 123  --hello
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_around_math_operator) {
@@ -679,7 +779,8 @@ local t = 123 + (456^7) / 4 * 5 - 9
 )",
             R"(
 local t = 123 + (456 ^ 7) / 4 * 5 - 9
-)", style));
+)",
+            style));
     style.space_around_math_operator = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -687,7 +788,8 @@ local t = 123 + (456^7) / 4 * 5 - 9
 )",
             R"(
 local t = 123+(456^7)/4*5-9
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_after_comma) {
@@ -702,7 +804,8 @@ p(4,5,6)
             R"(
 local t = 1, 2, 3
 p(4, 5, 6)
-)", style));
+)",
+            style));
     style.space_after_comma = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -712,7 +815,8 @@ p(4,5,6)
             R"(
 local t = 1,2,3
 p(4,5,6)
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_after_comma_in_for_statement) {
@@ -733,7 +837,8 @@ end
 
 for i = 1, 2, 3 do
 end
-)", style));
+)",
+            style));
     style.space_after_comma_in_for_statement = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -749,7 +854,8 @@ end
 
 for i = 1,2,3 do
 end
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, space_around_concat_operator) {
@@ -762,7 +868,8 @@ local t = "123" .. 1
 )",
             R"(
 local t = "123" .. 1
-)", style));
+)",
+            style));
     style.space_around_concat_operator = false;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -770,7 +877,8 @@ local t = "123" .. 1
 )",
             R"(
 local t = "123"..1
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, align_call_args) {
@@ -787,7 +895,8 @@ cpdd(1,
 cpdd(1,
     2,
     3)
-)", style));
+)",
+            style));
     style.align_call_args = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -799,7 +908,8 @@ cpdd(1,
 cpdd(1,
      2,
      3)
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, align_function_params) {
@@ -818,7 +928,8 @@ function f(aaa,
     bbb,
     ccc)
 end
-)", style));
+)",
+            style));
     style.align_function_params = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -832,7 +943,8 @@ function f(aaa,
            bbb,
            ccc)
 end
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, align_continuous_assign_statement) {
@@ -847,7 +959,8 @@ local dddd = 456
             R"(
 local t = 123
 local dddd = 456
-)", style));
+)",
+            style));
     style.align_continuous_assign_statement = ContinuousAlign::WhenExtraSpace;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -857,7 +970,8 @@ local dddd = 456
             R"(
 local t    = 123
 local dddd = 456
-)", style));
+)",
+            style));
     style.align_continuous_assign_statement = ContinuousAlign::Always;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -867,7 +981,8 @@ local dddd = 456
             R"(
 local t    = 123
 local dddd = 456
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, align_continuous_rect_table_field) {
@@ -886,7 +1001,8 @@ local t = {
     aaa = 123,
     bbbbbbbb = 456
 }
-)", style));
+)",
+            style));
     style.align_continuous_rect_table_field = ContinuousAlign::WhenExtraSpace;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -900,7 +1016,8 @@ local t = {
     aaa      = 123,
     bbbbbbbb = 456
 }
-)", style));
+)",
+            style));
     style.align_continuous_rect_table_field = ContinuousAlign::Always;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -914,7 +1031,8 @@ local t = {
     aaa      = 123,
     bbbbbbbb = 456
 }
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, align_if_branch) {
@@ -945,7 +1063,8 @@ end
 if c == 1
     and d == 3 then
 end
-)", style));
+)",
+            style));
     style.align_if_branch = true;
     style.never_indent_before_if_condition = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
@@ -972,7 +1091,8 @@ end
 if  c == 1
 and d == 3 then
 end
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, align_array_table) {
@@ -995,7 +1115,8 @@ local t = {
     { a, b, c, d },
     { 1, 2, 3 },
 }
-)", style));
+)",
+            style));
     style.align_array_table = AlignArrayTable::Normal;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -1013,7 +1134,8 @@ local t = {
     { a,       b,             c,        d },
     { 1,       2,             3 },
 }
-)", style));
+)",
+            style));
     style.align_array_table = AlignArrayTable::ContainCurly;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -1031,7 +1153,8 @@ local t = {
     { a,       b,             c,        d },
     { 1,       2,             3           },
 }
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, never_indent_before_if_condition) {
@@ -1048,7 +1171,8 @@ end
 if a
     and b then
 end
-)", style));
+)",
+            style));
     style.never_indent_before_if_condition = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -1060,7 +1184,8 @@ end
 if a
 and b then
 end
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, never_indent_comment_on_if_branch) {
@@ -1081,7 +1206,8 @@ if a then
     --hello
 elseif b then
 end
-)", style));
+)",
+            style));
     style.never_indent_comment_on_if_branch = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -1097,7 +1223,8 @@ if a then
 --hello
 elseif b then
 end
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, break_all_list_when_line_exceed) {
@@ -1111,7 +1238,8 @@ local t = { aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
             R"(
 local t = { aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb,
     cccccccccccccccccccccccccccccccccccccc, eeeeeeeeeeeeeeee }
-)", style));
+)",
+            style));
     style.break_all_list_when_line_exceed = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -1124,7 +1252,8 @@ local t = {
     cccccccccccccccccccccccccccccccccccccc,
     eeeeeeeeeeeeeeee
 }
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, auto_collapse_lines) {
@@ -1147,7 +1276,8 @@ local t = {
     dddd = 123,
     hhihi = 123
 }
-)", style));
+)",
+            style));
     style.auto_collapse_lines = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -1160,7 +1290,8 @@ local t = {
 )",
             R"(
 local t = { aaaa, bbbbbbb, dddd = 123, hhihi = 123 }
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, ignore_space_after_colon) {
@@ -1177,7 +1308,8 @@ local t = switch(a)
 local t = switch(a)
     :case(function()
     end)
-)", style));
+)",
+            style));
     style.ignore_space_after_colon = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -1189,7 +1321,8 @@ local t = switch(a)
 local t = switch(a)
     : case(function()
     end)
-)", style));
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, remove_call_expression_list_finish_comma) {
@@ -1202,7 +1335,8 @@ p(1,2,3,)
 )",
             R"(
 p(1, 2, 3,)
-)", style));
+)",
+            style));
     style.remove_call_expression_list_finish_comma = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -1210,10 +1344,11 @@ p(1,2,3,)
 )",
             R"(
 p(1, 2, 3)
-)", style));
+)",
+            style));
 }
 
-TEST(FormatByStyleOption, align_continuous_inline_comment){
+TEST(FormatByStyleOption, align_continuous_inline_comment) {
     LuaStyle style;
 
     style.align_continuous_inline_comment = false;
@@ -1249,7 +1384,8 @@ local t = {
     aa = 1, -- e1
     bbaa = 2, --bb
 }
-)", style));
+)",
+            style));
     style.align_continuous_inline_comment = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -1283,10 +1419,11 @@ local t = {
     aa = 1,   -- e1
     bbaa = 2, --bb
 }
-)", style));
+)",
+            style));
 }
 
-TEST(FormatByStyleOption, align_chain_expr){
+TEST(FormatByStyleOption, align_chain_expr) {
     LuaStyle style;
 
     style.align_chain_expr = AlignChainExpr::Always;
@@ -1306,7 +1443,8 @@ local t = aaaaaaaaaaaa.wfgoiwjofjw()
                       .afjoajofjw + 123131 + 123131
 aaaaaaaaaaaa.wfgoiwjofjw()
             .afjoajofjw()
-)", style));
+)",
+            style));
     style.align_chain_expr = AlignChainExpr::OnlyCallStmt;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -1324,10 +1462,11 @@ local t = aaaaaaaaaaaa.wfgoiwjofjw()
     .afjoajofjw + 123131 + 123131
 aaaaaaaaaaaa.wfgoiwjofjw()
             .afjoajofjw()
-)", style));
+)",
+            style));
 }
 
-TEST(FormatByStyleOption, align_continuous_similar_call_args){
+TEST(FormatByStyleOption, align_continuous_similar_call_args) {
     LuaStyle style;
 
     style.align_continuous_similar_call_args = false;
@@ -1343,7 +1482,8 @@ map("n", "<C-j>", quickfix_step("below"), { buffer = true })
 map("n", "<C-k>", quickfix_step("above"), { buffer = true })
 map("n", "<Space>", "<CR><C-w>p", { buffer = true })
 map({ "n", "x" }, "<CR>", "<CR>", { buffer = true })
-)", style));
+)",
+            style));
     style.align_continuous_similar_call_args = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
@@ -1357,5 +1497,6 @@ map("n",          "<C-j>",   quickfix_step("below"), { buffer = true })
 map("n",          "<C-k>",   quickfix_step("above"), { buffer = true })
 map("n",          "<Space>", "<CR><C-w>p",           { buffer = true })
 map({ "n", "x" }, "<CR>",    "<CR>",                 { buffer = true })
-)", style));
+)",
+            style));
 }

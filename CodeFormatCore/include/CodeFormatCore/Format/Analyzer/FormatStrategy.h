@@ -29,7 +29,8 @@ enum class TokenStrategy {
 
 enum class TokenAddStrategy {
     None,
-    TableAddSep,
+    TableAddColon,
+    TableAddComma
 };
 
 enum class IndentStrategy {
