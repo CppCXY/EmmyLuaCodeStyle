@@ -1,5 +1,36 @@
 # Change Log
 
+[English Change Log](CHANGELOG_EN.md)
+
+
+# 1.2.0
+
+`NEW` 支持选项`break_before_braces`
+
+`NEW` 支持设置`table_separator_style`
+
+`NEW` 命令行工具支持范围格式化
+
+`NEW` 支持了intellij平台, Intellij-EmmyLua的用户在2023.1以上的IDE可以安装本插件
+
+# 1.1.5
+
+`NEW` 支持通过设置选项 `align_continuous_similar_call_args=true` 对齐相似函数的参数列表
+
+## 1.1.4
+
+`FIX` 修复拼写检查在字符串中少一位的BUG
+
+`CHANGE` 命名风格检查的camel_case 和 snake_case 不再兼容下划线前缀, 有相关需求的请使用正则表达式
+
+`FIX` 修复命名风格检查过早退出检查循环的BUG
+
+`FIX` 修复命名风格检查对空节点的错误检查, 和对table field的检查
+
+`Feature Request` 如果有更多合理的格式化样式的设置需求可以直接发起issue
+
+`Develop` 最近特性加入比较慢, 主要是我在全力开发新的语言服务
+
 ## 1.1.3
 
 `NEW` 功能 `命名风格检查` 正式支持配置.
