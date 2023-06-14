@@ -99,6 +99,16 @@ jobs:
         with: 
           filename: darwin-arm64.zip
           path: darwin-arm64
+      - name: tar darwin-arm64
+        run: |
+          chmod 777 darwin-arm64/bin/CodeFormat
+          chmod 777 darwin-arm64/bin/CodeFormatServer
+          tar -czvf darwin-arm64.tar.gz darwin-arm64
+      - name: tar darwin-x64
+        run: |
+          chmod 777 darwin-x64/bin/CodeFormat
+          chmod 777 darwin-x64/bin/CodeFormatServer
+          tar -czvf darwin-x64.tar.gz darwin-x64
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -113,4 +123,6 @@ jobs:
             darwin-x64.zip
             darwin-arm64.zip
             win32-x64.zip
+            darwin-x64.tar.gz
+            darwin-arm64.tar.gz
           token: ${{ secrets.RELEASE }}
