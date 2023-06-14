@@ -42,7 +42,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF
+        cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF -DCMAKE_BUILD_TYPE=Release
         cmake --build . --config Release --verbose
         ctest -V -C Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
@@ -52,9 +52,9 @@ jobs:
         mkdir build
         cd build
         if [[ "${{ matrix.platform }}" = darwin-arm64 ]]; then
-          cmake .. -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF
+          cmake .. -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF -DCMAKE_BUILD_TYPE=Release
         else
-          cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF
+          cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF -DCMAKE_BUILD_TYPE=Release
         fi
         cmake --build . --config Release --verbose
         ctest -V -C Release
