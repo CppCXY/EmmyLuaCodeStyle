@@ -43,7 +43,7 @@ jobs:
         mkdir build
         cd build
         cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF
-        cmake --build . --config Release
+        cmake --build . --config Release --verbose
         ctest -V -C Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
     - name: Build-macosx
@@ -56,7 +56,7 @@ jobs:
         else
           cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF
         fi
-        cmake --build . --config Release
+        cmake --build . --config Release --verbose
         ctest -V -C Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
 

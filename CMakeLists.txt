@@ -19,6 +19,8 @@ if(APPLE)
 	set(CMAKE_REQUIRED_LINK_OPTIONS "-arch;arm64")
 	check_c_compiler_flag("-arch arm64" arm64Supported)
 	message("arm64Supported=${arm64Supported}")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif ()
 
 add_subdirectory(LuaParser)
