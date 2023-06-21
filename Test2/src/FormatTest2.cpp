@@ -8,9 +8,7 @@
 
 int main() {
     std::string buffer = R"(
-local d = {
-    dddd = 23131;
-}
+local d =       {@123131}
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));

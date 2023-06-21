@@ -254,6 +254,17 @@ LuaTokenKind LuaLexer::Lex() {
                 }
                 return '#';
             }
+            case '{': {
+                // extend syntax see issue 119
+                _reader.SaveAndNext();
+                if (_reader.CheckNext1('@')){
+                    _reader.EatWhile([](char ch) { return lislalnum(ch); });
+                    if (_reader.CheckNext1('}')){
+                        return TK_NAME;
+                    }
+                }
+                return '{';
+            }
             default: {
                 if (lislalpha(_reader.GetCurrentChar())) /* identifier or reserved word? */
                 {
