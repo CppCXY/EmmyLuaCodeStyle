@@ -152,4 +152,6 @@ public:
     bool leading_comma_style = false;
 
     bool table_list_special_continue_indent = true;
+
+    EndStmtWithSemicolon end_statement_with_semicolon = EndStmtWithSemicolon(EndStmtWithSemicolon::Keep);
 };

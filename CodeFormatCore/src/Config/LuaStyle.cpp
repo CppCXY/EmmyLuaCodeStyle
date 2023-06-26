@@ -268,4 +268,26 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
     BOOL_OPTION(ignore_space_after_colon)
 
     BOOL_OPTION(remove_call_expression_list_finish_comma)
+
+    //if (configMap.count("align_chain_expr")) {
+    //    if (configMap.at("align_chain_expr") == "none") {
+    //        align_chain_expr = AlignChainExpr::None;
+    //    } else if (configMap.at("align_chain_expr") == "always") {
+    //        align_chain_expr = AlignChainExpr::Always;
+    //    } else if (configMap.at("align_chain_expr") == "only_call_stmt") {
+    //        align_chain_expr = AlignChainExpr::OnlyCallStmt;
+    //    }
+    //}
+
+    if (configMap.count("end_statement_with_semicolon")) {
+        if (configMap.at("end_statement_with_semicolon") == "keep") {
+            end_statement_with_semicolon = EndStmtWithSemicolon::Keep;
+        } else if (configMap.at("end_statement_with_semicolon") == "always") {
+            end_statement_with_semicolon = EndStmtWithSemicolon::Keep;
+        } else if (configMap.at("end_statement_with_semicolon") == "never") {
+            end_statement_with_semicolon = EndStmtWithSemicolon::Keep;
+        } else if (configMap.at("end_statement_with_semicolon") == "same_line") {
+            end_statement_with_semicolon = EndStmtWithSemicolon::Keep;
+        }
+    }
 }
