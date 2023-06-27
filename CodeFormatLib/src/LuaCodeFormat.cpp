@@ -70,6 +70,9 @@ void LuaCodeFormat::LoadSpellDictionaryFromBuffer(const std::string &buffer) {
 Result<std::string> LuaCodeFormat::Reformat(const std::string &uri, std::string &&text, ConfigMap &configMap) {
     auto file = std::make_shared<LuaFile>(std::move(text));
     LuaLexer luaLexer(file);
+    if (_supportNonStandardSymbol){
+        luaLexer.SupportNonStandardSymbol();
+    }
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -95,6 +98,9 @@ Result<std::string> LuaCodeFormat::RangeFormat(const std::string &uri, FormatRan
                                                ConfigMap &configMap) {
     auto file = std::make_shared<LuaFile>(std::move(text));
     LuaLexer luaLexer(file);
+    if (_supportNonStandardSymbol){
+        luaLexer.SupportNonStandardSymbol();
+    }
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -122,6 +128,9 @@ LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t 
                           ConfigMap &configMap, ConfigMap &stringTypeOptions) {
     auto file = std::make_shared<LuaFile>(std::move(text));
     LuaLexer luaLexer(file);
+    if (_supportNonStandardSymbol){
+        luaLexer.SupportNonStandardSymbol();
+    }
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -147,6 +156,9 @@ LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t 
 Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::Diagnostic(const std::string &uri, std::string &&text) {
     auto file = std::make_shared<LuaFile>(std::move(text));
     LuaLexer luaLexer(file);
+    if (_supportNonStandardSymbol){
+        luaLexer.SupportNonStandardSymbol();
+    }
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -170,6 +182,9 @@ Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::SpellCheck(const std::stri
                                                                  const CodeSpellChecker::CustomDictionary &tempDict) {
     auto file = std::make_shared<LuaFile>(std::move(text));
     LuaLexer luaLexer(file);
+    if (_supportNonStandardSymbol){
+        luaLexer.SupportNonStandardSymbol();
+    }
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -193,6 +208,9 @@ Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::SpellCheck(const std::stri
 Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::NameStyleCheck(const std::string &uri, std::string &&text) {
     auto file = std::make_shared<LuaFile>(std::move(text));
     LuaLexer luaLexer(file);
+    if (_supportNonStandardSymbol){
+        luaLexer.SupportNonStandardSymbol();
+    }
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));

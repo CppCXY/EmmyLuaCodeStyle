@@ -1,53 +1,52 @@
 ﻿#include "LuaParser/Lexer/LuaLexer.h"
-#include <limits>
+#include "LuaParser/File/LuaFile.h"
 #include "LuaParser/Lexer/LuaDefine.h"
 #include "LuaParser/Lexer/LuaIdentify.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
-#include "Util/format.h"
 #include "Util/Utf8.h"
-#include "LuaParser/File/LuaFile.h"
+#include "Util/format.h"
+#include <limits>
 
 std::map<std::string, LuaTokenKind, std::less<>> LuaLexer::LuaReserved = {
-        {"and",      TK_AND},
-        {"break",    TK_BREAK},
-        {"do",       TK_DO},
-        {"else",     TK_ELSE},
-        {"elseif",   TK_ELSEIF},
-        {"end",      TK_END},
-        {"false",    TK_FALSE},
-        {"for",      TK_FOR},
+        {"and",      TK_AND     },
+        {"break",    TK_BREAK   },
+        {"do",       TK_DO      },
+        {"else",     TK_ELSE    },
+        {"elseif",   TK_ELSEIF  },
+        {"end",      TK_END     },
+        {"false",    TK_FALSE   },
+        {"for",      TK_FOR     },
         {"function", TK_FUNCTION},
-        {"goto",     TK_GOTO},
-        {"if",       TK_IF},
-        {"in",       TK_IN},
-        {"local",    TK_LOCAL},
-        {"nil",      TK_NIL},
-        {"not",      TK_NOT},
-        {"or",       TK_OR},
-        {"repeat",   TK_REPEAT},
-        {"return",   TK_RETURN},
-        {"then",     TK_THEN},
-        {"true",     TK_TRUE},
-        {"until",    TK_UNTIL},
-        {"while",    TK_WHILE},
-        {"//",       TK_IDIV},
-        {"..",       TK_CONCAT},
-        {"...",      TK_DOTS},
-        {"==",       TK_EQ},
-        {">=",       TK_GE},
-        {"<=",       TK_LE},
-        {"~=",       TK_NE},
-        {"<<",       TK_SHL},
-        {">>",       TK_SHR},
-        {"::",       TK_DBCOLON}
+        {"goto",     TK_GOTO    },
+        {"if",       TK_IF      },
+        {"in",       TK_IN      },
+        {"local",    TK_LOCAL   },
+        {"nil",      TK_NIL     },
+        {"not",      TK_NOT     },
+        {"or",       TK_OR      },
+        {"repeat",   TK_REPEAT  },
+        {"return",   TK_RETURN  },
+        {"then",     TK_THEN    },
+        {"true",     TK_TRUE    },
+        {"until",    TK_UNTIL   },
+        {"while",    TK_WHILE   },
+        {"//",       TK_IDIV    },
+        {"..",       TK_CONCAT  },
+        {"...",      TK_DOTS    },
+        {"==",       TK_EQ      },
+        {">=",       TK_GE      },
+        {"<=",       TK_LE      },
+        {"~=",       TK_NE      },
+        {"<<",       TK_SHL     },
+        {">>",       TK_SHR     },
+        {"::",       TK_DBCOLON }
 };
 
 LuaLexer::LuaLexer(std::shared_ptr<LuaFile> file)
-        :
-        _linenumber(0),
-        _supportNonStandardSymbol(false),
-        _reader(file->GetSource()),
-        _file(file) {
+    : _linenumber(0),
+      _supportNonStandardSymbol(false),
+      _reader(file->GetSource()),
+      _file(file) {
 }
 
 bool LuaLexer::Parse() {
@@ -124,7 +123,6 @@ LuaTokenKind LuaLexer::Lex() {
                     }
                 } else if (_reader.GetCurrentChar() == '-') {
                     _reader.SaveAndNext();
-//                    type = TK_DOC_COMMENT;
                 }
 
                 // is short comment
@@ -140,6 +138,13 @@ LuaTokenKind LuaLexer::Lex() {
                     return '=';
                 }
                 return '+';
+            }
+            case '*': {
+                _reader.SaveAndNext();
+                if (_supportNonStandardSymbol && _reader.CheckNext1('=')) {
+                    return '=';
+                }
+                return '*';
             }
             case '[': {
                 std::size_t sep = SkipSep();
@@ -166,6 +171,10 @@ LuaTokenKind LuaLexer::Lex() {
                 if (_reader.CheckNext1('=')) {
                     return TK_LE;
                 } else if (_reader.CheckNext1('<')) {
+                    if (_supportNonStandardSymbol && _reader.CheckNext1('=')) {
+                        return '=';
+                    }
+
                     return TK_SHL;
                 } else {
                     return '<';
@@ -176,6 +185,10 @@ LuaTokenKind LuaLexer::Lex() {
                 if (_reader.CheckNext1('=')) {
                     return TK_GE;
                 } else if (_reader.CheckNext1('>')) {
+                    if (_supportNonStandardSymbol && _reader.CheckNext1('=')) {
+                        return '=';
+                    }
+
                     return TK_SHR;
                 } else {
                     return '>';
@@ -183,9 +196,33 @@ LuaTokenKind LuaLexer::Lex() {
             }
             case '/': {
                 _reader.SaveAndNext();
-                if (_reader.CheckNext1('/')) {
-                    return TK_IDIV;
+                if (_supportNonStandardSymbol) {
+                    switch (_reader.GetCurrentChar()) {
+                        case '=': {
+                            _reader.SaveAndNext();
+                            return '=';
+                        }
+                        case '/': {
+                            _reader.SaveAndNext();
+                            if (_reader.CheckNext1('=')) {
+                                return '=';
+                            }
+                            return TK_IDIV;
+                        }
+                        case '*': {
+                            _reader.SaveAndNext();
+                            ReadLongCLikeComment();
+                            return TK_LONG_COMMENT;
+                        }
+                        default: {
+                            return '/';
+                        }
+                    }
                 } else {
+                    if (_reader.CheckNext1('/')) {
+                        return TK_IDIV;
+                    }
+
                     return '/';
                 }
             }
@@ -196,6 +233,57 @@ LuaTokenKind LuaLexer::Lex() {
                 } else {
                     return '~';
                 }
+            }
+            case '^': {
+                _reader.SaveAndNext();
+                if (_supportNonStandardSymbol && _reader.CheckNext1('=')) {
+                    return '=';
+                }
+                return '^';
+            }
+            case '|': {
+                _reader.SaveAndNext();
+                if (_supportNonStandardSymbol) {
+                    if (_reader.CheckNext1('|')) {
+                        return TK_OR;
+                    }
+                    if (_reader.CheckNext1('=')) {
+                        return '=';
+                    }
+                }
+                return '|';
+            }
+            case '&': {
+                _reader.SaveAndNext();
+                if (_supportNonStandardSymbol) {
+                    if (_reader.CheckNext1('&')) {
+                        return TK_OR;// it should be TK_AND
+                    }
+                    if (_reader.CheckNext1('=')) {
+                        return '=';
+                    }
+                }
+
+                return '&';
+            }
+            case '%': {
+                _reader.SaveAndNext();
+
+                if (_supportNonStandardSymbol && _reader.CheckNext1('=')) {
+                    return '=';
+                }
+
+                return '%';
+            }
+            case '!': {
+                _reader.SaveAndNext();
+                if (_supportNonStandardSymbol) {
+                    if (_reader.CheckNext1('=')) {
+                        return TK_NE;
+                    }
+                    return TK_NOT;
+                }
+                return '!';
             }
             case ':': {
                 _reader.SaveAndNext();
@@ -268,7 +356,7 @@ LuaTokenKind LuaLexer::Lex() {
                     } else {
                         return TK_NAME;
                     }
-                } else /* single-char tokens ('+', '*', '%', '{', '}', ...) */
+                } else /* single-char tokens ('{', '}', ...) */
                 {
                     int c = _reader.GetCurrentChar();
                     _reader.SaveAndNext();
@@ -306,7 +394,7 @@ LuaTokenKind LuaLexer::ReadNumeral() {
     for (;;) {
         if (_reader.CheckNext2(expo)) /* exponent mark? */
         {
-            _reader.CheckNext2("-+"); /* optional exponent sign */
+            _reader.CheckNext2("-+");                                                      /* optional exponent sign */
         } else if (lisxdigit(_reader.GetCurrentChar()) || _reader.GetCurrentChar() == '.') /* '%x|%.' */
         {
             _reader.SaveAndNext();
@@ -344,10 +432,9 @@ std::size_t LuaLexer::SkipSep() {
     }
 
     return _reader.GetCurrentChar() == ch
-           ? count + 2
-           : (count == 0)
-             ? 1
-             : 0;
+                   ? count + 2
+           : (count == 0) ? 1
+                          : 0;
 }
 
 void LuaLexer::ReadLongString(std::size_t sep) {
@@ -366,6 +453,37 @@ void LuaLexer::ReadLongString(std::size_t sep) {
             case ']': {
                 if (SkipSep() == sep) {
                     _reader.SaveAndNext();
+                    return;
+                }
+                break;
+            }
+            case '\n':
+            case '\r': {
+                _reader.Save();
+                IncLinenumber();
+                break;
+            }
+            default: {
+                _reader.SaveAndNext();
+            }
+        }
+    }
+}
+
+void LuaLexer::ReadLongCLikeComment() {
+    if (CurrentIsNewLine()) {
+        IncLinenumber();
+    }
+
+    for (;;) {
+        switch (_reader.GetCurrentChar()) {
+            case EOZ: {
+                TokenError("unfinished long string starting", TextRange(_reader.GetPos(), 0));
+                return;
+            }
+            case '*': {
+                _reader.SaveAndNext();
+                if (_reader.CheckNext1('/')) {
                     return;
                 }
                 break;
@@ -423,8 +541,8 @@ void LuaLexer::ReadString(int del) {
             }
         }
         _reader.SaveAndNext();
-        // 空语句
-        no_save:;
+    // 空语句
+    no_save:;
     }
     _reader.SaveAndNext();
 }
@@ -463,3 +581,8 @@ bool LuaLexer::IsReserved(std::string_view text) {
 void LuaLexer::TokenError(std::string_view message, TextRange range) {
     _errors.emplace_back(message, range, 0);
 }
+
+void LuaLexer::SupportNonStandardSymbol() {
+    _supportNonStandardSymbol = true;
+}
+

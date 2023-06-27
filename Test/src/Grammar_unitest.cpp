@@ -28,10 +28,30 @@ TEST(LuaGrammar, basic) {
 }
 
 TEST(LuaGrammar, extend) {
-    std::string text = R"(
-    local t = `123`
-)";
-    auto p = TestHelper::GetParser(text);
-
-    EXPECT_FALSE(p.HasError()) << "extend grammar Interpolate strings test fail";
+    EXPECT_FALSE(TestHelper::GetParser("local t = `123`", true).HasError()) << "extend grammar Interpolate strings test fail";
+    EXPECT_FALSE(TestHelper::GetParser(R"(
+t+=123
+t-=123
+t/=123
+t//=123
+t*=123
+t<<=123
+t>>=123
+t%=123
+t|=123
+t&=123
+)", true).HasError()) << "extend grammar compound assignment operator test fail";
+    EXPECT_FALSE(TestHelper::GetParser(R"(
+if a && b || d && h then
+    return a != 123 && ! false
+end
+while true do
+    if a then
+        continue
+    end
+end
+)", true).HasError()) << "extend grammar C likely operator symbol test fail";
+    EXPECT_FALSE(TestHelper::GetParser(R"(
+local t = 123/*1233*/
+)", true).HasError()) << "extend grammar c likely comment test fail";
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Types/TextRange.h"
+#include "LuaParser/Types/TextRange.h"
 #include "LuaTokenKind.h"
 #include <string>
 

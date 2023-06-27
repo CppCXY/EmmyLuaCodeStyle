@@ -8,13 +8,21 @@
 
 int main() {
     std::string buffer = R"(
-local d = {
-    dddd = 23131;
-}
+t+=123
+t-=123
+t/=123
+t//=123
+t*=123
+t<<=123
+t>>=123
+t%=123
+t|=123
+t&=123
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
     LuaLexer luaLexer(file);
+    luaLexer.SupportNonStandardSymbol();
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));

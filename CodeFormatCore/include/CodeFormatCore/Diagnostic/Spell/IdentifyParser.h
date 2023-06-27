@@ -18,7 +18,7 @@ public:
         End,
     };
 
-    IdentifyParser(std::string_view source);
+    explicit IdentifyParser(std::string_view source);
 
     void Parse();
 

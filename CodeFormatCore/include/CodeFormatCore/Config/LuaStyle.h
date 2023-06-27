@@ -1,12 +1,12 @@
 ﻿#pragma once
 
+#include "LuaParser/Types/EndOfLineType.h"
+#include "LuaStyleEnum.h"
+#include <map>
+#include <memory>
 #include <string>
 #include <string_view>
-#include <memory>
 #include <vector>
-#include <map>
-#include "LuaStyleEnum.h"
-#include "LuaParser/Types/EndOfLineType.h"
 
 class LuaStyle {
 public:
@@ -46,9 +46,9 @@ public:
 
     CallArgParentheses call_arg_parentheses = CallArgParentheses::Keep;
 
-	bool detect_end_of_line = true;
+    bool detect_end_of_line = true;
 
-	bool insert_final_newline = true;
+    bool insert_final_newline = true;
 
     // [Space]
     bool space_around_table_field_list = true;
@@ -109,18 +109,18 @@ public:
     AlignChainExpr align_chain_expr = AlignChainExpr::None;
     // [Indent]
 
-	/*
+    /*
 	 * if语句的条件可以无延续行缩进
 	 */
-	bool never_indent_before_if_condition = false;
+    bool never_indent_before_if_condition = false;
 
-	bool never_indent_comment_on_if_branch = false;
+    bool never_indent_comment_on_if_branch = false;
 
     // [line space]
 
-	LineSpace line_space_after_if_statement = LineSpace(LineSpaceType::Keep);
+    LineSpace line_space_after_if_statement = LineSpace(LineSpaceType::Keep);
 
-	LineSpace line_space_after_do_statement = LineSpace(LineSpaceType::Keep);
+    LineSpace line_space_after_do_statement = LineSpace(LineSpaceType::Keep);
 
     LineSpace line_space_after_while_statement = LineSpace(LineSpaceType::Keep);
 
@@ -144,9 +144,9 @@ public:
     bool break_before_braces = false;
 
     // [preference]
-	bool ignore_space_after_colon = false;
+    bool ignore_space_after_colon = false;
 
-	bool remove_call_expression_list_finish_comma = false;
+    bool remove_call_expression_list_finish_comma = false;
 
     // not implement now
     bool leading_comma_style = false;

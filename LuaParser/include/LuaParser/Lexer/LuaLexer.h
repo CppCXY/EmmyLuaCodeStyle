@@ -7,7 +7,7 @@
 #include <vector>
 #include <set>
 
-#include "../File/LuaFile.h"
+#include "LuaParser/File/LuaFile.h"
 #include "LuaToken.h"
 #include "LuaTokenError.h"
 #include "LuaTokenKind.h"
@@ -44,6 +44,8 @@ private:
 	std::size_t SkipSep();
 
 	void ReadLongString(std::size_t sep);
+
+    void ReadLongCLikeComment();
 
 	void ReadString(int del);
 

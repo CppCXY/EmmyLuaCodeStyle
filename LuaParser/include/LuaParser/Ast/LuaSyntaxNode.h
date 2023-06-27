@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "../Lexer/LuaTokenKind.h"
-#include "../Types/TextRange.h"
+#include "LuaParser/Lexer/LuaTokenKind.h"
+#include "LuaParser/Types/TextRange.h"
 #include "LuaSyntaxMultiKind.h"
 #include "LuaSyntaxNodeKind.h"
 #include <functional>

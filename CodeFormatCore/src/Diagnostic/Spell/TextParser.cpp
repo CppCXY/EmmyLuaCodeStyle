@@ -2,7 +2,7 @@
 using namespace spell;
 
 bool IsIdentifier(char ch) {
-    return ch > 0 && (std::isalnum(ch) || ch == '_');
+    return ch > 0 && (std::isalnum(ch) || ch == '_' || ch == '\'');
 }
 
 std::vector<Word> TextParser::ParseToWords(std::string_view source) {

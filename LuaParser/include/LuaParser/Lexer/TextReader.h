@@ -1,5 +1,5 @@
 #pragma once
-#include "../Types/TextRange.h"
+#include "LuaParser/Types/TextRange.h"
 #include <functional>
 #include <string_view>
 

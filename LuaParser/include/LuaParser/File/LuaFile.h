@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Types/EndOfLineType.h"
-#include "../Types/TextRange.h"
+#include "LuaParser/Types/EndOfLineType.h"
+#include "LuaParser/Types/TextRange.h"
 #include <string>
 #include <string_view>
 #include <vector>

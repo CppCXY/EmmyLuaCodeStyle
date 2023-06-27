@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../File/LuaFile.h"
-#include "../Lexer/LuaToken.h"
-#include "../Parse/Mark.h"
+#include "LuaParser/File/LuaFile.h"
+#include "LuaParser/Lexer/LuaToken.h"
+#include "LuaParser/Parse/Mark.h"
 #include "LuaSyntaxNode.h"
 #include "NodeOrToken.h"
 #include <memory>

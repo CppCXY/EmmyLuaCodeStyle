@@ -77,9 +77,13 @@ std::string TestHelper::ReadFile(const std::string &path) {
     return "";
 }
 
-LuaParser TestHelper::GetParser(std::string input) {
+LuaParser TestHelper::GetParser(std::string input, bool nonStandard) {
     auto file = std::make_shared<LuaFile>(std::move(input));
     LuaLexer luaLexer(file);
+    if (nonStandard) {
+        luaLexer.SupportNonStandardSymbol();
+    }
+
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
