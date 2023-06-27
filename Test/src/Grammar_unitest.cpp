@@ -54,4 +54,7 @@ end
     EXPECT_FALSE(TestHelper::GetParser(R"(
 local t = 123/*1233*/
 )", true).HasError()) << "extend grammar c likely comment test fail";
+    EXPECT_FALSE(TestHelper::GetParser(R"(
+local t = {@abaa}
+)", true).HasError()) << "extend grammar issue 119 test fail";
 }

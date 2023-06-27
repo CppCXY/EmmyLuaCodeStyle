@@ -345,11 +345,12 @@ LuaTokenKind LuaLexer::Lex() {
             case '{': {
                 // extend syntax see issue 119
                 _reader.SaveAndNext();
-                if (_reader.CheckNext1('@')){
+                if (_supportNonStandardSymbol && _reader.CheckNext1('@')) {
                     _reader.EatWhile([](char ch) { return lislalnum(ch); });
-                    if (_reader.CheckNext1('}')){
+                    if (_reader.CheckNext1('}')) {
                         return TK_NAME;
                     }
+                    return TK_ERR;
                 }
                 return '{';
             }
@@ -596,4 +597,3 @@ void LuaLexer::TokenError(std::string_view message, TextRange range) {
 void LuaLexer::SupportNonStandardSymbol() {
     _supportNonStandardSymbol = true;
 }
-
