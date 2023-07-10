@@ -463,40 +463,6 @@ void LuaParser::ExpressionStatement() {
     }
 }
 
-//
-//void LuaParser::DocStatement(std::shared_ptr<LuaSyntaxNode> comment, LuaToken &docComment) {
-//    LuaDocTokenParser docTokenParser(docComment.Text, docComment.Range);
-//    docTokenParser.Next();
-//
-//    switch (docTokenParser.Current().TokenType) {
-//        case TK_DOC_TAG_FORMAT: {
-//            DocTagFormatStatement(comment, docTokenParser);
-//            break;
-//        }
-//        default: {
-//            break;
-//        }
-//    }
-//}
-//
-//void LuaParser::DocTagFormatStatement(std::shared_ptr<LuaSyntaxNode> comment, LuaDocTokenParser &docTokenParser) {
-//    auto docFormat = CreateAstNodeFromToken(LuaSyntaxNodeKind::DocTagFormat, docTokenParser.Current());
-//
-//    docTokenParser.Next();
-//    switch (docTokenParser.Current().TokenType) {
-//        case TK_DOC_DISABLE:
-//        case TK_DOC_DISABLE_NEXT: {
-//            docFormat->AddChild(CreateAstNodeFromToken(LuaSyntaxNodeKind::KeyWord, docTokenParser.Current()));
-//            break;
-//        }
-//        default: {
-//            return;
-//        }
-//    }
-//
-//    comment->AddChild(docFormat);
-//}
-
 void LuaParser::Condition() {
     Expression();
 }
@@ -1013,15 +979,3 @@ void LuaParser::NameDefList() {
 std::vector<LuaToken> &LuaParser::GetTokens() {
     return _tokens;
 }
-
-
-
-
-
-
-
-
-
-
-
-

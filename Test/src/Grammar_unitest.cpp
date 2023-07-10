@@ -57,4 +57,7 @@ local t = 123/*1233*/
     EXPECT_FALSE(TestHelper::GetParser(R"(
 local t = {@abaa}
 )", true).HasError()) << "extend grammar issue 119 test fail";
+    EXPECT_FALSE(TestHelper::GetParser(R"(
+local t = disableControl?.disableMovement
+)", true).HasError()) << "extend grammar nullable operator test fail";
 }

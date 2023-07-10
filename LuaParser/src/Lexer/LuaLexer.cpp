@@ -354,6 +354,14 @@ LuaTokenKind LuaLexer::Lex() {
                 }
                 return '{';
             }
+            case '?': {
+                _reader.SaveAndNext();
+                if(_supportNonStandardSymbol && _reader.CheckNext1('.')) {
+                    return '.';
+                }
+
+                return '?';
+            }
             default: {
                 if (lislalpha(_reader.GetCurrentChar())) /* identifier or reserved word? */
                 {

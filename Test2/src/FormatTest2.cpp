@@ -8,16 +8,11 @@
 
 int main() {
     std::string buffer = R"(
-t+=123
-t-=123
-t/=123
-t//=123
-t*=123
-t<<=123
-t>>=123
-t%=123
-t|=123
-t&=123
+local disable = {
+move= disableControls?.disableMovement,
+oko = disableControls?.disableLook,
+combat = disableControls?.disableCombat,
+}
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));

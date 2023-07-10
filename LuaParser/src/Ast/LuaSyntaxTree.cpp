@@ -1,13 +1,12 @@
 #include "LuaParser/Ast/LuaSyntaxTree.h"
-#include <algorithm>
-#include "LuaParser/Parse/LuaParser.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
+#include "LuaParser/Parse/LuaParser.h"
 #include "Util/format.h"
+#include <algorithm>
 
 LuaSyntaxTree::LuaSyntaxTree()
-        : _file(),
-          _tokenIndex(0) {
-
+    : _file(),
+      _tokenIndex(0) {
 }
 
 void LuaSyntaxTree::BuildTree(LuaParser &p) {
@@ -107,8 +106,7 @@ void LuaSyntaxTree::EatInlineComment(LuaParser &p) {
             case TK_LONG_COMMENT:
             case TK_SHEBANG: {
                 auto prevToken = tokens[index - 1];
-                if (_file->GetLine(prevToken.Range.GetEndOffset())
-                    == _file->GetLine(tokens[index].Range.StartOffset)) {
+                if (_file->GetLine(prevToken.Range.GetEndOffset()) == _file->GetLine(tokens[index].Range.StartOffset)) {
                     EatToken(p);
                 }
                 break;
@@ -263,7 +261,7 @@ std::size_t LuaSyntaxTree::GetEndOffset(std::size_t index) const {
 TextRange LuaSyntaxTree::GetTokenRange(std::size_t index) const {
     if (index < _nodeOrTokens.size()) {
         auto &n = _nodeOrTokens[index];
-        if(n.Type == NodeOrTokenType::Token) {
+        if (n.Type == NodeOrTokenType::Token) {
             auto &token = _tokens[n.Data.TokenIndex];
             return TextRange(token.Start, token.Length);
         }
@@ -343,7 +341,7 @@ std::size_t LuaSyntaxTree::GetPrevToken(std::size_t index) const {
             if (tokenIndex != 0) {
                 return _tokens[tokenIndex - 1].NodeIndex;
             }
-        } else { // Node, 可能存在无元素节点
+        } else {// Node, 可能存在无元素节点
             for (auto nodeIndex = index - 1; nodeIndex > 0; nodeIndex--) {
                 if (IsToken(nodeIndex)) {
                     return nodeIndex;
@@ -364,7 +362,7 @@ std::size_t LuaSyntaxTree::GetNextToken(std::size_t index) const {
         auto &n = _nodeOrTokens[index];
         if (n.Type == NodeOrTokenType::Token) {
             tokenNodeIndex = index;
-        } else { // Node, 可能存在无元素节点
+        } else {// Node, 可能存在无元素节点
             auto lastTokenIndex = GetLastToken(index);
             if (lastTokenIndex != 0) {
                 tokenNodeIndex = lastTokenIndex;
@@ -541,13 +539,9 @@ bool LuaSyntaxTree::HasError() const {
 }
 
 bool LuaSyntaxTree::IsEatAllComment(LuaSyntaxNodeKind kind) const {
-    return kind == LuaSyntaxNodeKind::Block
-           || kind == LuaSyntaxNodeKind::TableFieldList
-           || kind == LuaSyntaxNodeKind::File;
+    return kind == LuaSyntaxNodeKind::Block || kind == LuaSyntaxNodeKind::TableFieldList || kind == LuaSyntaxNodeKind::File;
 }
 
 const std::vector<LuaParseError> &LuaSyntaxTree::GetErrors() const {
     return _errors;
 }
-
-
