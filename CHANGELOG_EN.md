@@ -1,6 +1,12 @@
 # Change Log
 
 
+# 1.2.2
+
+`FIX` abandon alignment behavior when there are Unicode characters in the current line.
+
+`NEW` support non-standard symbols.
+
 # 1.2.0
 
 `NEW` support option `break_before_braces`
