@@ -19,7 +19,8 @@
 LuaFormat::LuaFormat()
     : _mode(WorkMode::File),
       _isRangeLine(false),
-      _isCompleteOutputRangeFormat(false) {
+      _isCompleteOutputRangeFormat(false),
+      _isSupportNonStandardLua(false) {
     _diagnosticStyle.name_style_check = false;
 }
 
@@ -156,6 +157,10 @@ bool LuaFormat::Reformat() {
 bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view outPath, std::string &&sourceText) {
     auto file = std::make_shared<LuaFile>(std::move(sourceText));
     LuaLexer luaLexer(file);
+    if (_isSupportNonStandardLua) {
+        luaLexer.SupportNonStandardSymbol();
+    }
+
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -192,6 +197,10 @@ bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view 
 bool LuaFormat::RangeReformat() {
     auto file = std::make_shared<LuaFile>(std::move(_inputFileText));
     LuaLexer luaLexer(file);
+    if (_isSupportNonStandardLua) {
+        luaLexer.SupportNonStandardSymbol();
+    }
+
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -311,6 +320,9 @@ LuaStyle LuaFormat::GetStyle(std::string_view path) {
 bool LuaFormat::CheckSingleFile(std::string_view inputPath, std::string &&sourceText) {
     auto file = std::make_shared<LuaFile>(std::move(sourceText));
     LuaLexer luaLexer(file);
+    if (_isSupportNonStandardLua) {
+        luaLexer.SupportNonStandardSymbol();
+    }
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -447,3 +459,6 @@ void LuaFormat::SetFormatRange(bool rangeLine, std::string_view rangeStr) {
     _rangeStr = std::string(rangeStr);
 }
 
+void LuaFormat::SupportNonStandardLua() {
+    _isSupportNonStandardLua = true;
+}

@@ -49,6 +49,7 @@ public:
 
     void SetFormatRange(bool rangeLine, std::string_view rangeStr);
 
+    void SupportNonStandardLua();
 private:
     std::optional<std::string> ReadFile(std::string_view path);
 
@@ -78,4 +79,5 @@ private:
     bool _isCompleteOutputRangeFormat;
     bool _isRangeLine;
     std::string _rangeStr;
+    bool _isSupportNonStandardLua;
 };

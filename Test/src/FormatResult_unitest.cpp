@@ -941,3 +941,98 @@ local table = { -- My comment
 }
 )"));
 }
+
+TEST(Format, feature_107_ignore_unicode_align) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = 123
+local dddd  = 456
+
+
+local 你说的对 = 123
+local 但是  = 456
+)",
+            R"(
+local t    = 123
+local dddd = 456
+
+
+local 你说的对 = 123
+local 但是 = 456
+)"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = {
+    t = 123
+    dddd  = 456
+}
+
+
+local t = {
+    你说的对 = 123
+    但是  = 456
+}
+)",
+            R"(
+local t = {
+    t    = 123
+    dddd = 456
+}
+
+
+local t = {
+    你说的对 = 123
+    但是 = 456
+}
+)"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = { -- hello
+    t = 123
+    dddd = 456 -- hello
+}
+
+
+local t = { --hello
+    你说的对 = 123 --hello
+    但是 = 456 --hello
+}
+)",
+            R"(
+local t = {    -- hello
+    t = 123
+    dddd = 456 -- hello
+}
+
+
+local t = { --hello
+    你说的对 = 123 --hello
+    但是 = 456 --hello
+}
+)"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = {
+    { 1, 222, 333 }
+    { 4, 55, 6 }
+}
+
+
+local t = {
+    { "你说的对", 222, 333 },
+    { "但是", 55, 6 }
+}
+)",
+            R"(
+local t = {
+    { 1, 222, 333 }
+    { 4, 55,  6 }
+}
+
+
+local t = {
+    { "你说的对", 222, 333 },
+    { "但是", 55, 6 }
+}
+)"));
+}

@@ -59,5 +59,7 @@ local t = {@abaa}
 )", true).HasError()) << "extend grammar issue 119 test fail";
     EXPECT_FALSE(TestHelper::GetParser(R"(
 local t = disableControl?.disableMovement
+local t2 = ddd?:ffffff()
+local t3 = ddd?["hello"]
 )", true).HasError()) << "extend grammar nullable operator test fail";
 }

@@ -1,27 +1,28 @@
-#include <iostream>
 #include <cstring>
 #include <fstream>
+#include <iostream>
 
 #include "LuaFormat.h"
-#include "Util/format.h"
 #include "Util/CommandLine.h"
 #include "Util/StringUtil.h"
+#include "Util/format.h"
 
 // https://stackoverflow.com/questions/1598985/c-read-binary-stdin
 #ifdef _WIN32
 
-# include <io.h>
-# include <fcntl.h>
+#include <fcntl.h>
+#include <io.h>
 
-# define SET_BINARY_MODE() _setmode(_fileno(stdin), _O_BINARY);\
+#define SET_BINARY_MODE()                \
+    _setmode(_fileno(stdin), _O_BINARY); \
     _setmode(_fileno(stdout), _O_BINARY)
 #else
-# define SET_BINARY_MODE() ((void)0)
+#define SET_BINARY_MODE() ((void) 0)
 #endif
 
-bool InitFormat(CommandLine& cmd, LuaFormat& format);
-bool InitCheck(CommandLine& cmd, LuaFormat& format);
-bool InitRangeFormat(CommandLine& cmd, LuaFormat& format);
+bool InitFormat(CommandLine &cmd, LuaFormat &format);
+bool InitCheck(CommandLine &cmd, LuaFormat &format);
+bool InitRangeFormat(CommandLine &cmd, LuaFormat &format);
 
 int main(int argc, char **argv) {
     CommandLine cmd;
@@ -34,8 +35,7 @@ int main(int argc, char **argv) {
             "\tCodeFormat check -w . -d --ignores \"Test/*.lua;src/**.lua\"\n"
             "\tCodeFormat check -w . -d --ignores-file \".gitignore\"\n"
             "\tCodeFormat rangeformat -i -d --rangeline 1:10\n"
-            "\tCodeFormat rangeformat -i -d --rangeOffset 0:100\n"
-    );
+            "\tCodeFormat rangeformat -i -d --rangeOffset 0:100\n");
     cmd.AddTarget("format")
             .Add<std::string>("file", "f", "Specify the input file")
             .Add<bool>("overwrite", "ow", "Format overwrite the input file")
@@ -50,12 +50,11 @@ int main(int argc, char **argv) {
             .Add<std::string>("outfile", "o",
                               "Specify output file")
             .Add<std::string>("ignores-file", "igf",
-                              "Specify which files to ignore through configuration file,for example \".gitignore\""
-            )
+                              "Specify which files to ignore through configuration file,for example \".gitignore\"")
             .Add<std::string>("ignores", "ig",
                               "Use file wildcards to specify how to ignore files\n"
-                              "\t\tseparated by ';'"
-            )
+                              "\t\tseparated by ';'")
+            .Add<bool>("non-standard", "", "Enable non-standard formatting")
             .EnableKeyValueArgs();
     cmd.AddTarget("rangeformat")
             .Add<std::string>("file", "f", "Specify the input file")
@@ -71,6 +70,7 @@ int main(int argc, char **argv) {
                        "If true, all content will be output")
             .Add<std::string>("range-line", "", "the format is startline:endline, for eg: 1:10")
             .Add<std::string>("range-offset", "", "the format is startOffset:endOffset, for eg: 0:256")
+            .Add<bool>("non-standard", "", "Enable non-standard rangeformatting")
             .EnableKeyValueArgs();
     cmd.AddTarget("check")
             .Add<std::string>("file", "f", "Specify the input file")
@@ -83,13 +83,12 @@ int main(int argc, char **argv) {
                        "\t\tIf this option is set, the config option has no effect")
             .Add<bool>("diagnosis-as-error", "DAE", "if exist error or diagnosis info , return -1")
             .Add<std::string>("ignores-file", "igf",
-                              "Specify which files to ignore through configuration file,for example \".gitignore\""
-            )
+                              "Specify which files to ignore through configuration file,for example \".gitignore\"")
             .Add<std::string>("ignores", "ig",
                               "Use file wildcards to specify how to ignore files\n"
-                              "\t\tseparated by ';'"
-            )
+                              "\t\tseparated by ';'")
             .Add<bool>("name-style", "ns", "Enable name-style check")
+            .Add<bool>("non-standard", "", "Enable non-standard checking")
             .EnableKeyValueArgs();
 
 
@@ -110,7 +109,7 @@ int main(int argc, char **argv) {
         if (!format.Check() && cmd.Get<bool>("diagnosis-as-error")) {
             return -1;
         }
-    } else if(cmd.GetTarget() == "rangeformat") {
+    } else if (cmd.GetTarget() == "rangeformat") {
         InitRangeFormat(cmd, format);
         if (!format.RangeReformat()) {
             // special return code for intellij
@@ -121,7 +120,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-bool InitFormat(CommandLine &cmd, LuaFormat& format) {
+bool InitFormat(CommandLine &cmd, LuaFormat &format) {
     if (cmd.HasOption("file") || cmd.HasOption("stdin")) {
         if (cmd.HasOption("file")) {
             format.SetInputFile(cmd.Get<std::string>("file"));
@@ -175,11 +174,15 @@ bool InitFormat(CommandLine &cmd, LuaFormat& format) {
         format.SetConfigPath(cmd.Get<std::string>("config"));
     }
 
+    if (cmd.Get<bool>("non-standard")) {
+        format.SupportNonStandardLua();
+    }
+
     format.SetDefaultStyle(cmd.GetKeyValueOptions());
     return true;
 }
 
-bool InitCheck(CommandLine &cmd, LuaFormat& format) {
+bool InitCheck(CommandLine &cmd, LuaFormat &format) {
 
     if (cmd.HasOption("file") || cmd.HasOption("stdin")) {
         if (cmd.HasOption("file")) {
@@ -230,13 +233,17 @@ bool InitCheck(CommandLine &cmd, LuaFormat& format) {
 
     format.SetDefaultStyle(cmd.GetKeyValueOptions());
 
-    if(cmd.Get<bool>("name-style")){
+    if (cmd.Get<bool>("name-style")) {
         format.SupportNameStyleCheck();
     }
+
+    if (cmd.Get<bool>("non-standard")) {
+        format.SupportNonStandardLua();
+    }
     return true;
 }
 
-bool InitRangeFormat(CommandLine &cmd, LuaFormat& format) {
+bool InitRangeFormat(CommandLine &cmd, LuaFormat &format) {
     if (cmd.HasOption("file") || cmd.HasOption("stdin")) {
         if (cmd.HasOption("file")) {
             format.SetInputFile(cmd.Get<std::string>("file"));
@@ -285,16 +292,17 @@ bool InitRangeFormat(CommandLine &cmd, LuaFormat& format) {
     }
 
     format.SetDefaultStyle(cmd.GetKeyValueOptions());
-    if(cmd.Get<bool>("complete-output")) {
+    if (cmd.Get<bool>("complete-output")) {
         format.SupportCompleteOutputRange();
     }
 
-    if(cmd.HasOption("range-line")) {
+    if (cmd.HasOption("range-line")) {
         format.SetFormatRange(true, cmd.Get<std::string>("range-line"));
-    }
-    else if (cmd.HasOption("range-offset")){
+    } else if (cmd.HasOption("range-offset")) {
         format.SetFormatRange(false, cmd.Get<std::string>("range-offset"));
     }
-
+    if (cmd.Get<bool>("non-standard")) {
+        format.SupportNonStandardLua();
+    }
     return true;
 }

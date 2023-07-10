@@ -297,7 +297,12 @@ void AlignAnalyzer::AnalyzeContinuousArrayTableField(FormatState &f, LuaSyntaxNo
 void AlignAnalyzer::AnalyzeArrayTableAlign(FormatState &f, std::vector<LuaSyntaxNode> &arrayTable, const LuaSyntaxTree &t) {
     std::vector<std::vector<LuaSyntaxNode>> arrayTableFieldVec;
     std::size_t maxAlign = 0;
+    auto &file = t.GetFile();
     for (auto &table: arrayTable) {
+        if (file.CheckCurrentLineUnicodeBefore(table.GetTextRange(t).GetEndOffset())) {
+            return;
+        }
+
         auto tableFieldList = table.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldList, t);
         auto tableFields = tableFieldList.GetChildSyntaxNodes(LuaSyntaxNodeKind::TableField, t);
         if (tableFields.size() > maxAlign) {
@@ -351,6 +356,7 @@ void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, Al
     switch (group.Strategy) {
         case AlignStrategy::AlignToEqWhenExtraSpace: {
             bool allowAlign = false;
+            auto &file = t.GetFile();
             for (auto i: group.SyntaxGroup) {
                 auto node = LuaSyntaxNode(i);
                 auto eq = node.GetChildToken('=', t);
@@ -358,7 +364,9 @@ void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, Al
                     auto diff = eq.GetTextRange(t).StartOffset - eq.GetPrevToken(t).GetTextRange(t).GetEndOffset();
                     if (diff > 2) {
                         allowAlign = true;
-                        break;
+                    }
+                    if (file.CheckCurrentLineUnicodeBefore(eq.GetTextRange(t).StartOffset)) {
+                        return;
                     }
                 }
             }
@@ -382,11 +390,15 @@ void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, Al
         }
         case AlignStrategy::AlignToEqAlways: {
             std::size_t maxDis = 0;
+            auto &file = t.GetFile();
             for (auto i: group.SyntaxGroup) {
                 auto node = LuaSyntaxNode(i);
                 auto eq = node.GetChildToken('=', t);
                 if (eq.IsToken(t)) {
                     auto prev = eq.GetPrevToken(t);
+                    if (file.CheckCurrentLineUnicodeBefore(eq.GetTextRange(t).StartOffset)) {
+                        return;
+                    }
                     auto newPos = prev.GetTextRange(t).GetEndOffset() + 2 - node.GetTextRange(t).StartOffset;
                     if (newPos > maxDis) {
                         maxDis = newPos;
@@ -421,6 +433,10 @@ void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, Al
             for (auto i: group.SyntaxGroup) {
                 auto comment = LuaSyntaxNode(i);
                 if (comment.IsToken(t)) {
+                    if (file.CheckCurrentLineUnicodeBefore(comment.GetTextRange(t).StartOffset)) {
+                        return;
+                    }
+
                     auto prev = comment.GetPrevToken(t);
                     auto newPos =
                             file.GetColumn(prev.GetTextRange(t).GetEndOffset()) +

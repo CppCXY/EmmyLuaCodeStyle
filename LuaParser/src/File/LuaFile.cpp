@@ -57,6 +57,21 @@ std::size_t LuaFile::GetColumn(std::size_t offset) const {
     return 0;
 }
 
+bool LuaFile::CheckCurrentLineUnicodeBefore(std::size_t offset) const {
+    auto line = GetLine(offset);
+
+    auto lineStartOffset = _lineOffsetVec[line];
+
+    if (offset > lineStartOffset) {
+        for (std::size_t i = lineStartOffset; i < offset; i++) {
+            if (_source[i] & 0x80) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 std::size_t LuaFile::GetLineOffset(std::size_t offset) const {
     auto line = GetLine(offset);
 
