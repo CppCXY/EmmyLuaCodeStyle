@@ -40,3 +40,7 @@ target_sources(LuaParser
         )
 
 target_link_libraries(LuaParser PUBLIC Util)
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_compile_options(LuaParser PUBLIC /utf-8)
+endif ()

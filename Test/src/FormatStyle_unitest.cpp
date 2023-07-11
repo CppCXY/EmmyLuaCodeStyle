@@ -1523,11 +1523,20 @@ local t = {
 local t = {
     a = 123
 }
+local t = { {
+    okokok = 123
+} }
 )",
             R"(
 local t =
 {
     a = 123
+}
+local t =
+{
+    {
+        okokok = 123
+    }
 }
 )",
             style));

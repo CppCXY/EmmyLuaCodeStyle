@@ -141,10 +141,7 @@ void TokenAnalyzer::AnalyzeTableField(FormatState &f, LuaSyntaxNode &syntaxNode,
     }
 
     if (f.GetStyle().trailing_table_separator != TrailingTableSeparator::Keep) {
-        auto nextToken = syntaxNode.GetNextToken(t);
-        while (nextToken.GetTokenKind(t) == TK_SHORT_COMMENT || nextToken.GetTokenKind(t) == TK_LONG_COMMENT) {
-            nextToken = nextToken.GetNextToken(t);
-        }
+        auto nextToken = syntaxNode.GetNextTokenSkipComment(t);
         // the last table field
         if (nextToken.GetTokenKind(t) == '}') {
             switch (f.GetStyle().trailing_table_separator) {
@@ -160,7 +157,7 @@ void TokenAnalyzer::AnalyzeTableField(FormatState &f, LuaSyntaxNode &syntaxNode,
                 }
                 case TrailingTableSeparator::Smart: {
                     auto tableFieldList = syntaxNode.GetParent(t);
-                    if (tableFieldList.GetStartLine(t) == nextToken.GetStartLine(t)) {
+                    if (tableFieldList.GetEndLine(t) == nextToken.GetStartLine(t)) {
                         auto sep = syntaxNode.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldSep, t);
                         auto sepToken = sep.GetFirstToken(t);
                         Mark(sepToken, t, TokenStrategy::Remove);

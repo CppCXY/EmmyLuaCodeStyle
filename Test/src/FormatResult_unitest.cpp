@@ -1036,3 +1036,25 @@ local t = {
 }
 )"));
 }
+
+TEST(Format, issue_121) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = { function ()
+    local t = 123
+end }
+
+local t = { {
+    okokok = 123
+} }
+)",
+            R"(
+local t = { function()
+    local t = 123
+end }
+
+local t = { {
+    okokok = 123
+} }
+)"));
+}

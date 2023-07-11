@@ -81,6 +81,8 @@ public:
 
     LuaSyntaxNode GetNextToken(const LuaSyntaxTree &t) const;
 
+    LuaSyntaxNode GetNextTokenSkipComment(const LuaSyntaxTree &t) const;
+
     LuaSyntaxNode GetPrevToken(const LuaSyntaxTree &t) const;
 
     LuaSyntaxNode GetFirstToken(const LuaSyntaxTree &t) const;

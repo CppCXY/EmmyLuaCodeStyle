@@ -8,11 +8,13 @@
 
 int main() {
     std::string buffer = R"(
-local disable = {
-move= disableControls?.disableMovement,
-oko = disableControls?.disableLook,
-combat = disableControls?.disableCombat,
-}
+local t = { function ()
+    local t = 123
+end }
+
+local t = { {
+    okokok = 123
+} }
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -28,7 +30,6 @@ combat = disableControls?.disableCombat,
     std::cout << t.GetDebugView() << std::endl;
 
     LuaStyle s;
-    s.break_before_braces = true;
     FormatBuilder b(s);
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;

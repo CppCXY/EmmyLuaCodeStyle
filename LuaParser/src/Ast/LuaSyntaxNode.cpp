@@ -1,5 +1,6 @@
 ﻿#include "LuaParser/Ast/LuaSyntaxNode.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "Util/Utf8.h"
 
 LuaSyntaxNode::LuaSyntaxNode(std::size_t index)
@@ -228,6 +229,18 @@ LuaSyntaxNode LuaSyntaxNode::GetNextToken(const LuaSyntaxTree &t) const {
     return LuaSyntaxNode(t.GetNextToken(_index));
 }
 
+LuaSyntaxNode LuaSyntaxNode::GetNextTokenSkipComment(const LuaSyntaxTree &t) const {
+    if (_index == 0) {
+        return *this;
+    }
+    auto nextIndex = t.GetNextToken(_index);
+    while(t.GetTokenKind(nextIndex) == TK_SHORT_COMMENT || t.GetTokenKind(nextIndex) == TK_LONG_COMMENT) {
+        nextIndex = t.GetNextToken(nextIndex);
+    }
+
+    return LuaSyntaxNode(nextIndex);
+}
+
 LuaSyntaxNode LuaSyntaxNode::GetPrevToken(const LuaSyntaxTree &t) const {
     if (_index == 0) {
         return *this;
@@ -277,3 +290,4 @@ std::size_t LuaSyntaxNode::CountNodeChild(LuaSyntaxNodeKind kind, const LuaSynta
 bool LuaSyntaxNode::IsEmpty(const LuaSyntaxTree &t) const {
     return t.GetFirstChild(_index) == 0;
 }
+

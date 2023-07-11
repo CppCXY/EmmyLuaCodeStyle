@@ -19,7 +19,8 @@ void LineBreakAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     BreakAfter(syntaxNode, t, LineSpace(LineSpaceType::Keep));
                     break;
                 }
-                case '{': {
+                case '{':
+                case '}': {
                     if (f.GetStyle().break_before_braces) {
                         auto parent = syntaxNode.GetParent(t);
                         if (parent.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression && !parent.IsSingleLineNode(t)) {
