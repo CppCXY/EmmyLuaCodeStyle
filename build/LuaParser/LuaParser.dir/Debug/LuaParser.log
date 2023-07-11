@@ -1,0 +1,14 @@
+﻿  LuaParser.cpp
+  Mark.cpp
+  LuaLexer.cpp
+  LuaIdentify.cpp
+  TextReader.cpp
+  LuaSyntaxNode.cpp
+  LuaSyntaxTree.cpp
+  LuaSyntaxMultiKind.cpp
+  LuaSyntaxNodeKind.cpp
+  TextRange.cpp
+  LuaFile.cpp
+  LuaParseException.cpp
+  Generating Code...
+  LuaParser.vcxproj -> C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\LuaParser\Debug\LuaParser.lib

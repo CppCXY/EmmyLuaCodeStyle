@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\FormatDocAnalyze.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\FunctionOption.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\LuaStyle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\LuaEditorConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\LuaDiagnosticStyle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\LanguageTranslator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\EditorconfigPattern.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\FormatBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\FormatState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\FormatAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\SpaceAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\IndentationAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\LineBreakAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\AlignAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\TokenAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\FormatResolve.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\SyntaxNodeHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\RangeFormat\RangeFormatBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\TypeFormat\LuaTypeFormat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\TypeFormat\LuaTypeFormatOptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\DiagnosticBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\NameStyle\NameStyleChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\NameStyle\NameStyleRuleMatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\Spell\CodeSpellChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\Spell\IdentifyParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\Spell\TextParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\CodeStyle\CodeStyleChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include\Util\CommandLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include\Util\StringUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include\Util\Utf8.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include\Util\Url.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include\Util\SymSpell\SymSpell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsAnsi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsUnicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\Uri.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriIp4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{59060E71-E01B-3C4D-822F-F8363990C3D6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{015EABF3-0C93-3E19-9E94-C57385BE7C1D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

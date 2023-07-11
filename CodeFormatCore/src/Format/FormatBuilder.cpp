@@ -139,6 +139,11 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 }
                 return;
             }
+            case TokenStrategy::StmtEndSemicolon: {
+                WriteSyntaxNode(syntaxNode, t);
+                WriteChar(';');
+                break;
+            }
             default: {
                 break;
             }

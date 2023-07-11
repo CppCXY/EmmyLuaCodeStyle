@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\LanguageServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Config\ClientConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\LSP\LSP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\LSP\LSPHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Session\IOSession.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Session\SocketIOSession.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Session\StandardIOSession.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Session\Protocol\ProtocolParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Session\Protocol\ProtocolBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\VFS\VirtualFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\VFS\VirtualFileSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\DB\FileDB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\DB\UriDB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\DB\LineIndexDB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Lib\LineIndex\LineIndex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Lib\LineIndex\LineTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Service\Service.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Service\FormatService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Service\DiagnosticService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Service\CommandService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Service\CodeActionService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\src\Service\ConfigService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\mimalloc-2.0.9\src\static.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsAnsi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsUnicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\Uri.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriIp4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatServer\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{59060E71-E01B-3C4D-822F-F8363990C3D6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{015EABF3-0C93-3E19-9E94-C57385BE7C1D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

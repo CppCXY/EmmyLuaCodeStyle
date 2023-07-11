@@ -24,13 +24,15 @@ enum class TokenStrategy {
     StringDoubleQuote,
     TableSepSemicolon,
     TableSepComma,
-    OriginRange
+    OriginRange,
+    StmtEndSemicolon
 };
 
 enum class TokenAddStrategy {
     None,
     TableAddColon,
-    TableAddComma
+    TableAddComma,
+    StmtEndSemicolon
 };
 
 enum class IndentStrategy {

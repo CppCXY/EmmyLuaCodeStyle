@@ -1,0 +1,68 @@
+﻿  Building Custom Rule C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/CodeService/CMakeLists.txt
+  CMake is re-running because C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/CodeService/CMakeFiles/generate.stamp is out-of-date.
+    the file 'C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/CodeService/CMakeLists.txt'
+    is newer than 'C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/CodeService/CMakeFiles/generate.stamp.depend'
+    result='0'
+  -- Selecting Windows SDK version 10.0.19041.0 to target Windows 10.0.19045.
+  -- Could NOT find Python (missing: Python_EXECUTABLE Interpreter) 
+  -- Configuring done
+  -- Generating done
+  -- Build files have been written to: C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(241,5): warning MSB8064: Custom build for item "C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\CMakeLists.txt" succeeded, but specified dependency "c:\users\walchshofer\documents\git\emmyluacodestyle\codeservice\cmakelists.txt" does not exist. This may cause incremental build to work incorrectly.
+  EditorconfigPattern.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\EditorconfigPattern.cpp': No such file or directory
+  FunctionOption.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\FunctionOption.cpp': No such file or directory
+  LanguageTranslator.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\LanguageTranslator.cpp': No such file or directory
+  LuaDiagnosticStyle.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\LuaDiagnosticStyle.cpp': No such file or directory
+  LuaEditorConfig.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\LuaEditorConfig.cpp': No such file or directory
+  LuaStyle.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Config\LuaStyle.cpp': No such file or directory
+  CodeStyleChecker.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\CodeStyle\CodeStyleChecker.cpp': No such file or directory
+  DiagnosticBuilder.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\DiagnosticBuilder.cpp': No such file or directory
+  NameStyleChecker.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\NameStyle\NameStyleChecker.cpp': No such file or directory
+  NameStyleRuleMatcher.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\NameStyle\NameStyleRuleMatcher.cpp': No such file or directory
+  CodeSpellChecker.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\Spell\CodeSpellChecker.cpp': No such file or directory
+  IdentifyParser.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\Spell\IdentifyParser.cpp': No such file or directory
+  TextParser.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Diagnostic\Spell\TextParser.cpp': No such file or directory
+  AlignAnalyzer.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\AlignAnalyzer.cpp': No such file or directory
+  FormatAnalyzer.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\FormatAnalyzer.cpp': No such file or directory
+  FormatDocAnalyze.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\FormatDocAnalyze.cpp': No such file or directory
+  FormatResolve.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\FormatResolve.cpp': No such file or directory
+  IndentationAnalyzer.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\IndentationAnalyzer.cpp': No such file or directory
+  LineBreakAnalyzer.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\LineBreakAnalyzer.cpp': No such file or directory
+  SpaceAnalyzer.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\SpaceAnalyzer.cpp': No such file or directory
+  Generating Code...
+  Compiling...
+  SyntaxNodeHelper.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\SyntaxNodeHelper.cpp': No such file or directory
+  TokenAnalyzer.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\Analyzer\TokenAnalyzer.cpp': No such file or directory
+  FormatBuilder.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\FormatBuilder.cpp': No such file or directory
+  FormatState.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\Format\FormatState.cpp': No such file or directory
+  RangeFormatBuilder.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\RangeFormat\RangeFormatBuilder.cpp': No such file or directory
+  LuaTypeFormat.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\TypeFormat\LuaTypeFormat.cpp': No such file or directory
+  LuaTypeFormatOptions.cpp
+c1xx : fatal error C1083: Cannot open source file: 'C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeService\src\TypeFormat\LuaTypeFormatOptions.cpp': No such file or directory
+  Generating Code...

@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\src\CommandLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\src\StringUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\src\Utf8.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\src\Url.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\src\FileFinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\src\SymSpell\SymSpell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\src\SymSpell\SuggestItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\src\SymSpell\EditDistance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\src\InfoTree\InfoTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\src\InfoTree\InfoNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsAnsi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsUnicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\Uri.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriIp4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{59060E71-E01B-3C4D-822F-F8363990C3D6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{015EABF3-0C93-3E19-9E94-C57385BE7C1D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,12 @@
+﻿  CommandLine.cpp
+  StringUtil.cpp
+  Utf8.cpp
+  Url.cpp
+  FileFinder.cpp
+  SymSpell.cpp
+  SuggestItem.cpp
+  EditDistance.cpp
+  InfoTree.cpp
+  InfoNode.cpp
+  Generating Code...
+  Util.vcxproj -> C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\Util\Debug\Util.lib

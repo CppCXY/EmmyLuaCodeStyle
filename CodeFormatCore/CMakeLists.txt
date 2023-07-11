@@ -33,6 +33,7 @@ target_sources(CodeFormatCore
         src/Format/Analyzer/FormatDocAnalyze.cpp
         src/Format/Analyzer/AlignAnalyzer.cpp
         src/Format/Analyzer/TokenAnalyzer.cpp
+		src/Format/Analyzer/SemicolonAnalyzer.cpp
         src/Format/Analyzer/FormatResolve.cpp
         src/Format/Analyzer/SyntaxNodeHelper.cpp
         # rangeFormat
@@ -51,7 +52,7 @@ target_sources(CodeFormatCore
         src/Diagnostic/Spell/TextParser.cpp
         # diagnostic/codestyle
         src/Diagnostic/CodeStyle/CodeStyleChecker.cpp
-        )
+		)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(CodeFormatCore PUBLIC /utf-8)

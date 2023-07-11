@@ -1,0 +1,10 @@
+^C:\USERS\WALCHSHOFER\DOCUMENTS\GIT\EMMYLUACODESTYLE\3RD\GOOGLETEST-1.13.0\GOOGLETEST\CMAKELISTS.TXT
+setlocal
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle -BC:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build --check-stamp-file C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/3rd/googletest-1.13.0/googletest/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

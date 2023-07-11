@@ -1,0 +1,359 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AF115317-08CC-31C2-970D-2EFC732080FD}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>FormatTest2</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\Test2\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">FormatTest2.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">FormatTest2</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\Test2\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">FormatTest2.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">FormatTest2</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\Test2\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">FormatTest2.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">FormatTest2</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\Test2\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">FormatTest2.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">FormatTest2</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;URI_STATIC_BUILD;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;URI_STATIC_BUILD;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\CodeFormatCore\Debug\CodeFormatCore.lib;..\LuaParser\Debug\LuaParser.lib;..\Util\Debug\Util.lib;..\Util\uriparser.out\Debug\uriparser.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/Debug/FormatTest2.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/Debug/FormatTest2.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;URI_STATIC_BUILD;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;URI_STATIC_BUILD;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\CodeFormatCore\Release\CodeFormatCore.lib;..\LuaParser\Release\LuaParser.lib;..\Util\Release\Util.lib;..\Util\uriparser.out\Release\uriparser.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/Release/FormatTest2.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/Release/FormatTest2.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;URI_STATIC_BUILD;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;URI_STATIC_BUILD;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\CodeFormatCore\MinSizeRel\CodeFormatCore.lib;..\LuaParser\MinSizeRel\LuaParser.lib;..\Util\MinSizeRel\Util.lib;..\Util\uriparser.out\MinSizeRel\uriparser.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/MinSizeRel/FormatTest2.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/MinSizeRel/FormatTest2.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /utf-8</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;URI_STATIC_BUILD;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;URI_STATIC_BUILD;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\CodeFormatCore\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\LuaParser\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Util\include;C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\CodeFormatCore\RelWithDebInfo\CodeFormatCore.lib;..\LuaParser\RelWithDebInfo\LuaParser.lib;..\Util\RelWithDebInfo\Util.lib;..\Util\uriparser.out\RelWithDebInfo\uriparser.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/RelWithDebInfo/FormatTest2.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/RelWithDebInfo/FormatTest2.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\CMakeLists.txt">
+      <StdOutEncoding>UTF-8</StdOutEncoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/Test2/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle -BC:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build --check-stamp-file C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\Test2\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/Test2/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle -BC:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build --check-stamp-file C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\Test2\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/Test2/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle -BC:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build --check-stamp-file C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\Test2\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/Test2/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle -BC:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build --check-stamp-file C:/Users/walchshofer/Documents/git/EmmyLuaCodeStyle/build/Test2/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\Test2\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\Test2\src\FormatTest2.cpp" />
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriBase.h" />
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsAnsi.h" />
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsConfig.h" />
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriDefsUnicode.h" />
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\Uri.h" />
+    <ClInclude Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\3rd\uriparser\include\uriparser\UriIp4.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\ZERO_CHECK.vcxproj">
+      <Project>{8ABDD4B1-A709-399A-B7FA-CDC0EAE2E178}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\CodeFormatCore\CodeFormatCore.vcxproj">
+      <Project>{153E3ADA-A7A8-394F-80E3-0AB45B1F22AD}</Project>
+      <Name>CodeFormatCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\LuaParser\LuaParser.vcxproj">
+      <Project>{4BEDD956-A191-3F1B-93EF-1577EDA7C2A0}</Project>
+      <Name>LuaParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\Util\Util.vcxproj">
+      <Project>{AA32D284-131F-35CF-852D-21358709BA62}</Project>
+      <Name>Util</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\walchshofer\Documents\git\EmmyLuaCodeStyle\build\Util\uriparser.out\uriparser.vcxproj">
+      <Project>{B9D4CEAA-02D1-3DB9-AC61-5889EADC1E4F}</Project>
+      <Name>uriparser</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

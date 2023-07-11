@@ -7,7 +7,7 @@ enum class FormatAnalyzerType {
     AlignAnalyzer,
     TokenAnalyzer,
     FormatDocAnalyze,
-
+    SemicolonAnalyzer,
     Count,
 };
 
