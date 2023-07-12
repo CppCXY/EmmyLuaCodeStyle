@@ -17,6 +17,10 @@ public:
 
 private:
 	void AddSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t);
+	void ReplaceSemicolonWithNewLine(LuaSyntaxNode n, const LuaSyntaxTree& t);
+	void RemoveSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t);
+	bool IsSingleLineStmt(LuaSyntaxNode n, const LuaSyntaxTree& t);
+	bool EndsWithSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t);
 
-	std::unordered_set<std::size_t> _semicolon;
+	std::unordered_map<std::size_t, SemicolonStrategy> _semicolon;
 };
