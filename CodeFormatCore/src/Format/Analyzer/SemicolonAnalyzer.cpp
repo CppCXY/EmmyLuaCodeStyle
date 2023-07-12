@@ -21,7 +21,7 @@ void SemicolonAnalyzer::Analyze(FormatState& f, const LuaSyntaxTree& t) {
 							AddSemicolon(syntaxNode, t);
 						}
 						break;
-					case EndStmtWithSemicolon::None:
+					case EndStmtWithSemicolon::Never:
 						if (EndsWithSemicolon(syntaxNode, t)) {
 							if (IsSingleLineStmt(syntaxNode, t)) {
 								RemoveSemicolon(syntaxNode, t);
