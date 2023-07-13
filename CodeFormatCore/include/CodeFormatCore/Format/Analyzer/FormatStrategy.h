@@ -26,7 +26,7 @@ enum class TokenStrategy {
     TableSepComma,
     OriginRange,
     StmtEndSemicolon,
-    StmtEndSemicolonNewLine
+    NewLineBeforeToken
 };
 
 enum class TokenAddStrategy {
@@ -127,5 +127,5 @@ struct AlignGroup {
 enum class SemicolonStrategy {
     Add,
     Remove,
-    ReplaceWithNewLine
+    InsertNewLine
 };

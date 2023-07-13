@@ -16,8 +16,12 @@ void SemicolonAnalyzer::Analyze(FormatState& f, const LuaSyntaxTree& t) {
 	for (auto syntaxNode : t.GetSyntaxNodes()) {
 		if (syntaxNode.IsNode(t)) {
 			if (detail::multi_match::StatementMatch(syntaxNode.GetSyntaxKind(t))) {
+				auto text = syntaxNode.GetText(t);
 				switch (f.GetStyle().end_statement_with_semicolon) {
 					case EndStmtWithSemicolon::Always:
+						// TODO handle stray semicolons that are unnecessarily added!
+						/*if (syntaxNode.GetTextRange(t).Length < 2)
+							break;*/
 						if (!EndsWithSemicolon(syntaxNode, t)) {
 							AddSemicolon(syntaxNode, t);
 						}
@@ -25,7 +29,7 @@ void SemicolonAnalyzer::Analyze(FormatState& f, const LuaSyntaxTree& t) {
 					case EndStmtWithSemicolon::Never:
 						// is on same line as other statement -> needs to go on new line
 						if (!IsFirstStmtOfLine(syntaxNode, t)) {
-							ReplaceSemicolonWithNewLine(syntaxNode, t);
+							InsertNewLineBeforeNode(syntaxNode, t);
 						}
 						if (EndsWithSemicolon(syntaxNode, t)) {
 							RemoveSemicolon(syntaxNode, t);
@@ -57,8 +61,8 @@ void SemicolonAnalyzer::Query(FormatState& f, LuaSyntaxNode n, const LuaSyntaxTr
 		case SemicolonStrategy::Remove:
 			resolve.SetTokenStrategy(TokenStrategy::StmtEndSemicolon);
 			break;
-		case SemicolonStrategy::ReplaceWithNewLine:
-			resolve.SetTokenStrategy(TokenStrategy::StmtEndSemicolonNewLine);
+		case SemicolonStrategy::InsertNewLine:
+			resolve.SetTokenStrategy(TokenStrategy::NewLineBeforeToken);
 			break;
 		default:
 			break;
@@ -73,10 +77,10 @@ void SemicolonAnalyzer::AddSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t) {
 	}
 }
 
-void SemicolonAnalyzer::ReplaceSemicolonWithNewLine(LuaSyntaxNode n, const LuaSyntaxTree& t) {
+void SemicolonAnalyzer::InsertNewLineBeforeNode(LuaSyntaxNode n, const LuaSyntaxTree& t) {
 	auto token = n.GetFirstToken(t); // line breaks are put in front of the statement itself by non-first statements 
 	if (token.IsToken(t)) {
-		_semicolon[token.GetIndex()] = SemicolonStrategy::ReplaceWithNewLine;
+		_semicolon[token.GetIndex()] = SemicolonStrategy::InsertNewLine;
 	}
 }
 
