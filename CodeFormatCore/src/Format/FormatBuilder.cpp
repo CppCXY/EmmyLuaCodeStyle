@@ -142,6 +142,7 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
             }
             case TokenStrategy::StmtEndSemicolonNewLine: {
                 WriteLine(1);
+                WriteSyntaxNode(syntaxNode, t);
                 break;
             }
             default: {

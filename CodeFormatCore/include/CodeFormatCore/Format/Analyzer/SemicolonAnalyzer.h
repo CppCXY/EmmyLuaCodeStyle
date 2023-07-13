@@ -19,8 +19,10 @@ private:
 	void AddSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t);
 	void ReplaceSemicolonWithNewLine(LuaSyntaxNode n, const LuaSyntaxTree& t);
 	void RemoveSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t);
-	bool IsSingleLineStmt(LuaSyntaxNode n, const LuaSyntaxTree& t);
+	bool IsFirstStmtOfLine(LuaSyntaxNode n, const LuaSyntaxTree& t);
+	bool IsLastStmtOfLine(LuaSyntaxNode n, const LuaSyntaxTree& t);
 	bool EndsWithSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t);
+	LuaSyntaxNode GetLastNonCommentToken(LuaSyntaxNode n, const LuaSyntaxTree& t);
 
 	std::unordered_map<std::size_t, SemicolonStrategy> _semicolon;
 };

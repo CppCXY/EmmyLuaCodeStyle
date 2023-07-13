@@ -2,6 +2,7 @@
 #include "CodeFormatCore/Format/FormatState.h"
 #include "CodeFormatCore/Config/LuaStyleEnum.h"
 #include <iostream>
+#include <LuaParser/Lexer/LuaTokenTypeDetail.h>
 
 SemicolonAnalyzer::SemicolonAnalyzer() {
 
@@ -22,18 +23,17 @@ void SemicolonAnalyzer::Analyze(FormatState& f, const LuaSyntaxTree& t) {
 						}
 						break;
 					case EndStmtWithSemicolon::Never:
+						// is on same line as other statement -> needs to go on new line
+						if (!IsFirstStmtOfLine(syntaxNode, t)) {
+							ReplaceSemicolonWithNewLine(syntaxNode, t);
+						}
 						if (EndsWithSemicolon(syntaxNode, t)) {
-							if (IsSingleLineStmt(syntaxNode, t)) {
-								RemoveSemicolon(syntaxNode, t);
-							}
-							else {
-								ReplaceSemicolonWithNewLine(syntaxNode, t);
-							}
+							RemoveSemicolon(syntaxNode, t);
 						}
 						break;
 					case EndStmtWithSemicolon::SameLine:
 						if (EndsWithSemicolon(syntaxNode, t)) {
-							if (IsSingleLineStmt(syntaxNode, t)) {
+							if (IsLastStmtOfLine(syntaxNode, t)) {
 								RemoveSemicolon(syntaxNode, t);
 							}
 						}
@@ -67,39 +67,65 @@ void SemicolonAnalyzer::Query(FormatState& f, LuaSyntaxNode n, const LuaSyntaxTr
 }
 
 void SemicolonAnalyzer::AddSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t) {
-	auto token = n.GetLastToken(t);
+	auto token = GetLastNonCommentToken(n, t);
 	if (token.IsToken(t)) {
 		_semicolon[token.GetIndex()] = SemicolonStrategy::Add;
 	}
 }
 
 void SemicolonAnalyzer::ReplaceSemicolonWithNewLine(LuaSyntaxNode n, const LuaSyntaxTree& t) {
-	auto token = n.GetLastToken(t);
+	auto token = n.GetFirstToken(t); // line breaks are put in front of the statement itself by non-first statements 
 	if (token.IsToken(t)) {
 		_semicolon[token.GetIndex()] = SemicolonStrategy::ReplaceWithNewLine;
 	}
 }
 
 void SemicolonAnalyzer::RemoveSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t) {
-	auto token = n.GetLastToken(t);
+	auto token = GetLastNonCommentToken(n, t);
 	if (token.IsToken(t)) {
 		_semicolon[token.GetIndex()] = SemicolonStrategy::Remove;
 	}
 }
 
-bool SemicolonAnalyzer::IsSingleLineStmt(LuaSyntaxNode n, const LuaSyntaxTree& t) {
-	auto token = n.GetLastToken(t);
+bool SemicolonAnalyzer::IsFirstStmtOfLine(LuaSyntaxNode n, const LuaSyntaxTree& t) {
+	// check if current stmt starts on same line as the previous one ends
+	auto startCurrent = n.GetStartLine(t);
+	auto prev = n.GetPrevToken(t);
+	if (!prev.IsNull(t)) {
+		auto endPrev = prev.GetEndLine(t);
+		return endPrev < startCurrent;
+	}
+	return true; // there's no previous token
+}
+
+bool SemicolonAnalyzer::IsLastStmtOfLine(LuaSyntaxNode n, const LuaSyntaxTree& t) {
+	// check if next stmt starts on same line as the current one ends
+	auto currentEnd = n.GetEndLine(t);
 	auto nextToken = n.GetNextToken(t);
-
-	auto tokenEnd = token.GetEndLine(t);
-	auto nextStart = nextToken.GetStartLine(t);
-
-	return tokenEnd != nextStart;
+	if (!nextToken.IsNull(t)) {
+		auto nextStart = nextToken.GetStartLine(t);
+		return currentEnd != nextStart;
+	}
+	return true; // there's no next token
 }
 
 bool SemicolonAnalyzer::EndsWithSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t) {
-	auto token = n.GetLastToken(t);
+	auto token = GetLastNonCommentToken(n, t);
 	auto text = token.GetText(t);
 
 	return text == ";";
+}
+
+LuaSyntaxNode SemicolonAnalyzer::GetLastNonCommentToken(LuaSyntaxNode n, const LuaSyntaxTree& t) {
+	auto token = n.GetLastToken(t);
+	switch (token.GetTokenKind(t)) {
+		case TK_SHORT_COMMENT:
+		case TK_LONG_COMMENT:
+		case TK_SHEBANG: {
+			return token.GetPrevToken(t);
+		}
+		default: {
+			return token;
+		}
+	}
 }
