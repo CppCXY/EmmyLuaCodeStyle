@@ -88,7 +88,13 @@ void SemicolonAnalyzer::RemoveSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t)
 }
 
 bool SemicolonAnalyzer::IsSingleLineStmt(LuaSyntaxNode n, const LuaSyntaxTree& t) {
-	return false;
+	auto token = n.GetLastToken(t);
+	auto nextToken = n.GetNextToken(t);
+
+	auto tokenEnd = token.GetEndLine(t);
+	auto nextStart = nextToken.GetStartLine(t);
+
+	return tokenEnd != nextStart;
 }
 
 bool SemicolonAnalyzer::EndsWithSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t) {
