@@ -41,9 +41,6 @@ void SemicolonAnalyzer::Analyze(FormatState& f, const LuaSyntaxTree& t) {
 					default:
 						break;
 				}
-
-
-				AddSemicolon(syntaxNode, t);
 			}
 		}
 	}
