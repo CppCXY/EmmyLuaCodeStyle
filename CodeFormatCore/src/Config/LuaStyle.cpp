@@ -286,7 +286,7 @@ void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &con
             end_statement_with_semicolon = EndStmtWithSemicolon::Always;
         } else if (configMap.at("end_statement_with_semicolon") == "never") {
             end_statement_with_semicolon = EndStmtWithSemicolon::Never;
-        } else if (configMap.at("end_statement_with_semicolon") == "same_line") {
+        } else if (configMap.at("end_statement_with_semicolon") == "sameLine") {
             end_statement_with_semicolon = EndStmtWithSemicolon::SameLine;
         }
     }
