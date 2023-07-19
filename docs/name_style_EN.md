@@ -72,7 +72,7 @@ Regular expressions support capture groups and then match basic nomenclature:
 ```json
 "local_name_style": {
      "type" : "pattern",
-     "param": "m_(w+)",
+     "param": "m_(\\w+)",
      "$1": "camel_case"
 }
 ```
@@ -88,7 +88,7 @@ Where `"$1": "camel_case"` means that the content of the first capture group nee
      "camel_case",
      {
          "type" : "pattern",
-         "param": "m_(w+)",
+         "param": "m_(\\w+)",
          "$1": "camel_case"
      }
 ]
