@@ -72,7 +72,7 @@
 ```json
 "local_name_style": {
     "type" : "pattern",
-    "param": "m_(w+)",
+    "param": "m_(\\w+)",
     "$1": "camel_case"
 }
 ```
@@ -88,7 +88,7 @@
     "camel_case",
     {
         "type" : "pattern",
-        "param": "m_(w+)",
+        "param": "m_(\\w+)",
         "$1": "camel_case"
     }
 ]
