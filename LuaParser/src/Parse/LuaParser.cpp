@@ -361,6 +361,8 @@ void LuaParser::FunctionStatement() {
 
     FunctionBody();
 
+    TestAndNext(';');
+
     m.Complete(*this, LuaSyntaxNodeKind::FunctionStatement);
 }
 
@@ -374,6 +376,8 @@ void LuaParser::LocalFunctionStatement() {
     CheckName();
 
     FunctionBody();
+
+    TestAndNext(';');
 
     m.Complete(*this, LuaSyntaxNodeKind::LocalFunctionStatement);
 }
@@ -674,8 +678,6 @@ void LuaParser::FunctionBody() {
     Block();
 
     CheckAndNext(TK_END);
-
-    TestAndNext(';');
 
     m.Complete(*this, LuaSyntaxNodeKind::FunctionBody);
 }
