@@ -163,8 +163,7 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
                 }
             }
             for (auto &analyzer: _analyzers) {
-                if(analyzer)
-                    analyzer->Query(*this, traverse.Node, t, resolve);
+                analyzer->Query(*this, traverse.Node, t, resolve);
             }
             auto children = traverse.Node.GetChildren(t);
             // 不采用 <range>
