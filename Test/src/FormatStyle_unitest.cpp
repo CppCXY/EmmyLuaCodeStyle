@@ -1561,3 +1561,114 @@ local t =
 )",
             style));
 }
+
+TEST(FormatByStyleOption, end_statement_with_semicolon) {
+    LuaStyle style;
+
+    style.end_statement_with_semicolon = EndStmtWithSemicolon::Keep;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(local func = testFunc; print(type(nil)); -- nil;
+print("Hello"); print(" "); --[[ test comment --]] print("World")
+for i, v in ipairs(values) do
+    if v then
+        print(i, v, "True");
+    else
+        print(i, v, "False")
+    end;
+end;
+local table1 = { 1, 2, 3 }
+)",
+            R"(local func = testFunc; print(type(nil)); -- nil;
+print("Hello"); print(" "); --[[ test comment --]] print("World")
+for i, v in ipairs(values) do
+    if v then
+        print(i, v, "True");
+    else
+        print(i, v, "False")
+    end;
+end;
+local table1 = { 1, 2, 3 }
+)",
+            style));
+
+    style.end_statement_with_semicolon = EndStmtWithSemicolon::Always;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(local func = testFunc; print(type(nil)); -- nil;
+print("Hello"); print(" "); --[[ test comment --]] print("World")
+for i, v in ipairs(values) do
+    if v then
+        print(i, v, "True");
+    else
+        print(i, v, "False")
+    end;
+end;
+local table1 = { 1, 2, 3 }
+)",
+            R"(local func = testFunc; print(type(nil)); -- nil;
+print("Hello"); print(" "); --[[ test comment --]] print("World");
+for i, v in ipairs(values) do
+    if v then
+        print(i, v, "True");
+    else
+        print(i, v, "False");
+    end;
+end;
+local table1 = { 1, 2, 3 };
+)",
+            style));
+
+    style.end_statement_with_semicolon = EndStmtWithSemicolon::Never;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(local func = testFunc; print(type(nil)); -- nil;
+print("Hello"); print(" "); --[[ test comment --]] print("World")
+for i, v in ipairs(values) do
+    if v then
+        print(i, v, "True");
+    else
+        print(i, v, "False")
+    end;
+end;
+local table1 = { 1, 2, 3 }
+)",
+            R"(local func = testFunc
+print(type(nil))                         -- nil;
+print("Hello")
+print(" ") --[[ test comment --]]
+print("World")
+for i, v in ipairs(values) do
+    if v then
+        print(i, v, "True")
+    else
+        print(i, v, "False")
+    end
+end
+local table1 = { 1, 2, 3 }
+)",
+            style));
+
+    style.end_statement_with_semicolon = EndStmtWithSemicolon::SameLine;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(local func = testFunc; print(type(nil)); -- nil;
+print("Hello"); print(" "); --[[ test comment --]] print("World")
+for i, v in ipairs(values) do
+    if v then
+        print(i, v, "True");
+    else
+        print(i, v, "False")
+    end;
+end;
+local table1 = { 1, 2, 3 }
+)",
+            R"(local func = testFunc; print(type(nil))  -- nil;
+print("Hello"); print(" "); --[[ test comment --]] print("World")
+for i, v in ipairs(values) do
+    if v then
+        print(i, v, "True")
+    else
+        print(i, v, "False")
+    end
+end
+local table1 = { 1, 2, 3 }
+)",
+            style));
+}

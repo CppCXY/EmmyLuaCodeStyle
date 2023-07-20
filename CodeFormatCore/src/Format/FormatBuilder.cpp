@@ -79,6 +79,7 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 WriteSyntaxNode(syntaxNode, t);
                 break;
             }
+            case TokenStrategy::StmtEndSemicolon:
             case TokenStrategy::Remove: {
                 break;
             }
@@ -139,6 +140,11 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 }
                 return;
             }
+            case TokenStrategy::NewLineBeforeToken: {
+                WriteLine(1);
+                WriteSyntaxNode(syntaxNode, t);
+                break;
+            }
             default: {
                 break;
             }
@@ -150,6 +156,10 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 break;
             }
             case TokenAddStrategy::TableAddColon: {
+                WriteChar(';');
+                break;
+            }
+            case TokenAddStrategy::StmtEndSemicolon: {
                 WriteChar(';');
                 break;
             }

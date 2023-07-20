@@ -5,6 +5,7 @@
 #include "CodeFormatCore/Format/Analyzer/LineBreakAnalyzer.h"
 #include "CodeFormatCore/Format/Analyzer/SpaceAnalyzer.h"
 #include "CodeFormatCore/Format/Analyzer/TokenAnalyzer.h"
+#include <CodeFormatCore/Format/Analyzer/SemicolonAnalyzer.h>
 
 FormatState::FormatState(Mode mode)
     : _currentWidth(0),
@@ -52,6 +53,7 @@ void FormatState::Analyze(const LuaSyntaxTree &t) {
     AddAnalyzer<AlignAnalyzer>();
     AddAnalyzer<TokenAnalyzer>();
     AddAnalyzer<FormatDocAnalyze>();
+    AddAnalyzer<SemicolonAnalyzer>();
 
     _fileEndOfLine = t.GetFile().GetEndOfLine();
     for (const auto &analyzer: _analyzers) {
@@ -161,7 +163,8 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
                 }
             }
             for (auto &analyzer: _analyzers) {
-                analyzer->Query(*this, traverse.Node, t, resolve);
+                if(analyzer)
+                    analyzer->Query(*this, traverse.Node, t, resolve);
             }
             auto children = traverse.Node.GetChildren(t);
             // 不采用 <range>

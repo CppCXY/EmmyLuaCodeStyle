@@ -84,3 +84,10 @@ enum class AlignChainExpr {
     Always,
     OnlyCallStmt
 };
+
+enum class EndStmtWithSemicolon {
+    Keep,
+    Never,
+    Always,
+    SameLine
+};

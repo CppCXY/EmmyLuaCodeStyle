@@ -218,6 +218,8 @@ void LuaParser::IfStatement() {
     }
     CheckAndNext(TK_END);
 
+    TestAndNext(';');
+
     m.Complete(*this, LuaSyntaxNodeKind::IfStatement);
 }
 
@@ -235,6 +237,8 @@ void LuaParser::WhileStatement() {
 
     CheckAndNext(TK_END);
 
+    TestAndNext(';');
+
     m.Complete(*this, LuaSyntaxNodeKind::WhileStatement);
 }
 
@@ -246,6 +250,8 @@ void LuaParser::DoStatement() {
     Block();
 
     CheckAndNext(TK_END);
+
+    TestAndNext(';');
 
     m.Complete(*this, LuaSyntaxNodeKind::DoStatement);
 }
@@ -324,6 +330,8 @@ void LuaParser::ForBody() {
 
     CheckAndNext(TK_END);
 
+    TestAndNext(';');
+
     m.Complete(*this, LuaSyntaxNodeKind::ForBody);
 }
 
@@ -338,6 +346,8 @@ void LuaParser::RepeatStatement() {
     CheckAndNext(TK_UNTIL);
 
     Condition();
+
+    TestAndNext(';');
 
     m.Complete(*this, LuaSyntaxNodeKind::RepeatStatement);
 }
@@ -398,6 +408,8 @@ void LuaParser::LabelStatement() {
     CheckName();
 
     CheckAndNext(TK_DBCOLON);
+
+    TestAndNext(';');
 
     m.Complete(*this, LuaSyntaxNodeKind::LabelStatement);
 }
@@ -662,6 +674,8 @@ void LuaParser::FunctionBody() {
     Block();
 
     CheckAndNext(TK_END);
+
+    TestAndNext(';');
 
     m.Complete(*this, LuaSyntaxNodeKind::FunctionBody);
 }
