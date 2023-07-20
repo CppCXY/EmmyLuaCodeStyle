@@ -533,7 +533,7 @@ The possible values are:
     deactivates this option
 - always
     every statement should end with semicolon, missing semicolons will be added
-- sameLine
+- same_line
     multiple statements in a single line may be separated by necessary semicolons, but optional semicolons will be removed
 - never
     no statement should end with semicolon, all semicolons at the end of statements will be removed, lines with multiple statements will be separated into multiple lines

@@ -5,7 +5,7 @@
 #include "CodeFormatCore/Format/Analyzer/LineBreakAnalyzer.h"
 #include "CodeFormatCore/Format/Analyzer/SpaceAnalyzer.h"
 #include "CodeFormatCore/Format/Analyzer/TokenAnalyzer.h"
-#include <CodeFormatCore/Format/Analyzer/SemicolonAnalyzer.h>
+#include "CodeFormatCore/Format/Analyzer/SemicolonAnalyzer.h"
 
 FormatState::FormatState(Mode mode)
     : _currentWidth(0),

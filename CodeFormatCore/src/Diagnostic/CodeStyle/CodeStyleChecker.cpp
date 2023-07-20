@@ -96,16 +96,19 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
             }
             case TokenStrategy::StmtEndSemicolon: {
                 switch (d.GetState().GetStyle().end_statement_with_semicolon) {
-                    case EndStmtWithSemicolon::Never: 
+                    case EndStmtWithSemicolon::Never: {
                         d.PushDiagnostic(DiagnosticType::Semicolon, textRange,
-                            LText("expected statement not to end with ;"));
+                                         LText("expected statement not to end with ;"));
                         break;
-                    case EndStmtWithSemicolon::SameLine:
+                    }
+                    case EndStmtWithSemicolon::SameLine: {
                         d.PushDiagnostic(DiagnosticType::Semicolon, textRange,
-                            LText("; should only separate multiple statements on a single line"));
+                                         LText("; should only separate multiple statements on a single line"));
                         break;
-                    default:
+                    }
+                    default: {
                         break;
+                    }
                 }
                 break;
             }
@@ -115,13 +118,15 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
         }
 
         switch (resolve.GetTokenAddStrategy()) {
-            case TokenAddStrategy::StmtEndSemicolon:
-                d.PushDiagnostic(DiagnosticType::Semicolon, 
-                    TextRange(textRange.GetEndOffset(), 1),
-                    LText("expected ; at end of statement"));
+            case TokenAddStrategy::StmtEndSemicolon: {
+                d.PushDiagnostic(DiagnosticType::Semicolon,
+                                 TextRange(textRange.GetEndOffset(), 1),
+                                 LText("expected ; at end of statement"));
                 break;
-            default:
+            }
+            default: {
                 break;
+            }
         }
 
         switch (resolve.GetNextSpaceStrategy()) {
