@@ -11,6 +11,7 @@ enum class DiagnosticType {
     StatementLineSpace,
     EndWithNewLine,
     Indent,
+    Semicolon,
     NameStyle,
     Spell
 };

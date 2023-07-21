@@ -218,6 +218,8 @@ void LuaParser::IfStatement() {
     }
     CheckAndNext(TK_END);
 
+    TestAndNext(';');
+
     m.Complete(*this, LuaSyntaxNodeKind::IfStatement);
 }
 
@@ -235,6 +237,8 @@ void LuaParser::WhileStatement() {
 
     CheckAndNext(TK_END);
 
+    TestAndNext(';');
+
     m.Complete(*this, LuaSyntaxNodeKind::WhileStatement);
 }
 
@@ -246,6 +250,8 @@ void LuaParser::DoStatement() {
     Block();
 
     CheckAndNext(TK_END);
+
+    TestAndNext(';');
 
     m.Complete(*this, LuaSyntaxNodeKind::DoStatement);
 }
@@ -273,6 +279,8 @@ void LuaParser::ForStatement() {
             LuaExpectedError("'=' or 'in' expected");
         }
     }
+
+    TestAndNext(';');
 
     m.Complete(*this, LuaSyntaxNodeKind::ForStatement);
 }
@@ -339,6 +347,8 @@ void LuaParser::RepeatStatement() {
 
     Condition();
 
+    TestAndNext(';');
+
     m.Complete(*this, LuaSyntaxNodeKind::RepeatStatement);
 }
 
@@ -350,6 +360,8 @@ void LuaParser::FunctionStatement() {
     FunctionName();
 
     FunctionBody();
+
+    TestAndNext(';');
 
     m.Complete(*this, LuaSyntaxNodeKind::FunctionStatement);
 }
@@ -364,6 +376,8 @@ void LuaParser::LocalFunctionStatement() {
     CheckName();
 
     FunctionBody();
+
+    TestAndNext(';');
 
     m.Complete(*this, LuaSyntaxNodeKind::LocalFunctionStatement);
 }

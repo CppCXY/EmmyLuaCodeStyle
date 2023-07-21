@@ -94,6 +94,36 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
 
                 break;
             }
+            case TokenStrategy::StmtEndSemicolon: {
+                switch (d.GetState().GetStyle().end_statement_with_semicolon) {
+                    case EndStmtWithSemicolon::Never: {
+                        d.PushDiagnostic(DiagnosticType::Semicolon, textRange,
+                                         LText("expected statement not to end with ;"));
+                        break;
+                    }
+                    case EndStmtWithSemicolon::SameLine: {
+                        d.PushDiagnostic(DiagnosticType::Semicolon, textRange,
+                                         LText("; should only separate multiple statements on a single line"));
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+        switch (resolve.GetTokenAddStrategy()) {
+            case TokenAddStrategy::StmtEndSemicolon: {
+                d.PushDiagnostic(DiagnosticType::Semicolon,
+                                 TextRange(textRange.GetEndOffset(), 1),
+                                 LText("expected ; at end of statement"));
+                break;
+            }
             default: {
                 break;
             }

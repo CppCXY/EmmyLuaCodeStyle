@@ -24,13 +24,16 @@ enum class TokenStrategy {
     StringDoubleQuote,
     TableSepSemicolon,
     TableSepComma,
-    OriginRange
+    OriginRange,
+    StmtEndSemicolon,
+    NewLineBeforeToken
 };
 
 enum class TokenAddStrategy {
     None,
     TableAddColon,
-    TableAddComma
+    TableAddComma,
+    StmtEndSemicolon
 };
 
 enum class IndentStrategy {
@@ -119,4 +122,10 @@ struct AlignGroup {
     std::vector<std::size_t> SyntaxGroup;
     bool Resolve;
     std::size_t AlignPos;
+};
+
+enum class SemicolonStrategy {
+    Add,
+    Remove,
+    InsertNewLine
 };

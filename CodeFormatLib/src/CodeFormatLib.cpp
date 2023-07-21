@@ -41,6 +41,8 @@ std::string GetDiagnosisString(DiagnosticType type) {
             return "spell";
         case DiagnosticType::StringQuote:
             return "string-quote";
+        case DiagnosticType::Semicolon:
+            return "semicolon";
         default: {
             break;
         }

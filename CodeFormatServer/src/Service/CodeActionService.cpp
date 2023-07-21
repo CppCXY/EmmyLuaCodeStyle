@@ -18,7 +18,7 @@ bool CodeActionService::Initialize() {
     CodeProtocol(DiagnosticType::StringQuote, "string-quote", &CodeActionService::Reformat);
     CodeProtocol(DiagnosticType::EndWithNewLine, "end-with-new-line");
     CodeProtocol(DiagnosticType::NameStyle, "name-style");
-
+    CodeProtocol(DiagnosticType::Semicolon, "semicolon");
     return true;
 }
 
