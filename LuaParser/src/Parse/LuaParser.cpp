@@ -280,6 +280,8 @@ void LuaParser::ForStatement() {
         }
     }
 
+    TestAndNext(';');
+
     m.Complete(*this, LuaSyntaxNodeKind::ForStatement);
 }
 
@@ -329,8 +331,6 @@ void LuaParser::ForBody() {
     Block();
 
     CheckAndNext(TK_END);
-
-    TestAndNext(';');
 
     m.Complete(*this, LuaSyntaxNodeKind::ForBody);
 }
