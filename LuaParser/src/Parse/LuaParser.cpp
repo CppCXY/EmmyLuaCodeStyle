@@ -413,8 +413,6 @@ void LuaParser::LabelStatement() {
 
     CheckAndNext(TK_DBCOLON);
 
-    TestAndNext(';');
-
     m.Complete(*this, LuaSyntaxNodeKind::LabelStatement);
 }
 

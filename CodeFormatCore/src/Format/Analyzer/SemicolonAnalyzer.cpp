@@ -16,6 +16,9 @@ void SemicolonAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
             if (detail::multi_match::StatementMatch(syntaxNode.GetSyntaxKind(t))) {
                 switch (f.GetStyle().end_statement_with_semicolon) {
                     case EndStmtWithSemicolon::Always: {
+                        if (syntaxNode.GetSyntaxKind(t) == LuaSyntaxNodeKind::LabelStatement) {
+                            break; // labels should not end with semicolons
+                        }
                         if (!EndsWithSemicolon(syntaxNode, t)) {
                             AddSemicolon(syntaxNode, t);
                         }
