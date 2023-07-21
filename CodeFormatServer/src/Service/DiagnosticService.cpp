@@ -64,6 +64,10 @@ DiagnosticService::Diagnostic(std::size_t fileId,
                 diag.severity = lsp::DiagnosticSeverity::Warning;
                 break;
             }
+            case DiagnosticType::Semicolon: {
+                diag.severity = lsp::DiagnosticSeverity::Warning;
+                break;
+            }
             case DiagnosticType::NameStyle: {
                 diag.severity = lsp::DiagnosticSeverity::Information;
                 break;
