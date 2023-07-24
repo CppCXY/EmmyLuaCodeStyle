@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Format/FormatBuilder.h"
+#include "CodeFormatCore/Format/FormatBuilder.h"
 
 class RangeFormatBuilder : public FormatBuilder {
 public:

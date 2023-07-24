@@ -1,28 +1,28 @@
 #include "LanguageServer.h"
-#include <iterator>
-#include <fstream>
-#include "Util/format.h"
-#include "Util/Url.h"
-#include "Util/FileFinder.h"
-#include "asio.hpp"
-#include "Service/Service.h"
 #include "Service/CodeActionService.h"
-#include "Service/FormatService.h"
-#include "Service/DiagnosticService.h"
-#include "Service/ConfigService.h"
 #include "Service/CommandService.h"
+#include "Service/ConfigService.h"
+#include "Service/DiagnosticService.h"
+#include "Service/FormatService.h"
+#include "Service/Service.h"
+#include "Util/FileFinder.h"
+#include "Util/Url.h"
+#include "Util/format.h"
+#include "asio.hpp"
+#include <fstream>
+#include <iterator>
 
 LanguageServer::LanguageServer()
-        : _idCounter(0),
-          _ioc(1),
-          _lspHandle(this) {
+    : _idCounter(0),
+      _ioc(1),
+      _lspHandle(this) {
 }
 
 void LanguageServer::InitializeService() {
     AddService<FormatService>();
     AddService<DiagnosticService>();
-	AddService<CommandService>();
-	AddService<CodeActionService>();
+    AddService<CommandService>();
+    AddService<CodeActionService>();
     AddService<ConfigService>();
 
     for (auto &service: _services) {
@@ -93,9 +93,8 @@ asio::io_context &LanguageServer::GetIOContext() {
     return _ioc;
 }
 
-uint64_t LanguageServer::GetRequestId()
-{
-	return ++_idCounter;
+uint64_t LanguageServer::GetRequestId() {
+    return ++_idCounter;
 }
 
 LSPHandle &LanguageServer::GetLSPHandle() {

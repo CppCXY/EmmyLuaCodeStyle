@@ -9,8 +9,8 @@ std::vector<LuaTypeFormat::Result> LuaTypeFormat::GetResult() {
     return _results;
 }
 
-LuaTypeFormat::LuaTypeFormat(LuaTypeFormatOptions &typeOptions)
-    : _typeOptions(typeOptions) {
+LuaTypeFormat::LuaTypeFormat(LuaTypeFormatFeatures &features)
+    : _features(features) {
 }
 
 void LuaTypeFormat::Analyze(std::string_view trigger,
@@ -43,11 +43,11 @@ void LuaTypeFormat::AnalyzeReturn(std::size_t line, std::size_t character, const
         return;
     }
 
-    if (_typeOptions.format_line) {
+    if (_features.format_line) {
         FormatLine(line, character, t, style);
     }
 
-    if (_typeOptions.fix_indent) {
+    if (_features.fix_indent) {
         FixIndent(line, character, t, style);
     }
 }
@@ -57,7 +57,7 @@ void LuaTypeFormat::CompleteMissToken(std::size_t line,
                                       const LuaParseError &luaError,
                                       const LuaSyntaxTree &t,
                                       LuaStyle &style) {
-    if (!_typeOptions.auto_complete_end) {
+    if (!_features.auto_complete_end) {
         return;
     }
     auto &result = _results.emplace_back();
@@ -178,7 +178,7 @@ void LuaTypeFormat::FormatLine(std::size_t line, std::size_t character, const Lu
             formatRange.StartLine = line - 1;
             formatRange.EndLine = line - 1;
 
-            if (_typeOptions.auto_complete_table_sep) {
+            if (_features.auto_complete_table_sep) {
                 tempStyle.trailing_table_separator = TrailingTableSeparator::Smart;
             }
 

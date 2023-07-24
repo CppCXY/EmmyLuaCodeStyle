@@ -1,25 +1,25 @@
 #pragma once
 
-#include <cstdlib>
-#include <string_view>
-#include <memory>
-#include <variant>
 #include "LSP/LSP.h"
+#include <cstdlib>
+#include <memory>
+#include <string_view>
+#include <variant>
 
-class ProtocolParser
-{
+class ProtocolParser {
 public:
-	ProtocolParser();
+    ProtocolParser();
 
-	void Parse(std::string_view msg);
+    void Parse(std::string_view msg);
 
-	nlohmann::json GetParams();
+    nlohmann::json GetParams();
 
-	std::string_view GetMethod();
+    std::string_view GetMethod();
 
-	std::string SerializeProtocol(std::shared_ptr<lsp::Serializable> result);
+    std::string SerializeProtocol(std::shared_ptr<lsp::Serializable> result);
+
 private:
-	std::variant<int, std::string, void*> _id;
-	std::string _method;
-	nlohmann::json _params;
+    std::variant<int, std::string, void *> _id;
+    std::string _method;
+    nlohmann::json _params;
 };

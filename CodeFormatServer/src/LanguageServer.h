@@ -5,17 +5,16 @@
 #include <asio.hpp>
 #include <asio/io_context.hpp>
 
-#include "Session/IOSession.h"
 #include "CodeFormatCore/Config/LuaEditorConfig.h"
-#include "Service/ServiceType.h"
-#include "VFS/VirtualFile.h"
 #include "LSP/LSPHandle.h"
-#include "VFS/VirtualFileSystem.h"
 #include "Service/Service.h"
+#include "Service/ServiceType.h"
+#include "Session/IOSession.h"
+#include "VFS/VirtualFile.h"
+#include "VFS/VirtualFileSystem.h"
 
 template<class Derived>
-concept ServiceClass = requires(Derived d)
-{
+concept ServiceClass = requires(Derived d) {
     std::is_base_of<Service, Derived>::value;
     Derived::ServiceIndex;
 };
@@ -38,8 +37,8 @@ public:
 
     asio::io_context &GetIOContext();
 
-    template<ServiceClass Service, typename ... ARGS>
-    void AddService(ARGS &&... args);
+    template<ServiceClass Service, typename... ARGS>
+    void AddService(ARGS &&...args);
 
     template<ServiceClass Service>
     Service *GetService();
@@ -69,8 +68,8 @@ Service *LanguageServer::GetService() {
     return dynamic_cast<Service *>(_services[static_cast<std::size_t>(Service::ServiceIndex)].get());
 }
 
-template<ServiceClass Service, typename ... ARGS>
-void LanguageServer::AddService(ARGS &&... args) {
+template<ServiceClass Service, typename... ARGS>
+void LanguageServer::AddService(ARGS &&...args) {
     auto index = Service::ServiceIndex;
     auto service = std::make_unique<Service>(this, std::forward<ARGS &&>(args)...);
     _services[static_cast<std::size_t>(index)] = std::move(service);

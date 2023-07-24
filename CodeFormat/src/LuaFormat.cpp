@@ -138,7 +138,7 @@ void LuaFormat::SetDefaultStyle(std::map<std::string, std::string, std::less<>> 
     if (keyValues.empty()) {
         return;
     }
-    _defaultStyle.ParseFromMap(keyValues);
+    _defaultStyle.Parse(keyValues);
 }
 
 bool LuaFormat::Reformat() {

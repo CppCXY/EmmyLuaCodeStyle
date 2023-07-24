@@ -6,8 +6,10 @@ enum class FormatAnalyzerType {
     IndentationAnalyzer,
     AlignAnalyzer,
     TokenAnalyzer,
-    FormatDocAnalyze,
     SemicolonAnalyzer,
+
+    // last
+    FormatDocAnalyze,
     Count,
 };
 

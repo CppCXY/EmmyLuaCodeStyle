@@ -1,35 +1,34 @@
 ﻿#pragma once
 
-#include <string>
 #include <list>
+#include <string>
 
-class ProtocolBuffer
-{
+class ProtocolBuffer {
 public:
-	ProtocolBuffer(std::size_t capacity);
+    ProtocolBuffer(std::size_t capacity);
 
-	char* GetWritableCursor();
+    char *GetWritableCursor();
 
-	std::size_t GetRestCapacity();
+    std::size_t GetRestCapacity();
 
-	void SetWriteSize(std::size_t size);
+    void SetWriteSize(std::size_t size);
 
-	bool CanReadOneProtocol();
+    bool CanReadOneProtocol();
 
-	std::string_view ReadOneProtocol();
+    std::string_view ReadOneProtocol();
 
-	void FitCapacity();
+    void FitCapacity();
 
-	void Reset();
+    void Reset();
+
 private:
-	bool TryParseHead();
-	// 代表从这个位置开始可写
-	std::size_t _writeIndex;
+    bool TryParseHead();
+    // 代表从这个位置开始可写
+    std::size_t _writeIndex;
 
-	std::string _textProtocol;
+    std::string _textProtocol;
 
-	std::size_t _contentLength;
-	std::size_t _bodyStartIndex;
-	std::size_t _normalCapacity;
+    std::size_t _contentLength;
+    std::size_t _bodyStartIndex;
+    std::size_t _normalCapacity;
 };
-

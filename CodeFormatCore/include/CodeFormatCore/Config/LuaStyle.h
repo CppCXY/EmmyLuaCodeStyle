@@ -12,7 +12,7 @@ class LuaStyle {
 public:
     LuaStyle() = default;
 
-    void ParseFromMap(std::map<std::string, std::string, std::less<>> &configMap);
+    void Parse(std::map<std::string, std::string, std::less<>> &configMap);
     // [basic]
     /*
      * 缩进风格

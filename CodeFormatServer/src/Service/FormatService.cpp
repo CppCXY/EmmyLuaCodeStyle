@@ -32,7 +32,7 @@ FormatService::TypeFormat(std::string_view trigger,
                           std::size_t character,
                           LuaSyntaxTree &luaSyntaxTree,
                           LuaStyle &luaStyle,
-                          LuaTypeFormatOptions &typeOptions) {
+                          LuaTypeFormatFeatures &typeOptions) {
     LuaTypeFormat tf(typeOptions);
     tf.Analyze(trigger, line, character, luaSyntaxTree, luaStyle);
     return tf.GetResult();

@@ -40,7 +40,7 @@ target_sources(CodeFormatCore
         src/RangeFormat/RangeFormatBuilder.cpp
         # typeFormat
         src/TypeFormat/LuaTypeFormat.cpp
-        src/TypeFormat/LuaTypeFormatOptions.cpp
+        src/TypeFormat/LuaTypeFormatFeatures.cpp
         # diagnostic
         src/Diagnostic/DiagnosticBuilder.cpp
         # diagnostic/nameStyle

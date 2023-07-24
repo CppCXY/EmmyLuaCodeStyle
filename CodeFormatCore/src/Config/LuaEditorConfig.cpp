@@ -85,7 +85,7 @@ LuaStyle &LuaEditorConfig::Generate(std::string_view filePath) {
     auto &luaStyle = _styleMap.at(patternKey);
     for (auto i: patternSection) {
         auto &configMap = _sections[i].ConfigMap;
-        luaStyle.ParseFromMap(configMap);
+        luaStyle.Parse(configMap);
     }
 
     return luaStyle;

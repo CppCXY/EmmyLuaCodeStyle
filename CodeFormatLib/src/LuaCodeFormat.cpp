@@ -50,7 +50,7 @@ void LuaCodeFormat::RemoveCodeStyle(const std::string &workspaceUri) {
 void LuaCodeFormat::SetDefaultCodeStyle(ConfigMap &configMap) {
     if (!configMap.empty()) {
         LuaStyle style;
-        style.ParseFromMap(configMap);
+        style.Parse(configMap);
         _defaultStyle = style;
     }
 }
@@ -146,7 +146,7 @@ LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t 
     LuaStyle style = GetStyle(uri);
     CalculateTempStyle(style, configMap);
 
-    LuaTypeFormatOptions typeFormatOptions = LuaTypeFormatOptions::ParseFromMap(stringTypeOptions);
+    LuaTypeFormatFeatures typeFormatOptions = LuaTypeFormatFeatures::From(stringTypeOptions);
 
     LuaTypeFormat tf(typeFormatOptions);
     tf.Analyze("\n", line, character, t, style);

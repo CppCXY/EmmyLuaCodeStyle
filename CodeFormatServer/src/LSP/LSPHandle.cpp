@@ -261,7 +261,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnTypeFormatting(
     auto &syntaxTree = opSyntaxTree.value();
     LuaStyle &luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
 
-    LuaTypeFormatOptions typeFormatOptions;
+    LuaTypeFormatFeatures typeFormatOptions;
     auto typeFormatResults = _server->GetService<FormatService>()->TypeFormat(
             "\n",
             params->position.line,

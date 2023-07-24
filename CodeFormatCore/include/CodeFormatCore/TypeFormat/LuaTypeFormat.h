@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Format/FormatBuilder.h"
-#include "LuaTypeFormatOptions.h"
+#include "CodeFormatCore/Format/FormatBuilder.h"
+#include "LuaTypeFormatFeatures.h"
 
 class LuaTypeFormat {
 public:
@@ -10,13 +10,12 @@ public:
         std::string Text;
     };
 
-    LuaTypeFormat(LuaTypeFormatOptions &typeOptions);
+    explicit LuaTypeFormat(LuaTypeFormatFeatures &features);
 
     void Analyze(
             std::string_view trigger, std::size_t line, std::size_t character,
             const LuaSyntaxTree &t,
-            LuaStyle &style
-    );
+            LuaStyle &style);
 
     std::vector<Result> GetResult();
 
@@ -29,19 +28,16 @@ private:
                            std::size_t character,
                            const LuaParseError &luaError,
                            const LuaSyntaxTree &t,
-                           LuaStyle &style
-    );
+                           LuaStyle &style);
 
     void FormatLine(std::size_t line,
                     std::size_t character,
                     const LuaSyntaxTree &t,
-                    LuaStyle &style
-    );
+                    LuaStyle &style);
 
     void FormatByRange(FormatRange range,
                        const LuaSyntaxTree &t,
-                       LuaStyle &style
-    );
+                       LuaStyle &style);
 
     void FixIndent(std::size_t line,
                    std::size_t character,
@@ -50,7 +46,6 @@ private:
 
     void FixEndIndent(std::size_t line, std::size_t character);
 
-    LuaTypeFormatOptions _typeOptions;
+    LuaTypeFormatFeatures _features;
     std::vector<Result> _results;
 };
- 

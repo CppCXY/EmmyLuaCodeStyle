@@ -24,7 +24,7 @@ bool IsNumber(std::string_view source) {
         op = std::stoi(configMap.at(#op));                     \
     }
 
-void LuaStyle::ParseFromMap(std::map<std::string, std::string, std::less<>> &configMap) {
+void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap) {
     if (configMap.count("indent_style")) {
         if (configMap.at("indent_style") == "space") {
             indent_style = IndentStyle::Space;

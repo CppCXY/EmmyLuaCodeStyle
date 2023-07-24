@@ -27,5 +27,5 @@ public:
             std::size_t character,
             LuaSyntaxTree &luaSyntaxTree,
             LuaStyle &luaStyle,
-            LuaTypeFormatOptions &typeOptions);
+            LuaTypeFormatFeatures &typeOptions);
 };
