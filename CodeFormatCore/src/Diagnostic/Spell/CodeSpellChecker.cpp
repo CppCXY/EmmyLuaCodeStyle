@@ -1,13 +1,13 @@
 ﻿#include "CodeFormatCore/Diagnostic/Spell/CodeSpellChecker.h"
-#include "Util/format.h"
-#include "CodeFormatCore/Diagnostic/Spell/TextParser.h"
-#include "LuaParser/Lexer/LuaToken.h"
-#include "CodeFormatCore/Diagnostic/DiagnosticType.h"
-#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeFormatCore/Diagnostic/DiagnosticBuilder.h"
+#include "CodeFormatCore/Diagnostic/DiagnosticType.h"
+#include "CodeFormatCore/Diagnostic/Spell/Util.h"
+#include "LuaParser/Lexer/LuaToken.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
+#include "Util/format.h"
 
 CodeSpellChecker::CodeSpellChecker()
-        : _symSpell(std::make_shared<SymSpell>(SymSpell::Strategy::LazyLoaded)) {
+    : _symSpell(std::make_shared<SymSpell>(SymSpell::Strategy::LazyLoaded)) {
 }
 
 void CodeSpellChecker::LoadDictionary(std::string_view path) {
@@ -49,7 +49,7 @@ std::vector<SuggestItem> CodeSpellChecker::GetSuggests(std::string word) {
                 if (std::isupper(c)) {
                     state = ParseState::AllUpper;
                     c = static_cast<char>(std::tolower(c));
-                } else // lower
+                } else// lower
                 {
                     state = ParseState::Lower;
                 }
@@ -115,8 +115,13 @@ std::vector<SuggestItem> CodeSpellChecker::GetSuggests(std::string word) {
     return suggests;
 }
 
+std::string lowerString(std::string_view source) {
+    std::string lowerItem(source);
+    std::transform(lowerItem.begin(), lowerItem.end(), lowerItem.begin(), ::tolower);
+    return lowerItem;
+}
+
 void CodeSpellChecker::IdentifyAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &token, const LuaSyntaxTree &t) {
-    std::shared_ptr<spell::IdentifyParser> parser = nullptr;
     std::string text(token.GetText(t));
 
     auto &customDict = _dictionary;
@@ -124,27 +129,17 @@ void CodeSpellChecker::IdentifyAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &toke
         return;
     }
 
-    auto it = _caches.find(text);
-    if (it != _caches.end()) {
-        parser = it->second;
-    } else {
-        parser = std::make_shared<spell::IdentifyParser>(text);
-        parser->Parse();
-        _caches.insert({text, parser});
-    }
-
-    auto &words = parser->GetWords();
+    auto words = spell::identify::ParseToWords(text);
     if (words.empty()) {
         return;
     }
-
     for (auto &word: words) {
-        if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item) && customDict.count(word.Item) == 0) {
+        auto lowerItem = lowerString(word.Item);
+        if (!word.Item.empty() && customDict.count(lowerItem) == 0 && !_symSpell->IsCorrectWord(lowerItem)) {
             auto tokenRange = token.GetTextRange(t);
-            auto range = TextRange(tokenRange.StartOffset + word.Range.Start,
-                                   word.Range.Count
-            );
-            std::string originText(text.substr(word.Range.Start, word.Range.Count));
+            auto range = TextRange(tokenRange.StartOffset + word.Range.StartOffset,
+                                   word.Range.Length);
+            std::string originText(text.substr(word.Range.StartOffset, word.Range.Length));
             d.PushDiagnostic(DiagnosticType::Spell, range,
                              util::format("Typo in identifier '{}'", originText), originText);
         }
@@ -152,42 +147,27 @@ void CodeSpellChecker::IdentifyAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &toke
 }
 
 void CodeSpellChecker::TextAnalyze(DiagnosticBuilder &d, LuaSyntaxNode &token, const LuaSyntaxTree &t) {
-    auto identifiers = spell::TextParser::ParseToWords(token.GetText(t));
+    auto identifiers = spell::text::ParseToIdentifies(token.GetText(t));
     if (identifiers.empty()) {
         return;
     }
     auto &customDict = _dictionary;
 
     for (auto &identifier: identifiers) {
-        auto &text = identifier.Item;
-
-        if (customDict.count(text) != 0) {
-            continue;
-        }
-        std::shared_ptr<spell::IdentifyParser> identifierParser = nullptr;
-
-        auto it = _caches.find(text);
-        if (it != _caches.end()) {
-            identifierParser = it->second;
-        } else {
-            identifierParser = std::make_shared<spell::IdentifyParser>(text);
-            identifierParser->Parse();
-            _caches.insert({text, identifierParser});
-        }
-
-        auto &words = identifierParser->GetWords();
+        auto identifyText = identifier.Item;
+        auto words = spell::identify::ParseToWords(identifyText);
         if (words.empty()) {
             continue;
         }
 
         auto tokenRange = token.GetTextRange(t);
         for (auto &word: words) {
-            if (!word.Item.empty() && !_symSpell->IsCorrectWord(word.Item) && customDict.count(word.Item) == 0) {
-                auto range = TextRange(tokenRange.StartOffset + identifier.Range.Start + word.Range.Start,
-                                       word.Range.Count
-                );
+            auto lowerItem = lowerString(word.Item);
+            if (!word.Item.empty() && !_symSpell->IsCorrectWord(lowerItem) && customDict.count(lowerItem) == 0) {
+                auto range = TextRange(tokenRange.StartOffset + identifier.Range.StartOffset + word.Range.StartOffset,
+                                       word.Range.Length);
                 std::string originText(
-                        token.GetText(t).substr(identifier.Range.Start + word.Range.Start, word.Range.Count));
+                        token.GetText(t).substr(identifier.Range.StartOffset + word.Range.StartOffset, word.Range.Length));
                 d.PushDiagnostic(DiagnosticType::Spell, range,
                                  util::format("Typo in string '{}'", originText), originText);
             }

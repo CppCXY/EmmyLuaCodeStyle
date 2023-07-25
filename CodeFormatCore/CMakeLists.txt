@@ -48,8 +48,7 @@ target_sources(CodeFormatCore
         src/Diagnostic/NameStyle/NameStyleRuleMatcher.cpp
         # diagnostic/spell
         src/Diagnostic/Spell/CodeSpellChecker.cpp
-        src/Diagnostic/Spell/IdentifyParser.cpp
-        src/Diagnostic/Spell/TextParser.cpp
+        src/Diagnostic/Spell/Util.cpp
         # diagnostic/codestyle
         src/Diagnostic/CodeStyle/CodeStyleChecker.cpp
 		)

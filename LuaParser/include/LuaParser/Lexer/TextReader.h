@@ -19,9 +19,9 @@ public:
 
     bool CheckNext2(std::string_view set);
 
-    std::size_t GetPos();
+    std::size_t GetPos() const;
 
-    TextRange GetTokenRange();
+    TextRange GetTokenRange() const;
 
     std::string_view GetSaveText() const;
 
@@ -29,9 +29,19 @@ public:
 
     std::size_t EatWhen(int ch);
 
-    std::size_t EatWhile(const std::function<bool(int ch)>& fn);
+    template<class Fn>
+    std::size_t EatWhile(Fn fn) {
+        std::size_t count = 0;
+        while (!IsEof() && fn(GetCurrentChar())) {
+            SaveAndNext();
+            count++;
+        }
+        return count;
+    }
 
     bool IsEof() const;
+
+    bool HasSaveText() const;
 private:
     std::string_view _text;
 

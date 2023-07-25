@@ -63,11 +63,11 @@ bool TextReader::CheckNext2(std::string_view set) {
     return false;
 }
 
-std::size_t TextReader::GetPos() {
+std::size_t TextReader::GetPos() const {
     return _currentIndex;
 }
 
-TextRange TextReader::GetTokenRange() {
+TextRange TextReader::GetTokenRange() const {
     return TextRange(_buffStart, _buffIndex - _buffStart + 1);
 }
 
@@ -88,6 +88,10 @@ bool TextReader::IsEof() const {
     return _isEof;
 }
 
+bool TextReader::HasSaveText() const {
+    return _hasSaveText;
+}
+
 std::size_t TextReader::EatWhen(int ch) {
     std::size_t count = 0;
     while (!IsEof() && GetCurrentChar() == ch) {
@@ -97,11 +101,3 @@ std::size_t TextReader::EatWhen(int ch) {
     return count;
 }
 
-std::size_t TextReader::EatWhile(const std::function<bool(int)> &fn) {
-    std::size_t count = 0;
-    while (!IsEof() && fn(GetCurrentChar())) {
-        SaveAndNext();
-        count++;
-    }
-    return count;
-}

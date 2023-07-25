@@ -211,6 +211,7 @@ glob
 proto
 inlay
 params
+args
 wakeup
 none
 nil
@@ -228,3 +229,12 @@ enum
 enums
 substring
 globals
+https
+http
+apis
+api
+sql
+json
+jsonrpc
+workspace
+ide

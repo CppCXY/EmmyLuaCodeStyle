@@ -1,16 +1,15 @@
 #pragma once
 
-#include <string_view>
-#include <memory>
 #include "IDistance.h"
+#include <memory>
+#include <string_view>
 
-class EditDistance
-{
+class EditDistance {
 public:
-	explicit EditDistance();
+    explicit EditDistance();
 
-	int Compare(std::string_view lhs, std::string_view rhs, std::size_t maxEditDistance);
-	
+    int Compare(std::string_view lhs, std::string_view rhs, std::size_t maxEditDistance);
+
 private:
-	std::shared_ptr<IDistance> _distanceAlgorithm;
+    std::shared_ptr<IDistance> _distanceAlgorithm;
 };
