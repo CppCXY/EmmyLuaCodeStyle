@@ -22,8 +22,10 @@ protected:
 
     virtual void WriteSpace(std::size_t space);
 
+    void BreakLine(std::size_t line);
+    
     virtual void WriteLine(std::size_t line);
-
+    
     virtual void WriteIndent();
 
     virtual void WriteChar(char ch);

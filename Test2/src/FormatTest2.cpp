@@ -8,13 +8,18 @@
 
 int main() {
     std::string buffer = R"(
-local t = { function ()
-    local t = 123
-end }
+local t = function()  local a = 131
 
-local t = { {
-    okokok = 123
-} }
+
+    local b = function()
+        local c = {
+        }
+    end
+end
+
+local t2 = function()
+    local c = 1
+end
 )";
 
     auto file = std::make_shared<LuaFile>(std::move(buffer));
@@ -30,6 +35,8 @@ local t = { {
     std::cout << t.GetDebugView() << std::endl;
 
     LuaStyle s;
+    s.indent_style = IndentStyle::Tab;
+    s.keep_indents_on_empty_lines = true;
     FormatBuilder b(s);
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;

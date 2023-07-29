@@ -116,6 +116,8 @@ public:
 
     bool never_indent_comment_on_if_branch = false;
 
+    bool keep_indents_on_empty_lines = false; // 空行保持缩进
+
     // [line space]
 
     LineSpace line_space_after_if_statement = LineSpace(LineSpaceType::Keep);
