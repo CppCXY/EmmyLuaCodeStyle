@@ -1680,3 +1680,75 @@ local table1 = { 1, 2, 3 }
 )",
             style));
 }
+
+TEST(FormatByStyleOption, keep_indents_on_empty_lines) {
+    LuaStyle style;
+
+    style.keep_indents_on_empty_lines = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = function()  local a = 131
+
+
+    local b = function()
+        local c = {
+        }
+    end
+end
+      
+local t2 = function()
+    local c = 1
+end
+)",
+            R"(
+local t = function()
+    local a = 131
+    
+    
+    local b = function()
+        local c = {
+        }
+    end
+end
+
+local t2 = function()
+    local c = 1
+end
+
+)",
+            style));
+    
+    style.keep_indents_on_empty_lines = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = function()  local a = 131
+
+
+    local b = function()
+        local c = {
+        }
+    end
+end
+      
+local t2 = function()
+    local c = 1
+end
+)",
+            R"(
+local t = function()
+    local a = 131
+
+
+    local b = function()
+        local c = {
+        }
+    end
+end
+
+local t2 = function()
+    local c = 1
+end
+
+)",
+            style));
+}

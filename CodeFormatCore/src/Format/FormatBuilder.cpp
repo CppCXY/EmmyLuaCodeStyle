@@ -251,22 +251,7 @@ void FormatBuilder::WriteSpace(std::size_t space) {
     _state.CurrentWidth() += space;
 }
 
-void FormatBuilder::WriteLine(std::size_t line) {
-    if (line == 0) {
-        return;
-    }
-    // trim end space
-    auto lastIndex = _formattedText.size();
-    std::size_t reduce = 0;
-    while (_formattedText[lastIndex - reduce - 1] == ' ') {
-        reduce++;
-        if (lastIndex <= reduce + 1) {
-            break;
-        }
-    }
-    if (reduce > 0) {
-        _formattedText.resize(_formattedText.size() - reduce);
-    }
+void FormatBuilder::AddEndOfLine(std::size_t line) {
     auto endOfLine = _state.GetEndOfLine();
     switch (endOfLine) {
         case EndOfLine::CRLF: {
@@ -302,6 +287,35 @@ void FormatBuilder::WriteLine(std::size_t line) {
         }
     }
     _state.CurrentWidth() = 0;
+}
+
+void FormatBuilder::WriteLine(std::size_t line) {
+    if (line == 0) {
+        return;
+    }
+    // trim end space
+    auto lastIndex = _formattedText.size();
+    std::size_t reduce = 0;
+    while (_formattedText[lastIndex - reduce - 1] == ' ') {
+        reduce++;
+        if (lastIndex <= reduce + 1) {
+            break;
+        }
+    }
+    if (reduce > 0) {
+        _formattedText.resize(_formattedText.size() - reduce);
+    }
+
+    if (line > 1 && _state.GetStyle().keep_indents_on_empty_lines) {
+        AddEndOfLine(1);
+
+        for (int i = 1; i < line; ++i) {
+            WriteIndent();
+            AddEndOfLine(1);
+        }
+    } else {
+        AddEndOfLine(line);
+    }
 }
 
 void FormatBuilder::WriteIndent() {
