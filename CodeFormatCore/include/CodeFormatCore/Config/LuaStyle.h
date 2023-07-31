@@ -116,6 +116,12 @@ public:
 
     bool never_indent_comment_on_if_branch = false;
 
+    /*
+     * if true retains indents on empty lines as if they contained some code
+     * if false deletes the tab characters and spaces on empty lines 
+     */
+    bool keep_indents_on_empty_lines = false;
+
     // [line space]
 
     LineSpace line_space_after_if_statement = LineSpace(LineSpaceType::Keep);
