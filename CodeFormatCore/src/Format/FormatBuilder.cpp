@@ -309,7 +309,7 @@ void FormatBuilder::WriteLine(std::size_t line) {
     if (line > 1 && _state.GetStyle().keep_indents_on_empty_lines) {
         AddEndOfLine(1);
 
-        for (int i = 1; i < line; ++i) {
+        for (std::size_t i = 1; i < line; ++i) {
             WriteIndent();
             AddEndOfLine(1);
         }
