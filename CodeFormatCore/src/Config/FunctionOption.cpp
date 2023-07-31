@@ -4,7 +4,7 @@
 
 void FunctionOption::Parse(std::string_view option) {
     std::string text(option);
-    auto virtualFile = std::make_shared<LuaFile>(std::move(text));
+    auto virtualFile = LuaSource::From(std::move(text));
     LuaLexer lexer(virtualFile);
     lexer.Parse();
     if (lexer.HasError()) {

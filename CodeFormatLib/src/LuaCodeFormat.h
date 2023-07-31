@@ -55,7 +55,7 @@ public:
     LuaStyle &GetStyle(const std::string &uri);
 private:
     std::vector<LuaDiagnosticInfo> MakeDiagnosticInfo(const std::vector<LuaDiagnostic>& diagnostics,
-                                                      std::shared_ptr<LuaFile> file);
+                                                      std::shared_ptr<LuaSource> file);
 
     void CalculateTempStyle(LuaStyle& style, ConfigMap &configMap);
 

@@ -66,6 +66,9 @@ cmake --build .
 
 [**@Rainer Poisel**](https://github.com/rpoisel)
 
+[**@AndreaWalchshoferSCCH**](https://github.com/AndreaWalchshoferSCCH)
+
+[**@一醉青衫**](https://github.com/qq792453582)
 ## License
 
 [MIT](LICENSE)

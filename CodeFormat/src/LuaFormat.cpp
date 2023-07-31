@@ -4,7 +4,7 @@
 #include "CodeFormatCore/Format/FormatBuilder.h"
 #include "CodeFormatCore/RangeFormat/RangeFormatBuilder.h"
 #include "LuaParser/Ast/LuaSyntaxTree.h"
-#include "LuaParser/File/LuaFile.h"
+#include "LuaParser/File/LuaSource.h"
 #include "LuaParser/Lexer/LuaLexer.h"
 #include "LuaParser/Parse/LuaParser.h"
 #include "LuaParser/Types/TextRange.h"
@@ -155,7 +155,7 @@ bool LuaFormat::Reformat() {
 }
 
 bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view outPath, std::string &&sourceText) {
-    auto file = std::make_shared<LuaFile>(std::move(sourceText));
+    auto file = LuaSource::From(std::move(sourceText));
     LuaLexer luaLexer(file);
     if (_isSupportNonStandardLua) {
         luaLexer.SupportNonStandardSymbol();
@@ -195,7 +195,7 @@ bool LuaFormat::ReformatSingleFile(std::string_view inputPath, std::string_view 
 
 
 bool LuaFormat::RangeReformat() {
-    auto file = std::make_shared<LuaFile>(std::move(_inputFileText));
+    auto file = LuaSource::From(std::move(_inputFileText));
     LuaLexer luaLexer(file);
     if (_isSupportNonStandardLua) {
         luaLexer.SupportNonStandardSymbol();
@@ -267,7 +267,7 @@ bool LuaFormat::Check() {
     return CheckWorkspace();
 }
 
-void LuaFormat::DiagnosticInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file,
+void LuaFormat::DiagnosticInspection(std::string_view message, TextRange range, std::shared_ptr<LuaSource> file,
                                      std::string_view path) {
     auto startLine = file->GetLine(range.StartOffset);
     auto startChar = file->GetColumn(range.StartOffset);
@@ -318,7 +318,7 @@ LuaStyle LuaFormat::GetStyle(std::string_view path) {
 }
 
 bool LuaFormat::CheckSingleFile(std::string_view inputPath, std::string &&sourceText) {
-    auto file = std::make_shared<LuaFile>(std::move(sourceText));
+    auto file = std::make_shared<LuaSource>(std::move(sourceText));
     LuaLexer luaLexer(file);
     if (_isSupportNonStandardLua) {
         luaLexer.SupportNonStandardSymbol();

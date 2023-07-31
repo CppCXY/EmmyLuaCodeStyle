@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LuaParser/File/LuaFile.h"
+#include "LuaParser/File/LuaSource.h"
 #include "LuaParser/Lexer/LuaToken.h"
 #include "LuaParser/Parse/Mark.h"
 #include "LuaSyntaxNode.h"
@@ -15,7 +15,7 @@ public:
 
     void BuildTree(LuaParser &p);
 
-    const LuaFile &GetFile() const;
+    const LuaSource &GetFile() const;
 
     std::size_t GetStartOffset(std::size_t index) const;
 
@@ -81,7 +81,7 @@ private:
 
     void BuildToken(LuaToken &token);
 
-    std::shared_ptr<LuaFile> _file;
+    std::shared_ptr<LuaSource> _source;
     std::vector<NodeOrToken> _nodeOrTokens;
     std::vector<IncrementalToken> _tokens;
     std::vector<LuaSyntaxNode> _syntaxNodes;

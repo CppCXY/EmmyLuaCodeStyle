@@ -1,5 +1,5 @@
 ﻿#include "LuaParser/Lexer/LuaLexer.h"
-#include "LuaParser/File/LuaFile.h"
+#include "LuaParser/File/LuaSource.h"
 #include "LuaParser/Lexer/LuaDefine.h"
 #include "LuaParser/Lexer/LuaIdentify.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
@@ -42,7 +42,7 @@ std::map<std::string, LuaTokenKind, std::less<>> LuaLexer::LuaReserved = {
         {"::",       TK_DBCOLON }
 };
 
-LuaLexer::LuaLexer(std::shared_ptr<LuaFile> file)
+LuaLexer::LuaLexer(std::shared_ptr<LuaSource> file)
     : _linenumber(0),
       _supportNonStandardSymbol(false),
       _reader(file->GetSource()),
@@ -77,7 +77,7 @@ bool LuaLexer::HasError() const {
     return !_errors.empty();
 }
 
-std::shared_ptr<LuaFile> LuaLexer::GetFile() {
+std::shared_ptr<LuaSource> LuaLexer::GetFile() {
     return _file;
 }
 

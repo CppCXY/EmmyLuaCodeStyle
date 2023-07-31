@@ -1,5 +1,14 @@
 # Change Log
 
+# 1.3.0
+
+`REFACTOR` rewrote the tokenization algorithm and related spell-checking.
+
+`FIX` fixed the issue of adding incorrect trailing separators to table entries.
+
+`NEW` added support for the option `end_statement_with_semicolon`. Now you can choose whether to keep the semicolon at the end of statements or enforce it. This option provides corresponding diagnostic messages. Thanks to `@AndreaWalchshoferSCCH`.
+
+`NEW` added support for the option `keep_indents_on_empty_lines`. This option is mainly for IntelliJ platform, which usually has a default option to keep indentation on empty lines. Thanks to `@qq792453582`.
 
 # 1.2.2
 

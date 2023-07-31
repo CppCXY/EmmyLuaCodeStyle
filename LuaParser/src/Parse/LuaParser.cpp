@@ -1,12 +1,12 @@
 ﻿#include "LuaParser/Parse/LuaParser.h"
+#include "LuaParser/File/LuaSource.h"
 #include "LuaParser/Lexer/LuaDefine.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "LuaParser/Parse/LuaOperatorType.h"
-#include "Util/format.h"
 #include "LuaParser/exception/LuaParseException.h"
-#include "LuaParser/File/LuaFile.h"
+#include "Util/format.h"
 
-LuaParser::LuaParser(std::shared_ptr<LuaFile> luaFile, std::vector<LuaToken> &&tokens)
+LuaParser::LuaParser(std::shared_ptr<LuaSource> luaFile, std::vector<LuaToken> &&tokens)
         :
         _tokens(tokens),
         _tokenIndex(0),
@@ -28,7 +28,7 @@ bool LuaParser::HasError() const {
     return !_errors.empty();
 }
 
-std::shared_ptr<LuaFile> LuaParser::GetLuaFile() {
+std::shared_ptr<LuaSource> LuaParser::GetLuaFile() {
     return _file;
 }
 

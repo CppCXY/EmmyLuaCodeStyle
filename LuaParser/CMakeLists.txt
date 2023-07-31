@@ -33,7 +33,7 @@ target_sources(LuaParser
         src/Types/TextRange.cpp
 
         # file
-        src/File/LuaFile.cpp
+        src/File/LuaSource.cpp
 
         #exception
         src/exception/LuaParseException.cpp

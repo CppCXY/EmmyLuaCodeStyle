@@ -186,6 +186,7 @@ void LuaTypeFormat::FormatLine(std::size_t line, std::size_t character, const Lu
         }
     }
     tempStyle.call_arg_parentheses = CallArgParentheses::Keep;
+    tempStyle.keep_indents_on_empty_lines = false;
     return FormatByRange(formatRange, t, tempStyle);
 }
 

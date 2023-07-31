@@ -14,7 +14,7 @@ std::optional<LuaSyntaxTree> VirtualFile::GetSyntaxTree(VirtualFileSystem &vfs) 
     auto opText = db.Query(_fileId);
     if (opText.has_value()) {
         auto text = *std::move(opText.value());
-        auto file = std::make_shared<LuaFile>(std::move(text));
+        auto file = std::make_shared<LuaSource>(std::move(text));
         LuaLexer luaLexer(file);
         luaLexer.Parse();
 

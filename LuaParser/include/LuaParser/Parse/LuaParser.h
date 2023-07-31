@@ -15,7 +15,7 @@ class LuaParser
 public:
     static BinOpr GetBinaryOperator(LuaTokenKind op);
 
-	LuaParser(std::shared_ptr<LuaFile> luaFile, std::vector<LuaToken>&& tokens);
+	LuaParser(std::shared_ptr<LuaSource> luaFile, std::vector<LuaToken>&& tokens);
 
     bool Parse();
 
@@ -27,7 +27,7 @@ public:
 
 	bool HasError() const;
 
-	std::shared_ptr<LuaFile> GetLuaFile();
+	std::shared_ptr<LuaSource> GetLuaFile();
 
     Marker Mark();
 private:
@@ -148,7 +148,7 @@ private:
     std::vector<LuaToken> _tokens;
     std::size_t _tokenIndex;
 	std::vector<LuaParseError> _errors;
-	std::shared_ptr<LuaFile> _file;
+	std::shared_ptr<LuaSource> _file;
     std::vector<MarkEvent> _events;
     bool _invalid;
     LuaTokenKind _current;

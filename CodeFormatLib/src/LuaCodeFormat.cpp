@@ -68,7 +68,7 @@ void LuaCodeFormat::LoadSpellDictionaryFromBuffer(const std::string &buffer) {
 }
 
 Result<std::string> LuaCodeFormat::Reformat(const std::string &uri, std::string &&text, ConfigMap &configMap) {
-    auto file = std::make_shared<LuaFile>(std::move(text));
+    auto file = std::make_shared<LuaSource>(std::move(text));
     LuaLexer luaLexer(file);
     if (_supportNonStandardSymbol){
         luaLexer.SupportNonStandardSymbol();
@@ -96,7 +96,7 @@ Result<std::string> LuaCodeFormat::Reformat(const std::string &uri, std::string 
 Result<std::string> LuaCodeFormat::RangeFormat(const std::string &uri, FormatRange &range,
                                                std::string &&text,
                                                ConfigMap &configMap) {
-    auto file = std::make_shared<LuaFile>(std::move(text));
+    auto file = std::make_shared<LuaSource>(std::move(text));
     LuaLexer luaLexer(file);
     if (_supportNonStandardSymbol){
         luaLexer.SupportNonStandardSymbol();
@@ -126,7 +126,7 @@ Result<std::string> LuaCodeFormat::RangeFormat(const std::string &uri, FormatRan
 Result<std::vector<LuaTypeFormat::Result>>
 LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t character, std::string &&text,
                           ConfigMap &configMap, ConfigMap &stringTypeOptions) {
-    auto file = std::make_shared<LuaFile>(std::move(text));
+    auto file = std::make_shared<LuaSource>(std::move(text));
     LuaLexer luaLexer(file);
     if (_supportNonStandardSymbol){
         luaLexer.SupportNonStandardSymbol();
@@ -154,7 +154,7 @@ LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t 
 }
 
 Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::Diagnostic(const std::string &uri, std::string &&text) {
-    auto file = std::make_shared<LuaFile>(std::move(text));
+    auto file = std::make_shared<LuaSource>(std::move(text));
     LuaLexer luaLexer(file);
     if (_supportNonStandardSymbol){
         luaLexer.SupportNonStandardSymbol();
@@ -180,7 +180,7 @@ Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::Diagnostic(const std::stri
 
 Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::SpellCheck(const std::string &uri, std::string &&text,
                                                                  const CodeSpellChecker::CustomDictionary &tempDict) {
-    auto file = std::make_shared<LuaFile>(std::move(text));
+    auto file = LuaSource::From(std::move(text));
     LuaLexer luaLexer(file);
     if (_supportNonStandardSymbol){
         luaLexer.SupportNonStandardSymbol();
@@ -206,7 +206,7 @@ Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::SpellCheck(const std::stri
 }
 
 Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::NameStyleCheck(const std::string &uri, std::string &&text) {
-    auto file = std::make_shared<LuaFile>(std::move(text));
+    auto file = LuaSource::From(std::move(text));
     LuaLexer luaLexer(file);
     if (_supportNonStandardSymbol){
         luaLexer.SupportNonStandardSymbol();
@@ -272,7 +272,7 @@ LuaStyle &LuaCodeFormat::GetStyle(const std::string &uri) {
 }
 
 std::vector<LuaDiagnosticInfo> LuaCodeFormat::MakeDiagnosticInfo(const std::vector<LuaDiagnostic> &diagnostics,
-                                                                 std::shared_ptr<LuaFile> file) {
+                                                                 std::shared_ptr<LuaSource> file) {
     std::vector<LuaDiagnosticInfo> results;
     for (auto &diagnostic: diagnostics) {
         auto& result = results.emplace_back();

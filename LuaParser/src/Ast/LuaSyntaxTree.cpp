@@ -5,14 +5,14 @@
 #include <algorithm>
 
 LuaSyntaxTree::LuaSyntaxTree()
-    : _file(),
+    : _source(),
       _tokenIndex(0) {
 }
 
 void LuaSyntaxTree::BuildTree(LuaParser &p) {
     _errors.swap(p.GetErrors());
 
-    _file = p.GetLuaFile();
+    _source = p.GetLuaFile();
     StartNode(LuaSyntaxNodeKind::File, p);
 
     auto &events = p.GetEvents();
@@ -106,7 +106,7 @@ void LuaSyntaxTree::EatInlineComment(LuaParser &p) {
             case TK_LONG_COMMENT:
             case TK_SHEBANG: {
                 auto prevToken = tokens[index - 1];
-                if (_file->GetLine(prevToken.Range.GetEndOffset()) == _file->GetLine(tokens[index].Range.StartOffset)) {
+                if (_source->GetLine(prevToken.Range.GetEndOffset()) == _source->GetLine(tokens[index].Range.StartOffset)) {
                     EatToken(p);
                 }
                 break;
@@ -184,8 +184,8 @@ void LuaSyntaxTree::BuildToken(LuaToken &token) {
     }
 }
 
-const LuaFile &LuaSyntaxTree::GetFile() const {
-    return *_file;
+const LuaSource &LuaSyntaxTree::GetFile() const {
+    return *_source;
 }
 
 std::size_t LuaSyntaxTree::GetStartOffset(std::size_t index) const {

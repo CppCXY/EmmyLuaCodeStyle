@@ -17,7 +17,7 @@ local t = { {
 } }
 )";
 
-    auto file = std::make_shared<LuaFile>(std::move(buffer));
+    auto file = std::make_shared<LuaSource>(std::move(buffer));
     LuaLexer luaLexer(file);
     luaLexer.SupportNonStandardSymbol();
     luaLexer.Parse();

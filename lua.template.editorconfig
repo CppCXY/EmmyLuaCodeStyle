@@ -104,6 +104,7 @@ never_indent_before_if_condition = false
 
 never_indent_comment_on_if_branch = false
 
+keep_indents_on_empty_lines = false
 # [line space]
 
 # The following configuration supports four expressions

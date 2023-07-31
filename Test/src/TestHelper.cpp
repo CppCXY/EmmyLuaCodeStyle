@@ -7,7 +7,7 @@ std::string TestHelper::ScriptBase = "";
 LuaStyle TestHelper::DefaultStyle;
 
 bool TestHelper::TestFormatted(std::string input, const std::string &shouldBe, LuaStyle &style) {
-    auto file = std::make_shared<LuaFile>(std::move(input));
+    auto file = std::make_shared<LuaSource>(std::move(input));
     LuaLexer luaLexer(file);
     luaLexer.Parse();
 
@@ -25,7 +25,7 @@ bool TestHelper::TestFormatted(std::string input, const std::string &shouldBe, L
 
 bool TestHelper::TestRangeFormatted(std::size_t startLine, std::size_t endLine, std::string input,
                                     const std::string &shouldBe, LuaStyle &style) {
-    auto file = std::make_shared<LuaFile>(std::move(input));
+    auto file = std::make_shared<LuaSource>(std::move(input));
     LuaLexer luaLexer(file);
     luaLexer.Parse();
 
@@ -78,7 +78,7 @@ std::string TestHelper::ReadFile(const std::string &path) {
 }
 
 LuaParser TestHelper::GetParser(std::string input, bool nonStandard) {
-    auto file = std::make_shared<LuaFile>(std::move(input));
+    auto file = std::make_shared<LuaSource>(std::move(input));
     LuaLexer luaLexer(file);
     if (nonStandard) {
         luaLexer.SupportNonStandardSymbol();

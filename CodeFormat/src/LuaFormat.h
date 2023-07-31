@@ -1,15 +1,15 @@
 #pragma once
 
-#include <string>
-#include <string_view>
-#include <filesystem>
-#include <cstring>
-#include <optional>
+#include "CodeFormatCore/Config/LuaDiagnosticStyle.h"
 #include "CodeFormatCore/Config/LuaStyle.h"
-#include "LuaParser/File/LuaFile.h"
+#include "LuaParser/File/LuaSource.h"
 #include "LuaParser/Types/TextRange.h"
 #include "Types.h"
-#include "CodeFormatCore/Config/LuaDiagnosticStyle.h"
+#include <cstring>
+#include <filesystem>
+#include <optional>
+#include <string>
+#include <string_view>
 
 class LuaFormat {
 public:
@@ -55,7 +55,7 @@ private:
 
     LuaStyle GetStyle(std::string_view path);
 
-    void DiagnosticInspection(std::string_view message, TextRange range, std::shared_ptr<LuaFile> file,
+    void DiagnosticInspection(std::string_view message, TextRange range, std::shared_ptr<LuaSource> file,
                               std::string_view path);
 
     bool ReformatSingleFile(std::string_view inputPath, std::string_view outPath, std::string&& sourceText);

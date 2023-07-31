@@ -7,7 +7,7 @@
 #include <vector>
 #include <set>
 
-#include "LuaParser/File/LuaFile.h"
+#include "LuaParser/File/LuaSource.h"
 #include "LuaToken.h"
 #include "LuaTokenError.h"
 #include "LuaTokenKind.h"
@@ -19,7 +19,7 @@
 class LuaLexer
 {
 public:
-	explicit LuaLexer(std::shared_ptr<LuaFile> file);
+	explicit LuaLexer(std::shared_ptr<LuaSource> file);
 
     bool Parse();
 
@@ -27,7 +27,7 @@ public:
 
 	bool HasError() const;
 
-	std::shared_ptr<LuaFile> GetFile();
+	std::shared_ptr<LuaSource> GetFile();
 
 	std::vector<LuaToken>& GetTokens();
 
@@ -62,5 +62,5 @@ private:
     TextReader _reader;
 	std::vector<LuaToken> _tokens;
 	std::vector<LuaTokenError> _errors;
-	std::shared_ptr<LuaFile> _file;
+	std::shared_ptr<LuaSource> _file;
 };

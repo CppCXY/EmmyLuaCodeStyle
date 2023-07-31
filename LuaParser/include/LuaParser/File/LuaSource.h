@@ -5,10 +5,13 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <memory>
 
-class LuaFile {
+class LuaSource {
 public:
-    explicit LuaFile(std::string &&fileText);
+    static std::shared_ptr<LuaSource> From(std::string&& source);
+
+    explicit LuaSource(std::string &&fileText);
 
     std::size_t GetLine(std::size_t offset) const;
 

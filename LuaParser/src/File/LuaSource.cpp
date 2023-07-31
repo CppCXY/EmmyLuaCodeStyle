@@ -1,17 +1,19 @@
-#include "LuaParser/File/LuaFile.h"
+#include "LuaParser/File/LuaSource.h"
 
 #include "Util/Utf8.h"
 
+std::shared_ptr<LuaSource> LuaSource::From(std::string &&source) {
+    return std::make_shared<LuaSource>(std::move(source));
+}
 
-LuaFile::LuaFile(std::string &&fileText)
-        : _source(fileText),
-          _linenumber(0),
-          _lineState(EndOfLine::UNKNOWN) {
+LuaSource::LuaSource(std::string &&fileText)
+    : _source(fileText),
+      _linenumber(0),
+      _lineState(EndOfLine::UNKNOWN) {
     _lineOffsetVec.push_back(0);
 }
 
-
-std::size_t LuaFile::GetLine(std::size_t offset) const {
+std::size_t LuaSource::GetLine(std::size_t offset) const {
     if (_lineOffsetVec.empty()) {
         return 0;
     }
@@ -44,7 +46,7 @@ std::size_t LuaFile::GetLine(std::size_t offset) const {
     return 0;
 }
 
-std::size_t LuaFile::GetColumn(std::size_t offset) const {
+std::size_t LuaSource::GetColumn(std::size_t offset) const {
     auto line = GetLine(offset);
 
     auto lineStartOffset = _lineOffsetVec[line];
@@ -57,7 +59,7 @@ std::size_t LuaFile::GetColumn(std::size_t offset) const {
     return 0;
 }
 
-bool LuaFile::CheckCurrentLineUnicodeBefore(std::size_t offset) const {
+bool LuaSource::CheckCurrentLineUnicodeBefore(std::size_t offset) const {
     auto line = GetLine(offset);
 
     auto lineStartOffset = _lineOffsetVec[line];
@@ -72,7 +74,7 @@ bool LuaFile::CheckCurrentLineUnicodeBefore(std::size_t offset) const {
     return false;
 }
 
-std::size_t LuaFile::GetLineOffset(std::size_t offset) const {
+std::size_t LuaSource::GetLineOffset(std::size_t offset) const {
     auto line = GetLine(offset);
 
     auto lineStartOffset = _lineOffsetVec[line];
@@ -83,7 +85,7 @@ std::size_t LuaFile::GetLineOffset(std::size_t offset) const {
     return 0;
 }
 
-std::size_t LuaFile::GetOffset(std::size_t line, std::size_t character) const {
+std::size_t LuaSource::GetOffset(std::size_t line, std::size_t character) const {
     std::size_t sizeLine = line;
 
     if (sizeLine >= _lineOffsetVec.size()) {
@@ -102,36 +104,36 @@ std::size_t LuaFile::GetOffset(std::size_t line, std::size_t character) const {
     return lineStartOffset + offset;
 }
 
-std::size_t LuaFile::GetTotalLine() const {
+std::size_t LuaSource::GetTotalLine() const {
     return _linenumber;
 }
 
-void LuaFile::PushLine(std::size_t offset) {
+void LuaSource::PushLine(std::size_t offset) {
     _lineOffsetVec.push_back(offset);
     _linenumber++;
 }
 
-std::string_view LuaFile::GetSource() const {
+std::string_view LuaSource::GetSource() const {
     return _source;
 }
 
-std::string_view LuaFile::Slice(std::size_t startOffset, std::size_t endOffset) const {
+std::string_view LuaSource::Slice(std::size_t startOffset, std::size_t endOffset) const {
     std::string_view source = _source;
     return source.substr(startOffset, endOffset - startOffset + 1);
 }
 
-std::string_view LuaFile::Slice(TextRange range) const {
+std::string_view LuaSource::Slice(TextRange range) const {
     if (range.Length == 0) {
         return "";
     }
     return Slice(range.StartOffset, range.GetEndOffset());
 }
 
-void LuaFile::SetTotalLine(std::size_t line) {
+void LuaSource::SetTotalLine(std::size_t line) {
     _linenumber = line;
 }
 
-void LuaFile::UpdateLineInfo(std::size_t startLine) {
+void LuaSource::UpdateLineInfo(std::size_t startLine) {
     auto totalLine = GetTotalLine();
     std::size_t startOffset = 0;
     if (totalLine < startLine) {
@@ -149,14 +151,14 @@ void LuaFile::UpdateLineInfo(std::size_t startLine) {
     }
 }
 
-void LuaFile::Reset() {
+void LuaSource::Reset() {
     _lineOffsetVec.resize(0);
     _lineOffsetVec.push_back(0);
     _linenumber = 0;
     _lineState = EndOfLine::UNKNOWN;
 }
 
-void LuaFile::SetEndOfLineState(EndOfLine endOfLine) {
+void LuaSource::SetEndOfLineState(EndOfLine endOfLine) {
     switch (_lineState) {
         case EndOfLine::UNKNOWN: {
             _lineState = endOfLine;
@@ -176,11 +178,11 @@ void LuaFile::SetEndOfLineState(EndOfLine endOfLine) {
     }
 }
 
-EndOfLine LuaFile::GetEndOfLine() const {
+EndOfLine LuaSource::GetEndOfLine() const {
     return _lineState;
 }
 
-std::size_t LuaFile::GetLineRestCharacter(std::size_t offset) {
+std::size_t LuaSource::GetLineRestCharacter(std::size_t offset) {
     auto line = GetLine(offset);
     std::size_t bytesLength = 0;
     if (line + 1 < _lineOffsetVec.size()) {
@@ -196,7 +198,7 @@ std::size_t LuaFile::GetLineRestCharacter(std::size_t offset) {
     }
 }
 
-TextRange LuaFile::GetIndentRange(std::size_t offset) const {
+TextRange LuaSource::GetIndentRange(std::size_t offset) const {
     std::string_view source = GetSource();
     auto line = GetLine(offset);
     const auto start = GetOffset(line, 0);
@@ -212,7 +214,7 @@ TextRange LuaFile::GetIndentRange(std::size_t offset) const {
     return TextRange(start, index - start);
 }
 
-bool LuaFile::IsEmptyLine(std::size_t line) const {
+bool LuaSource::IsEmptyLine(std::size_t line) const {
     if (line >= _lineOffsetVec.size()) {
         return true;
     }
@@ -235,4 +237,3 @@ bool LuaFile::IsEmptyLine(std::size_t line) const {
 
     return true;
 }
-
