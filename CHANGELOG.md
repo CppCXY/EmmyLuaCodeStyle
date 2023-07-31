@@ -2,6 +2,16 @@
 
 [English Change Log](CHANGELOG_EN.md)
 
+# 1.3.0
+
+`REFACTOR` 重写了分词算法, 和相关的拼写检查
+
+`FIX` 修复了错误的添加表项的尾部分隔符的问题
+
+`NEW` 支持选项`end_statement_with_semicolon`, 现在你可以设置语句是否保留行尾分号, 或者强行保持分号, 该选项提供对应诊断消息, 感谢`@AndreaWalchshoferSCCH`
+
+`NEW` 支持选项`keep_indents_on_empty_lines`, 这个选项主要是intellij平台通常会有默认的一个选项保持空行缩进, 感谢`@qq792453582`
+
 
 # 1.2.2
 
