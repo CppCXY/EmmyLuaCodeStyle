@@ -142,6 +142,7 @@ public:
 
     LineSpace line_space_after_comment = LineSpace(LineSpaceType::Keep);
 
+    LineSpace line_space_around_block = LineSpace(LineSpaceType::Fixed, 1);
     // [line break]
     bool break_all_list_when_line_exceed = false;
 
@@ -156,8 +157,6 @@ public:
 
     // not implement now
     bool leading_comma_style = false;
-
-    bool table_list_special_continue_indent = true;
 
     EndStmtWithSemicolon end_statement_with_semicolon = EndStmtWithSemicolon::Keep;
 };

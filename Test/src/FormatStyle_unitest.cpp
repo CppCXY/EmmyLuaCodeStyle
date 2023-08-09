@@ -1752,3 +1752,45 @@ end
 )",
             style));
 }
+
+TEST(FormatByStyleOption, line_space_around_block) {
+    LuaStyle style;
+
+    style.line_space_around_block = LineSpace(LineSpaceType::Keep);
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f()
+
+    local t = 123
+
+end
+)",
+            R"(
+function f()
+
+    local t = 123
+
+end
+)",
+            style));
+
+    style.line_space_around_block = LineSpace(LineSpaceType::Max, 2);
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f()
+
+
+    local t = 123
+
+
+end
+)",
+            R"(
+function f()
+
+    local t = 123
+
+end
+)",
+            style));
+}

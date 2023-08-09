@@ -9,7 +9,6 @@ AlignAnalyzer::AlignAnalyzer() {
 }
 
 void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
-    std::unordered_map<std::size_t, std::size_t> marks;
     for (auto syntaxNode: t.GetSyntaxNodes()) {
         if (syntaxNode.IsNode(t)) {
             switch (syntaxNode.GetSyntaxKind(t)) {

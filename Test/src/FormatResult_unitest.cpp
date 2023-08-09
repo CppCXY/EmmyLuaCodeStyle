@@ -1036,3 +1036,23 @@ local t = {
 }
 )"));
 }
+
+TEST(Format, bug_131) {
+    LuaStyle style;
+
+    style.space_before_inline_comment = 2;
+    style.align_continuous_inline_comment = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local table = { -- My comment
+    elem1 = {}, --12313
+    elem2 = {}
+}
+)",
+            R"(
+local table = {  -- My comment
+    elem1 = {},  --12313
+    elem2 = {}
+}
+)", style));
+}

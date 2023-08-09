@@ -132,6 +132,7 @@ line_space_after_expression_statement = keep
 
 line_space_after_comment = keep
 
+line_space_around_block = fixed(1)
 # [line break]
 break_all_list_when_line_exceed = false
 

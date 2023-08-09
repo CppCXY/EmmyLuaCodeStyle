@@ -231,7 +231,8 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
             {"line_space_after_local_or_assign_statement", line_space_after_local_or_assign_statement},
             {"line_space_after_function_statement",        line_space_after_function_statement       },
             {"line_space_after_expression_statement",      line_space_after_expression_statement     },
-            {"line_space_after_comment",                   line_space_after_comment                  }
+            {"line_space_after_comment",                   line_space_after_comment                  },
+            {"line_space_around_block",                    line_space_around_block                   }
     };
 
     for (auto &lineOption: fieldList) {

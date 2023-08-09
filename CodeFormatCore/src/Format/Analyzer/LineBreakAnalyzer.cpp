@@ -121,8 +121,8 @@ void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                         }
                     }
 
-                    BreakBefore(syntaxNode, t);
-                    BreakAfter(syntaxNode, t);
+                    BreakBefore(syntaxNode, t, f.GetStyle().line_space_around_block);
+                    BreakAfter(syntaxNode, t, f.GetStyle().line_space_around_block);
                     break;
                 }
                 case LuaSyntaxNodeKind::LocalStatement:
@@ -372,10 +372,9 @@ void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const L
             }
             bool forceBreak = f.GetStyle().break_all_list_when_line_exceed && CanBreakAll(f, tableFieldList, t);
             if (!forceBreak) {
-                forceBreak = tableFieldList.GetStartLine(t) != tableFieldList.GetEndLine(t) && std::any_of(fields.begin(), fields.end(),
-                                                                                                           [&](LuaSyntaxNode &node) {
-                                                                                                               return node.GetChildToken('=', t).IsToken(t);
-                                                                                                           });
+                forceBreak = tableFieldList.GetStartLine(t) != tableFieldList.GetEndLine(t) && std::any_of(fields.begin(), fields.end(), [&](LuaSyntaxNode &node) {
+                                 return node.GetChildToken('=', t).IsToken(t);
+                             });
             }
             if (forceBreak) {
                 auto leftBrace = expr.GetChildToken('{', t);
