@@ -44,7 +44,7 @@ private:
     struct SpaceData {
         SpaceData() : SpaceData(0) {}
 
-        explicit SpaceData(std::size_t space, SpacePriority priority = SpacePriority::Normal) : Priority(priority), Value(space) {}
+        explicit SpaceData(std::size_t space, SpacePriority priority = SpacePriority::Normal) : Value(space), Priority(priority) {}
 
         std::size_t Value;
         SpacePriority Priority;
