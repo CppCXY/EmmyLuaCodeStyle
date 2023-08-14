@@ -2,6 +2,14 @@
 
 [English Change Log](CHANGELOG_EN.md)
 
+# 1.3.1
+
+`FIX` 修复了`space_before_inline_comment=2`对大括号之后的注释不起作用的BUG
+
+`NEW` 新增选项`line_space_around_block`表示语句块开始和末尾保留的空行数, 该选项默认值为`fixed(1)`, 表示语句块不保留前面和后面的空行. 其可选的值范围是:
+`keep`, `max(n)`, `min(n)`, `fixed(n)`, 该选项无法作用于最外层的代码块.
+
+
 # 1.3.0
 
 `REFACTOR` 重写了分词算法, 和相关的拼写检查

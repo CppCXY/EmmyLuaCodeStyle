@@ -1,5 +1,11 @@
 # Change Log
 
+# 1.3.1
+
+`FIX` Fixed a bug where `space_before_inline_comment=2` did not work for comments after curly braces.
+
+`NEW` Added the option `line_space_around_block` to specify the number of blank lines to keep before and after a code block. The default value is `fixed(1)`, which means no blank lines are kept before or after the code block. The possible values are `keep`, `max(n)`, `min(n)`, and `fixed(n)`. Note that this option does not apply to the outermost level of code blocks.
+
 # 1.3.0
 
 `REFACTOR` rewrote the tokenization algorithm and related spell-checking.
