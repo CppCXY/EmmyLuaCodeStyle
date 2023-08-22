@@ -268,6 +268,18 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(break_before_braces)
 
+    if (configMap.count("break_table_list")) {
+        if (configMap.at("break_table_list") == "never") {
+            break_table_list = BreakTableList::Never;
+        }
+        else if(configMap.at("break_table_list") == "smart") {
+            break_table_list = BreakTableList::Smart;
+        }
+        else if(configMap.at("break_table_list") == "lazy") {
+            break_table_list = BreakTableList::Lazy;
+        }
+    }
+
     BOOL_OPTION(ignore_space_after_colon)
 
     BOOL_OPTION(remove_call_expression_list_finish_comma)

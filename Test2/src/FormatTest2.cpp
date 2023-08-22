@@ -8,13 +8,9 @@
 
 int main() {
     std::string buffer = R"(
-local t = { function ()
-    local t = 123
-end }
-
-local t = { {
-    okokok = 123
-} }
+local t = {
+    { aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb, cccccccccccccccccccccccccccccccccccccccccc,ddddddddddddddddddddddddddddddddd}
+}
 )";
 
     auto file = std::make_shared<LuaSource>(std::move(buffer));

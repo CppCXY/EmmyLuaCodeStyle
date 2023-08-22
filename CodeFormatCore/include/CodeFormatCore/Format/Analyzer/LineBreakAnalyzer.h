@@ -31,17 +31,19 @@ public:
 
     void CancelBreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t);
 private:
-    void AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t);
+    void AnalyzeExprList(FormatState &f, LuaSyntaxNode exprList, const LuaSyntaxTree &t);
 
-    void AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t);
+    void AnalyzeExpr(FormatState &f, LuaSyntaxNode expr, const LuaSyntaxTree &t);
 
-    void AnalyzeConditionExpr(FormatState &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t);
+    void AnalyzeConditionExpr(FormatState &f, LuaSyntaxNode expr, const LuaSyntaxTree &t);
 
-    void AnalyzeNameList(FormatState &f, LuaSyntaxNode &nameList, const LuaSyntaxTree &t);
+    void AnalyzeNameList(FormatState &f, LuaSyntaxNode nameList, const LuaSyntaxTree &t);
 
-    void AnalyzeSuffixedExpr(FormatState &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t);
+    void AnalyzeSuffixedExpr(FormatState &f, LuaSyntaxNode expr, const LuaSyntaxTree &t);
 
-    bool CanBreakAll(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t);
+    void AnalyzeTableExpr(FormatState &f, LuaSyntaxNode table, const LuaSyntaxTree &t);
+
+    bool CanBreakAll(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t);
 
     bool CanCollapseLines(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t);
 

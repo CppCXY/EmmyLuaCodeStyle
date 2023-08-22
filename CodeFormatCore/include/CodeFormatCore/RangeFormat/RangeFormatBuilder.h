@@ -28,7 +28,6 @@ protected:
     void WriteChar(char ch) override;
 
     void WriteText(std::string_view text) override;
-
 private:
     void CheckRange(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
 

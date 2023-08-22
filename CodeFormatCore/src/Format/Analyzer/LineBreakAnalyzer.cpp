@@ -1,5 +1,4 @@
 #include "CodeFormatCore/Format/Analyzer/LineBreakAnalyzer.h"
-#include "CodeFormatCore/Format/Analyzer/IndentationAnalyzer.h"
 #include "CodeFormatCore/Format/Analyzer/SpaceAnalyzer.h"
 #include "CodeFormatCore/Format/FormatState.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
@@ -167,13 +166,6 @@ void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
 
                     break;
                 }
-                case LuaSyntaxNodeKind::TableField: {
-                    auto expr = syntaxNode.GetChildSyntaxNode(LuaSyntaxMultiKind::Expression, t);
-                    if (expr.IsNode(t)) {
-                        AnalyzeExpr(f, expr, t);
-                    }
-                    break;
-                }
                 case LuaSyntaxNodeKind::ExpressionStatement: {
                     auto suffixedExpression = syntaxNode.GetChildSyntaxNode(NodeKind::SuffixedExpression, t);
                     if (suffixedExpression.IsNode(t)) {
@@ -263,7 +255,7 @@ void LineBreakAnalyzer::BreakBefore(LuaSyntaxNode n, const LuaSyntaxTree &t, Lin
     }
 }
 
-void LineBreakAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprList, const LuaSyntaxTree &t) {
+void LineBreakAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode exprList, const LuaSyntaxTree &t) {
     auto exprs = exprList.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
     if (exprs.empty()) {
         return;
@@ -279,7 +271,7 @@ void LineBreakAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprList,
     }
 }
 
-void LineBreakAnalyzer::AnalyzeConditionExpr(FormatState &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
+void LineBreakAnalyzer::AnalyzeConditionExpr(FormatState &f, LuaSyntaxNode expr, const LuaSyntaxTree &t) {
     switch (expr.GetSyntaxKind(t)) {
         case LuaSyntaxNodeKind::BinaryExpression: {
             break;
@@ -290,7 +282,7 @@ void LineBreakAnalyzer::AnalyzeConditionExpr(FormatState &f, LuaSyntaxNode &expr
     }
 }
 
-void LineBreakAnalyzer::AnalyzeNameList(FormatState &f, LuaSyntaxNode &nameList, const LuaSyntaxTree &t) {
+void LineBreakAnalyzer::AnalyzeNameList(FormatState &f, LuaSyntaxNode nameList, const LuaSyntaxTree &t) {
     auto names = nameList.GetChildTokens(TK_NAME, t);
     if (f.GetStyle().auto_collapse_lines && CanCollapseLines(f, nameList, t)) {
         for (auto name: names) {
@@ -311,10 +303,66 @@ void LineBreakAnalyzer::AnalyzeNameList(FormatState &f, LuaSyntaxNode &nameList,
     }
 }
 
-void LineBreakAnalyzer::AnalyzeSuffixedExpr(FormatState &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
+void LineBreakAnalyzer::AnalyzeSuffixedExpr(FormatState &f, LuaSyntaxNode expr, const LuaSyntaxTree &t) {
     auto children = expr.GetChildren(t);
     for (auto child: children) {
         AnalyzeExpr(f, child, t);
+    }
+}
+
+// 是格式化的重点内容
+void LineBreakAnalyzer::AnalyzeTableExpr(FormatState &f, LuaSyntaxNode table, const LuaSyntaxTree &t) {
+
+    auto tableFieldList = table.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldList, t);
+    auto fields = tableFieldList.GetChildSyntaxNodes(LuaSyntaxNodeKind::TableField, t);
+
+    if (f.GetStyle().auto_collapse_lines && CanCollapseLines(f, tableFieldList, t)) {
+        for (auto field: fields) {
+            MarkNotBreak(field, t);
+        }
+        MarkNotBreak(tableFieldList.GetNextToken(t), t);
+        return;
+    }
+
+    if (f.GetStyle().break_table_list == BreakTableList::Never) {
+        return;
+    }
+
+    // force break
+    bool breakAllList = f.GetStyle().break_all_list_when_line_exceed && CanBreakAll(f, tableFieldList, t);
+    if (!breakAllList && f.GetStyle().break_table_list == BreakTableList::Smart) {
+        breakAllList = tableFieldList.GetStartLine(t) != tableFieldList.GetEndLine(t) && std::any_of(fields.begin(), fields.end(), [&](LuaSyntaxNode &node) {
+                           return node.GetChildToken('=', t).IsToken(t);
+                       });
+    }
+    if (breakAllList) {
+        auto leftBrace = table.GetChildToken('{', t);
+        if (leftBrace.GetNextSibling(t).GetTokenKind(t) == TK_SHORT_COMMENT || leftBrace.GetNextSibling(t).GetTokenKind(t) == TK_LONG_COMMENT) {
+            BreakAfter(leftBrace.GetNextSibling(t), t, LineSpace(LineSpaceType::Keep));
+        } else {
+            BreakAfter(leftBrace, t, LineSpace(LineSpaceType::Keep));
+        }
+
+        for (auto field: fields) {
+            BreakAfter(field, t, LineSpace(LineSpaceType::Keep));
+        }
+    }
+
+
+    // 如果表的父节点也是表, 那表示格式化的期望就是
+    // {
+    //      {},
+    //      {}
+    // }
+    if (f.GetStyle().break_table_list == BreakTableList::Smart && table.GetParent(t).GetParent(t).GetSyntaxKind(t) == LuaSyntaxNodeKind::TableFieldList && table.IsSingleLineNode(t)) {
+        return;
+    }
+    for (auto field: fields) {
+        auto exprs = field.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
+        for (auto expr: exprs) {
+            AnalyzeExpr(f, expr, t);
+        }
+        //        MarkLazyBreak(field, t, LineBreakStrategy::WhenMayExceed);
     }
 }
 
@@ -339,7 +387,7 @@ void LineBreakAnalyzer::CancelBreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t
     }
 }
 
-void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const LuaSyntaxTree &t) {
+void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode expr, const LuaSyntaxTree &t) {
     switch (expr.GetSyntaxKind(t)) {
         case LuaSyntaxNodeKind::BinaryExpression: {
             auto exprs = expr.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
@@ -361,37 +409,7 @@ void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const L
             break;
         }
         case LuaSyntaxNodeKind::TableExpression: {
-            auto tableFieldList = expr.GetChildSyntaxNode(LuaSyntaxNodeKind::TableFieldList, t);
-            auto fields = tableFieldList.GetChildSyntaxNodes(LuaSyntaxNodeKind::TableField, t);
-            if (f.GetStyle().auto_collapse_lines && CanCollapseLines(f, tableFieldList, t)) {
-                for (auto field: fields) {
-                    MarkNotBreak(field, t);
-                }
-                MarkNotBreak(tableFieldList.GetNextToken(t), t);
-                return;
-            }
-            bool forceBreak = f.GetStyle().break_all_list_when_line_exceed && CanBreakAll(f, tableFieldList, t);
-            if (!forceBreak) {
-                forceBreak = tableFieldList.GetStartLine(t) != tableFieldList.GetEndLine(t) && std::any_of(fields.begin(), fields.end(), [&](LuaSyntaxNode &node) {
-                                 return node.GetChildToken('=', t).IsToken(t);
-                             });
-            }
-            if (forceBreak) {
-                auto leftBrace = expr.GetChildToken('{', t);
-                if (leftBrace.GetNextSibling(t).GetTokenKind(t) == TK_SHORT_COMMENT || leftBrace.GetNextSibling(t).GetTokenKind(t) == TK_LONG_COMMENT) {
-                    BreakAfter(leftBrace.GetNextSibling(t), t, LineSpace(LineSpaceType::Keep));
-                } else {
-                    BreakAfter(leftBrace, t, LineSpace(LineSpaceType::Keep));
-                }
-
-                for (auto field: fields) {
-                    BreakAfter(field, t, LineSpace(LineSpaceType::Keep));
-                }
-            } else {
-                for (auto field: fields) {
-                    MarkLazyBreak(field, t, LineBreakStrategy::WhenMayExceed);
-                }
-            }
+            AnalyzeTableExpr(f, expr, t);
             break;
         }
         case LuaSyntaxNodeKind::CallExpression: {
@@ -415,7 +433,7 @@ void LineBreakAnalyzer::AnalyzeExpr(FormatState &f, LuaSyntaxNode &expr, const L
     }
 }
 
-bool LineBreakAnalyzer::CanBreakAll(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t) {
+bool LineBreakAnalyzer::CanBreakAll(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t) {
     switch (n.GetSyntaxKind(t)) {
         case LuaSyntaxNodeKind::ParamList:
         case LuaSyntaxNodeKind::TableFieldList: {

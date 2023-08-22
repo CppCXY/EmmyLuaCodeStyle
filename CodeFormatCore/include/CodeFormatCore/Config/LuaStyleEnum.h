@@ -91,3 +91,9 @@ enum class EndStmtWithSemicolon {
     Always,
     SameLine
 };
+
+enum class BreakTableList {
+    Never,
+    Smart,
+    Lazy
+};
