@@ -29,13 +29,19 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     SpaceAround(syntaxNode, t, f.GetStyle().space_around_concat_operator ? 1 : 0);
                     break;
                 }
-                case '=':
-                case TK_AND:
-                case TK_OR:
+                case '=': {
+                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_assign_operator ? 1 : 0);
+                    break;
+                }
                 case TK_GE:
                 case TK_LE:
                 case TK_NE:
-                case TK_EQ:
+                case TK_EQ: {
+                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_logical_operator ? 1 : 0);
+                    break;
+                }
+                case TK_AND:
+                case TK_OR:
                 case TK_IN: {
                     SpaceAround(syntaxNode, t, 1);
                     break;
@@ -60,7 +66,7 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case '>': {
                     auto p = syntaxNode.GetParent(t);
                     if (p.GetSyntaxKind(t) == LuaSyntaxNodeKind::BinaryExpression) {
-                        SpaceAround(syntaxNode, t);
+                        SpaceAround(syntaxNode, t, f.GetStyle().space_around_logical_operator ? 1 : 0);
                     } else if (syntaxNode.GetTokenKind(t) == '<') {
                         SpaceRight(syntaxNode, t, 0);
                     } else {

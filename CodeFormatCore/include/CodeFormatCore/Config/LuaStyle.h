@@ -87,6 +87,10 @@ public:
 
     bool space_around_concat_operator = true;
 
+    bool space_around_logical_operator = true;
+
+    bool space_around_assign_operator = true;
+
     // [Align]
     bool align_call_args = false;
 

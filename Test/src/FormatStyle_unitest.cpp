@@ -1794,3 +1794,62 @@ end
 )",
             style));
 }
+TEST(FormatByStyleOption, space_around_assign_operator) {
+    LuaStyle style;
+
+    style.space_around_assign_operator = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = 123
+local d = {
+    d = 123
+}
+)",
+            R"(
+local t = 123
+local d = {
+    d = 123
+}
+)",
+            style));
+
+    style.space_around_assign_operator = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = 123
+local d = {
+    d = 123
+}
+)",
+            R"(
+local t=123
+local d={
+    d=123
+}
+)",
+            style));
+}
+
+TEST(FormatByStyleOption, space_around_logical_operator) {
+    LuaStyle style;
+
+    style.space_around_logical_operator = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = true == false or a < 2 and b > 3 or c <= 4 and d >= 5 or e ~= 6 and f == 7
+)",
+            R"(
+local t = true == false or a < 2 and b > 3 or c <= 4 and d >= 5 or e ~= 6 and f == 7
+)",
+            style));
+
+    style.space_around_logical_operator = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = true == false or a < 2 and b > 3 or c <= 4 and d >= 5 or e ~= 6 and f == 7
+)",
+            R"(
+local t = true==false or a<2 and b>3 or c<=4 and d>=5 or e~=6 and f==7
+)",
+            style));
+}

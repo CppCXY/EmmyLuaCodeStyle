@@ -160,6 +160,10 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(space_around_concat_operator)
 
+    BOOL_OPTION(space_around_logical_operator)
+
+    BOOL_OPTION(space_around_assign_operator)
+
     BOOL_OPTION(align_call_args)
 
     BOOL_OPTION(align_function_params)
