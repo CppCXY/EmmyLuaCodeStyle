@@ -2,6 +2,7 @@
 #include "CodeFormatCore/Config/LuaStyleEnum.h"
 #include "CodeFormatCore/Format/FormatState.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
+#include <iostream>
 
 SemicolonAnalyzer::SemicolonAnalyzer() {
 }
@@ -25,12 +26,15 @@ void SemicolonAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                         break;
                     }
                     case EndStmtWithSemicolon::Never: {
-                        // is on same line as other statement -> needs to go on new line
-                        if (!IsFirstStmtOfLine(syntaxNode, t)) {
-                            InsertNewLineBeforeNode(syntaxNode, t);
-                        }
-                        if (EndsWithSemicolon(syntaxNode, t)) {
-                            RemoveSemicolon(syntaxNode, t);
+                        // no action needed when there's no semicolons at all!
+                        if (ContainsSemicolon(syntaxNode, t)) {
+                            // is on same line as other statement -> needs to go on new line
+                            if (!IsFirstStmtOfLine(syntaxNode, t)) {
+                                InsertNewLineBeforeNode(syntaxNode, t);
+                            }
+                            if (EndsWithSemicolon(syntaxNode, t)) {
+                                RemoveSemicolon(syntaxNode, t);
+                            }
                         }
                         break;
                     }
@@ -83,6 +87,8 @@ void SemicolonAnalyzer::AddSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t) {
 }
 
 void SemicolonAnalyzer::InsertNewLineBeforeNode(LuaSyntaxNode n, const LuaSyntaxTree &t) {
+    std::cout << "Called InsertNewLineBeforeNode" << std::endl;
+    std::cout << n.GetText(t) << std::endl;
     auto token = n.GetFirstToken(t); // line breaks are put in front of the statement itself by non-first statements
     if (token.IsToken(t)) {
         _semicolon[token.GetIndex()] = SemicolonStrategy::InsertNewLine;
@@ -121,6 +127,10 @@ bool SemicolonAnalyzer::IsLastStmtOfLine(LuaSyntaxNode n, const LuaSyntaxTree &t
 bool SemicolonAnalyzer::EndsWithSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t) {
     auto token = GetLastNonCommentToken(n, t);
     return token.GetTokenKind(t) == ';';
+}
+
+bool SemicolonAnalyzer::ContainsSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t) {
+    return n.GetChildTokens(';', t).size() > 0;
 }
 
 LuaSyntaxNode SemicolonAnalyzer::GetLastNonCommentToken(LuaSyntaxNode n, const LuaSyntaxTree &t) {
