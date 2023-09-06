@@ -18,6 +18,7 @@ public:
 private:
     void AddSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t);
     void InsertNewLineBeforeNode(LuaSyntaxNode n, const LuaSyntaxTree &t);
+    void InsertNewLineBeforeNextNode(LuaSyntaxNode n, const LuaSyntaxTree& t);
     void RemoveSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t);
     bool IsFirstStmtOfLine(LuaSyntaxNode n, const LuaSyntaxTree &t);
     bool IsLastStmtOfLine(LuaSyntaxNode n, const LuaSyntaxTree &t);
