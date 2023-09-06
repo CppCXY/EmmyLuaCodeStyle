@@ -113,7 +113,7 @@ bool SemicolonAnalyzer::EndsWithSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &
 }
 
 bool SemicolonAnalyzer::ContainsSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t) {
-    return n.GetChildTokens(';', t).size() > 0;
+    return n.GetChildToken(';', t).IsToken(t);
 }
 
 LuaSyntaxNode SemicolonAnalyzer::GetLastNonCommentToken(LuaSyntaxNode n, const LuaSyntaxTree &t) {
