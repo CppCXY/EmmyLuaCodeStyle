@@ -83,13 +83,6 @@ void SemicolonAnalyzer::AddSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t) {
     }
 }
 
-void SemicolonAnalyzer::InsertNewLineBeforeNode(LuaSyntaxNode n, const LuaSyntaxTree &t) {
-    auto token = n.GetFirstToken(t); // line breaks are put in front of the statement itself by non-first statements
-    if (token.IsToken(t)) {
-        _semicolon[token.GetIndex()] = SemicolonStrategy::InsertNewLine;
-    }
-}
-
 void SemicolonAnalyzer::InsertNewLineBeforeNextNode(LuaSyntaxNode n, const LuaSyntaxTree& t) {
     auto token = n.GetNextTokenSkipComment(t);
     if (token.IsToken(t) && token.GetStartLine(t) == n.GetEndLine(t)) {
@@ -103,7 +96,6 @@ void SemicolonAnalyzer::RemoveSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t)
         _semicolon[token.GetIndex()] = SemicolonStrategy::Remove;
     }
 }
-
 
 bool SemicolonAnalyzer::IsLastStmtOfLine(LuaSyntaxNode n, const LuaSyntaxTree &t) {
     // check if next stmt starts on same line as the current one ends
