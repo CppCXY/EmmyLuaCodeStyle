@@ -96,7 +96,7 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
             }
             case TokenStrategy::StmtEndSemicolon: {
                 switch (d.GetState().GetStyle().end_statement_with_semicolon) {
-                    case EndStmtWithSemicolon::Never: {
+                    case EndStmtWithSemicolon::ReplaceWithNewline: {
                         d.PushDiagnostic(DiagnosticType::Semicolon, textRange,
                                          LText("expected statement not to end with ;"));
                         break;

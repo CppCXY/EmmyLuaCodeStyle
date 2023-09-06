@@ -1621,7 +1621,7 @@ local table1 = { 1, 2, 3 };
 )",
             style));
 
-    style.end_statement_with_semicolon = EndStmtWithSemicolon::Never;
+    style.end_statement_with_semicolon = EndStmtWithSemicolon::ReplaceWithNewline;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local func = testFunc; print(type(nil)); -- nil;
@@ -1634,6 +1634,8 @@ for i, v in ipairs(values) do
     end;
 end;
 local table1 = { 1, 2, 3 }
+local opts = { on_exit = function() job = nil end }
+local opts = { on_exit = function() job = nil; end };
 )",
             R"(
 local func = testFunc
@@ -1649,6 +1651,9 @@ for i, v in ipairs(values) do
     end
 end
 local table1 = { 1, 2, 3 }
+local opts = { on_exit = function() job = nil end }
+local opts = { on_exit = function() job = nil
+end }
 )",
             style));
 

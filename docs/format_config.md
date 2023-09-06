@@ -538,5 +538,5 @@ end_statement_with_semicolon
     每条语句都应该以分号结束，缺失的分号将被添加。
 - same_line
     单行中的多个语句可以用必要的分号分隔，但可选的分号将被移除
-- never
+- replace_with_newline
     任何语句都不能以分号结束，语句末尾的所有分号都将被移除，包含多个语句的行将被分隔成多行
