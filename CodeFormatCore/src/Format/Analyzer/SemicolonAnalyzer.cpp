@@ -2,7 +2,6 @@
 #include "CodeFormatCore/Config/LuaStyleEnum.h"
 #include "CodeFormatCore/Format/FormatState.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
-#include <iostream>
 
 SemicolonAnalyzer::SemicolonAnalyzer() {
 }
@@ -18,7 +17,7 @@ void SemicolonAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 switch (f.GetStyle().end_statement_with_semicolon) {
                     case EndStmtWithSemicolon::Always: {
                         if (syntaxNode.GetSyntaxKind(t) == LuaSyntaxNodeKind::LabelStatement) {
-                            break; // labels should not end with semicolons
+                            break;// labels should not end with semicolons
                         }
                         if (!EndsWithSemicolon(syntaxNode, t)) {
                             AddSemicolon(syntaxNode, t);
@@ -83,7 +82,7 @@ void SemicolonAnalyzer::AddSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t) {
     }
 }
 
-void SemicolonAnalyzer::InsertNewLineBeforeNextNode(LuaSyntaxNode n, const LuaSyntaxTree& t) {
+void SemicolonAnalyzer::InsertNewLineBeforeNextNode(LuaSyntaxNode n, const LuaSyntaxTree &t) {
     auto token = n.GetNextTokenSkipComment(t);
     if (token.IsToken(t) && token.GetStartLine(t) == n.GetEndLine(t)) {
         _semicolon[token.GetIndex()] = SemicolonStrategy::InsertNewLine;
@@ -113,7 +112,7 @@ bool SemicolonAnalyzer::EndsWithSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &
     return token.GetTokenKind(t) == ';';
 }
 
-bool SemicolonAnalyzer::ContainsSemicolon(LuaSyntaxNode n, const LuaSyntaxTree& t) {
+bool SemicolonAnalyzer::ContainsSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t) {
     return n.GetChildTokens(';', t).size() > 0;
 }
 
