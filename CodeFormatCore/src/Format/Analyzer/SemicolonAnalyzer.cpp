@@ -25,7 +25,7 @@ void SemicolonAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                         }
                         break;
                     }
-                    case EndStmtWithSemicolon::Never: {
+                    case EndStmtWithSemicolon::ReplaceWithLinebreak: {
                         // no action needed when there's no semicolons at all!
                         if (ContainsSemicolon(syntaxNode, t)) {
                             if (EndsWithSemicolon(syntaxNode, t)) {
