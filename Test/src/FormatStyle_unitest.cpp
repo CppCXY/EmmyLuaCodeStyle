@@ -1621,7 +1621,7 @@ local table1 = { 1, 2, 3 };
 )",
             style));
 
-    style.end_statement_with_semicolon = EndStmtWithSemicolon::ReplaceWithLinebreak;
+    style.end_statement_with_semicolon = EndStmtWithSemicolon::ReplaceWithNewline;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local func = testFunc; print(type(nil)); -- nil;

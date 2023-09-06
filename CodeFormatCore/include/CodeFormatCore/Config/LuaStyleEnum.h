@@ -87,7 +87,7 @@ enum class AlignChainExpr {
 
 enum class EndStmtWithSemicolon {
     Keep,
-    ReplaceWithLinebreak,
+    ReplaceWithNewline,
     Always,
     SameLine
 };

@@ -293,8 +293,8 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
             end_statement_with_semicolon = EndStmtWithSemicolon::Keep;
         } else if (configMap.at("end_statement_with_semicolon") == "always") {
             end_statement_with_semicolon = EndStmtWithSemicolon::Always;
-        } else if (configMap.at("end_statement_with_semicolon") == "replace_with_linebreak") {
-            end_statement_with_semicolon = EndStmtWithSemicolon::ReplaceWithLinebreak;
+        } else if (configMap.at("end_statement_with_semicolon") == "replace_with_newline") {
+            end_statement_with_semicolon = EndStmtWithSemicolon::ReplaceWithNewline;
         } else if (configMap.at("end_statement_with_semicolon") == "same_line") {
             end_statement_with_semicolon = EndStmtWithSemicolon::SameLine;
         }

@@ -535,5 +535,5 @@ The possible values are:
     every statement should end with semicolon, missing semicolons will be added
 - same_line
     multiple statements in a single line may be separated by necessary semicolons, but optional semicolons will be removed
-- replace_with_linebreak
+- replace_with_newline
     no statement should end with semicolon, all semicolons at the end of statements will be removed, lines with multiple statements will be separated into multiple lines
