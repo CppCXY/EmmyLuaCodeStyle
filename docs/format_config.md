@@ -527,7 +527,7 @@ line_space_after_comment = keep
 
 该选项表示移除调用表达式中末尾逗号（这是一个扩展语法）
 
-end_statement_with_semicolon
+### end_statement_with_semicolon
 
 该选项设置如何处理语句末尾的分号。
 
