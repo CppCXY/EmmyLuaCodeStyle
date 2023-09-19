@@ -1056,3 +1056,16 @@ local table = {  -- My comment
 }
 )", style));
 }
+
+TEST(Format, bug_144) {
+    LuaStyle style;
+
+    style.space_around_concat_operator = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = 1 .. "1231"..bb..1111
+)",
+            R"(
+local t = 1 .. "1231"..bb..1111
+)", style));
+}

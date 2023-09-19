@@ -26,7 +26,13 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case TK_CONCAT: {
-                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_concat_operator ? 1 : 0);
+                    if (!f.GetStyle().space_around_concat_operator &&
+                        syntaxNode.GetPrevToken(t).GetTokenKind(t) != TK_NUMBER) {
+                        SpaceAround(syntaxNode, t, 0);
+                        break;
+                    }
+
+                    SpaceAround(syntaxNode, t, 1);
                     break;
                 }
                 case '=': {
@@ -146,7 +152,8 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                 case LuaSyntaxNodeKind::CallExpression: {
                     auto leftBrace = syntaxNode.GetChildToken('(', t);
                     if (leftBrace.IsToken(t)) {
-                        if (f.GetStyle().space_inside_function_call_parentheses && leftBrace.GetNextToken(t).GetTokenKind(t) != ')') {
+                        if (f.GetStyle().space_inside_function_call_parentheses &&
+                            leftBrace.GetNextToken(t).GetTokenKind(t) != ')') {
                             auto rightBrace = syntaxNode.GetChildToken(')', t);
                             SpaceRight(leftBrace, t, 1);
                             SpaceLeft(rightBrace, t, 1);
@@ -186,7 +193,8 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                             }
                             case FunctionSingleArgSpace::OnlyString: {
                                 auto firstToken = syntaxNode.GetFirstToken(t);
-                                if (firstToken.GetTokenKind(t) == TK_STRING || firstToken.GetTokenKind(t) == TK_LONG_STRING) {
+                                if (firstToken.GetTokenKind(t) == TK_STRING ||
+                                    firstToken.GetTokenKind(t) == TK_LONG_STRING) {
                                     SpaceLeft(syntaxNode, t, 1);
                                 } else {
                                     SpaceLeft(syntaxNode, t, 0);
@@ -211,7 +219,8 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                 }
                 case LuaSyntaxNodeKind::TableExpression: {
                     auto leftCurly = syntaxNode.GetChildToken('{', t);
-                    if (leftCurly.GetNextToken(t).GetTokenKind(t) != '}' && f.GetStyle().space_around_table_field_list) {
+                    if (leftCurly.GetNextToken(t).GetTokenKind(t) != '}' &&
+                        f.GetStyle().space_around_table_field_list) {
                         SpaceRight(leftCurly, t, 1);
                         auto rightCurly = syntaxNode.GetChildToken('}', t);
                         SpaceLeft(rightCurly, t, 1);
@@ -236,7 +245,10 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                         } else {
                             auto tokenKindAfterSquareBracket = leftSquareBracket.GetNextToken(t).GetTokenKind(t);
                             auto tokenKindBeforeSquareBracket = rightSquareBracket.GetPrevToken(t).GetTokenKind(t);
-                            if (tokenKindAfterSquareBracket == TK_LONG_STRING || tokenKindAfterSquareBracket == TK_LONG_COMMENT || tokenKindBeforeSquareBracket == TK_LONG_COMMENT || tokenKindBeforeSquareBracket == TK_LONG_STRING) {
+                            if (tokenKindAfterSquareBracket == TK_LONG_STRING ||
+                                tokenKindAfterSquareBracket == TK_LONG_COMMENT ||
+                                tokenKindBeforeSquareBracket == TK_LONG_COMMENT ||
+                                tokenKindBeforeSquareBracket == TK_LONG_STRING) {
                                 SpaceRight(leftSquareBracket, t, 1);
                                 SpaceLeft(rightSquareBracket, t, 1);
                             }
@@ -251,7 +263,10 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                                     if (exprs.size() == 2) {
                                         auto leftExpr = exprs[0];
                                         auto rightExpr = exprs[1];
-                                        if (leftExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::UnaryExpression && leftExpr.GetChildToken('#', t).IsToken(t) && rightExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::LiteralExpression && rightExpr.GetText(t) == "1") {
+                                        if (leftExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::UnaryExpression &&
+                                            leftExpr.GetChildToken('#', t).IsToken(t) &&
+                                            rightExpr.GetSyntaxKind(t) == LuaSyntaxNodeKind::LiteralExpression &&
+                                            rightExpr.GetText(t) == "1") {
                                             SpaceAround(plus, t, 0);
                                         }
                                     }

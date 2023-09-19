@@ -8,9 +8,7 @@
 
 int main() {
     std::string buffer = R"(
-local t = {
-    { aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb, cccccccccccccccccccccccccccccccccccccccccc,ddddddddddddddddddddddddddddddddd}
-}
+local t = 1 .. "1231"
 )";
 
     auto file = std::make_shared<LuaSource>(std::move(buffer));
@@ -26,6 +24,7 @@ local t = {
     std::cout << t.GetDebugView() << std::endl;
 
     LuaStyle s;
+    s.space_around_concat_operator = false;
     FormatBuilder b(s);
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;
