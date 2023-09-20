@@ -24,7 +24,7 @@ local t = 1 .. "1231"
     std::cout << t.GetDebugView() << std::endl;
 
     LuaStyle s;
-    s.space_around_concat_operator = false;
+    s.space_around_concat_operator = SpaceAroundStyle::None;
     FormatBuilder b(s);
     auto text = b.GetFormatResult(t);
     std::cout<< text << std::endl;

@@ -85,11 +85,11 @@ public:
 
     bool space_after_comma_in_for_statement = true;
 
-    bool space_around_concat_operator = true;
+    SpaceAroundStyle space_around_concat_operator = SpaceAroundStyle::Always;
 
     bool space_around_logical_operator = true;
 
-    bool space_around_assign_operator = true;
+    SpaceAroundStyle space_around_assign_operator = SpaceAroundStyle::Always;
 
     // [Align]
     bool align_call_args = false;

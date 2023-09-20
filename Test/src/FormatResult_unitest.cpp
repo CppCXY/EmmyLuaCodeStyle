@@ -1060,12 +1060,43 @@ local table = {  -- My comment
 TEST(Format, bug_144) {
     LuaStyle style;
 
-    style.space_around_concat_operator = false;
+    style.space_around_concat_operator = SpaceAroundStyle::None;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = 1 .. "1231"..bb..1111
 )",
             R"(
 local t = 1 .. "1231"..bb..1111
+)", style));
+
+    style.space_around_concat_operator = SpaceAroundStyle::NoSpaceAsym;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = 1 .. "1231"..bb..1111
+)",
+            R"(
+local t = 1 .."1231"..bb..1111
+)", style));
+
+    style.space_around_concat_operator = SpaceAroundStyle::Always;
+    style.space_around_assign_operator = SpaceAroundStyle::None;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = 1
+local t <const> = 1
+)",
+            R"(
+local t=1
+local t <const> = 1
+)", style));
+    style.space_around_assign_operator = SpaceAroundStyle::NoSpaceAsym;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = 1
+local t <const> = 1
+)",
+            R"(
+local t=1
+local t <const> =1
 )", style));
 }

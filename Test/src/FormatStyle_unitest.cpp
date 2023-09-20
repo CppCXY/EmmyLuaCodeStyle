@@ -881,7 +881,7 @@ end
 TEST(FormatByStyleOption, space_around_concat_operator) {
     LuaStyle style;
 
-    style.space_around_concat_operator = true;
+    style.space_around_concat_operator = SpaceAroundStyle::Always;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = "123" .. 1
@@ -890,7 +890,7 @@ local t = "123" .. 1
 local t = "123" .. 1
 )",
             style));
-    style.space_around_concat_operator = false;
+    style.space_around_concat_operator = SpaceAroundStyle::None;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = "123" .. 1
@@ -1802,7 +1802,7 @@ end
 TEST(FormatByStyleOption, space_around_assign_operator) {
     LuaStyle style;
 
-    style.space_around_assign_operator = true;
+    style.space_around_assign_operator = SpaceAroundStyle::Always;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = 123
@@ -1818,7 +1818,7 @@ local d = {
 )",
             style));
 
-    style.space_around_assign_operator = false;
+    style.space_around_assign_operator = SpaceAroundStyle::None;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = 123

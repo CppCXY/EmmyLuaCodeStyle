@@ -376,7 +376,7 @@ void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, Al
                     auto eq = node.GetChildToken('=', t);
                     if (eq.IsToken(t)) {
                         auto prev = eq.GetPrevToken(t);
-                        auto prevSpace = f.GetStyle().space_around_assign_operator ? 2 : 1;
+                        auto prevSpace = f.GetStyle().space_around_assign_operator == SpaceAroundStyle::Always ? 2 : 1;
                         auto newPos = prev.GetTextRange(t).GetEndOffset() + prevSpace - node.GetTextRange(t).StartOffset;
                         if (newPos > maxDis) {
                             maxDis = newPos;
@@ -399,7 +399,7 @@ void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, Al
                     if (file.CheckCurrentLineUnicodeBefore(eq.GetTextRange(t).StartOffset)) {
                         return;
                     }
-                    auto prevSpace = f.GetStyle().space_around_assign_operator ? 2 : 1;
+                    auto prevSpace = f.GetStyle().space_around_assign_operator == SpaceAroundStyle::Always ? 2 : 1;
                     auto newPos = prev.GetTextRange(t).GetEndOffset() + prevSpace - node.GetTextRange(t).StartOffset;
                     if (newPos > maxDis) {
                         maxDis = newPos;

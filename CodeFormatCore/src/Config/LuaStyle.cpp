@@ -158,11 +158,29 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(space_after_comma_in_for_statement)
 
-    BOOL_OPTION(space_around_concat_operator)
+    if(configMap.count("space_around_concat_operator")) {
+        auto &value = configMap.at("space_around_concat_operator");
+        if (value == "true" || value == "always") {
+            space_around_concat_operator = SpaceAroundStyle::Always;
+        } else if (value == "false" || value == "none") {
+            space_around_concat_operator = SpaceAroundStyle::None;
+        } else if (value == "no_space_asym") {
+            space_around_concat_operator = SpaceAroundStyle::NoSpaceAsym;
+        }
+    }
 
     BOOL_OPTION(space_around_logical_operator)
 
-    BOOL_OPTION(space_around_assign_operator)
+    if (configMap.count("space_around_assign_operator")) {
+        auto &value = configMap.at("space_around_assign_operator");
+        if (value == "true" || value == "always") {
+            space_around_assign_operator = SpaceAroundStyle::Always;
+        } else if (value == "false" || value == "none") {
+            space_around_assign_operator = SpaceAroundStyle::None;
+        } else if (value == "no_space_asym") {
+            space_around_assign_operator = SpaceAroundStyle::NoSpaceAsym;
+        }
+    }
 
     BOOL_OPTION(align_call_args)
 

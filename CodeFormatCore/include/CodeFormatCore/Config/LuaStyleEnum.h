@@ -97,3 +97,12 @@ enum class BreakTableList {
     Smart,
     Lazy
 };
+
+enum class SpaceAroundStyle {
+    // for false and none
+    None,
+    // for true and always
+    Always,
+    // for no_space_asym
+    NoSpaceAsym,
+};

@@ -26,17 +26,65 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case TK_CONCAT: {
-                    if (!f.GetStyle().space_around_concat_operator &&
-                        syntaxNode.GetPrevToken(t).GetTokenKind(t) != TK_NUMBER) {
-                        SpaceAround(syntaxNode, t, 0);
-                        break;
+                    switch(f.GetStyle().space_around_concat_operator){
+                        case SpaceAroundStyle::Always: {
+                            SpaceAround(syntaxNode, t, 1);
+                            break;
+                        }
+                        case SpaceAroundStyle::None: {
+                            if(syntaxNode.GetPrevToken(t).GetTokenKind(t) == TK_NUMBER) {
+                                SpaceAround(syntaxNode, t, 1);
+                            }
+                            else {
+                                SpaceAround(syntaxNode, t, 0);
+                            }
+                            break;
+                        }
+                        case SpaceAroundStyle::NoSpaceAsym: {
+                            if(syntaxNode.GetPrevToken(t).GetTokenKind(t) == TK_NUMBER) {
+                                SpaceLeft(syntaxNode, t, 1);
+                                SpaceRight(syntaxNode, t, 0);
+                            }
+                            else {
+                                SpaceAround(syntaxNode, t, 0);
+                            }
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
                     }
-
-                    SpaceAround(syntaxNode, t, 1);
                     break;
                 }
                 case '=': {
-                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_assign_operator ? 1 : 0);
+                    switch(f.GetStyle().space_around_assign_operator){
+                        case SpaceAroundStyle::Always: {
+                            SpaceAround(syntaxNode, t, 1);
+                            break;
+                        }
+                        case SpaceAroundStyle::None: {
+                            if(syntaxNode.GetPrevToken(t).GetTokenKind(t) == '>') {
+                                SpaceAround(syntaxNode, t, 1);
+                            }
+                            else {
+                                SpaceAround(syntaxNode, t, 0);
+                            }
+                            break;
+                        }
+                        case SpaceAroundStyle::NoSpaceAsym: {
+                            if(syntaxNode.GetPrevToken(t).GetTokenKind(t) == '>') {
+                                SpaceLeft(syntaxNode, t, 1);
+                                SpaceRight(syntaxNode, t, 0);
+                            }
+                            else {
+                                SpaceAround(syntaxNode, t, 0);
+                            }
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
+                    }
                     break;
                 }
                 case TK_GE:

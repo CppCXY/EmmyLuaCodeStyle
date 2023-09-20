@@ -18,12 +18,13 @@ public:
     void MarkAdd(LuaSyntaxNode n, const LuaSyntaxTree &t, TokenAddStrategy strategy);
 
     bool IsRemove(LuaSyntaxNode n, const LuaSyntaxTree &t) const;
+
 private:
     void TableFieldAddSep(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t);
 
-    void AnalyzeTableField(FormatState &f, LuaSyntaxNode& syntaxNode , const LuaSyntaxTree &t);
+    void AnalyzeTableField(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
-    void AnalyzeCallExpression(FormatState &f, LuaSyntaxNode& syntaxNode , const LuaSyntaxTree &t);
+    void AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
 
 
     std::unordered_map<std::size_t, TokenStrategy> _tokenStrategies;
