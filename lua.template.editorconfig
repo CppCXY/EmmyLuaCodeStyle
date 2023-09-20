@@ -73,10 +73,12 @@ space_after_comma = true
 
 space_after_comma_in_for_statement = true
 
+# true/false or none/always/no_space_asym
 space_around_concat_operator = true
 
 space_around_logical_operator = true
 
+# true/false or none/always/no_space_asym
 space_around_assign_operator = true
 
 # [align]
