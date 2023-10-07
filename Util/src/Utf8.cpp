@@ -117,3 +117,29 @@ std::size_t utf8::Utf8OneCharLen(const char *source) {
         return 1;
     }
 }
+
+uint32_t utf8::Utf8ToUnicode(const char *source, std::size_t maxNum, std::size_t &byteNum) {
+    if (maxNum == 0) {
+        byteNum = 1;
+        return 0;
+    }
+
+    if (0xf0 == (0xf8 & *source) && maxNum >= 4) {
+        byteNum = 4;
+        // 4-byte utf8 code point (began with 0b11110xxx)
+        return ((source[0] & 0x07) << 18) | ((source[1] & 0x3f) << 12) | ((source[2] & 0x3f) << 6) | (source[3] & 0x3f);
+    } else if (0xe0 == (0xf0 & *source) && maxNum >= 3) {
+        byteNum = 3;
+        // 3-byte utf8 code point (began with 0b1110xxxx)
+        return ((source[0] & 0x0f) << 12) | ((source[1] & 0x3f) << 6) | (source[2] & 0x3f);
+    } else if (0xc0 == (0xe0 & *source) && maxNum >= 2) {
+        byteNum = 2;
+        // 2-byte utf8 code point (began with 0b110xxxxx)
+        return ((source[0] & 0x1f) << 6) | (source[1] & 0x3f);
+    } else {
+        byteNum = 1;
+        // if (0x00 == (0x80 & *s)) {
+        // 1-byte ascii (began with 0b0xxxxxxx)
+        return source[0];
+    }
+}

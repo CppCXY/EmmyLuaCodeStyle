@@ -1100,3 +1100,29 @@ local t=1
 local t <const> =1
 )", style));
 }
+
+TEST(Format, feature_146_support_UTF_8_Basic_Latin_and_Latin_1_Supplement) {
+    LuaStyle style;
+
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+t["¡¢£¤¥¦§¨©ª«®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ"] = 1
+b  = 123
+
+
+only_latin = {
+    { 'aaaa', nil },
+    { 'e', nil },
+}
+)",
+            R"(
+t["¡¢£¤¥¦§¨©ª«®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ"] = 1
+b                                                                                                  = 123
+
+
+only_latin = {
+    { 'aaaa', nil },
+    { 'e',    nil },
+}
+)", style));
+}

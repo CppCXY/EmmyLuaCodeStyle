@@ -27,6 +27,8 @@ public:
 
     std::string_view GetText(const LuaSyntaxTree &t) const;
 
+    std::size_t GetUtf8Length(const LuaSyntaxTree &t) const;
+
     bool IsNode(const LuaSyntaxTree &t) const;
 
     bool IsToken(const LuaSyntaxTree &t) const;

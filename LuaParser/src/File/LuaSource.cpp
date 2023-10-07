@@ -59,14 +59,17 @@ std::size_t LuaSource::GetColumn(std::size_t offset) const {
     return 0;
 }
 
-bool LuaSource::CheckCurrentLineUnicodeBefore(std::size_t offset) const {
-    auto line = GetLine(offset);
 
+bool LuaSource::CheckNonUniformCharBefore(std::size_t offset) const {
+    auto line = GetLine(offset);
     auto lineStartOffset = _lineOffsetVec[line];
 
     if (offset > lineStartOffset) {
-        for (std::size_t i = lineStartOffset; i < offset; i++) {
-            if (_source[i] & 0x80) {
+        std::size_t byteNum = 0;
+        for (std::size_t i = lineStartOffset; i < offset; i += byteNum) {
+            auto codepoint = utf8::Utf8ToUnicode(_source.data() + i, _source.size() - i, byteNum);
+            // support UTF-8 Basic Latin and Latin-1 Supplement
+            if (codepoint > 0xff) {
                 return true;
             }
         }

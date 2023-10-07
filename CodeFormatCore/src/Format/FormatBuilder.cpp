@@ -3,6 +3,7 @@
 #include "CodeFormatCore/Format/Analyzer/IndentationAnalyzer.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "Util/StringUtil.h"
+#include "Util/Utf8.h"
 
 
 FormatBuilder::FormatBuilder(LuaStyle &style) {
@@ -34,7 +35,7 @@ void FormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTr
             break;
         }
         default: {
-            _state.CurrentWidth() += text.size();
+            _state.CurrentWidth() += syntaxNode.GetUtf8Length(t);
             _formattedText.append(text);
         }
     }
@@ -365,7 +366,8 @@ void FormatBuilder::WriteText(std::string_view text) {
     }
 
     if (text.size() > last) {
-        _state.CurrentWidth() += text.size() - last;
+        std::size_t lastLineRest = text.size() - last;
+        _state.CurrentWidth() += utf8::Utf8nLen(text.data() + last, lastLineRest);
         if (last != 0) {
             _formattedText.append(text.substr(last));
         } else {

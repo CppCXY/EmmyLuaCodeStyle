@@ -17,7 +17,7 @@ public:
 
     std::size_t GetColumn(std::size_t offset) const;
 
-    bool CheckCurrentLineUnicodeBefore(std::size_t offset) const;
+    bool CheckNonUniformCharBefore(std::size_t offset) const;
 
     std::size_t GetLineOffset(std::size_t offset) const;
 

@@ -42,6 +42,11 @@ std::string_view LuaSyntaxNode::GetText(const LuaSyntaxTree &t) const {
     return t.GetFile().Slice(GetTextRange(t));
 }
 
+std::size_t LuaSyntaxNode::GetUtf8Length(const LuaSyntaxTree &t) const {
+    auto text = GetText(t);
+    return utf8::Utf8nLen(text.data(), text.size());
+}
+
 bool LuaSyntaxNode::IsNode(const LuaSyntaxTree &t) const {
     return t.IsNode(_index);
 }
@@ -290,4 +295,3 @@ std::size_t LuaSyntaxNode::CountNodeChild(LuaSyntaxNodeKind kind, const LuaSynta
 bool LuaSyntaxNode::IsEmpty(const LuaSyntaxTree &t) const {
     return t.GetFirstChild(_index) == 0;
 }
-

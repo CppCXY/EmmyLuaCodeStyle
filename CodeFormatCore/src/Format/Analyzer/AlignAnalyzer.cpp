@@ -298,7 +298,7 @@ void AlignAnalyzer::AnalyzeArrayTableAlign(FormatState &f, std::vector<LuaSyntax
     std::size_t maxAlign = 0;
     auto &file = t.GetFile();
     for (auto &table: arrayTable) {
-        if (file.CheckCurrentLineUnicodeBefore(table.GetTextRange(t).GetEndOffset())) {
+        if (file.CheckNonUniformCharBefore(table.GetTextRange(t).GetEndOffset())) {
             return;
         }
 
@@ -320,9 +320,9 @@ void AlignAnalyzer::AnalyzeArrayTableAlign(FormatState &f, std::vector<LuaSyntax
     for (std::size_t i = 0; i < maxAlign; i++) {
         for (auto &tableFieldArray: arrayTableFieldVec) {
             if (i < tableFieldArray.size()) {
-                auto text = tableFieldArray[i].GetText(t);
-                if (elementLength < text.size()) {
-                    elementLength = text.size();
+                auto textLength = tableFieldArray[i].GetUtf8Length(t);
+                if (elementLength < textLength) {
+                    elementLength = textLength;
                 }
                 group.push_back(tableFieldArray[i].GetFirstToken(t).GetIndex());
             }
@@ -364,7 +364,7 @@ void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, Al
                     if (diff > 2) {
                         allowAlign = true;
                     }
-                    if (file.CheckCurrentLineUnicodeBefore(eq.GetTextRange(t).StartOffset)) {
+                    if (file.CheckNonUniformCharBefore(eq.GetTextRange(t).StartOffset)) {
                         return;
                     }
                 }
@@ -377,7 +377,7 @@ void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, Al
                     if (eq.IsToken(t)) {
                         auto prev = eq.GetPrevToken(t);
                         auto prevSpace = f.GetStyle().space_around_assign_operator == SpaceAroundStyle::Always ? 2 : 1;
-                        auto newPos = prev.GetTextRange(t).GetEndOffset() + prevSpace - node.GetTextRange(t).StartOffset;
+                        auto newPos = prev.GetEndCol(t) + prevSpace - node.GetStartCol(t);
                         if (newPos > maxDis) {
                             maxDis = newPos;
                         }
@@ -396,7 +396,7 @@ void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, Al
                 auto eq = node.GetChildToken('=', t);
                 if (eq.IsToken(t)) {
                     auto prev = eq.GetPrevToken(t);
-                    if (file.CheckCurrentLineUnicodeBefore(eq.GetTextRange(t).StartOffset)) {
+                    if (file.CheckNonUniformCharBefore(eq.GetTextRange(t).StartOffset)) {
                         return;
                     }
                     auto prevSpace = f.GetStyle().space_around_assign_operator == SpaceAroundStyle::Always ? 2 : 1;
@@ -434,7 +434,7 @@ void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, Al
             for (auto i: group.SyntaxGroup) {
                 auto comment = LuaSyntaxNode(i);
                 if (comment.IsToken(t)) {
-                    if (file.CheckCurrentLineUnicodeBefore(comment.GetTextRange(t).StartOffset)) {
+                    if (file.CheckNonUniformCharBefore(comment.GetTextRange(t).StartOffset)) {
                         return;
                     }
 
@@ -637,9 +637,9 @@ void AlignAnalyzer::AnalyzeSimilarCallAlign(FormatState &f, std::vector<LuaSynta
     for (std::size_t i = 0; i < maxAlign; i++) {
         for (auto &args: argsVec) {
             if (i < args.size()) {
-                auto text = args[i].GetText(t);
-                if (elementLength < text.size()) {
-                    elementLength = text.size();
+                auto textLength = args[i].GetUtf8Length(t);
+                if (elementLength < textLength) {
+                    elementLength = textLength;
                 }
                 group.push_back(args[i].GetFirstToken(t).GetIndex());
             }
