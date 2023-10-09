@@ -3,11 +3,11 @@
 
 
 TextReader::TextReader(std::string_view text)
-        : _text(text),
-          _hasSaveText(false),
-          _buffStart(0), _buffIndex(0),
-          _isEof(false),
-          _currentIndex(0) {
+    : _text(text),
+      _hasSaveText(false),
+      _buffStart(0), _buffIndex(0),
+      _isEof(false),
+      _currentIndex(0) {
 }
 
 int TextReader::NextChar() {
@@ -100,4 +100,3 @@ std::size_t TextReader::EatWhen(int ch) {
     }
     return count;
 }
-

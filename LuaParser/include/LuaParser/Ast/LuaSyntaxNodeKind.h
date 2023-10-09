@@ -100,7 +100,7 @@ enum class LuaSyntaxNodeKind {
 };
 
 namespace detail {
-    namespace debug {
-        std::string_view GetSyntaxKindDebugName(LuaSyntaxNodeKind kind);
-    }
+namespace debug {
+std::string_view GetSyntaxKindDebugName(LuaSyntaxNodeKind kind);
 }
+}// namespace detail

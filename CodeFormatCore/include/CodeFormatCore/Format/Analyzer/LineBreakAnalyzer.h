@@ -30,6 +30,7 @@ public:
     void MarkNotBreak(LuaSyntaxNode n, const LuaSyntaxTree &t);
 
     void CancelBreakAfter(LuaSyntaxNode n, const LuaSyntaxTree &t);
+
 private:
     void AnalyzeExprList(FormatState &f, LuaSyntaxNode exprList, const LuaSyntaxTree &t);
 

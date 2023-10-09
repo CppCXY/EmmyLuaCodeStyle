@@ -1,8 +1,7 @@
 #pragma once
 
-enum class LuaAttribute
-{
-	NoAttribute,
-	Const,
-	Close,
+enum class LuaAttribute {
+    NoAttribute,
+    Const,
+    Close,
 };

@@ -11,7 +11,7 @@ class LuaDiagnosticStyle {
 public:
     LuaDiagnosticStyle() = default;
 
-    void ParseTree(InfoTree& tree);
+    void ParseTree(InfoTree &tree);
 
     bool code_style_check = true;
 
@@ -31,12 +31,10 @@ public:
 
     std::vector<NameStyleRule> global_variable_name_style = {
             NameStyleRule(NameStyleType::SnakeCase),
-            NameStyleRule(NameStyleType::UpperSnakeCase)
-    };
+            NameStyleRule(NameStyleType::UpperSnakeCase)};
 
     std::vector<NameStyleRule> module_name_style = {
-            NameStyleRule(NameStyleType::SnakeCase)
-    };
+            NameStyleRule(NameStyleType::SnakeCase)};
 
     std::vector<NameStyleRule> require_module_name_style = {
             NameStyleRule(NameStyleType::SnakeCase),
@@ -45,6 +43,5 @@ public:
 
     std::vector<NameStyleRule> class_name_style = {
             NameStyleRule(NameStyleType::SnakeCase),
-            NameStyleRule(NameStyleType::PascalCase)
-    };
+            NameStyleRule(NameStyleType::PascalCase)};
 };

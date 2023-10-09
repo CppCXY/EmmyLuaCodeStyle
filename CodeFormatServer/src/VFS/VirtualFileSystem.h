@@ -1,12 +1,12 @@
 #pragma once
 
-#include <string_view>
-#include "LSP/LSP.h"
-#include "VirtualFile.h"
 #include "CodeFormatCore/Config/LuaStyle.h"
 #include "DB/FileDB.h"
-#include "DB/UriDB.h"
 #include "DB/LineIndexDB.h"
+#include "DB/UriDB.h"
+#include "LSP/LSP.h"
+#include "VirtualFile.h"
+#include <string_view>
 
 class VirtualFileSystem {
 public:
@@ -30,7 +30,7 @@ public:
 
     UriDB &GetUriDB();
 
-    LineIndexDB& GetLineIndexDB();
+    LineIndexDB &GetLineIndexDB();
 
 private:
     FileDB _fileDB;

@@ -48,7 +48,7 @@ public:
 
     bool CreateDictionaryEntry(const std::string &key, int count);
 
-    bool IsCorrectWord(const std::string& word) const;
+    bool IsCorrectWord(const std::string &word) const;
 
     std::vector<SuggestItem> LookUp(const std::string &input);
 

@@ -38,8 +38,8 @@ NameStyleRule MakeNameStyle(InfoNode n) {
                     ignores.insert(paramNode.AsString());
                 } else if (paramNode.IsArray()) {
                     auto arr = paramNode.AsArray();
-                    for(auto item : arr){
-                        if(item.IsString()) {
+                    for (auto item: arr) {
+                        if (item.IsString()) {
                             ignores.insert(item.AsString());
                         }
                     }

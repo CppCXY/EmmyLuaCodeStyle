@@ -1,9 +1,9 @@
 #include "LuaCodeFormat.h"
 
 #include "CodeFormatCore/Config/LuaEditorConfig.h"
-#include "Util/StringUtil.h"
-#include "LuaParser/Parse/LuaParser.h"
 #include "CodeFormatCore/RangeFormat/RangeFormatBuilder.h"
+#include "LuaParser/Parse/LuaParser.h"
+#include "Util/StringUtil.h"
 
 LuaCodeFormat &LuaCodeFormat::GetInstance() {
     static LuaCodeFormat instance;
@@ -11,7 +11,7 @@ LuaCodeFormat &LuaCodeFormat::GetInstance() {
 }
 
 LuaCodeFormat::LuaCodeFormat()
-        : _supportNonStandardSymbol(false) {
+    : _supportNonStandardSymbol(false) {
 }
 
 void LuaCodeFormat::UpdateCodeStyle(const std::string &workspaceUri, const std::string &configPath) {
@@ -24,8 +24,7 @@ void LuaCodeFormat::UpdateCodeStyle(const std::string &workspaceUri, const std::
     }
 
     auto &config = _configs.emplace_back(
-            workspaceUri
-    );
+            workspaceUri);
     config.Editorconfig = LuaEditorConfig::LoadFromFile(configPath);
     config.Editorconfig->Parse();
 }
@@ -70,7 +69,7 @@ void LuaCodeFormat::LoadSpellDictionaryFromBuffer(const std::string &buffer) {
 Result<std::string> LuaCodeFormat::Reformat(const std::string &uri, std::string &&text, ConfigMap &configMap) {
     auto file = std::make_shared<LuaSource>(std::move(text));
     LuaLexer luaLexer(file);
-    if (_supportNonStandardSymbol){
+    if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
     luaLexer.Parse();
@@ -98,7 +97,7 @@ Result<std::string> LuaCodeFormat::RangeFormat(const std::string &uri, FormatRan
                                                ConfigMap &configMap) {
     auto file = std::make_shared<LuaSource>(std::move(text));
     LuaLexer luaLexer(file);
-    if (_supportNonStandardSymbol){
+    if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
     luaLexer.Parse();
@@ -128,7 +127,7 @@ LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t 
                           ConfigMap &configMap, ConfigMap &stringTypeOptions) {
     auto file = std::make_shared<LuaSource>(std::move(text));
     LuaLexer luaLexer(file);
-    if (_supportNonStandardSymbol){
+    if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
     luaLexer.Parse();
@@ -156,7 +155,7 @@ LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t 
 Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::Diagnostic(const std::string &uri, std::string &&text) {
     auto file = std::make_shared<LuaSource>(std::move(text));
     LuaLexer luaLexer(file);
-    if (_supportNonStandardSymbol){
+    if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
     luaLexer.Parse();
@@ -182,7 +181,7 @@ Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::SpellCheck(const std::stri
                                                                  const CodeSpellChecker::CustomDictionary &tempDict) {
     auto file = LuaSource::From(std::move(text));
     LuaLexer luaLexer(file);
-    if (_supportNonStandardSymbol){
+    if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
     luaLexer.Parse();
@@ -208,7 +207,7 @@ Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::SpellCheck(const std::stri
 Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::NameStyleCheck(const std::string &uri, std::string &&text) {
     auto file = LuaSource::From(std::move(text));
     LuaLexer luaLexer(file);
-    if (_supportNonStandardSymbol){
+    if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
     luaLexer.Parse();
@@ -275,7 +274,7 @@ std::vector<LuaDiagnosticInfo> LuaCodeFormat::MakeDiagnosticInfo(const std::vect
                                                                  std::shared_ptr<LuaSource> file) {
     std::vector<LuaDiagnosticInfo> results;
     for (auto &diagnostic: diagnostics) {
-        auto& result = results.emplace_back();
+        auto &result = results.emplace_back();
         result.Type = diagnostic.Type;
         result.Message = diagnostic.Message;
         result.Data = diagnostic.Data;
@@ -295,8 +294,8 @@ void LuaCodeFormat::CalculateTempStyle(LuaStyle &style, ConfigMap &configMap) {
 
     if (configMap.count("insertSpaces")) {
         style.indent_style = configMap.at("insertSpaces") == "true"
-                             ? IndentStyle::Space
-                             : IndentStyle::Tab;
+                                     ? IndentStyle::Space
+                                     : IndentStyle::Tab;
     }
     if (configMap.count("tabSize")) {
         if (style.indent_style == IndentStyle::Tab) {
@@ -306,4 +305,3 @@ void LuaCodeFormat::CalculateTempStyle(LuaStyle &style, ConfigMap &configMap) {
         }
     }
 }
-

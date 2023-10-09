@@ -1,7 +1,7 @@
 #include "StandardIOSession.h"
 
-#include <iostream>
 #include <asio.hpp>
+#include <iostream>
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -9,9 +9,9 @@
 
 #include <thread>
 
-#include "Protocol/ProtocolParser.h"
-#include "Protocol/ProtocolBuffer.h"
 #include "LanguageServer.h"
+#include "Protocol/ProtocolBuffer.h"
+#include "Protocol/ProtocolParser.h"
 
 class StandardIO {
 public:
@@ -41,24 +41,20 @@ StandardIO &StandardIO::GetInstance() {
 
 #ifndef _WIN32
 StandardIO::StandardIO()
-    :_ioc(1)
-{
+    : _ioc(1) {
     _in = std::make_shared<asio::posix::stream_descriptor>(_ioc, STDIN_FILENO);
     _out = std::make_shared<asio::posix::stream_descriptor>(_ioc, STDOUT_FILENO);
 }
 
-std::size_t StandardIO::ReadSome(char* buffer, std::size_t maxSize)
-{
+std::size_t StandardIO::ReadSome(char *buffer, std::size_t maxSize) {
     return _in->read_some(asio::buffer(buffer, maxSize), _code);
 }
 
-bool StandardIO::HasError()
-{
+bool StandardIO::HasError() {
     return _code == asio::error::eof || _code;
 }
 
-void StandardIO::Write(std::string_view content)
-{
+void StandardIO::Write(std::string_view content) {
     asio::write(*_out, asio::buffer(content.data(), content.size()));
 }
 
@@ -121,7 +117,7 @@ int StandardIOSession::Run(LanguageServer &server) {
             });
         } while (_protocolBuffer.CanReadOneProtocol());
     }
-    endLoop:
+endLoop:
     return 0;
 }
 

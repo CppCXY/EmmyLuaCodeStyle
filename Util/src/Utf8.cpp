@@ -73,8 +73,7 @@ std::size_t utf8::Utf8nLenAtFirstLine(const char *source, std::size_t byteNum) {
     const char *t = source;
     std::size_t length = 0;
 
-    while (static_cast<std::size_t>(source - t) < byteNum
-           && (*source != '\0' && *source != '\r' && *source != '\n')) {
+    while (static_cast<std::size_t>(source - t) < byteNum && (*source != '\0' && *source != '\r' && *source != '\n')) {
         if (0xf0 == (0xf8 & *source)) {
             // 4-byte utf8 code point (began with 0b11110xxx)
             source += 4;

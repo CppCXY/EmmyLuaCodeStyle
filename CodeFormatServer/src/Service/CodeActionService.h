@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string_view>
 #include <functional>
+#include <string_view>
 
-#include "Service.h"
-#include "LSP/LSP.h"
 #include "CodeFormatCore/Diagnostic/DiagnosticType.h"
+#include "LSP/LSP.h"
+#include "Service.h"
 
 class CodeActionService : public Service {
 public:

@@ -49,7 +49,7 @@ public:
 
     bool IsToken(std::size_t index) const;
 
-    const std::vector<LuaSyntaxNode>& GetSyntaxNodes() const;
+    const std::vector<LuaSyntaxNode> &GetSyntaxNodes() const;
 
     std::vector<LuaSyntaxNode> GetTokens() const;
 
@@ -63,7 +63,8 @@ public:
 
     bool HasError() const;
 
-    const std::vector<LuaParseError>& GetErrors() const;
+    const std::vector<LuaParseError> &GetErrors() const;
+
 private:
     void StartNode(LuaSyntaxNodeKind kind, LuaParser &p);
 

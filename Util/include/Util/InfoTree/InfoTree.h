@@ -3,8 +3,8 @@
 #include "InfoKind.h"
 #include "InfoNode.h"
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 class InfoTree {
 public:
@@ -36,6 +36,7 @@ public:
     InfoNode CreateNumber(double d);
 
     friend InfoNode;
+
 private:
     std::vector<InfoOrNode> _nodeOrInfos;
     std::vector<std::unordered_map<std::string, std::size_t>> _mapChildren;

@@ -1,26 +1,25 @@
 ﻿#include "LSP/LSPHandle.h"
+#include "CodeFormatCore/Config/LuaStyle.h"
+#include "CodeFormatCore/Format/Types.h"
+#include "Config/ClientConfig.h"
+#include "LSP.h"
+#include "LanguageServer.h"
+#include "Service/CodeActionService.h"
+#include "Service/CommandService.h"
+#include "Service/ConfigService.h"
+#include "Service/DiagnosticService.h"
+#include "Service/FormatService.h"
+#include "Util/Url.h"
+#include "Util/format.h"
+#include "nlohmann/json.hpp"
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "nlohmann/json.hpp"
-#include "LSP.h"
-#include "CodeFormatCore/Config/LuaStyle.h"
-#include "LanguageServer.h"
-#include "Service/CodeActionService.h"
-#include "Service/FormatService.h"
-#include "Service/ConfigService.h"
-#include "Service/CommandService.h"
-#include "Util/Url.h"
-#include "Util/format.h"
-#include "LanguageServer.h"
-#include "CodeFormatCore/Format/Types.h"
-#include "Service/DiagnosticService.h"
-#include "Config/ClientConfig.h"
 
 using namespace std::placeholders;
 
 LSPHandle::LSPHandle(LanguageServer *server)
-        : _server(server) {
+    : _server(server) {
     Initialize();
 }
 
@@ -92,11 +91,11 @@ std::shared_ptr<lsp::InitializeResult> LSPHandle::OnInitialize(std::shared_ptr<l
     }
 
 
-//    if (!param->initializationOptions.extensionChars.empty()) {
-//        for (auto &c: param->initializationOptions.extensionChars) {
-//            LuaIdentify::AddIdentifyChar(c);
-//        }
-//    }
+    //    if (!param->initializationOptions.extensionChars.empty()) {
+    //        for (auto &c: param->initializationOptions.extensionChars) {
+    //            LuaIdentify::AddIdentifyChar(c);
+    //        }
+    //    }
 
     auto dictionaryPath = params->initializationOptions.dictionaryPath;
     if (!dictionaryPath.empty()) {
@@ -168,8 +167,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnFormatting(
     edit.newText = std::move(newText);
     edit.range = lsp::Range(
             lsp::Position(0, 0),
-            lsp::Position(totalLine + 1, 0)
-    );
+            lsp::Position(totalLine + 1, 0));
     return result;
 }
 
@@ -228,7 +226,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnRangeFormatting(
     range.EndLine = params->range.end.line;
 
     auto newText = _server->GetService<FormatService>()->RangeFormat(syntaxTree, luaStyle, range);
-    if(newText.empty()){
+    if (newText.empty()) {
         result->hasError = true;
         return result;
     }
@@ -237,8 +235,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnRangeFormatting(
     edit.newText = std::move(newText);
     edit.range = lsp::Range(
             lsp::Position(range.StartLine, range.StartCol),
-            lsp::Position(range.EndLine + 1, 0)
-    );
+            lsp::Position(range.EndLine + 1, 0));
     return result;
 }
 
@@ -272,8 +269,7 @@ std::shared_ptr<lsp::Serializable> LSPHandle::OnTypeFormatting(
         edit.newText = std::move(formatResult.Text);
         edit.range = lsp::Range(
                 lsp::Position(formatResult.Range.StartLine, formatResult.Range.StartCol),
-                lsp::Position(formatResult.Range.EndLine, formatResult.Range.EndCol)
-        );
+                lsp::Position(formatResult.Range.EndLine, formatResult.Range.EndCol));
     }
 
     return result;
@@ -328,8 +324,7 @@ std::shared_ptr<lsp::DocumentDiagnosticReport> LSPHandle::OnTextDocumentDiagnost
     LuaStyle &luaStyle = _server->GetService<ConfigService>()->GetLuaStyle(params->textDocument.uri);
 
     auto diagnostics = _server->GetService<DiagnosticService>()->Diagnostic(
-            opFileId.value(), syntaxTree, luaStyle
-    );
+            opFileId.value(), syntaxTree, luaStyle);
     report->resultId = std::to_string(opFileId.value());
 
     report->items = std::move(diagnostics);

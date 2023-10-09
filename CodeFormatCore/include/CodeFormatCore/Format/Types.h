@@ -6,10 +6,9 @@
 
 struct IndentState {
     IndentState(LuaSyntaxNode node, std::size_t space, std::size_t tab)
-            :
-            SyntaxNode(node),
-            SpaceSize(space),
-            TabSize(tab) {}
+        : SyntaxNode(node),
+          SpaceSize(space),
+          TabSize(tab) {}
 
     LuaSyntaxNode SyntaxNode;
     std::size_t SpaceSize;
@@ -23,7 +22,7 @@ enum class TraverseEvent {
 
 struct Traverse {
     Traverse(LuaSyntaxNode n, TraverseEvent e)
-            : Node(n), Event(e) {}
+        : Node(n), Event(e) {}
 
     LuaSyntaxNode Node;
     TraverseEvent Event;
@@ -31,11 +30,11 @@ struct Traverse {
 
 struct FormatRange {
     FormatRange()
-            : StartLine(0), StartCol(0),
-              EndLine(0), EndCol(0) {}
+        : StartLine(0), StartCol(0),
+          EndLine(0), EndCol(0) {}
 
     FormatRange(std::size_t startLine, std::size_t endLine)
-            : StartLine(startLine), EndLine(endLine) {}
+        : StartLine(startLine), EndLine(endLine) {}
 
     std::size_t StartLine;
     std::size_t StartCol;
@@ -46,8 +45,8 @@ struct FormatRange {
 
 struct IndexRange {
     explicit IndexRange(std::size_t startIndex = 0, std::size_t endIndex = 0)
-            : StartIndex(startIndex),
-              EndIndex(endIndex) {}
+        : StartIndex(startIndex),
+          EndIndex(endIndex) {}
 
 
     std::size_t StartIndex;

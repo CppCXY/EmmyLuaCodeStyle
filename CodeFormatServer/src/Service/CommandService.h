@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Service.h"
 #include "LSP/LSP.h"
-#include <map>
+#include "Service.h"
 #include <functional>
+#include <map>
 #include <string_view>
 
 class CommandService : public Service {
@@ -31,9 +31,8 @@ public:
     void Dispatch(std::string_view command, std::shared_ptr<lsp::ExecuteCommandParams> params);
 
 private:
-
     void CommandProtocol(std::string_view command,
-                         void(CommandService::* handle)(std::shared_ptr<lsp::ExecuteCommandParams>)) {
+                         void (CommandService::*handle)(std::shared_ptr<lsp::ExecuteCommandParams>)) {
         _handles[std::string(command)] = [this, handle](auto params) {
             return (this->*handle)(params);
         };

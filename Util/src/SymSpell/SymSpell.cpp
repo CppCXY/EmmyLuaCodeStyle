@@ -80,7 +80,7 @@ bool SymSpell::CreateDictionaryEntry(const std::string &key, int count) {
     return BuildDeletesWords(key);
 }
 
-bool SymSpell::IsCorrectWord(const std::string& word) const {
+bool SymSpell::IsCorrectWord(const std::string &word) const {
     return (word.size() <= static_cast<std::size_t>(_maxDictionaryEditDistance)) || (_words.count(word) == 1);
 }
 

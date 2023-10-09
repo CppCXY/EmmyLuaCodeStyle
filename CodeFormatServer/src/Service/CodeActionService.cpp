@@ -1,13 +1,13 @@
 #include "CodeActionService.h"
 
 #include "CommandService.h"
+#include "DiagnosticService.h"
+#include "LanguageServer.h"
 #include "Util/Url.h"
 #include "Util/format.h"
-#include "LanguageServer.h"
-#include "DiagnosticService.h"
 
 CodeActionService::CodeActionService(LanguageServer *owner)
-        : Service(owner) {
+    : Service(owner) {
 }
 
 bool CodeActionService::Initialize() {

@@ -1,8 +1,11 @@
 #pragma once
 
 #include "CodeFormatCore/Format/FormatBuilder.h"
+#include <string>
+#include <string_view>
+#include <vector>
 
-class RangeFormatBuilder : public FormatBuilder {
+class MultiRangesFormatBuilder : public FormatBuilder {
 public:
     enum class Valid {
         Init,
@@ -10,11 +13,14 @@ public:
         Finish
     };
 
-    RangeFormatBuilder(LuaStyle &style, FormatRange &range);
+    struct RangeResult {
+        std::string Text;
+        FormatRange Range;
+    };
 
-    std::string GetFormatResult(const LuaSyntaxTree &t) override;
+    MultiRangesFormatBuilder(LuaStyle &style, std::vector<FormatRange> &range);
 
-    FormatRange GetReplaceRange() const;
+    std::string GetMultiFormatResult(const LuaSyntaxTree &t);
 
 protected:
     void WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) override;
@@ -32,6 +38,5 @@ protected:
 private:
     void CheckRange(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve);
 
-    Valid _validRange;
-    FormatRange _range;
+    std::vector<RangeResult> _results;
 };

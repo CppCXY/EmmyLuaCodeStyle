@@ -22,7 +22,7 @@ public:
         : Type(DiagnosticType::None), Range(), Message() {}
 
     LuaDiagnostic(DiagnosticType type, TextRange range, std::string_view message, std::string_view data)
-            : Type(type), Range(range), Message(message), Data(data) {}
+        : Type(type), Range(range), Message(message), Data(data) {}
 
     DiagnosticType Type;
     TextRange Range;

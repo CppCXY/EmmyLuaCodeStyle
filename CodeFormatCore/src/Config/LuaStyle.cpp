@@ -158,7 +158,7 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(space_after_comma_in_for_statement)
 
-    if(configMap.count("space_around_concat_operator")) {
+    if (configMap.count("space_around_concat_operator")) {
         auto &value = configMap.at("space_around_concat_operator");
         if (value == "true" || value == "always") {
             space_around_concat_operator = SpaceAroundStyle::Always;
@@ -293,11 +293,9 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
     if (configMap.count("break_table_list")) {
         if (configMap.at("break_table_list") == "never") {
             break_table_list = BreakTableList::Never;
-        }
-        else if(configMap.at("break_table_list") == "smart") {
+        } else if (configMap.at("break_table_list") == "smart") {
             break_table_list = BreakTableList::Smart;
-        }
-        else if(configMap.at("break_table_list") == "lazy") {
+        } else if (configMap.at("break_table_list") == "lazy") {
             break_table_list = BreakTableList::Lazy;
         }
     }

@@ -1,8 +1,7 @@
 #include "FileDB.h"
 
 FileDB::FileDB()
-        : SharedDBBase<std::size_t, std::string>(), _fileIdCounter(1) {
-
+    : SharedDBBase<std::size_t, std::string>(), _fileIdCounter(1) {
 }
 
 std::size_t FileDB::AllocFileId() {
@@ -15,5 +14,4 @@ void FileDB::ApplyFileUpdate(std::size_t fileId, std::string &&text) {
 }
 
 void FileDB::ApplyFileUpdate(std::vector<lsp::TextDocumentContentChangeEvent> &changeEvent) {
-
 }

@@ -2,8 +2,8 @@
 
 #include "InfoKind.h"
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 class InfoTree;
 
@@ -54,6 +54,7 @@ public:
     std::unordered_map<std::string, InfoNode> AsMap() const;
 
     InfoNode GetValue(std::string_view key) const;
+
 private:
     std::size_t _index;
     InfoTree *_tree;

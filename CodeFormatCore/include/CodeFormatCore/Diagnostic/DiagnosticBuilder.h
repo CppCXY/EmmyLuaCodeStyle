@@ -15,7 +15,7 @@ public:
 
     void NameStyleCheck(const LuaSyntaxTree &t);
 
-    void SpellCheck(const LuaSyntaxTree &t, CodeSpellChecker& spellChecker);
+    void SpellCheck(const LuaSyntaxTree &t, CodeSpellChecker &spellChecker);
 
     std::vector<LuaDiagnostic> GetDiagnosticResults(const LuaSyntaxTree &t);
 
@@ -33,9 +33,9 @@ public:
 
     void ClearDiagnostic(std::size_t leftIndex);
 
-    FormatState& GetState();
-private:
+    FormatState &GetState();
 
+private:
     LuaDiagnosticStyle _diagnosticStyle;
     FormatState _state;
     std::map<std::size_t, LuaDiagnostic> _nextDiagnosticMap;

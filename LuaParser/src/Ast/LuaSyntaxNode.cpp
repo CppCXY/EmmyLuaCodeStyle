@@ -239,7 +239,7 @@ LuaSyntaxNode LuaSyntaxNode::GetNextTokenSkipComment(const LuaSyntaxTree &t) con
         return *this;
     }
     auto nextIndex = t.GetNextToken(_index);
-    while(t.GetTokenKind(nextIndex) == TK_SHORT_COMMENT || t.GetTokenKind(nextIndex) == TK_LONG_COMMENT) {
+    while (t.GetTokenKind(nextIndex) == TK_SHORT_COMMENT || t.GetTokenKind(nextIndex) == TK_LONG_COMMENT) {
         nextIndex = t.GetNextToken(nextIndex);
     }
 

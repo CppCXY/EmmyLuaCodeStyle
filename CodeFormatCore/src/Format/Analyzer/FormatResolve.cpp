@@ -1,15 +1,14 @@
 #include "CodeFormatCore/Format/Analyzer/FormatResolve.h"
 
 FormatResolve::FormatResolve()
-        : _nextSpaceStrategy(NextSpaceStrategy::None),
-          _prevSpaceStrategy(PrevSpaceStrategy::None),
-          _tokenStrategy(TokenStrategy::Origin),
-          _tokenAddStrategy(TokenAddStrategy::None),
-          _indentStrategy(IndentStrategy::None),
-          _nextSpaceData(),
-          _prevSpaceData(),
-          _indent(0) {
-
+    : _nextSpaceStrategy(NextSpaceStrategy::None),
+      _prevSpaceStrategy(PrevSpaceStrategy::None),
+      _tokenStrategy(TokenStrategy::Origin),
+      _tokenAddStrategy(TokenAddStrategy::None),
+      _indentStrategy(IndentStrategy::None),
+      _nextSpaceData(),
+      _prevSpaceData(),
+      _indent(0) {
 }
 
 NextSpaceStrategy FormatResolve::GetNextSpaceStrategy() const {
@@ -101,4 +100,3 @@ void FormatResolve::SetOriginRange(IndexRange range) {
 IndexRange FormatResolve::GetOriginRange() const {
     return _range;
 }
-

@@ -2,7 +2,6 @@
 #include <algorithm>
 
 LineIndex::LineIndex() {
-
 }
 
 void LineIndex::Parse(std::string &text) {

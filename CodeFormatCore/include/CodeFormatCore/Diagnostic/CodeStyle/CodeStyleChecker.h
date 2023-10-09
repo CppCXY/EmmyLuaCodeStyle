@@ -26,18 +26,15 @@ private:
     void ProcessSpaceDiagnostic(LuaSyntaxNode &node, LuaSyntaxNode &next,
                                 size_t shouldSpace,
                                 const LuaSyntaxTree &t,
-                                DiagnosticBuilder &d
-                                );
+                                DiagnosticBuilder &d);
 
     void ProcessIndentDiagnostic(LuaSyntaxNode &node,
-                                const LuaSyntaxTree &t,
-                                DiagnosticBuilder &d
-    );
+                                 const LuaSyntaxTree &t,
+                                 DiagnosticBuilder &d);
 
     std::string GetIndentNote(IndentState indent, IndentStyle style);
 
     std::string GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxNode &right, const LuaSyntaxTree &t);
 
     void EndWithNewLine(DiagnosticBuilder &d, const LuaSyntaxTree &t);
-
 };

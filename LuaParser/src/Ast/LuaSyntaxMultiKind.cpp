@@ -2,7 +2,7 @@
 
 bool detail::multi_match::Match(LuaSyntaxMultiKind k, LuaSyntaxNodeKind syntaxNodeKind) {
     switch (k) {
-        case LuaSyntaxMultiKind::Expression:{
+        case LuaSyntaxMultiKind::Expression: {
             return ExpressionMatch(syntaxNodeKind);
         }
         case LuaSyntaxMultiKind::Statement: {
@@ -59,4 +59,3 @@ bool detail::multi_match::StatementMatch(LuaSyntaxNodeKind k) {
         }
     }
 }
-

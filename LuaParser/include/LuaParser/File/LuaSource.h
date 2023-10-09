@@ -2,14 +2,14 @@
 
 #include "LuaParser/Types/EndOfLineType.h"
 #include "LuaParser/Types/TextRange.h"
+#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <memory>
 
 class LuaSource {
 public:
-    static std::shared_ptr<LuaSource> From(std::string&& source);
+    static std::shared_ptr<LuaSource> From(std::string &&source);
 
     explicit LuaSource(std::string &&fileText);
 

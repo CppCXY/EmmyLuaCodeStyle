@@ -22,11 +22,11 @@ public:
 
     void Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
-    void AddIgnoreRange(const IndexRange& range, const LuaSyntaxTree &t);
+    void AddIgnoreRange(const IndexRange &range, const LuaSyntaxTree &t);
 
     std::vector<IndexRange> GetIgnores() const;
-private:
 
+private:
     void AnalyzeDocFormat(LuaSyntaxNode n, FormatState &f, const LuaSyntaxTree &t);
 
     std::unordered_map<std::size_t, IndexRange> _ignores;

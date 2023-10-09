@@ -1,23 +1,22 @@
 #pragma once
 
-#include <memory>
 #include "ServiceType.h"
+#include <memory>
 
 class LanguageServer;
 
-class Service
-{
+class Service {
 public:
-	LANGUAGE_SERVICE(Service);
+    LANGUAGE_SERVICE(Service);
 
-	explicit Service(LanguageServer* owner);
+    explicit Service(LanguageServer *owner);
 
-	virtual ~Service() = default;
+    virtual ~Service() = default;
 
-	virtual bool Initialize() { return true; }
+    virtual bool Initialize() { return true; }
 
-	virtual void Start() {};
+    virtual void Start(){};
 
 protected:
-	LanguageServer* _owner;
+    LanguageServer *_owner;
 };

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <string_view>
-#include <memory>
 #include "CodeFormatCore/Config/LuaEditorConfig.h"
+#include <memory>
+#include <string_view>
 
 
 struct LuaConfig {
     explicit LuaConfig(std::string_view workspace)
-            : Workspace(workspace), Editorconfig(nullptr) {}
+        : Workspace(workspace), Editorconfig(nullptr) {}
 
     std::string Workspace;
     std::shared_ptr<LuaEditorConfig> Editorconfig;

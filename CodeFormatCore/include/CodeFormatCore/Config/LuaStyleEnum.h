@@ -56,10 +56,10 @@ enum class LineBreakReason {
 
 struct LineSpace {
     explicit LineSpace(std::size_t space = 1, LineBreakReason reason = LineBreakReason::None)
-            : Type(LineSpaceType::Fixed), Space(space), Reason(reason) {}
+        : Type(LineSpaceType::Fixed), Space(space), Reason(reason) {}
 
     explicit LineSpace(LineSpaceType type, std::size_t space = 0)
-            : Type(type), Space(space), Reason(LineBreakReason::None) {}
+        : Type(type), Space(space), Reason(LineBreakReason::None) {}
 
     LineSpaceType Type;
     std::size_t Space;
@@ -68,7 +68,7 @@ struct LineSpace {
 
 enum class FunctionSingleArgSpace {
     None,
-    Always, // true
+    Always,// true
     OnlyTable,
     OnlyString
 };

@@ -1,8 +1,8 @@
 #pragma once
 
+#include "LuaParseError.h"
 #include "LuaParser/Ast/LuaSyntaxNodeKind.h"
 #include "LuaParser/Lexer/LuaTokenKind.h"
-#include "LuaParseError.h"
 #include <string>
 #include <vector>
 
@@ -40,8 +40,8 @@ struct CompleteMarker;
 
 struct Marker {
     explicit Marker(std::size_t pos);
-    CompleteMarker Complete(LuaParser& p, LuaSyntaxNodeKind kind);
-    void Undo(LuaParser& p);
+    CompleteMarker Complete(LuaParser &p, LuaSyntaxNodeKind kind);
+    void Undo(LuaParser &p);
     std::size_t Pos;
 };
 
@@ -49,7 +49,7 @@ struct CompleteMarker {
     CompleteMarker();
     CompleteMarker(std::size_t start, std::size_t finish, LuaSyntaxNodeKind kind);
 
-    Marker Precede(LuaParser& p);
+    Marker Precede(LuaParser &p);
 
     std::size_t Start;
     std::size_t Finish;

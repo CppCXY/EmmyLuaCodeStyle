@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
-#include <string>
 #include "LineTypes.h"
+#include <string>
+#include <vector>
 
 class LineIndex {
 public:
@@ -12,9 +12,10 @@ public:
 
     LineCol GetLineCol(std::size_t offset);
 
-    std::size_t GetOffset(const LineCol& lineCol);
+    std::size_t GetOffset(const LineCol &lineCol);
 
     std::size_t GetTotalLine();
+
 private:
     std::vector<LineOffset> _newLines;
 };

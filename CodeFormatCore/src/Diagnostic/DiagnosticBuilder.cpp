@@ -1,12 +1,12 @@
 #include "CodeFormatCore/Diagnostic/DiagnosticBuilder.h"
 #include "CodeFormatCore/Config/LanguageTranslator.h"
 
-#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include "CodeFormatCore/Diagnostic/CodeStyle/CodeStyleChecker.h"
+#include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 
 DiagnosticBuilder::DiagnosticBuilder(LuaStyle &style, LuaDiagnosticStyle &diagnosticStyle)
-        : _diagnosticStyle(diagnosticStyle),
-          _state(FormatState::Mode::Diagnostic) {
+    : _diagnosticStyle(diagnosticStyle),
+      _state(FormatState::Mode::Diagnostic) {
     _state.SetFormatStyle(style);
     _state.SetDiagnosticStyle(diagnosticStyle);
 }
@@ -19,12 +19,11 @@ std::vector<LuaDiagnostic> DiagnosticBuilder::GetDiagnosticResults(const LuaSynt
     return _diagnostics;
 }
 
-void
-DiagnosticBuilder::PushDiagnostic(DiagnosticType type,
-                                  std::size_t leftIndex,
-                                  TextRange range,
-                                  std::string_view message,
-                                  std::string_view data) {
+void DiagnosticBuilder::PushDiagnostic(DiagnosticType type,
+                                       std::size_t leftIndex,
+                                       TextRange range,
+                                       std::string_view message,
+                                       std::string_view data) {
     _nextDiagnosticMap[leftIndex] = LuaDiagnostic(type, range, message, data);
 }
 

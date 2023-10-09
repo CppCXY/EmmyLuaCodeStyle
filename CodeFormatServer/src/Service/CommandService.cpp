@@ -1,12 +1,12 @@
 #include "CommandService.h"
-#include "FormatService.h"
-#include "Util/format.h"
-#include "Util/Url.h"
-#include "LanguageServer.h"
 #include "ConfigService.h"
+#include "FormatService.h"
+#include "LanguageServer.h"
+#include "Util/Url.h"
+#include "Util/format.h"
 
 CommandService::CommandService(LanguageServer *owner)
-        : Service(owner) {
+    : Service(owner) {
 }
 
 void CommandService::Start() {
@@ -93,10 +93,9 @@ void CommandService::Reformat(std::shared_ptr<lsp::ExecuteCommandParams> params)
 
     edit.range = lsp::Range(
             lsp::Position(formatRange.StartLine, formatRange.StartCol),
-            lsp::Position(formatRange.EndLine + 1, formatRange.EndCol)
-    );
+            lsp::Position(formatRange.EndLine + 1, formatRange.EndCol));
 
-    _owner-> SendRequest("workspace/applyEdit", applyParams);
+    _owner->SendRequest("workspace/applyEdit", applyParams);
 }
 
 void CommandService::SpellCorrect(std::shared_ptr<lsp::ExecuteCommandParams> params) {
@@ -121,6 +120,5 @@ void CommandService::SpellCorrect(std::shared_ptr<lsp::ExecuteCommandParams> par
 
     edit.range = range;
 
-    _owner-> SendRequest("workspace/applyEdit", applyParams);
+    _owner->SendRequest("workspace/applyEdit", applyParams);
 }
-

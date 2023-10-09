@@ -1,5 +1,5 @@
-#include <queue>
 #include "SyntaxNodeHelper.h"
+#include <queue>
 
 std::vector<LuaSyntaxNode> helper::CollectBinaryOperator(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                                                          const std::function<bool(LuaTokenKind)> &predicated) {

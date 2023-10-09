@@ -12,7 +12,7 @@ target_include_directories(Util PUBLIC
         src
         ${LuaCodeStyle_SOURCE_DIR}/3rd/uriparser/include
         ${LuaCodeStyle_SOURCE_DIR}/3rd/wildcards/include
-        )
+)
 
 target_sources(Util
         PRIVATE
@@ -26,7 +26,7 @@ target_sources(Util
         src/SymSpell/EditDistance.cpp
         src/InfoTree/InfoTree.cpp
         src/InfoTree/InfoNode.cpp
-        )
+)
 
 
 target_link_libraries(Util PUBLIC uriparser)

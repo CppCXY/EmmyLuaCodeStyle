@@ -8,21 +8,18 @@ void UnitChars::Increment() {
 }
 
 UnitChars::UnitChars(std::size_t totalLen, std::size_t charsNum, std::size_t unit)
-        : TotalLen(totalLen), CharsNum(charsNum), Unit(unit) {
-
+    : TotalLen(totalLen), CharsNum(charsNum), Unit(unit) {
 }
 
 LineOffset::LineOffset(std::size_t start)
-        : Start(start) {
-
+    : Start(start) {
 }
 
 void LineOffset::Push(std::size_t cLen) {
     auto unit = cLen;
     if (CharsOffsets.empty() || CharsOffsets.back().Unit != unit) {
         CharsOffsets.emplace_back(
-                unit, 1, unit
-        );
+                unit, 1, unit);
     } else {
         CharsOffsets.back().Increment();
     }

@@ -1,25 +1,23 @@
 ﻿#pragma once
 
-#include <string>
 #include <map>
+#include <string>
 
-class LanguageTranslator
-{
+class LanguageTranslator {
 public:
-	static LanguageTranslator& GetInstance();
+    static LanguageTranslator &GetInstance();
 
-	LanguageTranslator();
+    LanguageTranslator();
 
-	std::string Get(const std::string& source);
+    std::string Get(const std::string &source);
 
-	void SetLanguageMap(std::map<std::string, std::string>&& languageDictionary);
+    void SetLanguageMap(std::map<std::string, std::string> &&languageDictionary);
 
 private:
-	std::map<std::string, std::string> _languageDictionary;
+    std::map<std::string, std::string> _languageDictionary;
 };
 
 /*
  * 语言本地化翻译实例，保持一种惯用法
  */
 #define LText(text) LanguageTranslator::GetInstance().Get(text)
-

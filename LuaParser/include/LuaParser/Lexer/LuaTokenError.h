@@ -4,17 +4,15 @@
 #include "LuaTokenKind.h"
 #include <string>
 
-class LuaTokenError
-{
+class LuaTokenError {
 public:
-	LuaTokenError(std::string_view errorMessage, TextRange range, LuaTokenKind token)
-		: ErrorMessage(errorMessage),
-		  ErrorRange(range),
-		  MissToken(token)
-	{
-	}
+    LuaTokenError(std::string_view errorMessage, TextRange range, LuaTokenKind token)
+        : ErrorMessage(errorMessage),
+          ErrorRange(range),
+          MissToken(token) {
+    }
 
-	std::string ErrorMessage;
-	TextRange ErrorRange;
-	LuaTokenKind MissToken;
+    std::string ErrorMessage;
+    TextRange ErrorRange;
+    LuaTokenKind MissToken;
 };

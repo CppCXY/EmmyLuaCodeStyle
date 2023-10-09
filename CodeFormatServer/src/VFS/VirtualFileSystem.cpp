@@ -1,7 +1,6 @@
 #include "VirtualFileSystem.h"
 
 VirtualFileSystem::VirtualFileSystem() {
-
 }
 
 void VirtualFileSystem::UpdateFile(std::string_view uri, const lsp::Range &range, std::string &&text) {
@@ -57,7 +56,7 @@ void VirtualFileSystem::UpdateFile(std::size_t fileId, const lsp::Range &range, 
     if (startOffset == endOffset) {
         sourceText.insert(startOffset, text);
     }
-        // for replace
+    // for replace
     else {
         sourceText.replace(startOffset, endOffset - startOffset, text);
     }
@@ -66,8 +65,7 @@ void VirtualFileSystem::UpdateFile(std::size_t fileId, const lsp::Range &range, 
     _fileDB.ApplyFileUpdate(fileId, std::move(sourceText));
 }
 
-void
-VirtualFileSystem::UpdateFile(std::string_view uri, std::vector<lsp::TextDocumentContentChangeEvent> &changeEvent) {
+void VirtualFileSystem::UpdateFile(std::string_view uri, std::vector<lsp::TextDocumentContentChangeEvent> &changeEvent) {
     std::string stringUri(uri);
     auto opFileId = _uriDB.Query(stringUri);
     if (!opFileId.has_value()) {

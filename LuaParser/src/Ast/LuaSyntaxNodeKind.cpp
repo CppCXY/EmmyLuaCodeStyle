@@ -1,5 +1,5 @@
-#include <string_view>
 #include "LuaParser/Ast/LuaSyntaxNodeKind.h"
+#include <string_view>
 
 std::string_view detail::debug::GetSyntaxKindDebugName(LuaSyntaxNodeKind kind) {
     switch (kind) {

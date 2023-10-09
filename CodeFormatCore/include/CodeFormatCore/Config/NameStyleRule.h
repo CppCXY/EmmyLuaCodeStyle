@@ -1,8 +1,8 @@
 #pragma once
 
 #include <regex>
-#include <string>
 #include <set>
+#include <string>
 
 enum class NameStyleType {
     Off,
@@ -31,7 +31,7 @@ struct NameStyleRule {
 };
 
 struct IgnoreNameStyleData : public NameStyleData {
-    explicit IgnoreNameStyleData(const std::set<std::string>& param)
+    explicit IgnoreNameStyleData(const std::set<std::string> &param)
         : NameStyleData(), Param(param.begin(), param.end()) {}
     std::set<std::string, std::less<>> Param;
 };

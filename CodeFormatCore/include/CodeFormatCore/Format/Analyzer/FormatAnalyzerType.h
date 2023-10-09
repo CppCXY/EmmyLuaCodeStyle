@@ -13,6 +13,6 @@ enum class FormatAnalyzerType {
     Count,
 };
 
-#define DECLARE_FORMAT_ANALYZER(CLASS) \
-inline static constexpr FormatAnalyzerType Type = FormatAnalyzerType::CLASS;   \
-FormatAnalyzerType GetType() const override { return Type; }
+#define DECLARE_FORMAT_ANALYZER(CLASS)                                           \
+    inline static constexpr FormatAnalyzerType Type = FormatAnalyzerType::CLASS; \
+    FormatAnalyzerType GetType() const override { return Type; }

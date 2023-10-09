@@ -1,15 +1,15 @@
 #pragma once
 
-#include <vector>
-#include <string>
-#include <string_view>
-#include <map>
-#include "LSP/LSP.h"
-#include "Service.h"
 #include "CodeFormatCore/Config/LuaStyle.h"
-#include "LuaParser/Ast/LuaSyntaxTree.h"
 #include "CodeFormatCore/Format/Types.h"
 #include "CodeFormatCore/TypeFormat/LuaTypeFormat.h"
+#include "LSP/LSP.h"
+#include "LuaParser/Ast/LuaSyntaxTree.h"
+#include "Service.h"
+#include <map>
+#include <string>
+#include <string_view>
+#include <vector>
 
 class FormatService : public Service {
 public:

@@ -7,13 +7,12 @@
 #include "Util/format.h"
 
 LuaParser::LuaParser(std::shared_ptr<LuaSource> luaFile, std::vector<LuaToken> &&tokens)
-        :
-        _tokens(tokens),
-        _tokenIndex(0),
-        _file(luaFile),
-        _events(),
-        _invalid(true),
-        _current(TK_EOF) {
+    : _tokens(tokens),
+      _tokenIndex(0),
+      _file(luaFile),
+      _events(),
+      _invalid(true),
+      _current(TK_EOF) {
 }
 
 std::vector<MarkEvent> &LuaParser::GetEvents() {
@@ -35,8 +34,7 @@ std::shared_ptr<LuaSource> LuaParser::GetLuaFile() {
 bool LuaParser::Parse() {
     try {
         Block();
-    }
-    catch (LuaParseException &e) {
+    } catch (LuaParseException &e) {
         auto text = _file->GetSource();
         _errors.emplace_back(e.what(), TextRange(text.size(), 0));
     }
@@ -298,7 +296,7 @@ void LuaParser::ForNumber() {
 
     Expression();
 
-    if (TestAndNext(',')) // optional step
+    if (TestAndNext(','))// optional step
     {
         Expression();
     }
@@ -705,7 +703,7 @@ void LuaParser::ParamList() {
                 }
             }
         } while (!isVararg && TestAndNext(','));
-        endLoop:
+    endLoop:
         // empty stat
         void(0);
     }
@@ -746,7 +744,7 @@ CompleteMarker LuaParser::SuffixedExpression() {
         }
         suffix = true;
     }
-    endLoop:
+endLoop:
     if (suffix) {
         return m.Complete(*this, LuaSyntaxNodeKind::SuffixedExpression);
     } else {

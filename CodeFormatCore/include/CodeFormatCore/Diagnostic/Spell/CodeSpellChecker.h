@@ -1,9 +1,9 @@
 #pragma once
 
 #include "LuaParser/Ast/LuaSyntaxTree.h"
+#include "Util.h"
 #include "Util/StringUtil.h"
 #include "Util/SymSpell/SymSpell.h"
-#include "Util.h"
 #include <memory>
 #include <set>
 #include <unordered_map>

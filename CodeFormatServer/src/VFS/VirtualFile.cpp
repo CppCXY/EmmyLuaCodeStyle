@@ -1,12 +1,12 @@
 #include "VirtualFile.h"
-#include "Util/Url.h"
+#include "Lib/LineIndex/LineIndex.h"
 #include "LuaParser/Lexer/LuaLexer.h"
 #include "LuaParser/Parse/LuaParser.h"
-#include "Lib/LineIndex/LineIndex.h"
+#include "Util/Url.h"
 #include "VirtualFileSystem.h"
 
 VirtualFile::VirtualFile(std::size_t fileId)
-        : _fileId(fileId) {
+    : _fileId(fileId) {
 }
 
 std::optional<LuaSyntaxTree> VirtualFile::GetSyntaxTree(VirtualFileSystem &vfs) const {

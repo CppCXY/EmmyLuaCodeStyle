@@ -1,16 +1,16 @@
 #pragma once
 
-#include <optional>
-#include <unordered_map>
 #include <functional>
 #include <memory>
+#include <optional>
+#include <unordered_map>
 
-template<class K, class V, class Container=std::unordered_map<K, V>>
+template<class K, class V, class Container = std::unordered_map<K, V>>
 class DBBase {
 public:
-    DBBase() {};
+    DBBase(){};
 
-    virtual ~DBBase() {};
+    virtual ~DBBase(){};
 
     virtual void Input(const K &key, V &&value) {
         _hash[key] = value;
@@ -34,7 +34,7 @@ private:
     Container _hash;
 };
 
-template<class K, class V, class Container=std::unordered_map<K, V>>
+template<class K, class V, class Container = std::unordered_map<K, V>>
 class SharedDBBase : public DBBase<K, std::shared_ptr<V>> {
 public:
     virtual void Input(const K &key, std::shared_ptr<V> value) {

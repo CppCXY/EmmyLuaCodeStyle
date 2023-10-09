@@ -50,6 +50,7 @@ public:
     void SetFormatRange(bool rangeLine, std::string_view rangeStr);
 
     void SupportNonStandardLua();
+
 private:
     std::optional<std::string> ReadFile(std::string_view path);
 
@@ -58,7 +59,7 @@ private:
     void DiagnosticInspection(std::string_view message, TextRange range, std::shared_ptr<LuaSource> file,
                               std::string_view path);
 
-    bool ReformatSingleFile(std::string_view inputPath, std::string_view outPath, std::string&& sourceText);
+    bool ReformatSingleFile(std::string_view inputPath, std::string_view outPath, std::string &&sourceText);
 
     bool ReformatWorkspace();
 

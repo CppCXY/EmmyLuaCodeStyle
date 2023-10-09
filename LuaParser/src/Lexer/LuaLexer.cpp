@@ -356,14 +356,12 @@ LuaTokenKind LuaLexer::Lex() {
             }
             case '?': {
                 _reader.SaveAndNext();
-                if(_supportNonStandardSymbol) {
-                    if(_reader.CheckNext1('.')) {
+                if (_supportNonStandardSymbol) {
+                    if (_reader.CheckNext1('.')) {
                         return '.';
-                    }
-                    else if(_reader.CheckNext1(':')) {
+                    } else if (_reader.CheckNext1(':')) {
                         return ':';
-                    }
-                    else if(_reader.CheckNext1('[')){
+                    } else if (_reader.CheckNext1('[')) {
                         return '[';
                     }
                 }

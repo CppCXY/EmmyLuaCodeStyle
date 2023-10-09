@@ -12,7 +12,7 @@ target_include_directories(CodeFormatServer PRIVATE
         ${LuaCodeStyle_SOURCE_DIR}/3rd/nlohmann_json/include
         ${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.9/include
         src
-        )
+)
 
 target_compile_options(CodeFormatServer PRIVATE -DASIO_STANDALONE)
 
@@ -58,7 +58,7 @@ target_sources(CodeFormatServer
 
         # mimalloc
         ${LuaCodeStyle_SOURCE_DIR}/3rd/mimalloc-2.0.9/src/static.c
-        )
+)
 
 target_link_libraries(CodeFormatServer CodeFormatCore)
 

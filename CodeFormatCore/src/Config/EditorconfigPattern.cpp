@@ -1,11 +1,10 @@
 #include "CodeFormatCore/Config/EditorconfigPattern.h"
-#include <algorithm>
 #include "LuaParser/Lexer/LuaDefine.h"
 #include "Util/StringUtil.h"
+#include <algorithm>
 
 
 EditorconfigPattern::EditorconfigPattern() {
-
 }
 
 void EditorconfigPattern::Compile(std::string_view pattern) {
@@ -236,5 +235,3 @@ bool EditorconfigPattern::Match(std::string_view filePath) {
 std::string_view EditorconfigPattern::GetPattern() {
     return _patternSource;
 }
-
-

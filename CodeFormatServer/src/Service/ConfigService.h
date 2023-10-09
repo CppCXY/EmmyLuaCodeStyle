@@ -1,15 +1,15 @@
 #pragma once
 
-#include <vector>
-#include "LSP/LSP.h"
-#include "Service.h"
+#include "CodeFormatCore/Config/LuaDiagnosticStyle.h"
 #include "CodeFormatCore/Config/LuaEditorConfig.h"
 #include "Config/ClientConfig.h"
-#include "CodeFormatCore/Config/LuaDiagnosticStyle.h"
+#include "LSP/LSP.h"
+#include "Service.h"
+#include <vector>
 
 struct LuaConfig {
     explicit LuaConfig(std::string_view workspace)
-            : Workspace(workspace), Editorconfig(nullptr) {}
+        : Workspace(workspace), Editorconfig(nullptr) {}
 
     std::string Workspace;
     std::shared_ptr<LuaEditorConfig> Editorconfig;

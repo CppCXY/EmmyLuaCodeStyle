@@ -1,9 +1,9 @@
 #pragma once
 
-#include "LuaParser/Ast/LuaSyntaxTree.h"
-#include "LuaParser/Ast/LuaSyntaxNode.h"
 #include "FormatAnalyzerType.h"
 #include "FormatResolve.h"
+#include "LuaParser/Ast/LuaSyntaxNode.h"
+#include "LuaParser/Ast/LuaSyntaxTree.h"
 
 class FormatState;
 
@@ -17,9 +17,9 @@ public:
 
     virtual void Analyze(FormatState &f, const LuaSyntaxTree &t) = 0;
 
-    virtual void ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {};
+    virtual void ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t){};
 
     virtual void Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) = 0;
 
-    virtual void OnFormatMessage(FormatState& f, FormatEvent event, LuaSyntaxNode syntaxNode, const LuaSyntaxTree& t) {};
+    virtual void OnFormatMessage(FormatState &f, FormatEvent event, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t){};
 };

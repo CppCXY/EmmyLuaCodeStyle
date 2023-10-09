@@ -4,12 +4,12 @@
 #include <string>
 #include <string_view>
 
-#include "CodeFormatCore/Config/LuaStyle.h"
 #include "CodeFormatCore/Config/LuaEditorConfig.h"
-#include "CodeFormatCore/Format/FormatBuilder.h"
-#include "CodeFormatCore/Diagnostic/Spell/CodeSpellChecker.h"
-#include "CodeFormatCore/TypeFormat/LuaTypeFormat.h"
+#include "CodeFormatCore/Config/LuaStyle.h"
 #include "CodeFormatCore/Diagnostic/DiagnosticBuilder.h"
+#include "CodeFormatCore/Diagnostic/Spell/CodeSpellChecker.h"
+#include "CodeFormatCore/Format/FormatBuilder.h"
+#include "CodeFormatCore/TypeFormat/LuaTypeFormat.h"
 #include "Types.h"
 
 
@@ -23,7 +23,7 @@ public:
 
     void UpdateCodeStyle(const std::string &workspaceUri, const std::string &configPath);
 
-    void UpdateDiagnosticStyle(InfoTree& tree);
+    void UpdateDiagnosticStyle(InfoTree &tree);
 
     void RemoveCodeStyle(const std::string &workspaceUri);
 
@@ -46,18 +46,19 @@ public:
     Result<std::vector<LuaDiagnosticInfo>> Diagnostic(const std::string &uri, std::string &&text);
 
     Result<std::vector<LuaDiagnosticInfo>> SpellCheck(const std::string &uri, std::string &&text,
-                                          const CodeSpellChecker::CustomDictionary &tempDict);
+                                                      const CodeSpellChecker::CustomDictionary &tempDict);
 
     Result<std::vector<LuaDiagnosticInfo>> NameStyleCheck(const std::string &uri, std::string &&text);
 
     std::vector<SuggestItem> SpellCorrect(const std::string &word);
 
     LuaStyle &GetStyle(const std::string &uri);
+
 private:
-    std::vector<LuaDiagnosticInfo> MakeDiagnosticInfo(const std::vector<LuaDiagnostic>& diagnostics,
+    std::vector<LuaDiagnosticInfo> MakeDiagnosticInfo(const std::vector<LuaDiagnostic> &diagnostics,
                                                       std::shared_ptr<LuaSource> file);
 
-    void CalculateTempStyle(LuaStyle& style, ConfigMap &configMap);
+    void CalculateTempStyle(LuaStyle &style, ConfigMap &configMap);
 
     std::vector<LuaConfig> _configs;
     LuaStyle _defaultStyle;

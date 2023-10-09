@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Analyzer/FormatAnalyzer.h"
 #include "CodeFormatCore/Config/LuaDiagnosticStyle.h"
 #include "CodeFormatCore/Config/LuaStyle.h"
-#include "Analyzer/FormatAnalyzer.h"
 #include "Types.h"
 #include <array>
 

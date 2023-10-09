@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include <map>
-#include <string>
-#include <memory>
-#include "LuaStyle.h"
 #include "EditorconfigPattern.h"
+#include "LuaStyle.h"
+#include <map>
+#include <memory>
+#include <string>
 
 class LuaEditorConfig {
 public:
@@ -27,7 +27,6 @@ public:
     LuaStyle &Generate(std::string_view fileUri);
 
 private:
-
     std::string _source;
     std::vector<Section> _sections;
     std::map<std::string, LuaStyle, std::less<>> _styleMap;

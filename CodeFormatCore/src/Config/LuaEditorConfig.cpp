@@ -1,9 +1,9 @@
 ﻿
 #include "CodeFormatCore/Config/LuaEditorConfig.h"
 
-#include <sstream>
 #include <fstream>
 #include <regex>
+#include <sstream>
 
 #include "Util/StringUtil.h"
 
@@ -20,7 +20,7 @@ std::shared_ptr<LuaEditorConfig> LuaEditorConfig::LoadFromFile(const std::string
 }
 
 LuaEditorConfig::LuaEditorConfig(std::string &&source)
-        : _source(source) {
+    : _source(source) {
 }
 
 void LuaEditorConfig::Parse() {
@@ -64,7 +64,7 @@ LuaStyle &LuaEditorConfig::Generate(std::string_view filePath) {
         if (pattern.GetPattern() == "*" || pattern.GetPattern() == "*.lua") {
             patternSection.push_back(i);
         }
-            // [{test.lua,lib.lua}]
+        // [{test.lua,lib.lua}]
         else if (pattern.Match(filePath)) {
             patternSection.push_back(i);
         }

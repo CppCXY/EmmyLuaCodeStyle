@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Service.h"
-#include "LuaParser/Ast/LuaSyntaxTree.h"
-#include "CodeFormatCore/Config/LuaStyle.h"
 #include "CodeFormatCore/Config/LuaDiagnosticStyle.h"
-#include "LSP/LSP.h"
-#include "CodeFormatCore/Diagnostic/Spell/CodeSpellChecker.h"
+#include "CodeFormatCore/Config/LuaStyle.h"
 #include "CodeFormatCore/Diagnostic/NameStyle/NameStyleChecker.h"
+#include "CodeFormatCore/Diagnostic/Spell/CodeSpellChecker.h"
+#include "LSP/LSP.h"
+#include "LuaParser/Ast/LuaSyntaxTree.h"
+#include "Service.h"
 
 class DiagnosticService : public Service {
 public:
@@ -23,4 +23,3 @@ public:
 private:
     std::shared_ptr<CodeSpellChecker> _spellChecker;
 };
-

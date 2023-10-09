@@ -1,19 +1,18 @@
 #include "DiagnosticService.h"
-#include "LanguageServer.h"
-#include "CodeFormatCore/Diagnostic/DiagnosticBuilder.h"
 #include "CodeActionService.h"
+#include "CodeFormatCore/Diagnostic/DiagnosticBuilder.h"
 #include "ConfigService.h"
+#include "LanguageServer.h"
 
 DiagnosticService::DiagnosticService(LanguageServer *owner)
-        : Service(owner),
-          _spellChecker(std::make_shared<CodeSpellChecker>()) {
-
+    : Service(owner),
+      _spellChecker(std::make_shared<CodeSpellChecker>()) {
 }
 
 std::vector<lsp::Diagnostic>
 DiagnosticService::Diagnostic(std::size_t fileId,
                               const LuaSyntaxTree &luaSyntaxTree, LuaStyle &luaStyle) {
-    LuaDiagnosticStyle& diagnosticStyle = _owner->GetService<ConfigService>()->GetDiagnosticStyle();
+    LuaDiagnosticStyle &diagnosticStyle = _owner->GetService<ConfigService>()->GetDiagnosticStyle();
 
     DiagnosticBuilder d(luaStyle, diagnosticStyle);
 
@@ -37,8 +36,7 @@ DiagnosticService::Diagnostic(std::size_t fileId,
         auto endLC = lineIndex->GetLineCol(result.Range.GetEndOffset());
         diag.range = lsp::Range(
                 lsp::Position(startLC.Line, startLC.Col),
-                lsp::Position(endLC.Line, endLC.Col + 1)
-        );
+                lsp::Position(endLC.Line, endLC.Col + 1));
         diag.data = result.Data;
 
         diag.source = "EmmyLua";
@@ -80,7 +78,6 @@ DiagnosticService::Diagnostic(std::size_t fileId,
                 break;
             }
         }
-
     }
     return diagnostics;
 }
@@ -88,4 +85,3 @@ DiagnosticService::Diagnostic(std::size_t fileId,
 std::shared_ptr<CodeSpellChecker> DiagnosticService::GetSpellChecker() {
     return _spellChecker;
 }
-

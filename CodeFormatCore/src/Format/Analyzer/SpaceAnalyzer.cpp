@@ -26,26 +26,24 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case TK_CONCAT: {
-                    switch(f.GetStyle().space_around_concat_operator){
+                    switch (f.GetStyle().space_around_concat_operator) {
                         case SpaceAroundStyle::Always: {
                             SpaceAround(syntaxNode, t, 1);
                             break;
                         }
                         case SpaceAroundStyle::None: {
-                            if(syntaxNode.GetPrevToken(t).GetTokenKind(t) == TK_NUMBER) {
+                            if (syntaxNode.GetPrevToken(t).GetTokenKind(t) == TK_NUMBER) {
                                 SpaceAround(syntaxNode, t, 1);
-                            }
-                            else {
+                            } else {
                                 SpaceAround(syntaxNode, t, 0);
                             }
                             break;
                         }
                         case SpaceAroundStyle::NoSpaceAsym: {
-                            if(syntaxNode.GetPrevToken(t).GetTokenKind(t) == TK_NUMBER) {
+                            if (syntaxNode.GetPrevToken(t).GetTokenKind(t) == TK_NUMBER) {
                                 SpaceLeft(syntaxNode, t, 1);
                                 SpaceRight(syntaxNode, t, 0);
-                            }
-                            else {
+                            } else {
                                 SpaceAround(syntaxNode, t, 0);
                             }
                             break;
@@ -57,26 +55,24 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case '=': {
-                    switch(f.GetStyle().space_around_assign_operator){
+                    switch (f.GetStyle().space_around_assign_operator) {
                         case SpaceAroundStyle::Always: {
                             SpaceAround(syntaxNode, t, 1);
                             break;
                         }
                         case SpaceAroundStyle::None: {
-                            if(syntaxNode.GetPrevToken(t).GetTokenKind(t) == '>') {
+                            if (syntaxNode.GetPrevToken(t).GetTokenKind(t) == '>') {
                                 SpaceAround(syntaxNode, t, 1);
-                            }
-                            else {
+                            } else {
                                 SpaceAround(syntaxNode, t, 0);
                             }
                             break;
                         }
                         case SpaceAroundStyle::NoSpaceAsym: {
-                            if(syntaxNode.GetPrevToken(t).GetTokenKind(t) == '>') {
+                            if (syntaxNode.GetPrevToken(t).GetTokenKind(t) == '>') {
                                 SpaceLeft(syntaxNode, t, 1);
                                 SpaceRight(syntaxNode, t, 0);
-                            }
-                            else {
+                            } else {
                                 SpaceAround(syntaxNode, t, 0);
                             }
                             break;

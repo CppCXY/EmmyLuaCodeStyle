@@ -3,10 +3,10 @@
 #include "LuaParser/Lexer/TextReader.h"
 #include "LuaParser/Types/TextRange.h"
 #include <cinttypes>
+#include <climits>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <climits>
 
 namespace spell {
 

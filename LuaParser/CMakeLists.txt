@@ -10,7 +10,7 @@ target_include_directories(LuaParser PUBLIC
         include
         PRIVATE
         src
-        )
+)
 
 target_sources(LuaParser
         #src
@@ -37,7 +37,7 @@ target_sources(LuaParser
 
         #exception
         src/exception/LuaParseException.cpp
-        )
+)
 
 target_link_libraries(LuaParser PUBLIC Util)
 

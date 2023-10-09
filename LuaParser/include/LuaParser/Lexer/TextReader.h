@@ -42,6 +42,7 @@ public:
     bool IsEof() const;
 
     bool HasSaveText() const;
+
 private:
     std::string_view _text;
 

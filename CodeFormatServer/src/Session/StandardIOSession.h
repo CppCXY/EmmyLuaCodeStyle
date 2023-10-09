@@ -3,10 +3,8 @@
 #include "IOSession.h"
 
 
-class StandardIOSession: public IOSession
-{
+class StandardIOSession : public IOSession {
 public:
-
-	int Run(LanguageServer& server) override;
-	void Send(std::string_view content) override;
+    int Run(LanguageServer &server) override;
+    void Send(std::string_view content) override;
 };

@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Util/Utf8.h"
 #include <cinttypes>
 #include <vector>
-#include "Util/Utf8.h"
 
 struct LineCol {
     LineCol(std::size_t line, std::size_t col);
@@ -33,5 +33,4 @@ public:
 
     std::size_t Start;
     std::vector<UnitChars> CharsOffsets;
-
 };

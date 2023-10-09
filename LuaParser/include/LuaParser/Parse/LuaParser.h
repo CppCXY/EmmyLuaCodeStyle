@@ -1,35 +1,35 @@
 ﻿#pragma once
 
-#include "LuaParser/Ast/LuaSyntaxNode.h"
-#include "LuaParser/Ast/LuaSyntaxTree.h"
-#include "LuaParser/Lexer/LuaLexer.h"
 #include "LuaAttribute.h"
 #include "LuaOperatorType.h"
 #include "LuaParseError.h"
+#include "LuaParser/Ast/LuaSyntaxNode.h"
+#include "LuaParser/Ast/LuaSyntaxTree.h"
+#include "LuaParser/Lexer/LuaLexer.h"
 #include "Mark.h"
 #include <memory>
 #include <vector>
 
-class LuaParser
-{
+class LuaParser {
 public:
     static BinOpr GetBinaryOperator(LuaTokenKind op);
 
-	LuaParser(std::shared_ptr<LuaSource> luaFile, std::vector<LuaToken>&& tokens);
+    LuaParser(std::shared_ptr<LuaSource> luaFile, std::vector<LuaToken> &&tokens);
 
     bool Parse();
 
-    std::vector<MarkEvent>& GetEvents();
+    std::vector<MarkEvent> &GetEvents();
 
-    std::vector<LuaToken>& GetTokens();
+    std::vector<LuaToken> &GetTokens();
 
-	std::vector<LuaParseError>& GetErrors();
+    std::vector<LuaParseError> &GetErrors();
 
-	bool HasError() const;
+    bool HasError() const;
 
-	std::shared_ptr<LuaSource> GetLuaFile();
+    std::shared_ptr<LuaSource> GetLuaFile();
 
     Marker Mark();
+
 private:
     void Next();
 
@@ -39,57 +39,57 @@ private:
 
     void SkipComment();
 
-	bool BlockFollow(bool rightbrace = false);
+    bool BlockFollow(bool rightbrace = false);
 
-	void StatementList();
+    void StatementList();
 
-	void Statement();
+    void Statement();
 
-	void IfStatement();
+    void IfStatement();
 
-	void WhileStatement();
+    void WhileStatement();
 
-	void DoStatement();
+    void DoStatement();
 
-	void ForStatement();
+    void ForStatement();
 
-	void RepeatStatement();
+    void RepeatStatement();
 
-	void FunctionStatement();
+    void FunctionStatement();
 
-	void LocalFunctionStatement();
+    void LocalFunctionStatement();
 
-	void LocalStatement();
+    void LocalStatement();
 
-	void LabelStatement();
+    void LabelStatement();
 
-	void ReturnStatement();
+    void ReturnStatement();
 
-	void BreakStatement();
+    void BreakStatement();
 
-	void GotoStatement();
+    void GotoStatement();
 
-	void ExpressionStatement();
+    void ExpressionStatement();
 
-	void ForNumber();
+    void ForNumber();
 
-	void ForList();
+    void ForList();
 
-	void ForBody();
+    void ForBody();
 
-	void Condition();
+    void Condition();
 
-	void TestThenBlock();
+    void TestThenBlock();
 
     void NameDefList();
 
-	void Block();
+    void Block();
 
-	void ExpressionList(LuaTokenKind stopToken = 0);
+    void ExpressionList(LuaTokenKind stopToken = 0);
 
-	void Expression();
+    void Expression();
 
-	void Subexpression(int limit);
+    void Subexpression(int limit);
 
     CompleteMarker SimpleExpression();
 
@@ -97,58 +97,57 @@ private:
 
     void FieldList();
 
-	void Field();
+    void Field();
 
-	void ListField();
+    void ListField();
 
-	void RectField();
+    void RectField();
 
-	void FunctionBody();
+    void FunctionBody();
 
-	void ParamList();
+    void ParamList();
 
     CompleteMarker SuffixedExpression();
 
-	void FunctionCallArgs();
+    void FunctionCallArgs();
 
-	void FieldSel();
+    void FieldSel();
 
-	void YIndex();
+    void YIndex();
 
-	void FunctionName();
+    void FunctionName();
 
-	std::string_view CheckName();
+    std::string_view CheckName();
 
-	void LocalAttribute();
+    void LocalAttribute();
 
-	void Check(LuaTokenKind c);
+    void Check(LuaTokenKind c);
 
     CompleteMarker PrimaryExpression();
 
-	UnOpr GetUnaryOperator(LuaTokenKind op);
+    UnOpr GetUnaryOperator(LuaTokenKind op);
 
 
-
-	/*
+    /*
 	 * 他是检查当前token的type是否与c相同
 	 * 如果是就跳过当前,
 	 * 否则会生成错误
 	 */
-	void CheckAndNext(LuaTokenKind kind);
+    void CheckAndNext(LuaTokenKind kind);
 
-	/*
+    /*
 	 * 他是检查当前token的type是否与c相同
 	 * 如果是就跳过当前，并返回true
 	 * 否则返回false
 	 */
-	bool TestAndNext(LuaTokenKind kind);
+    bool TestAndNext(LuaTokenKind kind);
 
-	void LuaExpectedError(std::string_view message, LuaTokenKind expectedToken = 0);
+    void LuaExpectedError(std::string_view message, LuaTokenKind expectedToken = 0);
 
     std::vector<LuaToken> _tokens;
     std::size_t _tokenIndex;
-	std::vector<LuaParseError> _errors;
-	std::shared_ptr<LuaSource> _file;
+    std::vector<LuaParseError> _errors;
+    std::shared_ptr<LuaSource> _file;
     std::vector<MarkEvent> _events;
     bool _invalid;
     LuaTokenKind _current;

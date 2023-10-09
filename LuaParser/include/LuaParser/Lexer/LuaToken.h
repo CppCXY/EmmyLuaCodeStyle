@@ -4,15 +4,13 @@
 #include "LuaTokenKind.h"
 #include <string_view>
 
-class LuaToken
-{
+class LuaToken {
 public:
-	LuaToken(LuaTokenKind type, TextRange range)
-		: TokenType(type),
-		  Range(range)
-	{
-	}
+    LuaToken(LuaTokenKind type, TextRange range)
+        : TokenType(type),
+          Range(range) {
+    }
 
-	LuaTokenKind TokenType;
-	TextRange Range;
+    LuaTokenKind TokenType;
+    TextRange Range;
 };

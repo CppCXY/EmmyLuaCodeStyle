@@ -1,14 +1,14 @@
 #pragma once
 
-#include <string_view>
 #include <string>
+#include <string_view>
 #include <vector>
 
 class FunctionOption {
 public:
     void Parse(std::string_view option);
 
-    std::string& GetKey();
+    std::string &GetKey();
 
     std::string GetParam(std::size_t index);
 

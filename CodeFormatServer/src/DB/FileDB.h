@@ -1,9 +1,9 @@
 #pragma once
 
 #include "DBBase.h"
+#include "LSP/LSP.h"
 #include <string>
 #include <vector>
-#include "LSP/LSP.h"
 
 class FileDB : public SharedDBBase<std::size_t, std::string> {
 public:
@@ -13,7 +13,7 @@ public:
 
     void ApplyFileUpdate(std::size_t fileId, std::string &&text);
 
-    void ApplyFileUpdate(std::vector<lsp::TextDocumentContentChangeEvent>& changeEvent);
+    void ApplyFileUpdate(std::vector<lsp::TextDocumentContentChangeEvent> &changeEvent);
 
 private:
     std::size_t _fileIdCounter;

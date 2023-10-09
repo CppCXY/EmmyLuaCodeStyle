@@ -1,8 +1,8 @@
 #include "Util/StringUtil.h"
+#include "wildcards/match.hpp"
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
-#include <algorithm>
-#include "wildcards/match.hpp"
 
 std::vector<std::string_view> string_util::Split(std::string_view source, std::string_view separator) {
     if (source.empty() || separator.empty()) {
@@ -120,8 +120,7 @@ std::string_view string_util::GetFileRelativePath(std::string_view workspace, st
         }
     }
 
-    if (i < filePath.size()
-        && (filePath[i] == '\\' || filePath[i] == '/')) {
+    if (i < filePath.size() && (filePath[i] == '\\' || filePath[i] == '/')) {
         i++;
     }
 
@@ -130,9 +129,7 @@ std::string_view string_util::GetFileRelativePath(std::string_view workspace, st
 
 struct equal_to {
     constexpr auto operator()(const char &lhs, const char &rhs) const -> decltype(lhs == rhs) {
-        return lhs == rhs
-               || ((lhs == '\\' || lhs == '/') && (rhs == '\\' || rhs == '/'))
-               || (::tolower(lhs) == ::tolower(rhs));
+        return lhs == rhs || ((lhs == '\\' || lhs == '/') && (rhs == '\\' || rhs == '/')) || (::tolower(lhs) == ::tolower(rhs));
     }
 };
 
