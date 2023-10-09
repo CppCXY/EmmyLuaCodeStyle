@@ -1,6 +1,8 @@
 #pragma once
 
 #include "LuaParser/Types/TextRange.h"
+#include <string>
+
 
 enum class DiagnosticType {
     None,
