@@ -3,5 +3,5 @@
 
 
 LuaParseException::LuaParseException(std::string_view message)
-    : runtime_error(std::string(message)) {
+    :         runtime_error(std::string(message)) {
 }
