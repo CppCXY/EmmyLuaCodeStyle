@@ -88,7 +88,7 @@ bool NameStyleRuleMatcher::SnakeCase(std::string_view source) {
                 break;
             }
             case ParseState::Underscore: {
-                if (::islower(ch)) {
+                if (::islower(ch) || ::isdigit(ch)) {// after the first underscore, sections might also begin with digits
                     state = ParseState::Letter;
                 } else {
                     return false;
@@ -135,7 +135,7 @@ bool NameStyleRuleMatcher::UpperSnakeCase(std::string_view text) {
                 break;
             }
             case ParseState::Underscore: {
-                if (::isupper(ch)) {
+                if (::isupper(ch) || ::isdigit(ch)) {// after the first underscore, sections might also begin with digits
                     state = ParseState::Letter;
                 } else {
                     return false;
