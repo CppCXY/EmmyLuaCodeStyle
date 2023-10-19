@@ -1684,6 +1684,19 @@ end
 local table1 = { 1, 2, 3 }
 )",
             style));
+    style.end_statement_with_semicolon = EndStmtWithSemicolon::Never;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = pp;
+("aa"):foramt()
+local d = {};
+)",
+            R"(
+local t = pp;
+("aa"):foramt()
+local d = {}
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, keep_indents_on_empty_lines) {

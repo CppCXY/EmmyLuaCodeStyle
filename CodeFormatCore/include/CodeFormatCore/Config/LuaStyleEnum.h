@@ -89,7 +89,8 @@ enum class EndStmtWithSemicolon {
     Keep,
     ReplaceWithNewline,
     Always,
-    SameLine
+    SameLine,
+    Never
 };
 
 enum class BreakTableList {

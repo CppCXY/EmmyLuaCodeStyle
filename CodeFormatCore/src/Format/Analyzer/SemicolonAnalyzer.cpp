@@ -42,6 +42,12 @@ void SemicolonAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                         }
                         break;
                     }
+                    case EndStmtWithSemicolon::Never: {
+                        if (CanCorrectRemoveSemicolon(syntaxNode, t)) {
+                            RemoveSemicolon(syntaxNode, t);
+                        }
+                        break;
+                    }
                     default: {
                         break;
                     }
@@ -128,4 +134,22 @@ LuaSyntaxNode SemicolonAnalyzer::GetLastNonCommentToken(LuaSyntaxNode n, const L
             return token;
         }
     }
+}
+
+bool SemicolonAnalyzer::CanCorrectRemoveSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t) {
+    if(!EndsWithSemicolon(n, t)){
+        return false;
+    }
+    auto semicolon = GetLastNonCommentToken(n, t);
+    auto nextToken = semicolon.GetNextToken(t);
+    if(n.GetEndLine(t) == nextToken.GetStartLine(t)){
+        return false;
+    }
+
+    auto nextTokenKind = nextToken.GetTokenKind(t);
+    if (nextTokenKind == '{' || nextTokenKind == '(') {
+        return false;
+    }
+
+    return true;
 }

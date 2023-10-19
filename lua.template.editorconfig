@@ -145,9 +145,10 @@ break_all_list_when_line_exceed = false
 auto_collapse_lines = false
 
 break_before_braces = false
+
 # [preference]
 ignore_space_after_colon = false
 
 remove_call_expression_list_finish_comma = false
-# keep / always / same_line / repalce_with_newline
+# keep / always / same_line / replace_with_newline / never
 end_statement_with_semicolon = keep

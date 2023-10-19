@@ -23,6 +23,7 @@ private:
     bool EndsWithSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t);
     bool ContainsSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t);
     LuaSyntaxNode GetLastNonCommentToken(LuaSyntaxNode n, const LuaSyntaxTree &t);
+    bool CanCorrectRemoveSemicolon(LuaSyntaxNode n, const LuaSyntaxTree &t);
 
     std::unordered_map<std::size_t, SemicolonStrategy> _semicolon;
 };
