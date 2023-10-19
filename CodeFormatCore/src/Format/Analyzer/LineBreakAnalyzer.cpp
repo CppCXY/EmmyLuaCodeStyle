@@ -42,7 +42,7 @@ void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
             switch (syntaxNode.GetSyntaxKind(t)) {
                 case LuaSyntaxNodeKind::Block: {
                     auto children = syntaxNode.GetChildren(t);
-                    if (syntaxNode.IsSingleLineNode(t)) {
+                    if (syntaxNode.GetParent(t).IsSingleLineNode(t)) {
                         if (children.size() <= 1) {
                             auto spaceAnalyzer = f.GetAnalyzer<SpaceAnalyzer>();
                             spaceAnalyzer->SpaceAround(syntaxNode, t);
