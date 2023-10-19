@@ -7,26 +7,22 @@ on:
 jobs:
   clang-format:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        path:
+          - check: 'LuaParser'
+          - check: 'CodeFormatCode'
+          - check: 'CodeFormatLib'
+          - check: 'CodeFormat'
+          - check: 'CodeFormatServer'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-      - name: Install ClangFormat
-        run: sudo apt-get install -y clang-format
-      - name: Run ClangFormat
-        run: clang-format -style=file -output-replacements-xml $(find . -name '*.cpp' -or -name '*.h' -not -path "./3rd/*" -not -path "./Test/*" -not -path "./Test2/*") | grep -c '<replacement ' > /tmp/clang-format-result
-      - name: Comment on pull request
-        uses: actions/github-script@v4
+      - name: Clang Format Checker
+      - uses: jidicula/clang-format-action@v4.11.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const result = fs.readFileSync('/tmp/clang-format-result', 'utf8');
-            const comment = `ClangFormat check found ${result} formatting issues.`;
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+          clang-format-version: '17'
+          check-path: ${{ matrix.path['check'] }}
+          fallback-style: 'file'
