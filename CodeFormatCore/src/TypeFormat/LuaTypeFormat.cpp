@@ -165,6 +165,13 @@ void LuaTypeFormat::FormatLine(std::size_t line, std::size_t character, const Lu
     FormatRange formatRange;
     auto &file = t.GetFile();
     auto offset = file.GetOffset(line, character);
+    auto currentTokenKind = t.GetTokenAtOffset(offset).GetTokenKind(t);
+    if (currentTokenKind == TK_STRING
+        || currentTokenKind == TK_LONG_COMMENT
+        || currentTokenKind == TK_LONG_STRING) {
+        return;
+    }
+
     auto prevToken = t.GetTokenBeforeOffset(offset);
     auto tempStyle = style;
     switch (prevToken.GetTokenKind(t)) {
