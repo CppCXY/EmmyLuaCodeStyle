@@ -8,7 +8,7 @@
 
 class FileFinder {
 public:
-    FileFinder(std::filesystem::path root);
+    explicit FileFinder(std::filesystem::path root);
 
     void AddIgnoreDirectory(const std::string &extension);
 
@@ -16,7 +16,7 @@ public:
 
     void AddFindFile(const std::string &fileName);
 
-    void AddignorePatterns(const std::string &pattern);
+    void AddIgnorePatterns(const std::string &pattern);
 
     std::vector<std::string> FindFiles();
 

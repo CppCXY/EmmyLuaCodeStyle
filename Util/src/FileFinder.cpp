@@ -17,7 +17,7 @@ void FileFinder::AddFindFile(const std::string &fileName) {
     _findFile.insert(fileName);
 }
 
-void FileFinder::AddignorePatterns(const std::string &pattern) {
+void FileFinder::AddIgnorePatterns(const std::string &pattern) {
     if (pattern.empty()) {
         return;
     }

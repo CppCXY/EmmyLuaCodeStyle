@@ -373,7 +373,7 @@ bool LuaFormat::CheckWorkspace() {
     finder.AddIgnoreDirectory(".vs");
     finder.AddIgnoreDirectory(".vscode");
     for (auto pattern: _ignorePattern) {
-        finder.AddignorePatterns(pattern);
+        finder.AddIgnorePatterns(pattern);
     }
 
     auto files = finder.FindFiles();
@@ -423,7 +423,7 @@ bool LuaFormat::ReformatWorkspace() {
     finder.AddIgnoreDirectory(".vs");
     finder.AddIgnoreDirectory(".vscode");
     for (auto pattern: _ignorePattern) {
-        finder.AddignorePatterns(pattern);
+        finder.AddIgnorePatterns(pattern);
     }
 
     auto files = finder.FindFiles();

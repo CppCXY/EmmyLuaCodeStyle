@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include <string>
-#include <string_view>
+#include <cstddef>
+#include <cstdint>
 
 namespace utf8 {
 /*
