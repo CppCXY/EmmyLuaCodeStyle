@@ -8,7 +8,11 @@
 
 int main() {
     std::string buffer = R"(
-local t = 1 .. "1231"
+with_latin_extended_a = {
+    { 'aaaa', nil },
+    { 'ő', nil },  -- U+0151
+    { 'ű', nil },  -- U+0171
+}
 )";
 
     auto file = std::make_shared<LuaSource>(std::move(buffer));
