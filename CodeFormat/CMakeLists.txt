@@ -8,12 +8,16 @@ add_dependencies(CodeFormat CodeFormatCore Util)
 
 target_include_directories(CodeFormat PRIVATE
         src
+        ${LuaCodeStyle_SOURCE_DIR}/3rd/nlohmann_json/include
 )
 
 target_sources(CodeFormat
         PRIVATE
         src/CodeFormat.cpp
         src/LuaFormat.cpp
+        src/FormatContext.cpp
+        src/LuaCheck.cpp
+        src/Util.cpp
 )
 
 target_link_libraries(CodeFormat CodeFormatCore Util)

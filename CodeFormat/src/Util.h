@@ -3,6 +3,8 @@
 #include "CodeFormatCore/Config/LuaEditorConfig.h"
 #include <memory>
 #include <string_view>
+#include <optional>
+#include <string>
 
 
 struct LuaConfig {
@@ -18,3 +20,5 @@ enum class WorkMode {
     Stdin,
     Workspace
 };
+
+std::optional<std::string> ReadFile(std::string_view path);

@@ -7,6 +7,9 @@
 #include "Util/StringUtil.h"
 #include "Util/format.h"
 
+
+#include <LuaCheck.h>
+
 // https://stackoverflow.com/questions/1598985/c-read-binary-stdin
 #ifdef _WIN32
 
@@ -20,9 +23,9 @@
 #define SET_BINARY_MODE() ((void) 0)
 #endif
 
-bool InitFormat(CommandLine &cmd, LuaFormat &format);
-bool InitCheck(CommandLine &cmd, LuaFormat &format);
-bool InitRangeFormat(CommandLine &cmd, LuaFormat &format);
+bool InitFormat(CommandLine &cmd, FormatContext &formatContext);
+bool InitCheck(CommandLine &cmd, FormatContext &formatContext);
+bool InitRangeFormat(CommandLine &cmd, FormatContext &formatContext);
 
 int main(int argc, char **argv) {
     CommandLine cmd;
@@ -74,6 +77,7 @@ int main(int argc, char **argv) {
             .EnableKeyValueArgs();
     cmd.AddTarget("check")
             .Add<std::string>("file", "f", "Specify the input file")
+            .Add<bool>("stdin", "i", "Read from stdin")
             .Add<std::string>("workspace", "w",
                               "Specify workspace directory, if no input file is specified, bulk checking is performed")
             .Add<std::string>("config", "c",
@@ -89,6 +93,7 @@ int main(int argc, char **argv) {
                               "\t\tseparated by ';'")
             .Add<bool>("name-style", "ns", "Enable name-style check")
             .Add<bool>("non-standard", "", "Enable non-standard checking")
+            .Add<bool>("dump-json", "", "Dump json format diagnosis info")
             .EnableKeyValueArgs();
 
 
@@ -97,21 +102,21 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    LuaFormat format;
+    FormatContext formatContext;
     if (cmd.GetTarget() == "format") {
-        InitFormat(cmd, format);
-        if (!format.Reformat()) {
+        InitFormat(cmd, formatContext);
+        if (LuaFormat format; !format.Reformat(formatContext)) {
             // special return code for intellij
             return 1;
         }
     } else if (cmd.GetTarget() == "check") {
-        InitCheck(cmd, format);
-        if (!format.Check() && cmd.Get<bool>("diagnosis-as-error")) {
+        InitCheck(cmd, formatContext);
+        if (LuaCheck check; !check.Check(formatContext) && cmd.Get<bool>("diagnosis-as-error")) {
             return -1;
         }
     } else if (cmd.GetTarget() == "rangeformat") {
-        InitRangeFormat(cmd, format);
-        if (!format.RangeReformat()) {
+        InitRangeFormat(cmd, formatContext);
+        if (LuaFormat format; !format.RangeReformat(formatContext)) {
             // special return code for intellij
             return 1;
         }
@@ -120,37 +125,30 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-bool InitFormat(CommandLine &cmd, LuaFormat &format) {
+bool InitFormat(CommandLine &cmd, FormatContext &formatContext) {
     if (cmd.HasOption("file") || cmd.HasOption("stdin")) {
         if (cmd.HasOption("file")) {
-            format.SetInputFile(cmd.Get<std::string>("file"));
+            formatContext.SetInputFilePath(cmd.Get<std::string>("file"));
         }
 
         if (cmd.HasOption("file") && !cmd.HasOption("stdin")) {
-            format.SetWorkMode(WorkMode::File);
-            if (!format.ReadFromInput()) {
-                std::cerr << util::format("Can not find file {}", cmd.Get<std::string>("file")) << std::endl;
-                return false;
-            }
+            formatContext.SetWorkMode(WorkMode::File);
         } else {
-            format.SetWorkMode(WorkMode::Stdin);
+            formatContext.SetWorkMode(WorkMode::Stdin);
             SET_BINARY_MODE();
-            if (!format.ReadFromStdin()) {
-                return false;
-            }
         }
 
         if (cmd.HasOption("outfile")) {
-            format.SetOutputFile(cmd.Get<std::string>("outfile"));
+            formatContext.SetOutputFilePath(cmd.Get<std::string>("outfile"));
         } else if (cmd.HasOption("overwrite")) {
-            format.SetOutputFile(cmd.Get<std::string>("file"));
+            formatContext.SetOutputFilePath(cmd.Get<std::string>("file"));
         }
     } else {
-        format.SetWorkMode(WorkMode::Workspace);
+        formatContext.SetWorkMode(WorkMode::Workspace);
     }
 
     if (cmd.HasOption("workspace")) {
-        format.SetWorkspace(cmd.Get<std::string>("workspace"));
+        formatContext.SetWorkspacePath(cmd.Get<std::string>("workspace"));
     }
 
     if (cmd.HasOption("ignores")) {
@@ -159,55 +157,52 @@ bool InitFormat(CommandLine &cmd, LuaFormat &format) {
         for (auto pattern: patterns) {
             auto patternNoSpace = string_util::TrimSpace(pattern);
             if (!patternNoSpace.empty()) {
-                format.AddIgnores(patternNoSpace);
+                formatContext.AddIgnorePattern(patternNoSpace);
             }
         }
     }
 
     if (cmd.HasOption("ignores-file")) {
-        format.AddIgnoresByFile(cmd.Get<std::string>("ignores-file"));
+        formatContext.AddIgnorePatternsFromFile(cmd.Get<std::string>("ignores-file"));
     }
 
     if (cmd.Get<bool>("detect-config")) {
-        format.AutoDetectConfig();
+        formatContext.EnableAutoDetectConfig();
     } else if (cmd.HasOption("config")) {
-        format.SetConfigPath(cmd.Get<std::string>("config"));
+        formatContext.SetConfigFilePath(cmd.Get<std::string>("config"));
     }
 
     if (cmd.Get<bool>("non-standard")) {
-        format.SupportNonStandardLua();
+        formatContext.EnableNonStandardLuaSupport();
     }
 
-    format.SetDefaultStyle(cmd.GetKeyValueOptions());
+    formatContext.SetDefaultStyleOptions(cmd.GetKeyValueOptions());
     return true;
 }
 
-bool InitCheck(CommandLine &cmd, LuaFormat &format) {
+bool InitCheck(CommandLine &cmd, FormatContext &formatContext) {
 
     if (cmd.HasOption("file") || cmd.HasOption("stdin")) {
         if (cmd.HasOption("file")) {
-            format.SetInputFile(cmd.Get<std::string>("file"));
+            formatContext.SetInputFilePath(cmd.Get<std::string>("file"));
         }
 
         if (cmd.HasOption("file") && !cmd.HasOption("stdin")) {
-            format.SetWorkMode(WorkMode::File);
-            if (!format.ReadFromInput()) {
-                std::cerr << util::format("Can not find file {}", cmd.Get<std::string>("file")) << std::endl;
-                return false;
-            }
+            formatContext.SetWorkMode(WorkMode::File);
         } else {
-            format.SetWorkMode(WorkMode::Stdin);
+            formatContext.SetWorkMode(WorkMode::Stdin);
             SET_BINARY_MODE();
-            if (!format.ReadFromStdin()) {
-                return false;
-            }
+        }
+
+        if (cmd.HasOption("outfile")) {
+            formatContext.SetOutputFilePath(cmd.Get<std::string>("outfile"));
         }
     } else {
-        format.SetWorkMode(WorkMode::Workspace);
+        formatContext.SetWorkMode(WorkMode::Workspace);
     }
 
     if (cmd.HasOption("workspace")) {
-        format.SetWorkspace(cmd.Get<std::string>("workspace"));
+        formatContext.SetWorkspacePath(cmd.Get<std::string>("workspace"));
     }
 
     if (cmd.HasOption("ignores")) {
@@ -216,93 +211,45 @@ bool InitCheck(CommandLine &cmd, LuaFormat &format) {
         for (auto pattern: patterns) {
             auto patternNoSpace = string_util::TrimSpace(pattern);
             if (!patternNoSpace.empty()) {
-                format.AddIgnores(patternNoSpace);
+                formatContext.AddIgnorePattern(patternNoSpace);
             }
         }
     }
 
     if (cmd.HasOption("ignores-file")) {
-        format.AddIgnoresByFile(cmd.Get<std::string>("ignores-file"));
+        formatContext.AddIgnorePatternsFromFile(cmd.Get<std::string>("ignores-file"));
     }
 
     if (cmd.Get<bool>("detect-config")) {
-        format.AutoDetectConfig();
+        formatContext.EnableAutoDetectConfig();
     } else if (cmd.HasOption("config")) {
-        format.SetConfigPath(cmd.Get<std::string>("config"));
+        formatContext.SetConfigFilePath(cmd.Get<std::string>("config"));
     }
 
-    format.SetDefaultStyle(cmd.GetKeyValueOptions());
+    if (cmd.Get<bool>("non-standard")) {
+        formatContext.EnableNonStandardLuaSupport();
+    }
 
     if (cmd.Get<bool>("name-style")) {
-        format.SupportNameStyleCheck();
+        formatContext.EnableNameStyleCheckSupport();
     }
 
-    if (cmd.Get<bool>("non-standard")) {
-        format.SupportNonStandardLua();
+    if(cmd.Get<bool>("dump-json")) {
+        formatContext.EnableJsonDump();
     }
+
+    formatContext.SetDefaultStyleOptions(cmd.GetKeyValueOptions());
     return true;
 }
 
-bool InitRangeFormat(CommandLine &cmd, LuaFormat &format) {
-    if (cmd.HasOption("file") || cmd.HasOption("stdin")) {
-        if (cmd.HasOption("file")) {
-            format.SetInputFile(cmd.Get<std::string>("file"));
-        }
-
-        if (cmd.HasOption("file") && !cmd.HasOption("stdin")) {
-            format.SetWorkMode(WorkMode::File);
-            if (!format.ReadFromInput()) {
-                std::cerr << util::format("Can not find file {}", cmd.Get<std::string>("file")) << std::endl;
-                return false;
-            }
-        } else {
-            format.SetWorkMode(WorkMode::Stdin);
-            SET_BINARY_MODE();
-            if (!format.ReadFromStdin()) {
-                return false;
-            }
-        }
-    } else {
-        format.SetWorkMode(WorkMode::Workspace);
-    }
-
-    if (cmd.HasOption("workspace")) {
-        format.SetWorkspace(cmd.Get<std::string>("workspace"));
-    }
-
-    if (cmd.HasOption("ignores")) {
-        auto ignores = cmd.Get<std::string>("ignores");
-        auto patterns = string_util::Split(ignores, ";");
-        for (auto pattern: patterns) {
-            auto patternNoSpace = string_util::TrimSpace(pattern);
-            if (!patternNoSpace.empty()) {
-                format.AddIgnores(patternNoSpace);
-            }
-        }
-    }
-
-    if (cmd.HasOption("ignores-file")) {
-        format.AddIgnoresByFile(cmd.Get<std::string>("ignores-file"));
-    }
-
-    if (cmd.Get<bool>("detect-config")) {
-        format.AutoDetectConfig();
-    } else if (cmd.HasOption("config")) {
-        format.SetConfigPath(cmd.Get<std::string>("config"));
-    }
-
-    format.SetDefaultStyle(cmd.GetKeyValueOptions());
-    if (cmd.Get<bool>("complete-output")) {
-        format.SupportCompleteOutputRange();
-    }
+bool InitRangeFormat(CommandLine &cmd, FormatContext &formatContext) {
+    InitFormat(cmd, formatContext);
 
     if (cmd.HasOption("range-line")) {
-        format.SetFormatRange(true, cmd.Get<std::string>("range-line"));
+        formatContext.SetFormatRange(true, cmd.Get<std::string>("range-line"));
     } else if (cmd.HasOption("range-offset")) {
-        format.SetFormatRange(false, cmd.Get<std::string>("range-offset"));
+        formatContext.SetFormatRange(false, cmd.Get<std::string>("range-offset"));
     }
-    if (cmd.Get<bool>("non-standard")) {
-        format.SupportNonStandardLua();
-    }
+
     return true;
 }
