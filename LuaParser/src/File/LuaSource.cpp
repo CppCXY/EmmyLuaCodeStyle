@@ -68,8 +68,8 @@ bool LuaSource::CheckNonUniformCharBefore(std::size_t offset) const {
         std::size_t byteNum = 0;
         for (std::size_t i = lineStartOffset; i < offset; i += byteNum) {
             auto codepoint = utf8::Utf8ToUnicode(_source.data() + i, _source.size() - i, byteNum);
-            // support UTF-8 Basic Latin and Latin-1 Supplement
-            if (codepoint > 0xff) {
+            // support UTF-8 Latin B
+            if (codepoint > 0x24F) {
                 return true;
             }
         }
