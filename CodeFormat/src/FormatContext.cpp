@@ -5,6 +5,10 @@
 #include <fstream>
 #include <iostream>
 
+FormatContext::FormatContext() {
+    _diagnosticStyle.name_style_check = false;
+}
+
 void FormatContext::SetWorkMode(WorkMode mode) {
     _workMode = mode;
 }

@@ -11,6 +11,8 @@
 
 class FormatContext {
 public:
+    FormatContext();
+
     void SetWorkMode(WorkMode mode);
 
     void SetWorkspacePath(std::string_view workspace);
