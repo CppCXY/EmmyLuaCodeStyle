@@ -3,6 +3,7 @@
 #include <Util/FileFinder.h>
 #include <Util/StringUtil.h>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 
 FormatContext::FormatContext() {
