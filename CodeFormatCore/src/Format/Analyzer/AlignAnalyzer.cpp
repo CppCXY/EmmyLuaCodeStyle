@@ -70,7 +70,7 @@ void AlignAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
         } else {
             switch (syntaxNode.GetTokenKind(t)) {
                 case TK_SHORT_COMMENT: {
-                    if (f.GetStyle().align_continuous_inline_comment) {
+                    if (f.GetStyle().align_continuous_inline_comment && f.GetStyle().space_before_inline_comment.Style == SpaceBeforeInlineCommentStyle::Fixed) {
                         AnalyzeInlineComment(f, syntaxNode, t);
                     }
                     break;
@@ -441,7 +441,7 @@ void AlignAnalyzer::ResolveAlignGroup(FormatState &f, std::size_t groupIndex, Al
                     auto prev = comment.GetPrevToken(t);
                     auto newPos =
                             file.GetColumn(prev.GetTextRange(t).GetEndOffset()) +
-                            f.GetStyle().space_before_inline_comment +
+                            f.GetStyle().space_before_inline_comment.Space +
                             1;
                     if (newPos > maxDis) {
                         maxDis = newPos;

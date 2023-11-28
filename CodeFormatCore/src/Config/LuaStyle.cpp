@@ -150,7 +150,14 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(ignore_spaces_inside_function_call)
 
-    NUMBER_OPTION(space_before_inline_comment)
+    if(configMap.count("space_before_inline_comment")) {
+        auto &value = configMap.at("space_before_inline_comment");
+        if (value == "keep") {
+            space_before_inline_comment = SpaceBeforeInlineComment(0, SpaceBeforeInlineCommentStyle::Keep);
+        } else if (IsNumber(value)) {
+            space_before_inline_comment = SpaceBeforeInlineComment(std::stoi(value), SpaceBeforeInlineCommentStyle::Fixed);
+        }
+    }
 
     BOOL_OPTION(space_around_math_operator)
 

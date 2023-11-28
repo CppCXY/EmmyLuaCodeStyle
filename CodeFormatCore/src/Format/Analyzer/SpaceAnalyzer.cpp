@@ -177,7 +177,17 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 }
                 case TK_LONG_COMMENT:
                 case TK_SHORT_COMMENT: {
-                    SpaceLeft(syntaxNode, t, f.GetStyle().space_before_inline_comment, SpacePriority::CommentFirst);
+                    if (f.GetStyle().space_before_inline_comment.Style == SpaceBeforeInlineCommentStyle::Fixed) {
+                        SpaceLeft(syntaxNode, t, f.GetStyle().space_before_inline_comment.Space, SpacePriority::CommentFirst);
+                    } else {
+                        auto prevToken = syntaxNode.GetPrevToken(t);
+                        if (prevToken.GetEndLine(t) == syntaxNode.GetStartLine(t)) {
+                            auto space = syntaxNode.GetStartCol(t) - prevToken.GetEndCol(t) - 1;
+                            SpaceLeft(syntaxNode, t, space, SpacePriority::CommentFirst);
+                        } else {
+                            SpaceLeft(syntaxNode, t, 0, SpacePriority::CommentFirst);
+                        }
+                    }
                     SpaceRight(syntaxNode, t, 1);
                     break;
                 }

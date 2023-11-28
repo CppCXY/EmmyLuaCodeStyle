@@ -107,3 +107,16 @@ enum class SpaceAroundStyle {
     // for no_space_asym
     NoSpaceAsym,
 };
+
+enum class SpaceBeforeInlineCommentStyle {
+    Fixed,
+    Keep,
+};
+
+struct SpaceBeforeInlineComment {
+    explicit SpaceBeforeInlineComment(std::size_t space = 1, SpaceBeforeInlineCommentStyle style = SpaceBeforeInlineCommentStyle::Fixed)
+        : Style(style), Space(space) {}
+
+    SpaceBeforeInlineCommentStyle Style;
+    std::size_t Space;
+};

@@ -76,7 +76,7 @@ public:
 
     bool ignore_spaces_inside_function_call = false;
 
-    std::size_t space_before_inline_comment = 1;
+    SpaceBeforeInlineComment space_before_inline_comment = SpaceBeforeInlineComment();
 
     // [operator space]
     bool space_around_math_operator = true;

@@ -64,6 +64,7 @@ space_around_table_append_operator = false
 
 ignore_spaces_inside_function_call = false
 
+# detail number or 'keep'
 space_before_inline_comment = 1
 
 # [operator space]

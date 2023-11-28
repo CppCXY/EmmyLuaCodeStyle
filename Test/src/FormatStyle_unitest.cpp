@@ -769,7 +769,7 @@ map('k', 123, 456)
 TEST(FormatByStyleOption, space_before_inline_comment) {
     LuaStyle style;
 
-    style.space_before_inline_comment = 1;
+    style.space_before_inline_comment = SpaceBeforeInlineComment(1);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = 123 --hello
@@ -778,7 +778,7 @@ local t = 123 --hello
 local t = 123 --hello
 )",
             style));
-    style.space_before_inline_comment = 2;
+    style.space_before_inline_comment = SpaceBeforeInlineComment(2);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = 123 --hello
@@ -787,6 +787,24 @@ local t = 123 --hello
 local t = 123  --hello
 )",
             style));
+    style.space_before_inline_comment = SpaceBeforeInlineComment(0, SpaceBeforeInlineCommentStyle::Keep);
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local function fff()                   --123131
+    local t = "hello world", 1         --12313131
+end
+local t        = hello --fjoiwjfowifw
+yes.it.is.me.a = 123                --fjoiwjfowifw
+)",
+            R"(
+local function fff()                   --123131
+    local t = "hello world", 1         --12313131
+end
+local t        = hello --fjoiwjfowifw
+yes.it.is.me.a = 123                --fjoiwjfowifw
+)",
+            style));
+
 }
 
 TEST(FormatByStyleOption, space_around_math_operator) {
