@@ -126,7 +126,7 @@ void RangeFormatBuilder::CheckRange(LuaSyntaxNode &syntaxNode, const LuaSyntaxTr
         switch (_validRange) {
             case Valid::Init: {
                 auto tokenEndLine = endNode.GetEndLine(t);
-                if (tokenEndLine >= _range.StartLine) {
+                if (tokenEndLine >= _range.StartLine && tokenEndLine <= _range.EndLine) {
                     _validRange = Valid::Process;
                     auto tokenStartLine = startNode.GetStartLine(t);
                     if (tokenStartLine < _range.StartLine) {
