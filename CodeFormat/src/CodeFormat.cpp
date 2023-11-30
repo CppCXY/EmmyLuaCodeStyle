@@ -251,5 +251,9 @@ bool InitRangeFormat(CommandLine &cmd, FormatContext &formatContext) {
         formatContext.SetFormatRange(false, cmd.Get<std::string>("range-offset"));
     }
 
+    if (cmd.HasOption("complete-output")) {
+        formatContext.EnableCompleteOutputRangeSupport();
+    }
+
     return true;
 }
