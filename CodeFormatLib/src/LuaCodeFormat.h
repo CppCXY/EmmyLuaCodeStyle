@@ -31,6 +31,8 @@ public:
 
     void SupportNonStandardSymbol();
 
+    void SupportCLikeComments();
+
     void LoadSpellDictionary(const std::string &path);
 
     void LoadSpellDictionaryFromBuffer(const std::string &buffer);
@@ -65,4 +67,5 @@ private:
     CodeSpellChecker _spellChecker;
     LuaDiagnosticStyle _diagnosticStyle;
     bool _supportNonStandardSymbol;
+    bool _supportCLikeComments;
 };

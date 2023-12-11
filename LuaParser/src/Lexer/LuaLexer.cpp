@@ -42,11 +42,12 @@ std::map<std::string, LuaTokenKind, std::less<>> LuaLexer::LuaReserved = {
         {"::",       TK_DBCOLON }
 };
 
-LuaLexer::LuaLexer(std::shared_ptr<LuaSource> file)
+LuaLexer::LuaLexer(std::shared_ptr<LuaSource> source)
     : _linenumber(0),
       _supportNonStandardSymbol(false),
-      _reader(file->GetSource()),
-      _file(file) {
+      _supportCLikeComments(false),
+      _reader(source->GetSource()),
+      _file(source) {
 }
 
 bool LuaLexer::Parse() {
@@ -83,6 +84,13 @@ std::shared_ptr<LuaSource> LuaLexer::GetFile() {
 
 std::vector<LuaToken> &LuaLexer::GetTokens() {
     return _tokens;
+}
+
+void LuaLexer::SupportNonStandardSymbol() {
+    _supportNonStandardSymbol = true;
+}
+void LuaLexer::SupportCLikeComments(){
+    _supportCLikeComments = true;
 }
 
 LuaTokenKind LuaLexer::Lex() {
@@ -204,9 +212,18 @@ LuaTokenKind LuaLexer::Lex() {
                         }
                         case '/': {
                             _reader.SaveAndNext();
+
+                            if(_supportCLikeComments) {
+                                while (!CurrentIsNewLine() && _reader.GetCurrentChar() != EOZ) {
+                                    _reader.SaveAndNext();
+                                }
+                                return TK_SHORT_COMMENT;
+                            }
+
                             if (_reader.CheckNext1('=')) {
                                 return '=';
                             }
+
                             return TK_IDIV;
                         }
                         case '*': {
@@ -606,8 +623,4 @@ bool LuaLexer::IsReserved(std::string_view text) {
 
 void LuaLexer::TokenError(std::string_view message, TextRange range) {
     _errors.emplace_back(message, range, 0);
-}
-
-void LuaLexer::SupportNonStandardSymbol() {
-    _supportNonStandardSymbol = true;
 }

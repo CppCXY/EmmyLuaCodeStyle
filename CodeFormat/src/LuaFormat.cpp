@@ -12,7 +12,6 @@
 #include "Util/format.h"
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 bool LuaFormat::Reformat(const FormatContext &context) {
     switch (context.GetWorkMode()) {
@@ -37,6 +36,10 @@ bool LuaFormat::ReformatSingleFile(const FormatContext &context, std::string_vie
     if (context.IsNonStandardLua()) {
         luaLexer.SupportNonStandardSymbol();
     }
+    if (context.IsCLikeCommentsSupport()) {
+        luaLexer.SupportCLikeComments();
+    }
+
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -74,6 +77,9 @@ bool LuaFormat::RangeReformat(const FormatContext &context) {
     LuaLexer luaLexer(file);
     if (context.IsNonStandardLua()) {
         luaLexer.SupportNonStandardSymbol();
+    }
+    if (context.IsCLikeCommentsSupport()) {
+        luaLexer.SupportCLikeComments();
     }
 
     luaLexer.Parse();

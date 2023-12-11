@@ -41,6 +41,8 @@ public:
 
     void EnableJsonDump();
 
+    void EnableCLikeCommentsSupport();
+
     [[nodiscard]] LuaStyle GetStyle(std::string_view path) const;
 
     [[nodiscard]] WorkMode GetWorkMode() const;
@@ -67,6 +69,7 @@ public:
 
     [[nodiscard]] const LuaDiagnosticStyle &GetDiagnosticStyle() const;
 
+    [[nodiscard]] bool IsCLikeCommentsSupport() const;
 private:
     WorkMode _workMode = WorkMode::File;
     std::string _inputPath;
@@ -81,5 +84,6 @@ private:
     bool _isRangeLine = false;
     std::string _rangeStr;
     bool _isSupportNonStandardLua = false;
+    bool _isSupportCLikeComments = false;
     bool _dumpJson = false;
 };

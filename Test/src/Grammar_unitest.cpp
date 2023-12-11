@@ -62,4 +62,15 @@ local t = disableControl?.disableMovement
 local t2 = ddd?:ffffff()
 local t3 = ddd?["hello"]
 )", true).HasError()) << "extend grammar nullable operator test fail";
+    EXPECT_FALSE(TestHelper::GetParser(R"(
+local t = a // yes it is a comment
+)", true).HasError()) << "extend grammar comment test fail";
+    EXPECT_FALSE(TestHelper::GetParser(R"(
+-- yes it is a comment
+// it is a comemnt
+local t = a /*
+a new comments
+
+*/
+)", true, true).HasError()) << "extend grammar comment test fail";
 }

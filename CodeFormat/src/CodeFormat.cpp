@@ -58,6 +58,7 @@ int main(int argc, char **argv) {
                               "Use file wildcards to specify how to ignore files\n"
                               "\t\tseparated by ';'")
             .Add<bool>("non-standard", "", "Enable non-standard formatting")
+            .Add<bool>("c-like-comments", "", "Enable c-like-comments formatting")
             .EnableKeyValueArgs();
     cmd.AddTarget("rangeformat")
             .Add<std::string>("file", "f", "Specify the input file")
@@ -74,6 +75,7 @@ int main(int argc, char **argv) {
             .Add<std::string>("range-line", "", "the format is startline:endline, for eg: 1:10")
             .Add<std::string>("range-offset", "", "the format is startOffset:endOffset, for eg: 0:256")
             .Add<bool>("non-standard", "", "Enable non-standard rangeformatting")
+            .Add<bool>("c-like-comments", "", "Enable c-like-comments formatting")
             .EnableKeyValueArgs();
     cmd.AddTarget("check")
             .Add<std::string>("file", "f", "Specify the input file")
@@ -93,6 +95,7 @@ int main(int argc, char **argv) {
                               "\t\tseparated by ';'")
             .Add<bool>("name-style", "ns", "Enable name-style check")
             .Add<bool>("non-standard", "", "Enable non-standard checking")
+            .Add<bool>("c-like-comments", "", "Enable c-like-comments formatting")
             .Add<bool>("dump-json", "", "Dump json format diagnosis info")
             .EnableKeyValueArgs();
 
@@ -176,6 +179,10 @@ bool InitFormat(CommandLine &cmd, FormatContext &formatContext) {
         formatContext.EnableNonStandardLuaSupport();
     }
 
+    if (cmd.Get<bool>("c-like-comments")) {
+        formatContext.EnableCLikeCommentsSupport();
+    }
+
     formatContext.SetDefaultStyleOptions(cmd.GetKeyValueOptions());
     return true;
 }
@@ -234,8 +241,12 @@ bool InitCheck(CommandLine &cmd, FormatContext &formatContext) {
         formatContext.EnableNameStyleCheckSupport();
     }
 
-    if(cmd.Get<bool>("dump-json")) {
+    if (cmd.Get<bool>("dump-json")) {
         formatContext.EnableJsonDump();
+    }
+
+    if (cmd.Get<bool>("c-like-comments")) {
+        formatContext.EnableCLikeCommentsSupport();
     }
 
     formatContext.SetDefaultStyleOptions(cmd.GetKeyValueOptions());

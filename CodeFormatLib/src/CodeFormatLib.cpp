@@ -169,7 +169,6 @@ int range_format(lua_State *L) {
     return 0;
 }
 
-
 int type_format(lua_State *L) {
     int top = lua_gettop(L);
 
@@ -292,7 +291,6 @@ int type_format(lua_State *L) {
     }
     return 0;
 }
-
 
 int update_config(lua_State *L) {
     int top = lua_gettop(L);
@@ -474,6 +472,24 @@ int set_nonstandard_symbol(lua_State *L) {
 
     try {
         LuaCodeFormat::GetInstance().SupportNonStandardSymbol();
+        lua_pushboolean(L, true);
+        return 1;
+    } catch (std::exception &e) {
+        std::string err = e.what();
+        lua_settop(L, top);
+        lua_pushboolean(L, false);
+        lua_pushlstring(L, err.c_str(), err.size());
+        return 2;
+    }
+
+    return 0;
+}
+
+int set_clike_comments_symbol(lua_State *L) {
+    int top = lua_gettop(L);
+
+    try {
+        LuaCodeFormat::GetInstance().SupportCLikeComments();
         lua_pushboolean(L, true);
         return 1;
     } catch (std::exception &e) {
@@ -739,6 +755,7 @@ static const luaL_Reg lib[] = {
         {"spell_analysis",                    spell_analysis                   },
         {"spell_suggest",                     spell_suggest                    },
         {"set_nonstandard_symbol",            set_nonstandard_symbol           },
+        {"set_clike_comments_symbol",         set_clike_comments_symbol        },
         {"name_style_analysis",               name_style_analysis              },
         {"update_name_style_config",          update_name_style_config         },
         {nullptr,                             nullptr                          }

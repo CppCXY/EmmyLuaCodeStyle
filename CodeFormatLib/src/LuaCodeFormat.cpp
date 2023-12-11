@@ -11,7 +11,8 @@ LuaCodeFormat &LuaCodeFormat::GetInstance() {
 }
 
 LuaCodeFormat::LuaCodeFormat()
-    : _supportNonStandardSymbol(false) {
+    : _supportNonStandardSymbol(false),
+      _supportCLikeComments(false) {
 }
 
 void LuaCodeFormat::UpdateCodeStyle(const std::string &workspaceUri, const std::string &configPath) {
@@ -58,6 +59,10 @@ void LuaCodeFormat::SupportNonStandardSymbol() {
     _supportNonStandardSymbol = true;
 }
 
+void LuaCodeFormat::SupportCLikeComments() {
+    _supportCLikeComments = true;
+}
+
 void LuaCodeFormat::LoadSpellDictionary(const std::string &path) {
     _spellChecker.LoadDictionary(path);
 }
@@ -72,6 +77,10 @@ Result<std::string> LuaCodeFormat::Reformat(const std::string &uri, std::string 
     if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
+    if (_supportCLikeComments) {
+        luaLexer.SupportCLikeComments();
+    }
+
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -100,6 +109,10 @@ Result<std::string> LuaCodeFormat::RangeFormat(const std::string &uri, FormatRan
     if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
+    if (_supportCLikeComments) {
+        luaLexer.SupportCLikeComments();
+    }
+
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -130,6 +143,10 @@ LuaCodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t 
     if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
+    if (_supportCLikeComments) {
+        luaLexer.SupportCLikeComments();
+    }
+
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -158,6 +175,10 @@ Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::Diagnostic(const std::stri
     if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
+    if (_supportCLikeComments) {
+        luaLexer.SupportCLikeComments();
+    }
+
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -184,6 +205,10 @@ Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::SpellCheck(const std::stri
     if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
+    if (_supportCLikeComments) {
+        luaLexer.SupportCLikeComments();
+    }
+
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
@@ -210,6 +235,10 @@ Result<std::vector<LuaDiagnosticInfo>> LuaCodeFormat::NameStyleCheck(const std::
     if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
     }
+    if (_supportCLikeComments) {
+        luaLexer.SupportCLikeComments();
+    }
+
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));

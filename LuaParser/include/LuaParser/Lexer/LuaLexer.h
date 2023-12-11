@@ -18,7 +18,7 @@
  */
 class LuaLexer {
 public:
-    explicit LuaLexer(std::shared_ptr<LuaSource> file);
+    explicit LuaLexer(std::shared_ptr<LuaSource> source);
 
     bool Parse();
 
@@ -32,7 +32,7 @@ public:
 
     void SupportNonStandardSymbol();
 
-    //	void SetCustomParser(std::shared_ptr<LuaCustomParser> parser);
+    void SupportCLikeComments();
 private:
     static std::map<std::string, LuaTokenKind, std::less<>> LuaReserved;
 
@@ -52,12 +52,13 @@ private:
 
     bool CurrentIsNewLine();
 
-    bool IsReserved(std::string_view text);
+    static bool IsReserved(std::string_view text);
 
     void TokenError(std::string_view message, TextRange range);
 
     int _linenumber;
     bool _supportNonStandardSymbol;
+    bool _supportCLikeComments;
     TextReader _reader;
     std::vector<LuaToken> _tokens;
     std::vector<LuaTokenError> _errors;

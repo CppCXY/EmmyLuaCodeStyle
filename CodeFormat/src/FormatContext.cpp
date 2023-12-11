@@ -157,6 +157,10 @@ void FormatContext::EnableJsonDump() {
     _dumpJson = true;
 }
 
+void FormatContext::EnableCLikeCommentsSupport() {
+    _isSupportCLikeComments = false;
+}
+
 LuaStyle FormatContext::GetStyle(std::string_view path) const {
     std::shared_ptr<LuaEditorConfig> editorConfig = nullptr;
     std::size_t matchProcess = 0;
@@ -231,4 +235,8 @@ std::string FormatContext::GetInputPath() const {
 
 const LuaDiagnosticStyle &FormatContext::GetDiagnosticStyle() const {
     return _diagnosticStyle;
+}
+
+bool FormatContext::IsCLikeCommentsSupport() const {
+    return _isSupportCLikeComments;
 }

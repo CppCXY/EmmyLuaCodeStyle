@@ -24,7 +24,7 @@ public:
 
     static std::string ReadFile(const std::string &path);
 
-    static LuaParser GetParser(std::string input, bool nonStandard = false);
+    static LuaParser GetParser(std::string input, bool nonStandard = false, bool clikeComments = false);
 
     static void
     CollectLuaFile(std::filesystem::path directoryPath, std::vector<std::string> &paths, std::filesystem::path &root);

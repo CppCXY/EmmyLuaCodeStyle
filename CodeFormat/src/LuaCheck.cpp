@@ -57,6 +57,10 @@ bool LuaCheck::CheckSingleFile(const FormatContext &context, std::string_view pa
     if (context.IsNonStandardLua()) {
         luaLexer.SupportNonStandardSymbol();
     }
+    if (context.IsCLikeCommentsSupport()) {
+        luaLexer.SupportCLikeComments();
+    }
+
     luaLexer.Parse();
 
     LuaParser p(file, std::move(luaLexer.GetTokens()));
