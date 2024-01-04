@@ -23,7 +23,7 @@ public:
     };
 
     struct MatchData {
-        MatchData(MatchType type)
+        explicit MatchData(MatchType type)
             : Type(type) {}
 
         MatchType Type;

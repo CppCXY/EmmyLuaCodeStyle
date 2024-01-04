@@ -13,6 +13,10 @@ tab_width = 4
 quote_style = none
 
 continuation_indent = 4
+## extend option
+# continuation_indent.before_block = 4
+# continuation_indent.in_expr = 4
+# continuation_indent.in_table = 4
 
 # this mean utf8 length , if this is 'unset' then the line width is no longer checked
 # this option decides when to chopdown the code

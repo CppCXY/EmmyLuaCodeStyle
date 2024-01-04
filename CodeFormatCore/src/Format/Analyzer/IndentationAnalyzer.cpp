@@ -51,7 +51,7 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     break;
                 }
                 case LuaSyntaxNodeKind::ParamList: {
-                    AddIndenter(syntaxNode, t);
+                    AddIndenter(syntaxNode, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent.before_block));
                     break;
                 }
                 case LuaSyntaxNodeKind::CallExpression: {
@@ -92,7 +92,7 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     if (!f.GetStyle().never_indent_before_if_condition) {
                         auto exprs = syntaxNode.GetChildSyntaxNodes(MultiKind::Expression, t);
                         for (auto expr: exprs) {
-                            AddIndenter(expr, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent));
+                            AddIndenter(expr, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent.before_block));
                         }
                     }
                     break;
@@ -102,11 +102,11 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
 
                     for (auto expr: suffixedExpression.GetChildren(t)) {
                         if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::IndexExpression) {
-                            AddIndenter(expr, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent));
+                            AddIndenter(expr, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent.in_expr));
                         } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::CallExpression) {
                             auto prevSibling = expr.GetPrevSibling(t);
                             if (prevSibling.GetSyntaxKind(t) != LuaSyntaxNodeKind::NameExpression) {
-                                AddIndenter(expr, t, IndentData(IndentType::WhenPrevIndent, f.GetStyle().continuation_indent));
+                                AddIndenter(expr, t, IndentData(IndentType::WhenPrevIndent, f.GetStyle().continuation_indent.in_expr));
                             }
                         }
                     }
@@ -131,11 +131,11 @@ void IndentationAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
 
                         for (auto expr: suffixedExpression.GetChildren(t)) {
                             if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::IndexExpression) {
-                                AddIndenter(expr, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent));
+                                AddIndenter(expr, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent.in_table));
                             } else if (expr.GetSyntaxKind(t) == LuaSyntaxNodeKind::CallExpression) {
                                 auto prevSibling = expr.GetPrevSibling(t);
                                 if (prevSibling.GetSyntaxKind(t) != LuaSyntaxNodeKind::NameExpression) {
-                                    AddIndenter(expr, t, IndentData(IndentType::WhenPrevIndent, f.GetStyle().continuation_indent));
+                                    AddIndenter(expr, t, IndentData(IndentType::WhenPrevIndent, f.GetStyle().continuation_indent.in_table));
                                 }
                             }
                         }
@@ -245,10 +245,10 @@ void IndentationAnalyzer::AnalyzeExprList(FormatState &f, LuaSyntaxNode &exprLis
     }
 
     if (shouldIndent) {
-        AddIndenter(exprList, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent));
+        AddIndenter(exprList, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent.in_expr));
     } else {
         std::vector<LuaSyntaxNode> group = exprList.GetChildren(t);
-        AddLinebreakGroup(exprList, group, t, f.GetStyle().continuation_indent);
+        AddLinebreakGroup(exprList, group, t, f.GetStyle().continuation_indent.in_expr);
     }
 }
 
@@ -331,7 +331,7 @@ void IndentationAnalyzer::AnalyzeTableFieldKeyValuePairExpr(FormatState &f, LuaS
     }
 
     if (IsExprShouldIndent(expr, t)) {
-        AddIndenter(expr, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent));
+        AddIndenter(expr, t, IndentData(IndentType::Standard, f.GetStyle().continuation_indent.in_expr));
     }
 }
 

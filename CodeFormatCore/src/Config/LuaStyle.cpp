@@ -108,7 +108,26 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
         }
     }
 
-    NUMBER_OPTION(continuation_indent)
+
+    if (configMap.count("continuation_indent") && IsNumber(configMap.at("continuation_indent"))) {
+        auto value = std::stoull(configMap.at("continuation_indent"));
+        continuation_indent.SetAll(value);
+    }
+
+    if (configMap.count("continuation_indent.before_block") && IsNumber(configMap.at("continuation_indent.before_block"))) {
+        auto value = std::stoull(configMap.at("continuation_indent.before_block"));
+        continuation_indent.before_block = value;
+    }
+
+    if (configMap.count("continuation_indent.in_expr") && IsNumber(configMap.at("continuation_indent.in_expr"))) {
+        auto value = std::stoull(configMap.at("continuation_indent.in_expr"));
+        continuation_indent.in_expr = value;
+    }
+
+    if (configMap.count("continuation_indent.in_table") && IsNumber(configMap.at("continuation_indent.in_table"))) {
+        auto value = std::stoull(configMap.at("continuation_indent.in_table"));
+        continuation_indent.in_table = value;
+    }
 
     BOOL_OPTION(detect_end_of_line)
 
@@ -150,7 +169,7 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(ignore_spaces_inside_function_call)
 
-    if(configMap.count("space_before_inline_comment")) {
+    if (configMap.count("space_before_inline_comment")) {
         auto &value = configMap.at("space_before_inline_comment");
         if (value == "keep") {
             space_before_inline_comment = SpaceBeforeInlineComment(0, SpaceBeforeInlineCommentStyle::Keep);

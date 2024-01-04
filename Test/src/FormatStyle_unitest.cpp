@@ -155,7 +155,7 @@ local t = 'aaa' .. 'bbb' .. '\"\"' .. [[123]] .. '""'
 TEST(FormatByStyleOption, continuation_indent) {
     LuaStyle style;
 
-    style.continuation_indent = 4;
+    style.continuation_indent.SetAll(4);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 if a
@@ -176,7 +176,7 @@ table.insert(t, {
 })
 )",
             style));
-    style.continuation_indent = 8;
+    style.continuation_indent.SetAll(8);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 if a

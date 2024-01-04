@@ -2,6 +2,7 @@
 
 #include "LuaParser/Types/EndOfLineType.h"
 #include "LuaStyleEnum.h"
+#include "LuaStyleStruct.h"
 #include <map>
 #include <memory>
 #include <string>
@@ -31,7 +32,7 @@ public:
 
     QuoteStyle quote_style = QuoteStyle::None;
 
-    std::size_t continuation_indent = 4;
+    ContinuationIndent continuation_indent;
 
     TableSeparatorStyle table_separator_style = TableSeparatorStyle::Comma;
 

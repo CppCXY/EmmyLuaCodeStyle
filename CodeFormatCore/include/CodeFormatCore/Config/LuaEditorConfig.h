@@ -20,7 +20,7 @@ public:
 
     static std::shared_ptr<LuaEditorConfig> LoadFromFile(const std::string &path);
 
-    LuaEditorConfig(std::string &&source);
+    explicit LuaEditorConfig(std::string &&source);
 
     void Parse();
 

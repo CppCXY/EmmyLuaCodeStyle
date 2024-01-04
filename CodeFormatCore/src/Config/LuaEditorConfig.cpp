@@ -28,7 +28,7 @@ void LuaEditorConfig::Parse() {
 
     std::regex comment = std::regex(R"(^\s*(;|#))");
     std::regex luaSection = std::regex(R"(^\s*\[\s*([^\]]+)\s*\]\s*$)");
-    std::regex valueRegex = std::regex(R"(^\s*([\w\d_]+)\s*=\s*(.+)$)");
+    std::regex valueRegex = std::regex(R"(^\s*([\w\d_\\.]+)\s*=\s*(.+)$)");
     bool sectionFounded = false;
 
     for (auto &lineView: lines) {
