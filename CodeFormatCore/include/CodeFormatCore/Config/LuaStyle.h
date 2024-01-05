@@ -62,7 +62,7 @@ public:
 
     bool space_before_closure_open_parenthesis = false;
 
-    FunctionSingleArgSpace space_before_function_call_single_arg = FunctionSingleArgSpace::Always;
+    SpaceBeforeSingleArg space_before_function_call_single_arg;
 
     bool space_before_open_square_bracket = false;
 

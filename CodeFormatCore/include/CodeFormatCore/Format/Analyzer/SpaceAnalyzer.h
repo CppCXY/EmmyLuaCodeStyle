@@ -29,17 +29,8 @@ public:
 
     void SpaceIgnore(LuaSyntaxNode n);
 
+    void FunctionCallSingleArgSpace(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t);
 private:
-    // workaround for mac 10.13
-    struct OptionalInt {
-        OptionalInt() : HasValue(false), Value(0) {}
-
-        explicit OptionalInt(std::size_t value) : HasValue(true), Value(value) {}
-
-        bool HasValue;
-        std::size_t Value;
-    };
-
     // This is to ensure that the settings on the right take priority.
     struct SpaceData {
         SpaceData() : SpaceData(0) {}
@@ -50,7 +41,7 @@ private:
         SpacePriority Priority;
     };
 
-    OptionalInt GetRightSpace(LuaSyntaxNode n) const;
+    std::size_t GetRightSpace(LuaSyntaxNode n, bool& hasValue) const;
 
     std::size_t ProcessSpace(LuaSyntaxNode left, LuaSyntaxNode right, const LuaSyntaxTree &t);
 

@@ -155,13 +155,37 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
     if (configMap.count("space_before_function_call_single_arg")) {
         auto &value = configMap.at("space_before_function_call_single_arg");
         if (value == "true" || value == "always") {
-            space_before_function_call_single_arg = FunctionSingleArgSpace::Always;
+            space_before_function_call_single_arg.SetAll(FunctionSingleArgSpace::Always);
         } else if (value == "only_string") {
-            space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyString;
+            space_before_function_call_single_arg.string = FunctionSingleArgSpace::Always;
+            space_before_function_call_single_arg.table = FunctionSingleArgSpace::None;
         } else if (value == "only_table") {
-            space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyTable;
+            space_before_function_call_single_arg.string =  FunctionSingleArgSpace::None;
+            space_before_function_call_single_arg.table = FunctionSingleArgSpace::Always;
         } else if (value == "false" || value == "none") {
-            space_before_function_call_single_arg = FunctionSingleArgSpace::None;
+            space_before_function_call_single_arg.SetAll(FunctionSingleArgSpace::None);
+        }
+    }
+
+    if (configMap.count("space_before_function_call_single_arg.string")) {
+        auto &value = configMap.at("space_before_function_call_single_arg.string");
+        if (value == "true" || value == "always") {
+            space_before_function_call_single_arg.string = FunctionSingleArgSpace::Always;
+        } else if (value == "false" || value == "none") {
+            space_before_function_call_single_arg.string = FunctionSingleArgSpace::None;
+        } else if (value == "keep") {
+            space_before_function_call_single_arg.string = FunctionSingleArgSpace::Keep;
+        }
+    }
+
+    if (configMap.count("space_before_function_call_single_arg.table")) {
+        auto &value = configMap.at("space_before_function_call_single_arg.table");
+        if (value == "true" || value == "always") {
+            space_before_function_call_single_arg.table = FunctionSingleArgSpace::Always;
+        } else if (value == "false" || value == "none") {
+            space_before_function_call_single_arg.table = FunctionSingleArgSpace::None;
+        } else if (value == "keep") {
+            space_before_function_call_single_arg.table = FunctionSingleArgSpace::Keep;
         }
     }
 

@@ -11,3 +11,13 @@ struct ContinuationIndent {
         in_table = value;
     }
 };
+
+struct SpaceBeforeSingleArg {
+    FunctionSingleArgSpace table = FunctionSingleArgSpace::Always;
+    FunctionSingleArgSpace string = FunctionSingleArgSpace::Always;
+
+    void SetAll(FunctionSingleArgSpace value) {
+        table = value;
+        string = value;
+    }
+};

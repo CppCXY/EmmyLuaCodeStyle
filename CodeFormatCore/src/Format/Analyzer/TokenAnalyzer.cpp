@@ -264,37 +264,7 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxN
 
         auto spaceAnalyzer = f.GetAnalyzer<SpaceAnalyzer>();
         if (spaceAnalyzer) {
-            switch (f.GetStyle().space_before_function_call_single_arg) {
-                case FunctionSingleArgSpace::None: {
-                    spaceAnalyzer->SpaceLeft(syntaxNode, t, 0);
-                    break;
-                }
-                case FunctionSingleArgSpace::Always: {
-                    spaceAnalyzer->SpaceLeft(syntaxNode, t, 1);
-                    break;
-                }
-                case FunctionSingleArgSpace::OnlyString: {
-                    auto firstToken = syntaxNode.GetFirstToken(t);
-                    if (firstToken.GetTokenKind(t) == TK_STRING || firstToken.GetTokenKind(t) == TK_LONG_STRING) {
-                        spaceAnalyzer->SpaceLeft(syntaxNode, t, 1);
-                    } else {
-                        spaceAnalyzer->SpaceLeft(syntaxNode, t, 0);
-                    }
-                    break;
-                }
-                case FunctionSingleArgSpace::OnlyTable: {
-                    auto firstChild = syntaxNode.GetFirstChild(t);
-                    if (firstChild.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
-                        spaceAnalyzer->SpaceLeft(syntaxNode, t, 1);
-                    } else {
-                        spaceAnalyzer->SpaceLeft(syntaxNode, t, 0);
-                    }
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
+            spaceAnalyzer->FunctionCallSingleArgSpace(f, syntaxNode, t);
         }
     }
 }

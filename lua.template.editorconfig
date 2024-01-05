@@ -54,6 +54,11 @@ space_before_closure_open_parenthesis = true
 # optional always/only_string/only_table/none
 # or true/false
 space_before_function_call_single_arg = always
+## extend option
+## always/keep/none
+# space_before_function_call_single_arg.table = always
+## always/keep/none
+# space_before_function_call_single_arg.string = always
 
 space_before_open_square_bracket = false
 

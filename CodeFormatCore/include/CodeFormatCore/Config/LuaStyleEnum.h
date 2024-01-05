@@ -69,8 +69,7 @@ struct LineSpace {
 enum class FunctionSingleArgSpace {
     None,
     Always,// true
-    OnlyTable,
-    OnlyString
+    Keep
 };
 
 enum class AlignArrayTable {
