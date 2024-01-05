@@ -45,6 +45,15 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
         }
     }
 
+    // for editorconfig Domain-Specific Properties
+    if (configMap.count("quote_type")) {
+        if (configMap.at("quote_type") == "single") {
+            quote_style = QuoteStyle::Single;
+        } else if (configMap.at("quote_type") == "double") {
+            quote_style = QuoteStyle::Double;
+        }
+    }
+
     if (configMap.count("table_separator_style")) {
         auto style = configMap.at("table_separator_style");
         if (style == "none") {
