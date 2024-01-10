@@ -191,6 +191,72 @@ if a
 end
 )",
             style));
+    style.continuation_indent.SetAll(4);
+    style.continuation_indent.before_block = 8;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+if a
+    or c then
+
+end
+local t = a
+    + c
+)",
+            R"(
+if a
+        or c then
+
+end
+local t = a
+    + c
+)",
+            style));
+    style.continuation_indent.SetAll(4);
+    style.continuation_indent.in_expr = 8;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+if a
+    or c then
+
+end
+local t = a
+    + c
+)",
+            R"(
+if a
+    or c then
+
+end
+local t = a
+        + c
+)",
+            style));
+    style.continuation_indent.SetAll(4);
+    style.continuation_indent.in_table = 8;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+if a
+    or c then
+
+end
+local t = {
+    a = 1,
+    dddddddd
+        .ccccc
+}
+)",
+            R"(
+if a
+    or c then
+
+end
+local t = {
+    a = 1,
+    dddddddd
+            .ccccc
+}
+)",
+            style));
 }
 
 TEST(FormatByStyleOption, max_line_length) {
@@ -603,6 +669,30 @@ p "aaa"
             R"(
 local f = p{ a = 123 }
 p"aaa"
+)",
+            style));
+    style.space_before_function_call_single_arg.SetAll(FunctionSingleArgSpace::None);
+    style.space_before_function_call_single_arg.string = FunctionSingleArgSpace::Keep;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+p    "aaa"
+p "aaa"
+)",
+            R"(
+p    "aaa"
+p "aaa"
+)",
+            style));
+    style.space_before_function_call_single_arg.SetAll(FunctionSingleArgSpace::None);
+    style.space_before_function_call_single_arg.table = FunctionSingleArgSpace::Keep;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+p { a = 123 }
+p   { a = 123 }
+)",
+            R"(
+p { a = 123 }
+p   { a = 123 }
 )",
             style));
 }
