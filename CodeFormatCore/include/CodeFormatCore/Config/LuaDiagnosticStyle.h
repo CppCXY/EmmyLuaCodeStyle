@@ -44,4 +44,8 @@ public:
     std::vector<NameStyleRule> class_name_style = {
             NameStyleRule(NameStyleType::SnakeCase),
             NameStyleRule(NameStyleType::PascalCase)};
+
+    std::vector<NameStyleRule> const_variable_name_style = {
+            NameStyleRule(NameStyleType::SnakeCase),
+            NameStyleRule(NameStyleType::UpperSnakeCase)};
 };
