@@ -30,6 +30,7 @@
 * module_name_style
 * require_module_name_style
 * class_name_style
+* const_variable_name_style
 
 每一个可配置项的格式都是相同的, 每个可配置项可配置的值支持如下格式:
 * 单字符串 例如: 

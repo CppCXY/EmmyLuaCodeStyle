@@ -137,7 +137,23 @@ void NameStyleChecker::CheckInBody(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
                                 PushStyleCheck(NameDefineType::ModuleDefineName, name);
                                 break;
                             }
-                            PushStyleCheck(NameDefineType::LocalVariableName, name);
+                            // check for a separate namestyle if a non-special variable is marked with <const>
+                            bool matchConstRule = false;
+                            auto attribute = name.GetNextSibling(t);
+                            if (attribute.GetSyntaxKind(t) == LuaSyntaxNodeKind::Attribute) {
+                                auto attributes = attribute.GetChildTokens(TK_NAME, t);
+                                for (auto a: attributes) {
+                                    if (a.GetText(t) == "const") {
+                                        PushStyleCheck(NameDefineType::ConstVariableName, name);
+                                        matchConstRule = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!matchConstRule) {
+                                PushStyleCheck(NameDefineType::LocalVariableName, name);
+                            }
                         }
                     }
 
@@ -431,6 +447,15 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                                      n.GetTextRange(t),
                                      MakeDiagnosticInfo("TableFieldDefineName", n, t,
                                                         state.GetDiagnosticStyle().table_field_name_style));
+                }
+                break;
+            }
+            case NameDefineType::ConstVariableName: {
+                if (!matcher.Match(n, t, state.GetDiagnosticStyle().const_variable_name_style)) {
+                    d.PushDiagnostic(DiagnosticType::NameStyle,
+                                     n.GetTextRange(t),
+                                     MakeDiagnosticInfo("ConstVariableName", n, t,
+                                                        state.GetDiagnosticStyle().const_variable_name_style));
                 }
                 break;
             }
