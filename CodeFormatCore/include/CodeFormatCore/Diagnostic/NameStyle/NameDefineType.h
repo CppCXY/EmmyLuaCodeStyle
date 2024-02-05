@@ -10,6 +10,7 @@ enum class NameDefineType {
     ImportModuleName,
     ModuleDefineName,
     TableFieldDefineName,
+    ConstVariableName
 };
 
 struct NameStyleInfo {
