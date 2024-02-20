@@ -77,10 +77,10 @@ public:
 
     bool ignore_spaces_inside_function_call = false;
 
-    SpaceBeforeInlineComment space_before_inline_comment = SpaceBeforeInlineComment();
+    SpaceBeforeInlineComment space_before_inline_comment;
 
     // [operator space]
-    bool space_around_math_operator = true;
+    SpaceAroundMath space_around_math_operator;
 
     bool space_after_comma = true;
 

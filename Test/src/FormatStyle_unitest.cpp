@@ -902,7 +902,7 @@ yes.it.is.me.a = 123                --fjoiwjfowifw
 TEST(FormatByStyleOption, space_around_math_operator) {
     LuaStyle style;
 
-    style.space_around_math_operator = true;
+    style.space_around_math_operator.SetAll(true);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = 123 + (456^7) / 4 * 5 - 9
@@ -911,13 +911,23 @@ local t = 123 + (456^7) / 4 * 5 - 9
 local t = 123 + (456 ^ 7) / 4 * 5 - 9
 )",
             style));
-    style.space_around_math_operator = false;
+    style.space_around_math_operator.SetAll(false);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = 123 + (456^7) / 4 * 5 - 9
 )",
             R"(
 local t = 123+(456^7)/4*5-9
+)",
+            style));
+    style.space_around_math_operator.SetAll(true);
+    style.space_around_math_operator.exponent = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = 123 + (456^7) / 4 * 5 - 9
+)",
+            R"(
+local t = 123 + (456^7) / 4 * 5 - 9
 )",
             style));
 }

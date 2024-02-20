@@ -18,11 +18,14 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case '/':
                 case '%':
                 case '&':
-                case '^':
                 case TK_SHL:
                 case TK_SHR:
                 case TK_IDIV: {
-                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_math_operator ? 1 : 0);
+                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_math_operator.other ? 1 : 0);
+                    break;
+                }
+                case '^': {
+                    SpaceAround(syntaxNode, t, f.GetStyle().space_around_math_operator.exponent ? 1 : 0);
                     break;
                 }
                 case TK_CONCAT: {
@@ -104,7 +107,7 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case '~': {
                     auto p = syntaxNode.GetParent(t);
                     if (p.IsNode(t) && p.GetSyntaxKind(t) == LuaSyntaxNodeKind::BinaryExpression) {
-                        SpaceAround(syntaxNode, t, f.GetStyle().space_around_math_operator ? 1 : 0);
+                        SpaceAround(syntaxNode, t, f.GetStyle().space_around_math_operator.other ? 1 : 0);
                     } else {
                         SpaceRight(syntaxNode, t, 0);
                         auto rightSiblingKind = syntaxNode.GetNextSibling(t).GetSyntaxKind(t);

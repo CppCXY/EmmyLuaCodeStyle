@@ -21,3 +21,13 @@ struct SpaceBeforeSingleArg {
         string = value;
     }
 };
+
+struct SpaceAroundMath {
+    bool exponent = true;
+    bool other = true;
+
+    void SetAll(bool value) {
+        exponent = value;
+        other = value;
+    }
+};
