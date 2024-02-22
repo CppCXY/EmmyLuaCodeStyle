@@ -1995,7 +1995,7 @@ local t = true==false or a<2 and b>3 or c<=4 and d>=5 or e~=6 and f==7
 TEST(FormatByStyleOption, allow_non_indented_comments) {
     LuaStyle style;
 
-    style.allow_non_indented_comments = false;
+    style.allow_non_indented_comments = true;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 function f()
