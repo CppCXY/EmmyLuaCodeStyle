@@ -173,7 +173,7 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
 
             if (resolve.GetIndentStrategy() != IndentStrategy::None) {
                 auto indent = resolve.GetIndent();
-                if (indent == 0) {
+                if (indent == 0 && resolve.GetIndentStrategy() != IndentStrategy::Absolute) {
                     if (_formatStyle.indent_style == IndentStyle::Space) {
                         indent = _formatStyle.indent_size;
                     } else {

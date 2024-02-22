@@ -127,6 +127,7 @@ public:
      */
     bool keep_indents_on_empty_lines = false;
 
+    bool allow_non_indented_comments = false;
     // [line space]
 
     LineSpace line_space_after_if_statement = LineSpace(LineSpaceType::Keep);

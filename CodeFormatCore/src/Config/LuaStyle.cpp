@@ -330,6 +330,8 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(keep_indents_on_empty_lines)
 
+    BOOL_OPTION(allow_non_indented_comments)
+
     std::vector<std::pair<std::string, LineSpace &>> fieldList = {
             {"line_space_after_if_statement",              line_space_after_if_statement             },
             {"line_space_after_do_statement",              line_space_after_do_statement             },

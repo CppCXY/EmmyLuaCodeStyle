@@ -32,7 +32,7 @@ private:
                                  const LuaSyntaxTree &t,
                                  DiagnosticBuilder &d);
 
-    std::string GetIndentNote(IndentState indent, IndentStyle style);
+    std::string GetIndentNote(IndentState indent, std::size_t checkSpace, std::size_t checkTab, IndentStyle style);
 
     std::string GetAdditionalNote(LuaSyntaxNode &left, LuaSyntaxNode &right, const LuaSyntaxTree &t);
 

@@ -1991,3 +1991,38 @@ local t = true==false or a<2 and b>3 or c<=4 and d>=5 or e~=6 and f==7
 )",
             style));
 }
+
+TEST(FormatByStyleOption, allow_non_indented_comments) {
+    LuaStyle style;
+
+    style.allow_non_indented_comments = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f()
+    --wjfowoj
+
+    local t = 123
+end
+
+do
+--12313
+    local t = 123
+    print(t)
+end
+)",
+            R"(
+function f()
+    --wjfowoj
+
+    local t = 123
+end
+
+do
+--12313
+    local t = 123
+    print(t)
+end
+)",
+            style));
+
+}

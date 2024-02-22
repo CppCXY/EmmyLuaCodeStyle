@@ -78,6 +78,7 @@ space_before_inline_comment = 1
 
 # [operator space]
 space_around_math_operator = true
+# space_around_math_operator.exponent = false
 
 space_after_comma = true
 
@@ -121,6 +122,8 @@ never_indent_before_if_condition = false
 never_indent_comment_on_if_branch = false
 
 keep_indents_on_empty_lines = false
+
+allow_non_indented_comments = false
 # [line space]
 
 # The following configuration supports four expressions
