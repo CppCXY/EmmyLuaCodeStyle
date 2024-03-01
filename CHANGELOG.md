@@ -2,6 +2,17 @@
 
 [中文文档](./CHANGELOG_CN.md)
 
+## 1.5.0
+
+`NEW` `---@format disable-next` now supports working at any position
+
+`NEW` Naming style check supports special checks for local const
+
+`NEW` Allow setting separate whitespace for exponent symbol `space_around_math_operator.exponent = false`
+
+`NEW` Allow non-indented comments through the option `allow_non_indented_comments=true`
+
+
 ## 1.4.3
 
 `NEW` Support for a new family of options that can subdivide continuation_indent.

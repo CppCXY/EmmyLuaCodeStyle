@@ -1,5 +1,17 @@
 # Change Log
 
+[English Change Log](./CHANGELOG_EN.md)
+
+## 1.5.0
+
+`NEW` `---@format disable-next` 现在支持在任意位置起作用
+
+`NEW` 命名风格检查支持支持对local const的特别检查
+
+`NEW` 允许为次方符号设置单独的空白`space_around_math_operator.exponent = false`
+
+`NEW` 通过选项`allow_non_indented_comments=true`允许非缩进的注释
+
 ## 1.4.3
 
 `NEW` 支持新的选项系列可以细分continuation_indent:
