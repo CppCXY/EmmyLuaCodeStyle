@@ -41,8 +41,7 @@ void FormatContext::SetOutputFilePath(std::string_view path) {
 void FormatContext::SetConfigFilePath(std::string_view configPath) {
     if (!configPath.empty()) {
         auto &config = _configs.emplace_back("");
-        config.Editorconfig = LuaEditorConfig::LoadFromFile(std::string(configPath));
-        config.Editorconfig->Parse();
+        config.Editorconfig = LuaEditorConfig::OpenFile(std::string(configPath));
     }
 }
 
@@ -134,8 +133,7 @@ void FormatContext::EnableAutoDetectConfig() {
             for (auto &file: files) {
                 std::filesystem::path filePath(file);
                 auto &config = _configs.emplace_back(filePath.parent_path().string());
-                config.Editorconfig = LuaEditorConfig::LoadFromFile(std::string(file));
-                config.Editorconfig->Parse();
+                config.Editorconfig = LuaEditorConfig::OpenFile(std::string(file));
             }
         }
     }

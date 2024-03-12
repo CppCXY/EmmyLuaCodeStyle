@@ -7,7 +7,9 @@ class TextReader {
 public:
     explicit TextReader(std::string_view text);
 
-    int NextChar();
+    void NextChar();
+
+    void NextLine();
 
     void SaveAndNext();
 
@@ -41,8 +43,9 @@ public:
 
     bool IsEof() const;
 
-    bool HasSaveText() const;
+    bool IsEol() const;
 
+    bool HasSaveText() const;
 private:
     std::string_view _text;
 

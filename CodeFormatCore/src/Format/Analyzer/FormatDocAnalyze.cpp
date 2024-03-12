@@ -34,15 +34,15 @@ void FormatDocAnalyze::Query(FormatState &f, LuaSyntaxNode syntaxNode, const Lua
     resolve.SetOriginRange(it->second);
 }
 
-bool IsWhiteSpaces(int c) {
+static bool IsWhiteSpaces(int c) {
     return c > 0 && std::isspace(c);
 }
 
-bool ActionStart(int c) {
+static bool ActionStart(int c) {
     return c > 0 && std::isalpha(c);
 }
 
-bool ActionContinue(int c) {
+static bool ActionContinue(int c) {
     return c > 0 && (std::isalnum(c) || c == '-');
 }
 

@@ -2,6 +2,7 @@
 
 [中文文档](./CHANGELOG_CN.md)
 
+
 ## 1.5.0
 
 `NEW` `---@format disable-next` now supports working at any position

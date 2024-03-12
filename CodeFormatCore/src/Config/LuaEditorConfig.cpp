@@ -7,48 +7,95 @@
 
 #include "Util/StringUtil.h"
 
-std::shared_ptr<LuaEditorConfig> LuaEditorConfig::LoadFromFile(const std::string &path) {
-    std::fstream fin(path, std::ios::in);
+#ifdef WIN32
+#include <Windows.h>
+std::wstring utf8ToWideChar(const std::string &utf8Str) {
+    int wideCharSize = MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), -1, NULL, 0);
+    std::wstring wideStr(wideCharSize, L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), -1, &wideStr[0], wideCharSize);
+    return wideStr;
+}
+#endif
+
+std::shared_ptr<LuaEditorConfig> LuaEditorConfig::OpenFile(const std::string &path) {
+    //FIX windows下读取中文路径
+#ifdef WIN32
+    std::fstream fin(utf8ToWideChar(path), std::ios::in | std::ios::binary);
+#else
+    std::fstream fin(path, std::ios::in | std::ios::binary);
+#endif
     if (fin.is_open()) {
-        std::stringstream s;
-        s << fin.rdbuf();
-        auto editorConfig = std::make_shared<LuaEditorConfig>(s.str());
-        return editorConfig;
+        fin.seekg(0, std::ios::end);
+        auto size = fin.tellg();
+        std::string s(size, ' ');
+        fin.seekg(0);
+        fin.read(s.data(), size);
+        auto config = std::make_shared<LuaEditorConfig>();
+        config->Parse(s);
+        return config;
     }
 
     return nullptr;
 }
 
-LuaEditorConfig::LuaEditorConfig(std::string &&source)
-    : _source(source) {
+static bool IsWhiteSpaces(int c) {
+    return c > 0 && std::isspace(c);
 }
 
-void LuaEditorConfig::Parse() {
-    auto lines = string_util::Split(_source, "\n");
+static bool IsEndOfLine(int c){
+    return c == '\r' || c == '\n';
+}
 
-    std::regex comment = std::regex(R"(^\s*(;|#))");
-    std::regex luaSection = std::regex(R"(^\s*\[\s*([^\]]+)\s*\]\s*$)");
-    std::regex valueRegex = std::regex(R"(^\s*([\w\d_\\.]+)\s*=\s*(.+)$)");
-    bool sectionFounded = false;
+void LuaEditorConfig::Parse(std::string_view text) {
+    auto reader = TextReader(text);
+    _sections.emplace_back("");
+    while (!reader.IsEof()) {
+        reader.ResetBuffer();
+        switch (reader.GetCurrentChar()) {
+                // comment
+            case ';':
+            case '#':
+                //skip empty line
+            case '\r':
+            case '\n': {
+                reader.NextLine();
+                break;
+            }
+            case '\t':
+            case ' ': {
+                reader.EatWhile(IsWhiteSpaces);
+                break;
+            }
+            case '[': {
+                reader.NextChar();
+                reader.EatWhile([](char ch) { return ch != ']' && !IsEndOfLine(ch); });
+                auto pattern = string_util::TrimSpace(reader.GetSaveText());
+                if (pattern.empty() || reader.GetCurrentChar() != ']') {
+                    reader.NextLine();
+                    break;
+                }
+                reader.NextLine();
+                _sections.emplace_back(pattern);
+                break;
+            }
+            default: {
+                reader.EatWhile([](char ch) { return ch != '=' && !IsEndOfLine(ch); });
+                auto key = string_util::TrimSpace(reader.GetSaveText());
+                if (key.empty() || reader.GetCurrentChar() != '=') {
+                    reader.NextLine();
+                    break;
+                }
 
-    for (auto &lineView: lines) {
-        std::string line(lineView);
-        if (std::regex_search(line, comment)) {
-            continue;
-        }
-
-        std::smatch m;
-
-        if (std::regex_search(line, m, luaSection)) {
-            auto pattern = m.str(1);
-            sectionFounded = (pattern.find("lua") != std::string::npos) || pattern == "*";
-            _sections.emplace_back(pattern);
-            continue;
-        }
-
-        if (sectionFounded) {
-            if (std::regex_search(line, m, valueRegex)) {
-                _sections.back().ConfigMap.insert({m.str(1), std::string(string_util::TrimSpace(m.str(2)))});
+                reader.NextChar();
+                reader.ResetBuffer();
+                reader.EatWhile([](char ch) { return !IsEndOfLine(ch); });
+                auto value = string_util::TrimSpace(reader.GetSaveText());
+                if (value.empty()) {
+                    reader.NextLine();
+                    break;
+                }
+                _sections.back().ConfigMap.insert({std::string(key), std::string(value)});
+                break;
             }
         }
     }
@@ -60,8 +107,8 @@ LuaStyle &LuaEditorConfig::Generate(std::string_view filePath) {
     for (std::size_t i = 0; i != _sections.size(); i++) {
         auto &pattern = _sections[i].Pattern;
 
-        // [*] [*.lua]
-        if (pattern.GetPattern() == "*" || pattern.GetPattern() == "*.lua") {
+        // "" [*] [*.lua]
+        if (pattern.GetPattern().empty() || pattern.GetPattern() == "*" || pattern.GetPattern() == "*.lua") {
             patternSection.push_back(i);
         }
         // [{test.lua,lib.lua}]
@@ -85,7 +132,9 @@ LuaStyle &LuaEditorConfig::Generate(std::string_view filePath) {
     auto &luaStyle = _styleMap.at(patternKey);
     for (auto i: patternSection) {
         auto &configMap = _sections[i].ConfigMap;
-        luaStyle.Parse(configMap);
+        if (!configMap.empty()) {
+            luaStyle.Parse(configMap);
+        }
     }
 
     return luaStyle;

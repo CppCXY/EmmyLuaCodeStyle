@@ -33,16 +33,14 @@ void ConfigService::LoadEditorconfig(std::string_view workspace, std::string_vie
     std::string path(filePath);
     for (auto &config: _styleConfigs) {
         if (config.Workspace == workspace) {
-            config.Editorconfig = LuaEditorConfig::LoadFromFile(path);
-            config.Editorconfig->Parse();
+            config.Editorconfig = LuaEditorConfig::OpenFile(path);
             return;
         }
     }
 
     auto &config = _styleConfigs.emplace_back(
             std::string(workspace));
-    config.Editorconfig = LuaEditorConfig::LoadFromFile(path);
-    config.Editorconfig->Parse();
+    config.Editorconfig = LuaEditorConfig::OpenFile(path);
 }
 
 void ConfigService::LoadLanguageTranslator(std::string_view filePath) {
