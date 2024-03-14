@@ -2,6 +2,12 @@
 
 [English Change Log](./CHANGELOG_EN.md)
 
+## 1.5.1
+
+`NEW` 重构了editorconfig文件的读取和解析逻辑, 在windows上会把string转化为宽字符串, 以支持utf8路径
+
+`FIX` 通过支持windows下的utf8路径修复了当中文目录存在.editorconfig文件时进程崩溃的问题
+
 ## 1.5.0
 
 `NEW` `---@format disable-next` 现在支持在任意位置起作用

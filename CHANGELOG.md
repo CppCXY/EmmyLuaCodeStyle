@@ -2,6 +2,11 @@
 
 [中文文档](./CHANGELOG_CN.md)
 
+## 1.5.1
+
+`NEW` Refactored the logic for reading and parsing the editorconfig file, converting strings to wide strings on Windows to support UTF8 paths.
+
+`FIX` Fixed a process crash issue when there is a .editorconfig file in a directory with Chinese characters by supporting UTF8 paths on Windows.
 
 ## 1.5.0
 
