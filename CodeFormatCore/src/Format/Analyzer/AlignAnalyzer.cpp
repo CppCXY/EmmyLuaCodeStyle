@@ -689,7 +689,7 @@ void AlignAnalyzer::AnalyzeInlineComment(FormatState &f, LuaSyntaxNode &syntaxNo
     }
 
     auto lastComment = LuaSyntaxNode(topGroup.back());
-    if (currentLine - lastComment.GetEndLine(t) > 2) {
+    if (currentLine - lastComment.GetEndLine(t) > f.GetStyle().align_continuous_line_space) {
         auto &newTopGroup = _inlineCommentGroup.emplace_back();
         newTopGroup.push_back(syntaxNode.GetIndex());
     } else {
