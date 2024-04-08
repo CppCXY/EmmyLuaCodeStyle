@@ -22,10 +22,11 @@ public:
 private:
     void TableFieldAddSep(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t);
 
-    void AnalyzeTableField(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
+    void AnalyzeTableField(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t);
 
-    void AnalyzeCallExpression(FormatState &f, LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t);
+    void AnalyzeCallExpression(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t);
 
+    void AnalyzeComment(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t);
 
     std::unordered_map<std::size_t, TokenStrategy> _tokenStrategies;
     std::unordered_map<std::size_t, TokenAddStrategy> _tokenAddStrategies;

@@ -79,6 +79,8 @@ public:
 
     SpaceBeforeInlineComment space_before_inline_comment;
 
+    bool space_after_comment_dash = false;
+
     // [operator space]
     SpaceAroundMath space_around_math_operator;
 

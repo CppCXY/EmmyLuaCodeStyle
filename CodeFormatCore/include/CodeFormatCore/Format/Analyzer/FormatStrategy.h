@@ -26,7 +26,8 @@ enum class TokenStrategy {
     TableSepComma,
     OriginRange,
     StmtEndSemicolon,
-    NewLineBeforeToken
+    NewLineBeforeToken,
+    SpaceAfterCommentDash
 };
 
 enum class TokenAddStrategy {

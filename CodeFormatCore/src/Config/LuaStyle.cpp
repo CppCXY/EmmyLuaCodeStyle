@@ -226,6 +226,8 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
         }
     }
 
+    BOOL_OPTION(space_after_comment_dash)
+
     IF_EXIST(space_around_math_operator) {
         if (value == "true" || value == "always") {
             space_around_math_operator.SetAll(true);

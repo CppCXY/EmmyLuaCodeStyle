@@ -2026,3 +2026,23 @@ end
             style));
 
 }
+
+TEST(FormatByStyleOption, space_after_comment_dash) {
+    LuaStyle style;
+
+    style.space_after_comment_dash = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+--aa
+---aaa
+---@param
+-------
+)",
+            R"(
+-- aa
+--- aaa
+--- @param
+-------
+)",
+            style));
+}

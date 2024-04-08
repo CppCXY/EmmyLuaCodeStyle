@@ -146,6 +146,17 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 WriteSyntaxNode(syntaxNode, t);
                 break;
             }
+            case TokenStrategy::SpaceAfterCommentDash: {
+                auto text = syntaxNode.GetText(t);
+                auto pos = 0;
+                while (pos < text.size() && text[pos] == '-') {
+                    WriteChar('-');
+                    pos++;
+                }
+                WriteChar(' ');
+                WriteText(text.substr(pos));
+                break;
+            }
             default: {
                 break;
             }

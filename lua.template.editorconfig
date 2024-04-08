@@ -76,6 +76,9 @@ ignore_spaces_inside_function_call = false
 # detail number or 'keep'
 space_before_inline_comment = 1
 
+# convert '---' to '--- ' or '--' to '-- '
+space_after_comment_dash = false
+
 # [operator space]
 space_around_math_operator = true
 # space_around_math_operator.exponent = false
