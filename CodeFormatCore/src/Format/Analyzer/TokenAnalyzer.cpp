@@ -276,7 +276,7 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode n, const
 
 void TokenAnalyzer::AnalyzeComment(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t) {
     auto text = n.GetText(t);
-    auto pos = 0;
+    std::size_t pos = 0;
     while (pos < text.size() && text[pos] == '-') {
         pos++;
     }
