@@ -148,7 +148,7 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
             }
             case TokenStrategy::SpaceAfterCommentDash: {
                 auto text = syntaxNode.GetText(t);
-                auto pos = 0;
+                std::size_t pos = 0;
                 while (pos < text.size() && text[pos] == '-') {
                     WriteChar('-');
                     pos++;
