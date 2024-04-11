@@ -62,7 +62,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/cmake/aarch64-linux-gnu.cmake"
+        cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF -DCMAKE_BUILD_TYPE=Release
         cmake --build . --config Release --verbose
         ctest -V -C Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
