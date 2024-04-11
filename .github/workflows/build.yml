@@ -49,7 +49,7 @@ jobs:
         ctest -V -C Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
     - name: Build-Linux-x64
-      if: startsWith(matrix.os, 'ubuntu')
+      if:  ${{ matrix.platform == 'linux-x64' }}
       run: |
         mkdir build
         cd build
@@ -58,7 +58,7 @@ jobs:
         ctest -V -C Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
     - name: Build-Linux-aarch64
-      if: startsWith(matrix.os, 'ubuntu')
+      if: ${{ matrix.platform == 'linux-aarch64' }}
       run: |
         mkdir build
         cd build
