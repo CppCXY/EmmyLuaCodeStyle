@@ -109,6 +109,11 @@ jobs:
           chmod 777 linux-x64/bin/CodeFormat
           chmod 777 linux-x64/bin/CodeFormatServer
           tar -czvf linux-x64.tar.gz linux-x64
+      - name: tar linux-aarch64
+        run: |
+          chmod 777 linux-aarch64/bin/CodeFormat
+          chmod 777 linux-aarch64/bin/CodeFormatServer
+          tar -czvf linux-aarch64.tar.gz linux-aarch64
       - name: zip darwin-x64
         uses: TheDoctor0/zip-release@v0.2.1
         with:
@@ -129,7 +134,6 @@ jobs:
           chmod 777 darwin-x64/bin/CodeFormat
           chmod 777 darwin-x64/bin/CodeFormatServer
           tar -czvf darwin-x64.tar.gz darwin-x64
-
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -140,6 +144,7 @@ jobs:
           files: |
             linux-x64.zip
             linux-x64.tar.gz
+            linux-aarch64.tar.gz
             darwin-x64.zip
             darwin-arm64.zip
             win32-x64.zip
