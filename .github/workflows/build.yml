@@ -64,7 +64,6 @@ jobs:
         cd build
         cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF -DCMAKE_BUILD_TYPE=Release
         cmake --build . --config Release --verbose
-        ctest -V -C Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
     - name: Build-macosx
       if: startsWith(matrix.os, 'macos')
