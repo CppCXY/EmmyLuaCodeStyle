@@ -35,10 +35,6 @@ jobs:
     - name: Prepare Linux-aarch64
       if: ${{ matrix.target == 'linux' && matrix.platform == 'linux-aarch64' }}
       run: |
-        apt-get update
-        apt-get install -y software-properties-common
-        add-apt-repository -y ppa:ubuntu-toolchain-r/test
-        apt-get update
         sudo apt-get install -y gcc-11-aarch64-linux-gnu g++-11-aarch64-linux-gnu
         echo "CC=gcc-11-aarch64-linux-gnu" >> $GITHUB_ENV
         echo "CXX=g++-11-aarch64-linux-gnu" >> $GITHUB_ENV
