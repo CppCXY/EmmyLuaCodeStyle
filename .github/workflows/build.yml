@@ -36,8 +36,8 @@ jobs:
       if: ${{ matrix.target == 'linux' && matrix.platform == 'linux-aarch64' }}
       run: |
         sudo apt-get install -y gcc-11-aarch64-linux-gnu g++-11-aarch64-linux-gnu
-        echo "CC=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
-        echo "CXX=aarch64-linux-gnu-g++" >> $GITHUB_ENV
+        echo "CC=aarch64-linux-gnu-gcc-11" >> $GITHUB_ENV
+        echo "CXX=aarch64-linux-gnu-g++-11" >> $GITHUB_ENV
 
     - name: Build-Windows
       if: startsWith(matrix.os, 'windows')
