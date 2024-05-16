@@ -3,6 +3,7 @@
 #include "CodeFormatCore/Format/FormatState.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include <algorithm>
+#include <cstdio>
 
 using NodeKind = LuaSyntaxNodeKind;
 
@@ -107,8 +108,14 @@ void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
 
                         } else {
                             switch (stmt.GetTokenKind(t)) {
-                                case TK_SHORT_COMMENT:
                                 case TK_LONG_COMMENT:
+                                {
+                                    auto nextToken = stmt.GetNextToken(t).GetTokenKind(t);
+                                    if (nextToken == TK_SHORT_COMMENT) {
+                                        break;
+                                    }
+                                }
+                                case TK_SHORT_COMMENT:
                                 case TK_SHEBANG: {
                                     BreakAfter(stmt, t, style.line_space_after_comment);
                                     break;
