@@ -3,7 +3,6 @@
 #include "CodeFormatCore/Format/FormatState.h"
 #include "LuaParser/Lexer/LuaTokenTypeDetail.h"
 #include <algorithm>
-#include <cstdio>
 
 using NodeKind = LuaSyntaxNodeKind;
 
@@ -114,6 +113,7 @@ void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                                     if (nextToken == TK_SHORT_COMMENT) {
                                         break;
                                     }
+                                    // Fall through
                                 }
                                 case TK_SHORT_COMMENT:
                                 case TK_SHEBANG: {
