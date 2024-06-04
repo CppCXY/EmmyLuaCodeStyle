@@ -1,5 +1,7 @@
 #include "CodeFormatCore/Config/LuaStyle.h"
 #include "FunctionOption.h"
+
+#include <functional>
 #include <map>
 
 bool IsNumber(std::string_view source) {
@@ -14,22 +16,40 @@ bool IsNumber(std::string_view source) {
     return true;
 }
 
-#define BOOL_OPTION(op)                   \
-    if (configMap.count(#op)) {           \
-        op = configMap.at(#op) == "true"; \
+std::string GetOption(const std::map<std::string, std::string, std::less<>> &configMap, const std::string &key) {
+    auto it = configMap.find(key);
+    if (it != configMap.end()) {
+        return it->second;
+    }
+    return "";
+}
+
+#define IF_EXIST(op) if (auto value = GetOption(configMap, #op); !value.empty())
+
+#define BOOL_OPTION(op)                                   \
+    {                                                     \
+        auto value = GetOption(configMap, #op);           \
+        if (value == "true" || value == "always") {       \
+            op = true;                                    \
+        } else if (value == "false" || value == "none") { \
+            op = false;                                   \
+        }                                                 \
     }
 
-#define NUMBER_OPTION(op)                                      \
-    if (configMap.count(#op) && IsNumber(configMap.at(#op))) { \
-        op = std::stoi(configMap.at(#op));                     \
+#define NUMBER_OPTION(op)                        \
+    {                                            \
+        auto value = GetOption(configMap, #op);  \
+        if (!value.empty() && IsNumber(value)) { \
+            op = std::stoi(value);               \
+        }                                        \
     }
 
 void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap) {
-    if (configMap.count("indent_style")) {
-        if (configMap.at("indent_style") == "space") {
-            indent_style = IndentStyle::Space;
-        } else if (configMap.at("indent_style") == "tab") {
+    IF_EXIST(indent_style) {
+        if (value == "tab") {
             indent_style = IndentStyle::Tab;
+        } else if (value == "space") {
+            indent_style = IndentStyle::Space;
         }
     }
 
@@ -37,44 +57,51 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     NUMBER_OPTION(tab_width)
 
-    if (configMap.count("quote_style")) {
-        if (configMap.at("quote_style") == "single") {
+    IF_EXIST(quote_style) {
+        if (value == "single") {
             quote_style = QuoteStyle::Single;
-        } else if (configMap.at("quote_style") == "double") {
+        } else if (value == "double") {
             quote_style = QuoteStyle::Double;
         }
     }
 
-    if (configMap.count("table_separator_style")) {
-        auto style = configMap.at("table_separator_style");
-        if (style == "none") {
+    // for editorconfig Domain-Specific Properties
+    IF_EXIST(qoute_type) {
+        if (value == "single") {
+            quote_style = QuoteStyle::Single;
+        } else if (value == "double") {
+            quote_style = QuoteStyle::Double;
+        }
+    }
+
+    IF_EXIST(table_separator_style) {
+        if (value == "none") {
             table_separator_style = TableSeparatorStyle::None;
-        } else if (style == "comma") {
+        } else if (value == "comma") {
             table_separator_style = TableSeparatorStyle::Comma;
-        } else if (style == "semicolon") {
+        } else if (value == "semicolon") {
             table_separator_style = TableSeparatorStyle::Semicolon;
-        } else if (style == "only_kv_colon") {
+        } else if (value == "only_kv_colon") {
             table_separator_style = TableSeparatorStyle::OnlyKVColon;
         }
     }
 
-    if (configMap.count("max_line_length")) {
-        if (IsNumber(configMap.at("max_line_length"))) {
-            max_line_length = std::stoi(configMap.at("max_line_length"));
-        } else if (configMap.at("max_line_length") == "unset") {
+    IF_EXIST(max_line_length) {
+        if (IsNumber(value)) {
+            max_line_length = std::stoi(value);
+        } else if (value == "unset") {
             max_line_length = 998;
         }
     }
 
-    if (configMap.count("end_of_line")) {
-        auto lineSeparatorSymbol = configMap.at("end_of_line");
-        if (lineSeparatorSymbol == "crlf") {
+    IF_EXIST(end_of_line) {
+        if (value == "crlf") {
             end_of_line = EndOfLine::CRLF;
-        } else if (lineSeparatorSymbol == "lf") {
+        } else if (value == "lf") {
             end_of_line = EndOfLine::LF;
-        } else if (lineSeparatorSymbol == "cr") {
+        } else if (value == "cr") {
             end_of_line = EndOfLine::CR;
-        } else if (lineSeparatorSymbol == "auto" || lineSeparatorSymbol == "unset") {
+        } else if (value == "auto" || value == "unset") {
 #ifndef _WINDOWS
             end_of_line = EndOfLine::LF;
 #else
@@ -83,32 +110,53 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
         }
     }
 
-    if (configMap.count("trailing_table_separator")) {
-        auto action = configMap.at("trailing_table_separator");
-        if (action == "keep") {
+    IF_EXIST(trailing_table_separator) {
+        if (value == "keep") {
             trailing_table_separator = TrailingTableSeparator::Keep;
-        } else if (action == "never") {
+        } else if (value == "never") {
             trailing_table_separator = TrailingTableSeparator::Never;
-        } else if (action == "always") {
+        } else if (value == "always") {
             trailing_table_separator = TrailingTableSeparator::Always;
-        } else if (action == "smart") {
+        } else if (value == "smart") {
             trailing_table_separator = TrailingTableSeparator::Smart;
         }
     }
 
-    if (configMap.count("call_arg_parentheses")) {
-        if (configMap.at("call_arg_parentheses") == "keep") {
+    IF_EXIST(call_arg_parentheses) {
+        if (value == "keep") {
             call_arg_parentheses = CallArgParentheses::Keep;
-        } else if (configMap.at("call_arg_parentheses") == "remove") {
+        } else if (value == "remove") {
             call_arg_parentheses = CallArgParentheses::Remove;
-        } else if (configMap.at("call_arg_parentheses") == "remove_string_only") {
+        } else if (value == "remove_string_only") {
             call_arg_parentheses = CallArgParentheses::RemoveStringOnly;
-        } else if (configMap.at("call_arg_parentheses") == "remove_table_only") {
+        } else if (value == "remove_table_only") {
             call_arg_parentheses = CallArgParentheses::RemoveTableOnly;
         }
     }
 
-    NUMBER_OPTION(continuation_indent)
+    IF_EXIST(continuation_indent) {
+        if (IsNumber(value)) {
+            continuation_indent.SetAll(std::stoull(value));
+        }
+    }
+
+    IF_EXIST(continuation_indent.before_block) {
+        if (IsNumber(value)) {
+            continuation_indent.before_block = std::stoull(value);
+        }
+    }
+
+    IF_EXIST(continuation_indent.in_expr) {
+        if (IsNumber(value)) {
+            continuation_indent.in_expr = std::stoull(value);
+        }
+    }
+
+    IF_EXIST(continuation_indent.in_table) {
+        if (IsNumber(value)) {
+            continuation_indent.in_table = std::stoull(value);
+        }
+    }
 
     BOOL_OPTION(detect_end_of_line)
 
@@ -124,19 +172,39 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(space_before_closure_open_parenthesis)
 
-    if (configMap.count("space_before_function_call_single_arg")) {
-        auto &value = configMap.at("space_before_function_call_single_arg");
+    IF_EXIST(space_before_function_call_single_arg) {
         if (value == "true" || value == "always") {
-            space_before_function_call_single_arg = FunctionSingleArgSpace::Always;
+            space_before_function_call_single_arg.SetAll(FunctionSingleArgSpace::Always);
         } else if (value == "only_string") {
-            space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyString;
+            space_before_function_call_single_arg.string = FunctionSingleArgSpace::Always;
+            space_before_function_call_single_arg.table = FunctionSingleArgSpace::None;
         } else if (value == "only_table") {
-            space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyTable;
+            space_before_function_call_single_arg.string = FunctionSingleArgSpace::None;
+            space_before_function_call_single_arg.table = FunctionSingleArgSpace::Always;
         } else if (value == "false" || value == "none") {
-            space_before_function_call_single_arg = FunctionSingleArgSpace::None;
+            space_before_function_call_single_arg.SetAll(FunctionSingleArgSpace::None);
         }
     }
 
+    IF_EXIST(space_before_function_call_single_arg.string) {
+        if (value == "true" || value == "always") {
+            space_before_function_call_single_arg.string = FunctionSingleArgSpace::Always;
+        } else if (value == "false" || value == "none") {
+            space_before_function_call_single_arg.string = FunctionSingleArgSpace::None;
+        } else if (value == "keep") {
+            space_before_function_call_single_arg.string = FunctionSingleArgSpace::Keep;
+        }
+    }
+
+    IF_EXIST(space_before_function_call_single_arg.table) {
+        if (value == "true" || value == "always") {
+            space_before_function_call_single_arg.table = FunctionSingleArgSpace::Always;
+        } else if (value == "false" || value == "none") {
+            space_before_function_call_single_arg.table = FunctionSingleArgSpace::None;
+        } else if (value == "keep") {
+            space_before_function_call_single_arg.table = FunctionSingleArgSpace::Keep;
+        }
+    }
 
     BOOL_OPTION(space_before_open_square_bracket)
 
@@ -150,8 +218,7 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(ignore_spaces_inside_function_call)
 
-    if(configMap.count("space_before_inline_comment")) {
-        auto &value = configMap.at("space_before_inline_comment");
+    IF_EXIST(space_before_inline_comment) {
         if (value == "keep") {
             space_before_inline_comment = SpaceBeforeInlineComment(0, SpaceBeforeInlineCommentStyle::Keep);
         } else if (IsNumber(value)) {
@@ -159,14 +226,29 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
         }
     }
 
-    BOOL_OPTION(space_around_math_operator)
+    BOOL_OPTION(space_after_comment_dash)
+
+    IF_EXIST(space_around_math_operator) {
+        if (value == "true" || value == "always") {
+            space_around_math_operator.SetAll(true);
+        } else if (value == "false" || value == "none") {
+            space_around_math_operator.SetAll(false);
+        }
+    }
+
+    IF_EXIST(space_around_math_operator.exponent) {
+        if (value == "true" || value == "always") {
+            space_around_math_operator.exponent = true;
+        } else if (value == "false" || value == "none") {
+            space_around_math_operator.exponent = false;
+        }
+    }
 
     BOOL_OPTION(space_after_comma)
 
     BOOL_OPTION(space_after_comma_in_for_statement)
 
-    if (configMap.count("space_around_concat_operator")) {
-        auto &value = configMap.at("space_around_concat_operator");
+    IF_EXIST(space_around_concat_operator) {
         if (value == "true" || value == "always") {
             space_around_concat_operator = SpaceAroundStyle::Always;
         } else if (value == "false" || value == "none") {
@@ -178,8 +260,7 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(space_around_logical_operator)
 
-    if (configMap.count("space_around_assign_operator")) {
-        auto &value = configMap.at("space_around_assign_operator");
+    IF_EXIST(space_around_assign_operator) {
         if (value == "true" || value == "always") {
             space_around_assign_operator = SpaceAroundStyle::Always;
         } else if (value == "false" || value == "none") {
@@ -193,22 +274,22 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(align_function_params)
 
-    if (configMap.count("align_continuous_assign_statement")) {
-        if (configMap.at("align_continuous_assign_statement") == "true" || configMap.at("align_continuous_assign_statement") == "when_extra_space") {
+    IF_EXIST(align_continuous_assign_statement) {
+        if (value == "true" || value == "when_extra_space") {
             align_continuous_assign_statement = ContinuousAlign::WhenExtraSpace;
-        } else if (configMap.at("align_continuous_assign_statement") == "always") {
+        } else if (value == "always") {
             align_continuous_assign_statement = ContinuousAlign::Always;
-        } else if (configMap.at("align_continuous_assign_statement") == "false" || configMap.at("align_continuous_assign_statement") == "none") {
+        } else if (value == "false" || value == "none") {
             align_continuous_assign_statement = ContinuousAlign::None;
         }
     }
 
-    if (configMap.count("align_continuous_rect_table_field")) {
-        if (configMap.at("align_continuous_rect_table_field") == "true" || configMap.at("align_continuous_rect_table_field") == "when_extra_space") {
+    IF_EXIST(align_continuous_rect_table_field) {
+        if (value == "true" || value == "when_extra_space") {
             align_continuous_rect_table_field = ContinuousAlign::WhenExtraSpace;
-        } else if (configMap.at("align_continuous_rect_table_field") == "always") {
+        } else if (value == "always") {
             align_continuous_rect_table_field = ContinuousAlign::Always;
-        } else if (configMap.at("align_continuous_rect_table_field") == "false" || configMap.at("align_continuous_rect_table_field") == "none") {
+        } else if (value == "false" || value == "none") {
             align_continuous_rect_table_field = ContinuousAlign::None;
         }
     }
@@ -217,22 +298,22 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(align_if_branch)
 
-    if (configMap.count("align_array_table")) {
-        if (configMap.at("align_array_table") == "true" || configMap.at("align_array_table") == "normal") {
+    IF_EXIST(align_array_table) {
+        if (value == "true" || value == "normal") {
             align_array_table = AlignArrayTable::Normal;
-        } else if (configMap.at("align_array_table") == "contain_curly") {
+        } else if (value == "contain_curly") {
             align_array_table = AlignArrayTable::ContainCurly;
-        } else if (configMap.at("align_array_table") == "false" || configMap.at("align_array_table") == "none") {
+        } else if (value == "false" || value == "none") {
             align_array_table = AlignArrayTable::None;
         }
     }
 
-    if (configMap.count("align_chain_expr")) {
-        if (configMap.at("align_chain_expr") == "none") {
+    IF_EXIST(align_chain_expr) {
+        if (value == "none") {
             align_chain_expr = AlignChainExpr::None;
-        } else if (configMap.at("align_chain_expr") == "always") {
+        } else if (value == "always") {
             align_chain_expr = AlignChainExpr::Always;
-        } else if (configMap.at("align_chain_expr") == "only_call_stmt") {
+        } else if (value == "only_call_stmt") {
             align_chain_expr = AlignChainExpr::OnlyCallStmt;
         }
     }
@@ -250,6 +331,8 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
     BOOL_OPTION(never_indent_comment_on_if_branch)
 
     BOOL_OPTION(keep_indents_on_empty_lines)
+
+    BOOL_OPTION(allow_non_indented_comments)
 
     std::vector<std::pair<std::string, LineSpace &>> fieldList = {
             {"line_space_after_if_statement",              line_space_after_if_statement             },
@@ -297,12 +380,12 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(break_before_braces)
 
-    if (configMap.count("break_table_list")) {
-        if (configMap.at("break_table_list") == "never") {
+    IF_EXIST(break_table_list) {
+        if (value == "never") {
             break_table_list = BreakTableList::Never;
-        } else if (configMap.at("break_table_list") == "smart") {
+        } else if (value == "smart") {
             break_table_list = BreakTableList::Smart;
-        } else if (configMap.at("break_table_list") == "lazy") {
+        } else if (value == "lazy") {
             break_table_list = BreakTableList::Lazy;
         }
     }
@@ -311,16 +394,16 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
 
     BOOL_OPTION(remove_call_expression_list_finish_comma)
 
-    if (configMap.count("end_statement_with_semicolon")) {
-        if (configMap.at("end_statement_with_semicolon") == "keep") {
+    IF_EXIST(end_statement_with_semicolon)  {
+        if (value == "keep") {
             end_statement_with_semicolon = EndStmtWithSemicolon::Keep;
-        } else if (configMap.at("end_statement_with_semicolon") == "always") {
+        } else if (value == "always") {
             end_statement_with_semicolon = EndStmtWithSemicolon::Always;
-        } else if (configMap.at("end_statement_with_semicolon") == "replace_with_newline") {
+        } else if (value == "replace_with_newline") {
             end_statement_with_semicolon = EndStmtWithSemicolon::ReplaceWithNewline;
-        } else if (configMap.at("end_statement_with_semicolon") == "same_line") {
+        } else if (value == "same_line") {
             end_statement_with_semicolon = EndStmtWithSemicolon::SameLine;
-        } else if (configMap.at("end_statement_with_semicolon") == "never") {
+        } else if (value == "never") {
             end_statement_with_semicolon = EndStmtWithSemicolon::Never;
         }
     }

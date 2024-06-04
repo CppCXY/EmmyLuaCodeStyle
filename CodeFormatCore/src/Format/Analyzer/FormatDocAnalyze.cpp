@@ -11,10 +11,8 @@ void FormatDocAnalyze::Analyze(FormatState &f, const LuaSyntaxTree &t) {
     for (auto syntaxNode: t.GetSyntaxNodes()) {
         switch (syntaxNode.GetTokenKind(t)) {
             case TK_SHORT_COMMENT: {
-                if (syntaxNode.GetParent(t).GetSyntaxKind(t) == LuaSyntaxNodeKind::Block) {
-                    AnalyzeDocFormat(syntaxNode, f, t);
-                    break;
-                }
+                AnalyzeDocFormat(syntaxNode, f, t);
+                break;
             }
             default: {
                 break;
@@ -36,15 +34,15 @@ void FormatDocAnalyze::Query(FormatState &f, LuaSyntaxNode syntaxNode, const Lua
     resolve.SetOriginRange(it->second);
 }
 
-bool IsWhiteSpaces(int c) {
+static bool IsWhiteSpaces(int c) {
     return c > 0 && std::isspace(c);
 }
 
-bool ActionStart(int c) {
+static bool ActionStart(int c) {
     return c > 0 && std::isalpha(c);
 }
 
-bool ActionContinue(int c) {
+static bool ActionContinue(int c) {
     return c > 0 && (std::isalnum(c) || c == '-');
 }
 
@@ -100,7 +98,7 @@ void FormatDocAnalyze::AnalyzeDocFormat(LuaSyntaxNode n, FormatState &f, const L
                         break;
                     } else if (action == "disable-next") {
                         auto nextNode = n.GetNextSibling(t);
-                        while (!nextNode.IsNull(t) && !detail::multi_match::StatementMatch(nextNode.GetSyntaxKind(t))) {
+                        while (!nextNode.IsNull(t) && nextNode.GetTokenKind(t) == TK_SHORT_COMMENT) {
                             nextNode.ToNext(t);
                         }
                         if (nextNode.IsNode(t)) {

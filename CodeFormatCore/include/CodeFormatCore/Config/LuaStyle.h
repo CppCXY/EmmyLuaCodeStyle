@@ -2,6 +2,7 @@
 
 #include "LuaParser/Types/EndOfLineType.h"
 #include "LuaStyleEnum.h"
+#include "LuaStyleStruct.h"
 #include <map>
 #include <memory>
 #include <string>
@@ -31,7 +32,7 @@ public:
 
     QuoteStyle quote_style = QuoteStyle::None;
 
-    std::size_t continuation_indent = 4;
+    ContinuationIndent continuation_indent;
 
     TableSeparatorStyle table_separator_style = TableSeparatorStyle::Comma;
 
@@ -61,7 +62,7 @@ public:
 
     bool space_before_closure_open_parenthesis = false;
 
-    FunctionSingleArgSpace space_before_function_call_single_arg = FunctionSingleArgSpace::Always;
+    SpaceBeforeSingleArg space_before_function_call_single_arg;
 
     bool space_before_open_square_bracket = false;
 
@@ -76,10 +77,12 @@ public:
 
     bool ignore_spaces_inside_function_call = false;
 
-    SpaceBeforeInlineComment space_before_inline_comment = SpaceBeforeInlineComment();
+    SpaceBeforeInlineComment space_before_inline_comment;
+
+    bool space_after_comment_dash = false;
 
     // [operator space]
-    bool space_around_math_operator = true;
+    SpaceAroundMath space_around_math_operator;
 
     bool space_after_comma = true;
 
@@ -126,6 +129,7 @@ public:
      */
     bool keep_indents_on_empty_lines = false;
 
+    bool allow_non_indented_comments = false;
     // [line space]
 
     LineSpace line_space_after_if_statement = LineSpace(LineSpaceType::Keep);

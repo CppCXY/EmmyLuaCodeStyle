@@ -1,98 +1,153 @@
 # Change Log
 
-[English Change Log](CHANGELOG_EN.md)
+[中文文档](./CHANGELOG_CN.md)
 
-# 1.3.1
+## 1.5.1
 
-`FIX` 修复了`space_before_inline_comment=2`对大括号之后的注释不起作用的BUG
+`NEW` Refactored the logic for reading and parsing the editorconfig file, converting strings to wide strings on Windows to support UTF8 paths.
 
-`NEW` 新增选项`line_space_around_block`表示语句块开始和末尾保留的空行数, 该选项默认值为`fixed(1)`, 表示语句块不保留前面和后面的空行. 其可选的值范围是:
-`keep`, `max(n)`, `min(n)`, `fixed(n)`, 该选项无法作用于最外层的代码块.
+`FIX` Fixed a process crash issue when there is a .editorconfig file in a directory with Chinese characters by supporting UTF8 paths on Windows.
 
+## 1.5.0
 
-# 1.3.0
+`NEW` `---@format disable-next` now supports working at any position
 
-`REFACTOR` 重写了分词算法, 和相关的拼写检查
+`NEW` Naming style check supports special checks for local const
 
-`FIX` 修复了错误的添加表项的尾部分隔符的问题
+`NEW` Allow setting separate whitespace for exponent symbol `space_around_math_operator.exponent = false`
 
-`NEW` 支持选项`end_statement_with_semicolon`, 现在你可以设置语句是否保留行尾分号, 或者强行保持分号, 该选项提供对应诊断消息, 感谢`@AndreaWalchshoferSCCH`
-
-`NEW` 支持选项`keep_indents_on_empty_lines`, 这个选项主要是intellij平台通常会有默认的一个选项保持空行缩进, 感谢`@qq792453582`
+`NEW` Allow non-indented comments through the option `allow_non_indented_comments=true`
 
 
-# 1.2.2
+## 1.4.3
 
-`FIX` 当前行存在unicode字符时,放弃对齐行为
+`NEW` Support for a new family of options that can subdivide continuation_indent.
+* continuation_indent.before_block
+* continuation_indent.in_expr
+* continuation_indent.in_table
 
-`NEW` 支持非标准符号
+`NEW` Support for a new family of options to subdivide the indent: * space_before_function_indent.
+* space_before_function_call_single_arg.table 
+* space_before_function_call_single_arg.string
+its options are always/keep/none.
 
-# 1.2.0
+## 1.4.2
 
-`NEW` 支持选项`break_before_braces`
+`FIX` Fix error thrown by range formatting when formatting plain blank lines
 
-`NEW` 支持设置`table_separator_style`
+## 1.4.0
 
-`NEW` 命令行工具支持范围格式化
+`NEW` Refactored the CodeFormat command-line tool to export results in JSON format when performing checks.
 
-`NEW` 支持了intellij平台, Intellij-EmmyLua的用户在2023.1以上的IDE可以安装本插件
+## 1.3.4
 
-# 1.1.5
+`NEW` Added support for UTF8-Latin1 characters in formatted alignment.
 
-`NEW` 支持通过设置选项 `align_continuous_similar_call_args=true` 对齐相似函数的参数列表
+`NEW` Reintroduced support for `never` in `end_statement_with_semicolon`, but semicolons within the same line and semicolons that may cause ambiguity are not handled.
+
+`NEW` Naming style check now supports `AAA_1` in addition to snake_case.
+
+
+## 1.3.3
+
+`FIX` has fixed the syntax error caused by `space_around_concat_operator` and `space_around_assign_operator` when they are on the left side of a number or '>'. 
+
+`NEW` has added optional value ranges for `space_around_concat_operator` and `space_around_assign_operator`. The available values include none/always/no_space_asym.
+
+## 1.3.2
+
+`CHG` migration option `never` to `replace_with_newline` for `end_statement_with_semicolon`
+
+`NEW` Added options `space_around_logical_operator` and `space_around_assign_operator`
+
+## 1.3.1
+
+`FIX` Fixed a bug where `space_before_inline_comment=2` did not work for comments after curly braces.
+
+`NEW` Added the option `line_space_around_block` to specify the number of blank lines to keep before and after a code block. The default value is `fixed(1)`, which means no blank lines are kept before or after the code block. The possible values are `keep`, `max(n)`, `min(n)`, and `fixed(n)`. Note that this option does not apply to the outermost level of code blocks.
+
+## 1.3.0
+
+`REFACTOR` rewrote the tokenization algorithm and related spell-checking.
+
+`FIX` fixed the issue of adding incorrect trailing separators to table entries.
+
+`NEW` added support for the option `end_statement_with_semicolon`. Now you can choose whether to keep the semicolon at the end of statements or enforce it. This option provides corresponding diagnostic messages. Thanks to `@AndreaWalchshoferSCCH`.
+
+`NEW` added support for the option `keep_indents_on_empty_lines`. This option is mainly for IntelliJ platform, which usually has a default option to keep indentation on empty lines. Thanks to `@qq792453582`.
+
+## 1.2.2
+
+`FIX` abandon alignment behavior when there are Unicode characters in the current line.
+
+`NEW` support non-standard symbols.
+
+## 1.2.0
+
+`NEW` support option `break_before_braces`
+
+`NEW` supports setting `table_separator_style`
+
+`NEW` command line tool supports range formatting
+
+`NEW` supports the intellij platform, Intellij-EmmyLua users can install this plugin in IDEs above 2023.1
+
+## 1.1.5
+
+`NEW` supports aligning the argument lists of similar functions by setting the option `align_continuous_similar_call_args=true`
 
 ## 1.1.4
 
-`FIX` 修复拼写检查在字符串中少一位的BUG
+`FIX` Fix the bug that the spell check is missing one bit in the string
 
-`CHANGE` 命名风格检查的camel_case 和 snake_case 不再兼容下划线前缀, 有相关需求的请使用正则表达式
+The camel_case and snake_case of the `CHANGE` naming style check are no longer compatible with underscore prefixes, please use regular expressions if you have related needs
 
-`FIX` 修复命名风格检查过早退出检查循环的BUG
+`FIX` Fix the bug that the naming style check exits the checking loop prematurely
 
-`FIX` 修复命名风格检查对空节点的错误检查, 和对table field的检查
+`FIX` fix naming style checking error checking for empty nodes, and checking for table fields
 
-`Feature Request` 如果有更多合理的格式化样式的设置需求可以直接发起issue
+`Feature Request` If you have more reasonable formatting requirements, you can directly issue an issue
 
-`Develop` 最近特性加入比较慢, 主要是我在全力开发新的语言服务
+`Develop` The addition of features has been slow recently, mainly because I am working hard to develop new language services
 
 ## 1.1.3
 
-`NEW` 功能 `命名风格检查` 正式支持配置.
+`NEW` feature `naming style checking` officially supports configuration.
 
-`CHANGE` `local empty = function() end` 格式化时不会再换行
+`CHANGE` `local empty = function() end` will no longer wrap when formatting
 
-`NEW` 支持形如 `local d; Init()` 的排版方式
+`NEW` supports typesetting like `local d; Init()`
 
-`NEW` 支持链式表达式对齐
+`NEW` supports chained expression alignment
 
 ## 1.1.2
 
-`NEW` 新选项 `align_continuous_line_space`
+`NEW` new option `align_continuous_line_space`
 
-`NEW` 还有其他更新, 但是我忘了
+`NEW` There are other updates, but I forgot
 
 ## 1.1.1
 
-`NEW` 优化type format
+`NEW` optimize type format
 
-`FIX` type format 不会清理`---@format disable` 和`---@format disable-next`之下的内容了
+`FIX` type format will not clear the content under `---@format disable` and `---@format disable-next`
 
 ## 1.1.0
 
-`FIX` 修复许多BUG 
+`FIX` fix many bugs
 
 
-`NEW` 重新支持`---@format disable` 和 `---@format disable-next`
+`NEW` re-support `---@format disable` and `---@format disable-next`
 
 ## 1.0.9
 
-`FIX` 修复缩进检查的一些BUG
+`FIX` fix some bugs in indentation check
 
 ## 1.0.8
 
-`NEW` 支持缩进检查
+`NEW` supports indentation checking
 
-`NEW` 修复一些BUG
+`NEW` fix some bugs
 
 ## 1.0.7
 
@@ -100,45 +155,45 @@
 
 ## 1.0.6
 
-`NEW` 支持内联注释对齐
+`NEW` supports inline comment alignment
 
 ## 1.0.5
 
-`FIX` 修复文件增量更新算法的BUG
+`FIX` fix the BUG of file incremental update algorithm
 
 ## 1.0.4
 
-`Upgrade` 试图修复vscode-languageclient带来的依赖错误
+`Upgrade` tries to fix dependency errors brought by vscode-languageclient
 
 ## 1.0.3
 
-`Upgrade` 试图修复插件无法激活的问题, 更新所有依赖库
+`Upgrade` tries to fix the problem that the plugin cannot be activated, updating all dependent libraries
 
-`FIX` 修复一个格式化行为.
+`FIX` fixes a formatting behavior.
 
-`NEW` 选项`space_before_function_call_single_arg`支持其他值always/only_string/only_table/none
+`NEW` option `space_before_function_call_single_arg` supports other values always/only_string/only_table/none
 
 ## 1.0.2
 
-`FIX` 修复lineIndex错误导致的Unicode字符BUG
+`FIX` fix the Unicode character BUG caused by lineIndex error
 
 ## 1.0.0
 
-`EmmyLuaCodeStyle` 经过一年的更新现在进入正式版
+`EmmyLuaCodeStyle` is now in production after a year of updates
 
-`Refactor` 大部分代码重写, 数据结构重新设计
+`Refactor` Most of the code was rewritten, and the data structure was redesigned
 
-`Refactor` 大部分选项被重新命名, 新增了一批选项, 移除了一批选项
+Most options of `Refactor` have been renamed, a number of options have been added, and a number of options have been removed
 
-`Performance` 得益于从头开始重新设计, 格式化性能提高三倍, 在windows上一般的机器上格式化`10w`行代码仅需1到2秒 
+`Performance` thanks to the redesign from scratch, the formatting performance has been improved by three times, and it only takes 1 to 2 seconds to format `10w` lines of code on an average machine on windows
 
 ## 0.18.0
 
-`FIX` typeformat不会在字符串或者长注释内部做格式化行为
+`FIX` typeformat does not do formatting inside strings or long comments
 
-以下由[@obszczymucha](https://github.com/obszczymucha)实现:
+The following is implemented by [@obszczymucha](https://github.com/obszczymucha):
 
-`NEW` 支持选项
+`NEW` support option
 * `space_inside_function_call_parentheses`
 * `space_inside_function_param_list_parentheses`
 * `space_inside_square_brackets`
@@ -146,110 +201,110 @@
 
 ## 0.17.2
 
-`NEW` typeformat会智能填补表项之后的逗号
+`NEW` typeformat will intelligently fill the comma after the entry
 
-`NEW` 支持选项`table_separator_style` 可选值为`none/comma/semicolon`
+`NEW` supports the option `table_separator_style` and the optional values are `none/comma/semicolon`
 
-`NEW` 支持选项`trailing_table_separator` 可选值为 `keep/never/always/smart`
+`NEW` supports option `trailing_table_separator`, optional value is `keep/never/always/smart`
 
 ## 0.16.1
 
-`FIX` 优化typeformat体验
+`FIX` optimize typeformat experience
 
 ## 0.16.0
 
-`NEW` 开启typeformat后，键入'\n'时会自动补完缺失的end
+`NEW` After typeformat is turned on, the missing end will be automatically completed when typing '\n'
 
 ## 0.15.0
 
-`CHANGE` 改变代码风格检查时提示的文字
+`CHANGE` changes the text of the prompt when checking the code style
 
 ## 0.14.1
 
-`FIX` 修复因为设置`insert_final_newline = false`和开启typeOnFormat特性导致回车无效得BUG
+`FIX` Fix the bug that the carriage return is invalid due to setting `insert_final_newline = false` and enabling the typeOnFormat feature
 
 ## 0.14.0
 
-`CHANGE` 配置项`insert_final_newline`现在符合.editorconfig规定
+`CHANGE` configuration item `insert_final_newline` now complies with .editorconfig
 
-`CHANGE` 支持`break` 和 `goto` 语句后的分号
+`CHANGE` supports semicolons after `break` and `goto` statements
 
-`CHANGE` 格式化将移除空行分号，移除if语句，while语句，repeat语句后的分号
+`CHANGE` formatting will remove the semicolon of blank lines, remove the semicolon after the if statement, while statement, and repeat statement
 
-`NEW` 支持通过注解部分屏蔽格式化，详细看[disable-format](https://github.com/CppCXY/EmmyLuaCodeStyle/blob/master/docs/disable_format.md)
+`NEW` supports partially blocking formatting through annotations, see [disable-format](https://github.com/CppCXY/EmmyLuaCodeStyle/blob/master/docs/disable_format.md) for details
 
 
 ## 0.13.0
 
-`CHANGE` 放宽对齐调用表达式的限制
+`CHANGE` relaxes restrictions on alignment call expressions
 
-`NEW` 支持扩展语法，允许 '`' 表达的字符串
+`NEW` supports extended syntax, allowing strings expressed by '`'
 
-`NEW` 新增选项`space_before_function_open_parenthesis` 表示函数和其括号之间保持一个空格(包括函数定义，和函数调用，以及闭包表达式)
+`NEW` new option `space_before_function_open_parentthesis` indicates that there should be a space between the function and its parentheses (including function definition, function call, and closure expression)
 
-`NEW` 新增选项`space_before_open_square_bracket` 表示在索引表达式中的中括号和左边符号相距一个空格
+`NEW` new option `space_before_open_square_bracket` indicates that there is a space between the square bracket and the left symbol in the index expression
 
-`FIX` 修复因为支持`t[ [[1111]] .. 1 ]`的排版而错误将`t[t[1]]`格式化为`t[ t[1] ]`的问题
+`FIX` Fix the problem that `t[t[1]]` is formatted as `t[ t[1] ]` by mistake because `t[ [[1111]] .. 1 ]` is supported
 
 
 ## 0.12.0
 
-`NEW` 当代码超过指定行宽时会自动折行，该行为可能会产生不如意的代码排版。这时候建议ctrl z之后手动排版再格式化。
+`NEW` automatically wraps lines when the code exceeds the specified line width, which may result in unsatisfactory code layout. At this time, it is recommended to manually typeset and format after ctrl z.
 
-`FIX` 修复索引表达式中涉及长字符串时，格式化导致的语法错误
+`FIX` fix syntax errors caused by formatting when long strings are involved in index expressions
 
 ## 0.11.4
 
-`CHANGE` 更新基本词典
+`CHANGE` update the base dictionary
 
-`NEW` 支持字符串中的拼写检查
+`NEW` supports spell checking in strings
 
 ## 0.11.3
 
-`CHANGE` 更新词典
+`CHANGE` update dictionary
 
-`CHANGE` 语言服务按lsp3.17版本重新设计, 诊断采用lsp规定的方式诊断。
+`CHANGE` The language service is redesigned according to the lsp3.17 version, and the diagnosis is made in the way specified by lsp.
 
 ## 0.11.2
 
-`CHANGE` 更新lua常用词词典 
+`CHANGE` update lua common word dictionary
 
 ## 0.11.0
 
-`CHANGE` 重构了语言服务的代码组织，暂时移除插件对补全的影响，插件不在代码补全时提示模块了
+`CHANGE` refactored the code organization of the language service, temporarily removed the impact of plugins on completion, and plugins no longer prompt modules when code completion
 
-`CHANGE` 优化了模块诊断时提示的内容
+`CHANGE` optimizes the prompt content when module diagnosis
 
-`NEW` 提供针对lua优化的标识符单词拼写检查算法
+`NEW` provides an identifier word spell checking algorithm optimized for lua
 
-`NEW` 提供了新的格式化选项:
-* `remove_empty_header_and_footer_lines_in_function` 允许移除函数的上面和下面多余空行
-* `remove_expression_list_finish_comma` 允许移除函数调用时最后一个逗号(这本身是一个语法错误)
+`NEW` provides new formatting options:
+* `remove_empty_header_and_footer_lines_in_function` allows removing extra empty lines above and below the function
+* `remove_expression_list_finish_comma` allows removing the last comma in a function call (which itself is a syntax error)
 
 ## 0.10.3
 
-`NEW` 命令行工具支持使用通配符过滤
+The `NEW` command line tool supports filtering using wildcards
 
 ## 0.10.2
 
-`CHANGE` 默认情况下namedef和attribute会有一个空格的距离
+`CHANGE` By default namedef and attribute will have a space distance
 
-`NEW` 行布局支持使用`maxLine:$n`指定与下一行的最大行距
+`NEW` line layout supports using `maxLine:$n` to specify the maximum line distance from the next line
 
-`NEW` 行宽允许设定为unset
+`NEW` line width allows setting to unset
 
-`CHANGE` 函数调用的排版方式变更，更符合lua中的一些使用习惯
+`CHANGE` The typesetting method of the function call has changed, which is more in line with some usage habits in lua
 
 
 ## 0.10.0
 
-`NEW` vscode插件端实现配置EmmyluaCodeStyle开关`模块诊断`,`代码风格诊断`, `模块补全`.
+`NEW` The vscode plug-in implements the configuration of the EmmyluaCodeStyle switch `module diagnosis`, `code style diagnosis`, `module completion`.
 
-`NEW` 行距诊断换一种表现方式
+`NEW` Line spacing diagnosis changed to a different way of expression
 
-`NEW` 支持通过设置`align_chained_expression_statement=true`使链式表达式对齐到第一个'.'或者':' 
+`NEW` supports aligning chained expressions to the first '.' or ':' by setting `align_chained_expression_statement=true`
 
-`NEW` 支持通过设置`if_branch_comments_after_block_no_indent`允许else或者elseif之上的注释对齐到关键词上
+`NEW` supports to allow comments above else or elseif to be aligned to keywords by setting `if_branch_comments_after_block_no_indent`
 
 
 ## 0.9.7
@@ -258,36 +313,36 @@
 
 `IMPL` [#30](https://github.com/CppCXY/EmmyLuaCodeStyle/issues/30)
 
-1. 格式化会移除注释的尾部空白
-2. 通过选项`if_branch_comments_after_block_no_indent = true` 允许在else/elseif分支之上的注释不会缩进到语句块内部
+1. Formatting removes trailing whitespace from comments
+2. By option `if_branch_comments_after_block_no_indent = true`, allow the comments above the else/elseif branch not to be indented inside the statement block
 
 ## 0.9.6
 
-命令行工具帮助打印更规范
+The command line tool helps to print more standardized
 ## 0.9.5
 
-命令行工具在指定单输入文件时可以指定工作区，这可以帮助detect config。
+The command-line tool can specify a workspace when specifying a single input file, which can help detect config.
 
 ## 0.9.4
 
-修复命令行工具无法输出到文件的bug
+Fix the bug that the command line tool cannot output to the file
 
 ## 0.9.2
 
-命令行工具支持批量格式化和批量诊断
+Command line tools support batch formatting and batch diagnostics
 
 ## 0.9.0
 
-1. 命令行工具现在会自动寻找并使用最近的editorconfig配置
-2. 长字符串和长注释会采用配置的行尾格式化
+1. The command line tool will now automatically find and use the latest editorconfig configuration
+2. Long strings and long comments will be formatted using the configured line endings
 
 ## 0.8.7
 
-重写命令行工具
+Rewrite the command line tool
 
 ## 0.8.5
 
-修复一个bug:纯注释文件会被直接清空
+Fix a bug: pure comment files will be cleared directly
 
 ## 0.8.4
 
@@ -314,121 +369,122 @@
 
 `Resolve` [#15](https://github.com/CppCXY/EmmyLuaCodeStyle/issues/15)
 
-主要更新的特性为允许设定单双引号风格，对齐时采用最小对齐,允许移除函数调用的括号
+The main updated feature is allowing to set the style of single and double quotes, using the minimum alignment when aligning, and allowing to remove the parentheses of function calls
 
 ## 0.7.0
 
-1. 修复存在某些语法错误的情况下仍然格式化的问题
-2. 支持if的条件表达式互相对齐
-3. table表达式内支持不同的连续有不同的对齐
-4. 形如t[#t+1]可以无空白包含
-5. sumneko_lua 集成了该插件的主要功能
+1. Fix the problem of formatting even if there are some grammatical errors
+2. The conditional expressions that support if are aligned with each other
+3. Different alignments are supported in table expressions
+4. Forms such as t[#t+1] can contain no blanks
+5. sumneko_lua integrates the main functions of the plugin
     
     
 ## 0.6.1
 
-更新文档，更新editorconfig模板
+Update docs, update editorconfig template
 
 
 ## 0.6.0
 
-1. 提高测试的覆盖率,每一个格式化选项都有专门的测试
-2. 重构缩进算法,更好的支持使用tab作为缩进
-3. 提供许多与缩进有关的格式化选项
-4. 部分格式化选项重新命名了
-5. 修复许多bug
+1. Improve test coverage, each formatting
+options have specific tests
+2. Refactor the indentation algorithm to better support the use of tabs as indentation
+3. Provides many formatting options related to indentation
+4. Some formatting options have been renamed
+5. Fixed many bugs
 
 
 ## 0.5.1
 
-修复linux下不可用的问题
+Fix the unavailable problem under linux
 
 ## 0.5.0
 
-将语言服务由单线程分离io线程和逻辑线程。io线程会尽可能快的读取消息，逻辑线程为单线程内无锁异步(不含asio自己控制的锁)
-采用增量更新，单次发包量大幅度降低，语言服务采用原地增量更新算法(极少重新申请空间储存代码)
-语言服务实现调度机制，代码诊断实现后端防抖，防抖区间暂定0.3秒。
-大幅度提高插件性能，代码诊断不再成为性能瓶颈，在10万行以内的代码不会影响插件的正常使用
+The language service is separated from the io thread and the logic thread by a single thread. The io thread will read the message as fast as possible, and the logical thread is lock-free and asynchronous within a single thread (excluding locks controlled by asio itself)
+Incremental update is adopted, and the amount of a single contract is greatly reduced, and the language service adopts an in-place incremental update algorithm (rarely re-applying for space to store codes)
+The language service implements the scheduling mechanism, and the code diagnosis implements the back-end anti-shake, and the anti-shake interval is tentatively set at 0.3 seconds.
+The performance of the plug-in is greatly improved, code diagnosis is no longer a performance bottleneck, and the code within 100,000 lines will not affect the normal use of the plug-in
 
 ## 0.4.5
 
-修复由于linux下编译器版本为gcc11导致在大部分linux环境下不可用的问题
+Fix the problem that the compiler version under linux is gcc11, which makes it unavailable in most linux environments
 
 ## 0.4.4
 
-修复枚举不一致
+Fix enum inconsistencies
 ## 0.4.3
 
-修复诊断bug
+fix diagnostic bug
 
 ## 0.4.2
 
-1. 修改格式化规则，连续调用表达式中如果存在单参数省略括号的表达形式，则该参数与下一个调用参数列表保持一个间距。
-2. 修复一个识别错误的bug
+1. Modify the formatting rules. If there is an expression form with a single parameter omitting parentheses in the continuous call expression, the parameter will keep a distance from the next call parameter list.
+2. Fix a bug of recognition error
 
 ## 0.4.1
 
-提供模块的特殊export.rule规则，使用形式待考虑
+Provide a special export.rule rule for the module, the usage form is to be considered
 
 ## 0.4.0
 
-提供auto import 功能
+Provide auto import function
 
 ## 0.3.2
 
-修复label导致格式化结果不稳定的bug
+Fix the bug that the label causes the formatting result to be unstable
 
 ## 0.3.1
 
-现在修改配置会立即刷新所有打开的文件了
+Modifying the configuration now refreshes all open files immediately
 
 ## 0.3.0
 
-修复许多bug，重构迭代算法，增加测试用例
+Fix many bugs, refactor the iterative algorithm, and increase test cases
 
 ## 0.2.6
 
-降低插件体积，插件实现分系统分发不同的包。
+Reduce the size of the plug-in, and the plug-in realizes the distribution of different packages by system.
 
 ## 0.2.5
 
-修复一个连续调用函数时格式化错误的问题
+Fixed an issue with formatting errors when calling functions continuously
 
-## 0.2.4 
+## 0.2.4
 
-修复因为cin.readsome无法在linux和macosx上正确工作导致无法正确运行的问题，windows上仍然使用cin,cout
-linux和macosx上使用asio封装过的接口
+Fix the problem that cin.readsome cannot work correctly on linux and macosx, and cin and cout are still used on windows
+Use asio encapsulated interface on linux and macosx
 
 ## 0.2.2
 
-优化节点的内存占用，优化常驻内存，采用mimalloc优化内存分配性能，优化内存碎片。
+Optimize the memory usage of nodes, optimize resident memory, use mimalloc to optimize memory allocation performance, and optimize memory fragmentation.
 
 ## 0.2.1
 
-修复内存方面的问题，降低内存消耗
+Fix memory issues and reduce memory consumption
 
 ## 0.2.0
 
-1. 重写.editorconfig读取规则，支持editorconfig的基本匹配规则和所有基本选项
-2. 支持基于lua语法特性和日常习惯的lua命名风格检测规则
-3. 语言服务实现内采用异常提前中断没必要的解析
+1. Rewrite .editorconfig reading rules, support editorconfig's basic matching rules and all basic options
+2. Support lua naming style detection rules based on lua syntax features and daily habits
+3. Unnecessary parsing in language service implementation using abnormal early interruption
 
 ## 0.1.18
     
-修复命名风格检查未能正确工作的bug
+Fixed a bug where naming style checking was not working correctly
 
 ## 0.1.17
 
-1. 修改配置选项名称，和editorconfig使用的名称保持一直（建议重新导入配置）
+1. Modify the name of the configuration option, which is consistent with the name used by editorconfig (it is recommended to re-import the configuration)
 
-2. 支持检测是否以新行结束文本
+2. Support detecting whether the text ends with a new line
 
-3. 支持命名风格检测（默认不开启）
+3. Support naming style detection (not enabled by default)
 
 ## 0.1.16
 
-代码诊断本地化
+Code Diagnostics Localization
 
 ## 0.1.15
 
-修复bug
+fix bugs

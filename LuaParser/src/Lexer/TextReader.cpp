@@ -10,21 +10,38 @@ TextReader::TextReader(std::string_view text)
       _currentIndex(0) {
 }
 
-int TextReader::NextChar() {
-    if (_currentIndex < (_text.size() - 1)) {
-        return _text[++_currentIndex];
+void TextReader::NextChar() {
+    if (_currentIndex + 1 < _text.size()) {
+        ++_currentIndex;
     } else {
         ++_currentIndex;
-        return EOZ;
+        if (_currentIndex >= _text.size()) {
+            _isEof = true;
+        }
+    }
+}
+
+void TextReader::NextLine() {
+    while (_currentIndex < _text.size()) {
+        char ch = _text[_currentIndex];
+        if (ch == '\n' || ch == '\r') {
+            _currentIndex++;
+            if (ch == '\r' && _currentIndex < _text.size() && _text[_currentIndex] == '\n') {
+                _currentIndex++;
+            }
+            break;
+        }
+        _currentIndex++;
+    }
+
+    if (_currentIndex >= _text.size()) {
+        _isEof = true;
     }
 }
 
 void TextReader::SaveAndNext() {
     Save();
-    int ch = NextChar();
-    if (ch == EOZ) {
-        _isEof = true;
-    }
+    NextChar();
 }
 
 void TextReader::Save() {
@@ -99,4 +116,12 @@ std::size_t TextReader::EatWhen(int ch) {
         count++;
     }
     return count;
+}
+
+bool TextReader::IsEol() const {
+    if (_currentIndex < _text.size()) {
+        char ch = _text[_currentIndex];
+        return ch == '\n' || ch == '\r';
+    }
+    return true;
 }

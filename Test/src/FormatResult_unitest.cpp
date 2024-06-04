@@ -871,6 +871,27 @@ end
 
 local t = 123
 )"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+        R"(
+local t = {
+    ---@format disable-next
+
+    aa  = 123,
+    ---@format disable-next
+    lcc             =           123,
+    gjopepgo = 123,
+}
+)",
+        R"(
+local t = {
+    ---@format disable-next
+
+    aa  = 123,
+    ---@format disable-next
+    lcc             =           123,
+    gjopepgo = 123,
+}
+)"));
 }
 
 TEST(Format, feature_102) {
@@ -1125,4 +1146,32 @@ only_latin = {
     { 'e',    nil },
 }
 )", style));
+}
+
+TEST(Format, issue_170) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+--[[]]
+)",
+            R"(
+--[[]]
+)"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+--[[]]--
+)",
+            R"(
+--[[]] --
+)"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+--[[-----------
+
+]]-------------
+)",
+            R"(
+--[[-----------
+
+]] -------------
+)"));
 }

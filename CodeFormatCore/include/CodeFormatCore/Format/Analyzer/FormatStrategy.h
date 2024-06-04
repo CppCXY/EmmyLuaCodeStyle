@@ -31,6 +31,7 @@ enum class TokenStrategy {
     WithParentheses,
     WithLeftParentheses,
     WithRightParentheses
+    SpaceAfterCommentDash
 };
 
 enum class TokenAddStrategy {
@@ -54,7 +55,8 @@ enum class IndentType {
     InvertIndentation,
     WhenNewLine,
     WhenPrevIndent,
-    WhenExceedLinebreak
+    WhenExceedLinebreak,
+    Keep,
 };
 
 struct IndentData {

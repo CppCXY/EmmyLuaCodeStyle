@@ -49,6 +49,11 @@ void TokenAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
 
                     break;
                 }
+                case TK_SHORT_COMMENT: {
+                    if (f.GetStyle().space_after_comment_dash) {
+                        AnalyzeComment(f, syntaxNode, t);
+                    }
+                }
                 default: {
                     break;
                 }
@@ -174,8 +179,8 @@ void TokenAnalyzer::AnalyzeTableField(FormatState &f, LuaSyntaxNode n, const Lua
     }
 }
 
-bool IsSingleTableOrStringArg(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
-    auto children = syntaxNode.GetChildren(t);
+bool IsSingleTableOrStringArg(LuaSyntaxNode n, const LuaSyntaxTree &t) {
+    auto children = n.GetChildren(t);
     for (auto child: children) {
         if (child.GetTokenKind(t) == TK_STRING || child.GetTokenKind(t) == TK_LONG_STRING ||
             child.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
@@ -280,37 +285,20 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode n, const
 
         auto spaceAnalyzer = f.GetAnalyzer<SpaceAnalyzer>();
         if (spaceAnalyzer) {
-            switch (f.GetStyle().space_before_function_call_single_arg) {
-                case FunctionSingleArgSpace::None: {
-                    spaceAnalyzer->SpaceLeft(n, t, 0);
-                    break;
-                }
-                case FunctionSingleArgSpace::Always: {
-                    spaceAnalyzer->SpaceLeft(n, t, 1);
-                    break;
-                }
-                case FunctionSingleArgSpace::OnlyString: {
-                    auto firstToken = n.GetFirstToken(t);
-                    if (firstToken.GetTokenKind(t) == TK_STRING || firstToken.GetTokenKind(t) == TK_LONG_STRING) {
-                        spaceAnalyzer->SpaceLeft(n, t, 1);
-                    } else {
-                        spaceAnalyzer->SpaceLeft(n, t, 0);
-                    }
-                    break;
-                }
-                case FunctionSingleArgSpace::OnlyTable: {
-                    auto firstChild = n.GetFirstChild(t);
-                    if (firstChild.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
-                        spaceAnalyzer->SpaceLeft(n, t, 1);
-                    } else {
-                        spaceAnalyzer->SpaceLeft(n, t, 0);
-                    }
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
+            spaceAnalyzer->FunctionCallSingleArgSpace(f, n, t);
+        }
+    }
+}
+
+void TokenAnalyzer::AnalyzeComment(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t) {
+    auto text = n.GetText(t);
+    std::size_t pos = 0;
+    while (pos < text.size() && text[pos] == '-') {
+        pos++;
+    }
+    if (pos == 2 || pos == 3) {
+        if (pos < text.size() && text[pos] != ' ') {
+            Mark(n, t, TokenStrategy::SpaceAfterCommentDash);
         }
     }
 }

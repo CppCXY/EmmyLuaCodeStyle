@@ -48,6 +48,10 @@ private:
 
     void ProcessExceedLinebreak(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t);
 
+    void NeverIndentCommentOnIfBranch(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t);
+
+    void AllowNonIndentedComment(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t);
+
     std::unordered_map<std::size_t, IndentData> _indent;
     std::unordered_set<std::size_t> _indentMark;
 

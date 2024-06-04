@@ -160,6 +160,15 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
             case TokenStrategy::WithRightParentheses:{
                 WriteSyntaxNode(syntaxNode, t);
                 WriteChar(')');
+            case TokenStrategy::SpaceAfterCommentDash: {
+                auto text = syntaxNode.GetText(t);
+                std::size_t pos = 0;
+                while (pos < text.size() && text[pos] == '-') {
+                    WriteChar('-');
+                    pos++;
+                }
+                WriteChar(' ');
+                WriteText(text.substr(pos));
                 break;
             }
             default: {

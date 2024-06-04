@@ -155,7 +155,7 @@ local t = 'aaa' .. 'bbb' .. '\"\"' .. [[123]] .. '""'
 TEST(FormatByStyleOption, continuation_indent) {
     LuaStyle style;
 
-    style.continuation_indent = 4;
+    style.continuation_indent.SetAll(4);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 if a
@@ -176,7 +176,7 @@ table.insert(t, {
 })
 )",
             style));
-    style.continuation_indent = 8;
+    style.continuation_indent.SetAll(8);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 if a
@@ -189,6 +189,72 @@ if a
         or c then
 
 end
+)",
+            style));
+    style.continuation_indent.SetAll(4);
+    style.continuation_indent.before_block = 8;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+if a
+    or c then
+
+end
+local t = a
+    + c
+)",
+            R"(
+if a
+        or c then
+
+end
+local t = a
+    + c
+)",
+            style));
+    style.continuation_indent.SetAll(4);
+    style.continuation_indent.in_expr = 8;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+if a
+    or c then
+
+end
+local t = a
+    + c
+)",
+            R"(
+if a
+    or c then
+
+end
+local t = a
+        + c
+)",
+            style));
+    style.continuation_indent.SetAll(4);
+    style.continuation_indent.in_table = 8;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+if a
+    or c then
+
+end
+local t = {
+    a = 1,
+    dddddddd
+        .ccccc
+}
+)",
+            R"(
+if a
+    or c then
+
+end
+local t = {
+    a = 1,
+    dddddddd
+            .ccccc
+}
 )",
             style));
 }
@@ -559,7 +625,7 @@ end
 TEST(FormatByStyleOption, space_before_function_call_single_arg) {
     LuaStyle style;
 
-    style.space_before_function_call_single_arg = FunctionSingleArgSpace::Always;
+    style.space_before_function_call_single_arg.SetAll(FunctionSingleArgSpace::Always);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local f = p { a = 123 }
@@ -570,7 +636,8 @@ local f = p { a = 123 }
 p "aaa"
 )",
             style));
-    style.space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyString;
+    style.space_before_function_call_single_arg.string = FunctionSingleArgSpace::Always;
+    style.space_before_function_call_single_arg.table = FunctionSingleArgSpace::None;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local f = p { a = 123 }
@@ -581,7 +648,8 @@ local f = p{ a = 123 }
 p "aaa"
 )",
             style));
-    style.space_before_function_call_single_arg = FunctionSingleArgSpace::OnlyTable;
+    style.space_before_function_call_single_arg.string = FunctionSingleArgSpace::None;
+    style.space_before_function_call_single_arg.table = FunctionSingleArgSpace::Always;
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local f = p { a = 123 }
@@ -592,7 +660,7 @@ local f = p { a = 123 }
 p"aaa"
 )",
             style));
-    style.space_before_function_call_single_arg = FunctionSingleArgSpace::None;
+    style.space_before_function_call_single_arg.SetAll(FunctionSingleArgSpace::None);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local f = p { a = 123 }
@@ -601,6 +669,30 @@ p "aaa"
             R"(
 local f = p{ a = 123 }
 p"aaa"
+)",
+            style));
+    style.space_before_function_call_single_arg.SetAll(FunctionSingleArgSpace::None);
+    style.space_before_function_call_single_arg.string = FunctionSingleArgSpace::Keep;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+p    "aaa"
+p "aaa"
+)",
+            R"(
+p    "aaa"
+p "aaa"
+)",
+            style));
+    style.space_before_function_call_single_arg.SetAll(FunctionSingleArgSpace::None);
+    style.space_before_function_call_single_arg.table = FunctionSingleArgSpace::Keep;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+p { a = 123 }
+p   { a = 123 }
+)",
+            R"(
+p { a = 123 }
+p   { a = 123 }
 )",
             style));
 }
@@ -810,7 +902,7 @@ yes.it.is.me.a = 123                --fjoiwjfowifw
 TEST(FormatByStyleOption, space_around_math_operator) {
     LuaStyle style;
 
-    style.space_around_math_operator = true;
+    style.space_around_math_operator.SetAll(true);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = 123 + (456^7) / 4 * 5 - 9
@@ -819,13 +911,23 @@ local t = 123 + (456^7) / 4 * 5 - 9
 local t = 123 + (456 ^ 7) / 4 * 5 - 9
 )",
             style));
-    style.space_around_math_operator = false;
+    style.space_around_math_operator.SetAll(false);
     EXPECT_TRUE(TestHelper::TestFormatted(
             R"(
 local t = 123 + (456^7) / 4 * 5 - 9
 )",
             R"(
 local t = 123+(456^7)/4*5-9
+)",
+            style));
+    style.space_around_math_operator.SetAll(true);
+    style.space_around_math_operator.exponent = false;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = 123 + (456^7) / 4 * 5 - 9
+)",
+            R"(
+local t = 123 + (456^7) / 4 * 5 - 9
 )",
             style));
 }
@@ -1886,6 +1988,61 @@ local t = true == false or a < 2 and b > 3 or c <= 4 and d >= 5 or e ~= 6 and f 
 )",
             R"(
 local t = true==false or a<2 and b>3 or c<=4 and d>=5 or e~=6 and f==7
+)",
+            style));
+}
+
+TEST(FormatByStyleOption, allow_non_indented_comments) {
+    LuaStyle style;
+
+    style.allow_non_indented_comments = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+function f()
+    --wjfowoj
+
+    local t = 123
+end
+
+do
+--12313
+    local t = 123
+    print(t)
+end
+)",
+            R"(
+function f()
+    --wjfowoj
+
+    local t = 123
+end
+
+do
+--12313
+    local t = 123
+    print(t)
+end
+)",
+            style));
+
+}
+
+TEST(FormatByStyleOption, space_after_comment_dash) {
+    LuaStyle style;
+
+    style.space_after_comment_dash = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+--aa
+---aaa
+---@param
+-------
+)",
+            R"(
+-- aa
+--- aaa
+--- @param
+-------
 )",
             style));
 }

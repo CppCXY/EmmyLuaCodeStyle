@@ -18,16 +18,13 @@ public:
         std::map<std::string, std::string, std::less<>> ConfigMap;
     };
 
-    static std::shared_ptr<LuaEditorConfig> LoadFromFile(const std::string &path);
-
-    LuaEditorConfig(std::string &&source);
-
-    void Parse();
+    static std::shared_ptr<LuaEditorConfig> OpenFile(const std::string &path);
 
     LuaStyle &Generate(std::string_view fileUri);
 
 private:
-    std::string _source;
+    void Parse(std::string_view text);
+
     std::vector<Section> _sections;
     std::map<std::string, LuaStyle, std::less<>> _styleMap;
 };

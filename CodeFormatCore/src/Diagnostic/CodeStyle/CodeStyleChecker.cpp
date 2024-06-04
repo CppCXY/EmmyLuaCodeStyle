@@ -268,18 +268,17 @@ void CodeStyleChecker::ProcessIndentDiagnostic(LuaSyntaxNode &node, const LuaSyn
     }
 
     if (indent.TabSize != checkIndent.Tab || indent.SpaceSize != checkIndent.Space) {
+        // if(state.GetStyle().indent_style)
         d.PushDiagnostic(DiagnosticType::Indent,
                          currentIndentRange,
-                         util::format("{}, found {} whitespace, {} tab",
-                                      GetIndentNote(indent, state.GetStyle().indent_style),
-                                      checkIndent.Space, checkIndent.Tab));
+                         GetIndentNote(indent,checkIndent.Space, checkIndent.Tab, state.GetStyle().indent_style));
     }
 }
 
-std::string CodeStyleChecker::GetIndentNote(IndentState indent, IndentStyle style) {
+std::string CodeStyleChecker::GetIndentNote(IndentState indent, std::size_t checkSpace, std::size_t checkTab, IndentStyle style) {
     if (style == IndentStyle::Tab) {
-        return util::format("expected {} tab indent", indent.TabSize);
+        return util::format("expected {} tab indent, found {} tab", indent.TabSize, checkTab);
     } else {
-        return util::format("expected {} whitespace indent", indent.SpaceSize);
+        return util::format("expected {} whitespace indent, found {} whitespace", indent.SpaceSize, checkSpace);
     }
 }

@@ -18,16 +18,14 @@ LuaCodeFormat::LuaCodeFormat()
 void LuaCodeFormat::UpdateCodeStyle(const std::string &workspaceUri, const std::string &configPath) {
     for (auto &config: _configs) {
         if (config.Workspace == workspaceUri) {
-            config.Editorconfig = LuaEditorConfig::LoadFromFile(configPath);
-            config.Editorconfig->Parse();
+            config.Editorconfig = LuaEditorConfig::OpenFile(configPath);
             return;
         }
     }
 
     auto &config = _configs.emplace_back(
             workspaceUri);
-    config.Editorconfig = LuaEditorConfig::LoadFromFile(configPath);
-    config.Editorconfig->Parse();
+    config.Editorconfig = LuaEditorConfig::OpenFile(configPath);
 }
 
 void LuaCodeFormat::UpdateDiagnosticStyle(InfoTree &tree) {
