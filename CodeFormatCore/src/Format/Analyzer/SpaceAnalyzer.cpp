@@ -264,6 +264,25 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                                 }
                                 break;
                             }
+                            case FunctionSingleArgSpace::OnlyStringKeep: {
+                                auto firstToken = syntaxNode.GetFirstToken(t);
+                                if (firstToken.GetTokenKind(t) == TK_STRING ||
+                                    firstToken.GetTokenKind(t) == TK_LONG_STRING) {
+                                    SpaceIgnore(syntaxNode);
+                                } else {
+                                    SpaceLeft(syntaxNode, t, 1);
+                                }
+                                break;
+                            }
+                            case FunctionSingleArgSpace::OnlyTableKeep: {
+                                auto firstChild = syntaxNode.GetFirstChild(t);
+                                if (firstChild.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
+                                    SpaceIgnore(syntaxNode);
+                                } else {
+                                    SpaceLeft(syntaxNode, t, 1);
+                                }
+                                break;
+                            }
                             default: {
                                 break;
                             }

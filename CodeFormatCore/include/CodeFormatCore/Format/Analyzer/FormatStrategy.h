@@ -26,14 +26,18 @@ enum class TokenStrategy {
     TableSepComma,
     OriginRange,
     StmtEndSemicolon,
-    NewLineBeforeToken
+    NewLineBeforeToken,
+
+    WithParentheses,
+    WithLeftParentheses,
+    WithRightParentheses
 };
 
 enum class TokenAddStrategy {
     None,
     TableAddColon,
     TableAddComma,
-    StmtEndSemicolon
+    StmtEndSemicolon,
 };
 
 enum class IndentStrategy {
