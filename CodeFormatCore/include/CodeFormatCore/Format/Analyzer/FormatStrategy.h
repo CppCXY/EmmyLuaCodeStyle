@@ -30,7 +30,7 @@ enum class TokenStrategy {
 
     WithParentheses,
     WithLeftParentheses,
-    WithRightParentheses
+    WithRightParentheses,
     SpaceAfterCommentDash
 };
 

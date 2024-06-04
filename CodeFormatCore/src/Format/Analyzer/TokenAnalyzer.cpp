@@ -182,7 +182,7 @@ void TokenAnalyzer::AnalyzeTableField(FormatState &f, LuaSyntaxNode n, const Lua
 bool IsSingleTableOrStringArg(LuaSyntaxNode n, const LuaSyntaxTree &t) {
     auto children = n.GetChildren(t);
     for (auto child: children) {
-        if (child.GetTokenKind(t) == TK_STRING || child.GetTokenKind(t) == TK_LONG_STRING ||
+        if (child.GetSyntaxKind(t) == LuaSyntaxNodeKind::StringLiteralExpression ||
             child.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
             return true;
         } else if (
@@ -201,12 +201,12 @@ bool IsSingleTableOrStringArg(LuaSyntaxNode n, const LuaSyntaxTree &t) {
     return false;
 }
 
-LuaSyntaxNode GetSingleArgStringOrTable(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t) {
-    auto children = syntaxNode.GetChildren(t);
+LuaSyntaxNode GetSingleArgStringOrTable(LuaSyntaxNode n, const LuaSyntaxTree &t) {
+    auto children = n.GetChildren(t);
     for (auto child: children) {
-        if (child.GetTokenKind(t) == TK_STRING || child.GetTokenKind(t) == TK_LONG_STRING ||
+        if (child.GetSyntaxKind(t) == LuaSyntaxNodeKind::StringLiteralExpression ||
             child.GetSyntaxKind(t) == LuaSyntaxNodeKind::TableExpression) {
-            return syntaxNode;
+            return child;
         } else if (child.GetSyntaxKind(t) == LuaSyntaxNodeKind::ExpressionList) {
             auto exprs = child.GetChildSyntaxNodes(LuaSyntaxMultiKind::Expression, t);
             if (exprs.size() == 1) {
@@ -266,14 +266,22 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode n, const
             }
             case CallArgParentheses::Always: {
                 auto lbrace = n.GetChildToken('(', t);
-                if (!lbrace.IsToken(t)) {
+                auto spaceAnalyzer = f.GetAnalyzer<SpaceAnalyzer>();
+                if (!lbrace.IsToken(t) && spaceAnalyzer) {
                     auto node = GetSingleArgStringOrTable(n, t);
                     if (node.IsToken(t)) {
                         Mark(node, t, TokenStrategy::WithParentheses);
+                        spaceAnalyzer->SpaceAround(node, t, 0, SpaceAnalyzer::SpacePriority::First);
+                    } else if (node.GetSyntaxKind(t) == LuaSyntaxNodeKind::StringLiteralExpression) {
+                        Mark(node.GetFirstToken(t), t, TokenStrategy::WithParentheses);
+                        spaceAnalyzer->SpaceLeft(node.GetFirstToken(t), t, 0, SpaceAnalyzer::SpacePriority::First);
                     } else {
                         Mark(node.GetFirstToken(t), t, TokenStrategy::WithLeftParentheses);
+                        spaceAnalyzer->SpaceLeft(node.GetFirstToken(t), t, 0, SpaceAnalyzer::SpacePriority::First);
                         Mark(node.GetLastToken(t), t, TokenStrategy::WithRightParentheses);
                     }
+
+                    return;
                 }
 
                 break;

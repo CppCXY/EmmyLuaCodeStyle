@@ -157,9 +157,11 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 WriteSyntaxNode(syntaxNode, t);
                 break;
             }
-            case TokenStrategy::WithRightParentheses:{
+            case TokenStrategy::WithRightParentheses: {
                 WriteSyntaxNode(syntaxNode, t);
                 WriteChar(')');
+                break;
+            }
             case TokenStrategy::SpaceAfterCommentDash: {
                 auto text = syntaxNode.GetText(t);
                 std::size_t pos = 0;

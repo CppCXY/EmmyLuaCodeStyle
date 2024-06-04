@@ -10,7 +10,7 @@ public:
 
     enum class SpacePriority : std::size_t {
         Normal = 0,
-        CommentFirst,
+        First,
     };
 
     SpaceAnalyzer();

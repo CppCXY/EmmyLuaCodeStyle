@@ -131,6 +131,8 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
             call_arg_parentheses = CallArgParentheses::RemoveStringOnly;
         } else if (value == "remove_table_only") {
             call_arg_parentheses = CallArgParentheses::RemoveTableOnly;
+        } else if (value == "always") {
+            call_arg_parentheses = CallArgParentheses::Always;
         }
     }
 

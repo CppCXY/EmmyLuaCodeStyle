@@ -181,14 +181,14 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case TK_LONG_COMMENT:
                 case TK_SHORT_COMMENT: {
                     if (f.GetStyle().space_before_inline_comment.Style == SpaceBeforeInlineCommentStyle::Fixed) {
-                        SpaceLeft(syntaxNode, t, f.GetStyle().space_before_inline_comment.Space, SpacePriority::CommentFirst);
+                        SpaceLeft(syntaxNode, t, f.GetStyle().space_before_inline_comment.Space, SpacePriority::First);
                     } else {
                         auto prevToken = syntaxNode.GetPrevToken(t);
                         if (prevToken.GetEndLine(t) == syntaxNode.GetStartLine(t)) {
                             auto space = syntaxNode.GetStartCol(t) - prevToken.GetEndCol(t) - 1;
-                            SpaceLeft(syntaxNode, t, space, SpacePriority::CommentFirst);
+                            SpaceLeft(syntaxNode, t, space, SpacePriority::First);
                         } else {
-                            SpaceLeft(syntaxNode, t, 0, SpacePriority::CommentFirst);
+                            SpaceLeft(syntaxNode, t, 0, SpacePriority::First);
                         }
                     }
                     SpaceRight(syntaxNode, t, 1);
@@ -421,15 +421,15 @@ void SpaceAnalyzer::FunctionCallSingleArgSpace(FormatState &f, LuaSyntaxNode n, 
         firstToken.GetTokenKind(t) == TK_LONG_STRING) {
         switch (f.GetStyle().space_before_function_call_single_arg.string) {
             case FunctionSingleArgSpace::None: {
-                SpaceLeft(n, t, 0);
+                SpaceLeft(firstToken, t, 0);
                 break;
             }
             case FunctionSingleArgSpace::Always: {
-                SpaceLeft(n, t, 1);
+                SpaceLeft(firstToken, t, 1);
                 break;
             }
             case FunctionSingleArgSpace::Keep: {
-                SpaceIgnore(n);
+                SpaceIgnore(firstToken);
                 break;
             }
             default: {
@@ -439,15 +439,15 @@ void SpaceAnalyzer::FunctionCallSingleArgSpace(FormatState &f, LuaSyntaxNode n, 
     } else {
         switch (f.GetStyle().space_before_function_call_single_arg.table) {
             case FunctionSingleArgSpace::None: {
-                SpaceLeft(n, t, 0);
+                SpaceLeft(firstToken, t, 0);
                 break;
             }
             case FunctionSingleArgSpace::Always: {
-                SpaceLeft(n, t, 1);
+                SpaceLeft(firstToken, t, 1);
                 break;
             }
             case FunctionSingleArgSpace::Keep: {
-                SpaceIgnore(n);
+                SpaceIgnore(firstToken);
                 break;
             }
             default: {
