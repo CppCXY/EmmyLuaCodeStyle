@@ -31,6 +31,7 @@ The configurable items are:
 * require_module_name_style
 * class_name_style
 * const_variable_name_style
+* module_local_name_style (variables without additional scope, setting defaults to the one of `local_name_style` if not set)
 
 The format of each configurable item is the same, and the configurable value of each configurable item supports the following formats:
 * Single string Example:
