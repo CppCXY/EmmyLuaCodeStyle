@@ -104,7 +104,8 @@ void LuaDiagnosticStyle::ParseTree(InfoTree &tree) {
             {global_variable_name_style, "global_variable_name_style"},
             {module_name_style,          "module_name_style"         },
             {require_module_name_style,  "require_module_name_style" },
-            {class_name_style,           "class_name_style"          }
+            {class_name_style,           "class_name_style"          },
+            {const_variable_name_style,  "const_variable_name_style" }
     };
     for (auto &pair: name_styles) {
         if (auto n = root.GetValue(pair.second); !n.IsNull()) {
