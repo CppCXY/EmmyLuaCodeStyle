@@ -122,16 +122,16 @@ void LuaDiagnosticStyle::ParseTree(InfoTree &tree) {
     }
     // module_local_name_style should fallback on local_name_style if not defined
     if (root.GetValue("module_local_name_style").IsNull() && !root.GetValue("local_name_style").IsNull()) {
-        auto module_local_name_style_pair = std::find_if(name_styles.begin(), name_styles.end(), [&](const auto &pair) {
+        auto moduleLocalNameStyle = std::find_if(name_styles.begin(), name_styles.end(), [&](const std::pair<std::vector<NameStyleRule> &, std::string> &pair) {
             return pair.second == "module_local_name_style";
         });
-        auto local_name_style_pair = std::find_if(name_styles.begin(), name_styles.end(), [&](const auto &pair) {
+        auto localNameStyle = std::find_if(name_styles.begin(), name_styles.end(), [&](const std::pair<std::vector<NameStyleRule> &, std::string> &pair) {
             return pair.second == "local_name_style";
         });
 
         // overwrite the namestyle of module_local_name_style with the namestyle of local_name_style
-        if (module_local_name_style_pair != name_styles.end() && local_name_style_pair != name_styles.end()) {
-            module_local_name_style_pair->first = local_name_style_pair->first;
+        if (moduleLocalNameStyle != name_styles.end() && localNameStyle != name_styles.end()) {
+            moduleLocalNameStyle->first = localNameStyle->first;
         }
     }
 }
