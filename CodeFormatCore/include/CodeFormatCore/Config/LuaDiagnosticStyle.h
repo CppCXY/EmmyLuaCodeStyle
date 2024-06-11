@@ -48,4 +48,6 @@ public:
     std::vector<NameStyleRule> const_variable_name_style = {
             NameStyleRule(NameStyleType::SnakeCase),
             NameStyleRule(NameStyleType::UpperSnakeCase)};
+
+    std::vector<NameStyleRule> module_local_name_style = {NameStyleRule(NameStyleType::SnakeCase)};
 };

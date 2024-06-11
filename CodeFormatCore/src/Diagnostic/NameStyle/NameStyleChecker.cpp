@@ -152,6 +152,12 @@ void NameStyleChecker::CheckInBody(LuaSyntaxNode &n, const LuaSyntaxTree &t) {
                             }
 
                             if (!matchConstRule) {
+                                // check for non-special, non-const variables that are in the outermost scope
+                                if (_scopeStack.size() == 1) {
+                                    PushStyleCheck(NameDefineType::ModuleLocalVariableName, name);
+                                    break;
+                                }
+
                                 PushStyleCheck(NameDefineType::LocalVariableName, name);
                             }
                         }
@@ -456,6 +462,15 @@ void NameStyleChecker::Diagnostic(DiagnosticBuilder &d, const LuaSyntaxTree &t) 
                                      n.GetTextRange(t),
                                      MakeDiagnosticInfo("ConstVariableName", n, t,
                                                         state.GetDiagnosticStyle().const_variable_name_style));
+                }
+                break;
+            }
+            case NameDefineType::ModuleLocalVariableName: {
+                if (!matcher.Match(n, t, state.GetDiagnosticStyle().module_local_name_style)) {
+                    d.PushDiagnostic(DiagnosticType::NameStyle,
+                                     n.GetTextRange(t),
+                                     MakeDiagnosticInfo("ModuleLocalVariableName", n, t,
+                                                        state.GetDiagnosticStyle().module_local_name_style));
                 }
                 break;
             }
