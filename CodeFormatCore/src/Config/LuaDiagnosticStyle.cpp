@@ -104,7 +104,9 @@ void LuaDiagnosticStyle::ParseTree(InfoTree &tree) {
             {global_variable_name_style, "global_variable_name_style"},
             {module_name_style,          "module_name_style"         },
             {require_module_name_style,  "require_module_name_style" },
-            {class_name_style,           "class_name_style"          }
+            {class_name_style,           "class_name_style"          },
+            {const_variable_name_style,  "const_variable_name_style" },
+            {module_local_name_style,    "module_local_name_style"   }
     };
     for (auto &pair: name_styles) {
         if (auto n = root.GetValue(pair.second); !n.IsNull()) {
@@ -116,6 +118,20 @@ void LuaDiagnosticStyle::ParseTree(InfoTree &tree) {
             } else {
                 pair.first.push_back(MakeNameStyle(n));
             }
+        }
+    }
+    // module_local_name_style should fallback on local_name_style if not defined
+    if (root.GetValue("module_local_name_style").IsNull() && !root.GetValue("local_name_style").IsNull()) {
+        auto moduleLocalNameStyle = std::find_if(name_styles.begin(), name_styles.end(), [&](const std::pair<std::vector<NameStyleRule> &, std::string> &pair) {
+            return pair.second == "module_local_name_style";
+        });
+        auto localNameStyle = std::find_if(name_styles.begin(), name_styles.end(), [&](const std::pair<std::vector<NameStyleRule> &, std::string> &pair) {
+            return pair.second == "local_name_style";
+        });
+
+        // overwrite the namestyle of module_local_name_style with the namestyle of local_name_style
+        if (moduleLocalNameStyle != name_styles.end() && localNameStyle != name_styles.end()) {
+            moduleLocalNameStyle->first = localNameStyle->first;
         }
     }
 }

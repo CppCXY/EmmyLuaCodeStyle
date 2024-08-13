@@ -7,9 +7,9 @@ Naming style checking supports checking based on basic nomenclature and regular 
 * upper-snake-case
 * pattern
 
-## configuration
+## Configuration
 
-To enable naming style checking, you need to add configuration in settings:
+To enable naming style checking, you need to add the following configuration in the settings:
 ```json
 "emmylua.lint.nameStyle": true
 ```
@@ -31,6 +31,7 @@ The configurable items are:
 * require_module_name_style
 * class_name_style
 * const_variable_name_style
+* module_local_name_style (variables without additional scope, setting defaults to the one of `local_name_style` if not set)
 
 The format of each configurable item is the same, and the configurable value of each configurable item supports the following formats:
 * Single string Example:
@@ -80,7 +81,9 @@ Regular expressions support capture groups and then match basic nomenclature:
 
 Where `"$1": "camel_case"` means that the content of the first capture group needs to match the `camel_case` nomenclature
 
-* Supports mixed arrays of table structures and strings For example:
+* Supports mixed arrays of table structures and strings
+
+For example:
 
 ```json
 "local_name_style": [
@@ -93,4 +96,144 @@ Where `"$1": "camel_case"` means that the content of the first capture group nee
          "$1": "camel_case"
      }
 ]
+```
+
+## Examples for the configurable items
+
+The following list shows which elements each configurable item targets with a small code example, and lists the default configuration.
+
+### `local_name_style`
+
+> Default: `snake_case`
+
+Checked name in the following example is `result`. Note that
+`some_value` is checked by `module_local_name_style` because of its scope.
+
+```Lua
+local some_value = 42
+
+local function sum(first_value, second_value)
+    local result = first_value + second_value
+    return result
+end
+```
+
+### `function_param_name_style`
+
+> Default: `snake_case`
+
+Checked names in the following example are `first_value` and `second_value`.
+
+```Lua
+local function sum(first_value, second_value)
+    local result = first_value + second_value
+    return result
+end
+```
+
+### `function_name_style`
+
+> Default: `snake_case`
+
+Checked name in the following example is `some_action`.
+
+```Lua
+function some_action() 
+    return 0
+end
+```
+
+### `local_function_name_style`
+
+> Default: `snake_case`
+
+Checked name in the following example is `calculate_square`.
+
+```Lua
+local function calculate_square(x)
+  return x * x
+end
+```
+
+### `table_field_name_style`
+
+> Default: `snake_case`
+
+Checked names in the following example are `first_name` and `last_name`.
+
+```Lua
+local person = {}
+person.first_name = "John"
+person.last_name = "Doe"
+```
+
+### `global_variable_name_style`
+
+> Default: `snake_case` and `upper_snake_case`
+
+Checked name in the following example is `MAX_ELEMENTS`.
+
+```Lua
+MAX_ELEMENTS = 100
+```
+
+### `module_name_style`
+
+> Default: `snake_case`
+
+Checked name in the following example is `my_module`.
+
+```Lua
+local my_module = {}
+
+-- [...]
+
+return my_module
+```
+
+### `require_module_name_style`
+
+> Default: `snake_case` and `pascal_case`
+
+Checked name in the following example is `util_module`.
+
+```Lua
+local util_module = require("util_module")
+local data_module = import("data_module")
+```
+
+### `class_name_style`
+
+> Default: `snake_case` and `pascal_case`
+
+Checked name in the following example is `person`.
+
+```Lua
+local person = Class()
+```
+
+### `const_variable_name_style`
+
+> Default: `snake_case` and `upper_snake_case`
+
+Checked name in the following example is `PI`.
+
+```Lua
+local PI <const> = 3.14
+```
+
+### `module_local_name_style`
+
+> Default: Fallback on current `local_name_style` configuration
+
+Checked names in the following example are `some_value` and `data`.
+
+```Lua
+local some_value = 42
+local data = {}
+
+local function sum(first_value, second_value)
+    local result = first_value + second_value
+    return result
+end
 ```

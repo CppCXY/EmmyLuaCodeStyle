@@ -1147,3 +1147,31 @@ only_latin = {
 }
 )", style));
 }
+
+TEST(Format, issue_170) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+--[[]]
+)",
+            R"(
+--[[]]
+)"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+--[[]]--
+)",
+            R"(
+--[[]] --
+)"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+--[[-----------
+
+]]-------------
+)",
+            R"(
+--[[-----------
+
+]] -------------
+)"));
+}

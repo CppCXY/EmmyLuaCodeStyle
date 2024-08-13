@@ -18,8 +18,8 @@ enum class CallArgParentheses : int {
     Remove,
     RemoveStringOnly,
     RemoveTableOnly,
-    // 应该没人用
-    //UnambiguousRemoveStringOnly
+    Always
+
 };
 
 enum class ContinuousAlign {

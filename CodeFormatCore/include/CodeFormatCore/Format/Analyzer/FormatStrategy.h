@@ -27,6 +27,10 @@ enum class TokenStrategy {
     OriginRange,
     StmtEndSemicolon,
     NewLineBeforeToken,
+
+    WithParentheses,
+    WithLeftParentheses,
+    WithRightParentheses,
     SpaceAfterCommentDash
 };
 
@@ -34,7 +38,7 @@ enum class TokenAddStrategy {
     None,
     TableAddColon,
     TableAddComma,
-    StmtEndSemicolon
+    StmtEndSemicolon,
 };
 
 enum class IndentStrategy {
