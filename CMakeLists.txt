@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 option(BuildAsLuaLib "Build for lua dll" OFF)
 option(BuildCodeFormat "Build CodeFormat" ON)
 option(BuildCodeFormatServer "Build CodeFormatServer" ON)
+option(BuildCodeFormatCSharpLib "Build CodeFormatCSharpLib" ON)
 option(EnableTest "Test project" ON)
 
 if(APPLE)
@@ -22,7 +23,6 @@ if(APPLE)
 endif ()
 
 add_subdirectory(LuaParser)
-#add_subdirectory(LuaCompile)
 add_subdirectory(CodeFormatCore)
 add_subdirectory(Util)
 
@@ -36,6 +36,10 @@ endif()
 
 if(BuildCodeFormatServer)
 	add_subdirectory(CodeFormatServer)
+endif()
+
+if(BuildCodeFormatCSharpLib)
+	add_subdirectory(CodeFormatCSharpLib)
 endif()
 
 if(EnableTest)

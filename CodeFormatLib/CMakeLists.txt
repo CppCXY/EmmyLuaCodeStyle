@@ -4,6 +4,7 @@ project(CodeFormatLib)
 
 add_library(CodeFormatLib SHARED)
 
+
 add_subdirectory(${LuaCodeStyle_SOURCE_DIR}/3rd/lua-5.4.3 lua.out)
 
 set_target_properties(CodeFormatLib PROPERTIES OUTPUT_NAME code_format)
