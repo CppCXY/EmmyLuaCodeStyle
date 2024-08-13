@@ -44,4 +44,9 @@ EMMY_API void UpdateCodeStyle(const char *workspaceUri, const char *configPath) 
     CodeFormat &codeFormat = CodeFormat::GetInstance();
     codeFormat.UpdateCodeStyle(workspaceUri, configPath);
 }
+
+EMMY_API void RemoveCodeStyle(const char *workspaceUri) {
+    CodeFormat &codeFormat = CodeFormat::GetInstance();
+    codeFormat.RemoveCodeStyle(workspaceUri);
+}
 }
