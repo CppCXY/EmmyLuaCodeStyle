@@ -36,7 +36,7 @@ jobs:
     - name: Prepare Linux-aarch64
       if: ${{ matrix.target == 'linux' && matrix.platform == 'linux-aarch64' }}
       run: |
-        sudo apt-get install -y ppa:ubuntu-toolchain-r/test
+        sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         sudo apt-get install -y gcc-11-aarch64-linux-gnu g++-11-aarch64-linux-gnu
         echo "CC=aarch64-linux-gnu-gcc-11" >> $GITHUB_ENV
         echo "CXX=aarch64-linux-gnu-g++-11" >> $GITHUB_ENV
@@ -56,7 +56,7 @@ jobs:
         mkdir build
         cd build
         cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --config Release --verbose
+        cmake --build . --config Release
         ctest -V -C Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
     - name: Build-Linux-aarch64
@@ -65,7 +65,7 @@ jobs:
         mkdir build
         cd build
         cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --config Release --verbose
+        cmake --build . --config Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
     - name: Build-macosx
       if: startsWith(matrix.os, 'macos')
@@ -77,7 +77,7 @@ jobs:
         else
           cmake .. -DBUILD_GMOCK=OFF -DINSTALL_GTEST=OFF -DCMAKE_BUILD_TYPE=Release
         fi
-        cmake --build . --config Release --verbose
+        cmake --build . --config Release
         ctest -V -C Release
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
 
