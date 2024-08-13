@@ -22,6 +22,8 @@ if(APPLE)
 	message("arm64Supported=${arm64Supported}")
 endif ()
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 add_subdirectory(LuaParser)
 add_subdirectory(CodeFormatCore)
 add_subdirectory(Util)

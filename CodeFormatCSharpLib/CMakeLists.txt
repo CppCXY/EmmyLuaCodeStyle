@@ -14,8 +14,4 @@ target_sources(CodeFormatCSharpLib
         src/CodeFormat.cpp
 )
 
-if (NOT WIN32)
-    target_compile_options(CodeFormatCSharpLib PUBLIC -fPIC)
-endif ()
-
 target_link_libraries(CodeFormatCSharpLib PUBLIC CodeFormatCore)
