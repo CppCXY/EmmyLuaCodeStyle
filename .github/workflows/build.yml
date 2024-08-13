@@ -29,12 +29,14 @@ jobs:
     - name: Prepare Linux-64
       if: ${{ matrix.target == 'linux' && matrix.platform == 'linux-x64' }}
       run: |
+        sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         sudo apt-get install -y gcc-11 g++-11
         echo "CC=gcc-11" >> $GITHUB_ENV
         echo "CXX=g++-11" >> $GITHUB_ENV
     - name: Prepare Linux-aarch64
       if: ${{ matrix.target == 'linux' && matrix.platform == 'linux-aarch64' }}
       run: |
+        sudo apt-get install -y ppa:ubuntu-toolchain-r/test
         sudo apt-get install -y gcc-11-aarch64-linux-gnu g++-11-aarch64-linux-gnu
         echo "CC=aarch64-linux-gnu-gcc-11" >> $GITHUB_ENV
         echo "CXX=aarch64-linux-gnu-g++-11" >> $GITHUB_ENV
