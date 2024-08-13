@@ -57,7 +57,7 @@ void CodeFormat::SupportNonStandardSymbol() {
     _supportNonStandardSymbol = true;
 }
 
-Result<char*> CodeFormat::Reformat(const std::string &uri, std::string &&text) {
+Result<char *> CodeFormat::Reformat(const std::string &uri, std::string &&text) {
     auto file = std::make_shared<LuaSource>(std::move(text));
     LuaLexer luaLexer(file);
     if (_supportNonStandardSymbol) {
@@ -85,14 +85,14 @@ Result<char*> CodeFormat::Reformat(const std::string &uri, std::string &&text) {
 
     auto result = f.GetFormatResult(t);
     // 由于可能存在sso string，所以需要拷贝一份
-    char* ptr = new char[result.size() + 1];
+    char *ptr = new char[result.size() + 1];
     std::copy(result.begin(), result.end(), ptr);
-    ptr[result.size()] = '\0'; // [result.size()] = '\0'
+    ptr[result.size()] = '\0';// [result.size()] = '\0'
     return ptr;
 }
 
 Result<RangeFormatResult> CodeFormat::RangeFormat(const std::string &uri, FormatRange &range,
-                                            std::string &&text) {
+                                                  std::string &&text) {
     auto file = std::make_shared<LuaSource>(std::move(text));
     LuaLexer luaLexer(file);
     if (_supportNonStandardSymbol) {
@@ -121,16 +121,15 @@ Result<RangeFormatResult> CodeFormat::RangeFormat(const std::string &uri, Format
     auto formattedText = f.GetFormatResult(t);
     range = f.GetReplaceRange();
 
-    char* ptr = new char[formattedText.size() + 1];
+    char *ptr = new char[formattedText.size() + 1];
     std::copy(formattedText.begin(), formattedText.end(), ptr);
-    ptr[formattedText.size()] = '\0'; // [formattedText.size()] = '\0'
+    ptr[formattedText.size()] = '\0';// [formattedText.size()] = '\0'
     return RangeFormatResult{
-        static_cast<int>(range.StartLine),
-        static_cast<int>(range.StartCol),
-        static_cast<int>(range.EndLine),
-        static_cast<int>(range.EndCol),
-        ptr
-    };
+            static_cast<int>(range.StartLine),
+            static_cast<int>(range.StartCol),
+            static_cast<int>(range.EndLine),
+            static_cast<int>(range.EndCol),
+            ptr};
 }
 
 Result<std::vector<LuaTypeFormat::Result>>

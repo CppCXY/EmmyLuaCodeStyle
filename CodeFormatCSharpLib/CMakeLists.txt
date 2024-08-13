@@ -15,3 +15,9 @@ target_sources(CodeFormatCSharpLib
 )
 
 target_link_libraries(CodeFormatCSharpLib PUBLIC CodeFormatCore)
+
+install(TARGETS CodeFormatCSharpLib
+		RUNTIME DESTINATION bin
+		LIBRARY DESTINATION lib
+		ARCHIVE DESTINATION lib
+)
