@@ -39,9 +39,9 @@ jobs:
       run: |
         sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         sudo apt-get update
-        sudo apt-get install -y gcc-11-aarch64-linux-gnu g++-11-aarch64-linux-gnu
-        echo "CC=aarch64-linux-gnu-gcc-11" >> $GITHUB_ENV
-        echo "CXX=aarch64-linux-gnu-g++-11" >> $GITHUB_ENV
+        sudo apt-get install -y gcc-10-aarch64-linux-gnu g++-10-aarch64-linux-gnu
+        echo "CC=aarch64-linux-gnu-gcc-10" >> $GITHUB_ENV
+        echo "CXX=aarch64-linux-gnu-g++-10" >> $GITHUB_ENV
 
     - name: Build-Windows
       if: startsWith(matrix.os, 'windows')
