@@ -112,6 +112,7 @@ bool LuaCheck::CheckSingleFile(const FormatContext &context, std::string_view pa
 
 bool LuaCheck::CheckWorkspace(const FormatContext &context) {
     auto workspace = context.GetWorkspace();
+    bool diagnosis = false;
     FileFinder finder(workspace);
     finder.AddFindExtension(".lua");
     finder.AddFindExtension(".lua.txt");
@@ -136,10 +137,12 @@ bool LuaCheck::CheckWorkspace(const FormatContext &context) {
             auto style = context.GetStyle(relativePath);
             if (CheckSingleFile(context, relativePath, std::move(opText.value()), style)) {
                 std::cerr << util::format("Check {} ok.", relativePath) << std::endl;
+            } else {
+                diagnosis = true;
             }
         } else {
             std::cerr << util::format("Can not read file {}", relativePath) << std::endl;
         }
     }
-    return true;
+    return !diagnosis;
 }
