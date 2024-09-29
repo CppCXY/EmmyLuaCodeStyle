@@ -4,7 +4,7 @@ FormatResolve::FormatResolve()
     : _nextSpaceStrategy(NextSpaceStrategy::None),
       _prevSpaceStrategy(PrevSpaceStrategy::None),
       _tokenStrategy(TokenStrategy::Origin),
-      _tokenAddStrategy(TokenAddStrategy::None),
+      _nextAddStrategy(NextTokenStrategy::None),
       _indentStrategy(IndentStrategy::None),
       _nextSpaceData(),
       _prevSpaceData(),
@@ -19,12 +19,16 @@ PrevSpaceStrategy FormatResolve::GetPrevSpaceStrategy() const {
     return _prevSpaceStrategy;
 }
 
+PrevTokenStrategy FormatResolve::GetPrevTokenStrategy() const {
+    return _prevTokenStrategy;
+}
+
 TokenStrategy FormatResolve::GetTokenStrategy() const {
     return _tokenStrategy;
 }
 
-TokenAddStrategy FormatResolve::GetTokenAddStrategy() const {
-    return _tokenAddStrategy;
+NextTokenStrategy FormatResolve::GetNextTokenStrategy() const {
+    return _nextAddStrategy;
 }
 
 IndentStrategy FormatResolve::GetIndentStrategy() const {
@@ -32,10 +36,12 @@ IndentStrategy FormatResolve::GetIndentStrategy() const {
 }
 
 void FormatResolve::Reset() {
-    _tokenStrategy = TokenStrategy::Origin;
-    _tokenAddStrategy = TokenAddStrategy::None;
-    _nextSpaceStrategy = NextSpaceStrategy::None;
     _prevSpaceStrategy = PrevSpaceStrategy::None;
+    _prevTokenStrategy = PrevTokenStrategy::None;
+    _tokenStrategy = TokenStrategy::Origin;
+    _nextAddStrategy = NextTokenStrategy::None;
+    _nextSpaceStrategy = NextSpaceStrategy::None;
+
     _indentStrategy = IndentStrategy::None;
     _nextSpaceData = NextData();
     _prevSpaceData = PrevData();
@@ -88,8 +94,12 @@ void FormatResolve::SetTokenStrategy(TokenStrategy strategy) {
     _tokenStrategy = strategy;
 }
 
-void FormatResolve::SetTokenAddStrategy(TokenAddStrategy strategy) {
-    _tokenAddStrategy = strategy;
+void FormatResolve::SetPrevTokenStrategy(PrevTokenStrategy strategy) {
+    _prevTokenStrategy = strategy;
+}
+
+void FormatResolve::SetNextTokenStrategy(NextTokenStrategy strategy) {
+    _nextAddStrategy = strategy;
 }
 
 void FormatResolve::SetOriginRange(IndexRange range) {

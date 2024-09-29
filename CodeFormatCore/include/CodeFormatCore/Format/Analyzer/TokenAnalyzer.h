@@ -13,9 +13,11 @@ public:
 
     void Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) override;
 
+    void MarkPrev(LuaSyntaxNode n, const LuaSyntaxTree &t, PrevTokenStrategy strategy);
+
     void Mark(LuaSyntaxNode n, const LuaSyntaxTree &t, TokenStrategy strategy);
 
-    void MarkAdd(LuaSyntaxNode n, const LuaSyntaxTree &t, TokenAddStrategy strategy);
+    void MarkNext(LuaSyntaxNode n, const LuaSyntaxTree &t, NextTokenStrategy strategy);
 
     bool IsRemove(LuaSyntaxNode n, const LuaSyntaxTree &t) const;
 
@@ -29,5 +31,6 @@ private:
     void AnalyzeComment(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t);
 
     std::unordered_map<std::size_t, TokenStrategy> _tokenStrategies;
-    std::unordered_map<std::size_t, TokenAddStrategy> _tokenAddStrategies;
+    std::unordered_map<std::size_t, NextTokenStrategy> _nextTokenStrategies;
+    std::unordered_map<std::size_t, PrevTokenStrategy> _prevTokenStrategies;
 };

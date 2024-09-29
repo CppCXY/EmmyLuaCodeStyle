@@ -1175,3 +1175,20 @@ TEST(Format, issue_170) {
 ]] -------------
 )"));
 }
+
+TEST(Format, issue_186) {
+    LuaStyle style;
+    style.call_arg_parentheses = CallArgParentheses::Always;
+    style.quote_style = QuoteStyle::Double;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+foo 'a'
+foo "b"
+foo {}
+)",
+            R"(
+foo("a")
+foo("b")
+foo({})
+)", style));
+}

@@ -15,7 +15,8 @@ enum class DiagnosticType {
     Indent,
     Semicolon,
     NameStyle,
-    Spell
+    Spell,
+    Parentheses,
 };
 
 class LuaDiagnostic {

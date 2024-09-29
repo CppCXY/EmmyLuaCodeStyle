@@ -66,6 +66,9 @@ DiagnosticService::Diagnostic(std::size_t fileId,
                 diag.severity = lsp::DiagnosticSeverity::Warning;
                 break;
             }
+            case DiagnosticType::Parentheses: {
+                diag.severity = lsp::DiagnosticSeverity::Warning;
+            }
             case DiagnosticType::NameStyle: {
                 diag.severity = lsp::DiagnosticSeverity::Information;
                 break;

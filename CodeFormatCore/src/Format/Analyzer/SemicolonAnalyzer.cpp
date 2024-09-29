@@ -63,7 +63,7 @@ void SemicolonAnalyzer::Query(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTr
         auto &strategy = it->second;
         switch (strategy) {
             case SemicolonStrategy::Add: {
-                resolve.SetTokenAddStrategy(TokenAddStrategy::StmtEndSemicolon);
+                resolve.SetNextTokenStrategy(NextTokenStrategy::StmtEndSemicolon);
                 break;
             }
             case SemicolonStrategy::Remove: {

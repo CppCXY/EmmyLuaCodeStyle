@@ -64,24 +64,33 @@ void TokenAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
 
 void TokenAnalyzer::Query(FormatState &f, LuaSyntaxNode syntaxNode, const LuaSyntaxTree &t, FormatResolve &resolve) {
     if (syntaxNode.IsToken(t)) {
+        auto itPrev = _prevTokenStrategies.find(syntaxNode.GetIndex());
+        if (itPrev != _prevTokenStrategies.end()) {
+            resolve.SetPrevTokenStrategy(itPrev->second);
+        }
+
         auto it = _tokenStrategies.find(syntaxNode.GetIndex());
         if (it != _tokenStrategies.end()) {
             resolve.SetTokenStrategy(it->second);
         }
 
-        auto it2 = _tokenAddStrategies.find(syntaxNode.GetIndex());
-        if (it2 != _tokenAddStrategies.end()) {
-            resolve.SetTokenAddStrategy(it2->second);
+        auto itNext = _nextTokenStrategies.find(syntaxNode.GetIndex());
+        if (itNext != _nextTokenStrategies.end()) {
+            resolve.SetNextTokenStrategy(itNext->second);
         }
     }
+}
+
+void TokenAnalyzer::MarkPrev(LuaSyntaxNode n, const LuaSyntaxTree &t, PrevTokenStrategy strategy) {
+    _prevTokenStrategies[n.GetIndex()] = strategy;
 }
 
 void TokenAnalyzer::Mark(LuaSyntaxNode n, const LuaSyntaxTree &t, TokenStrategy strategy) {
     _tokenStrategies[n.GetIndex()] = strategy;
 }
 
-void TokenAnalyzer::MarkAdd(LuaSyntaxNode n, const LuaSyntaxTree &t, TokenAddStrategy strategy) {
-    _tokenAddStrategies[n.GetIndex()] = strategy;
+void TokenAnalyzer::MarkNext(LuaSyntaxNode n, const LuaSyntaxTree &t, NextTokenStrategy strategy) {
+    _nextTokenStrategies[n.GetIndex()] = strategy;
 }
 
 bool TokenAnalyzer::IsRemove(LuaSyntaxNode n, const LuaSyntaxTree &t) const {
@@ -101,16 +110,16 @@ void TokenAnalyzer::TableFieldAddSep(FormatState &f, LuaSyntaxNode n, const LuaS
         }
         switch (f.GetStyle().table_separator_style) {
             case TableSeparatorStyle::Semicolon: {
-                return MarkAdd(lastToken, t, TokenAddStrategy::TableAddColon);
+                return MarkNext(lastToken, t, NextTokenStrategy::TableAddColon);
             }
             case TableSeparatorStyle::OnlyKVColon: {
                 if (n.GetChildToken('=', t).IsToken(t)) {
-                    return MarkAdd(lastToken, t, TokenAddStrategy::TableAddColon);
+                    return MarkNext(lastToken, t, NextTokenStrategy::TableAddColon);
                 }
                 // fallthrough
             }
             default: {
-                return MarkAdd(lastToken, t, TokenAddStrategy::TableAddComma);
+                return MarkNext(lastToken, t, NextTokenStrategy::TableAddComma);
             }
         }
     }
@@ -270,15 +279,18 @@ void TokenAnalyzer::AnalyzeCallExpression(FormatState &f, LuaSyntaxNode n, const
                 if (!lbrace.IsToken(t) && spaceAnalyzer) {
                     auto node = GetSingleArgStringOrTable(n, t);
                     if (node.IsToken(t)) {
-                        Mark(node, t, TokenStrategy::WithParentheses);
+                        MarkPrev(node, t, PrevTokenStrategy::LeftParentheses);
+                        MarkNext(node, t, NextTokenStrategy::RightParentheses);
                         spaceAnalyzer->SpaceAround(node, t, 0, SpaceAnalyzer::SpacePriority::First);
                     } else if (node.GetSyntaxKind(t) == LuaSyntaxNodeKind::StringLiteralExpression) {
-                        Mark(node.GetFirstToken(t), t, TokenStrategy::WithParentheses);
+                        auto firstToken = node.GetFirstToken(t);
+                        MarkPrev(firstToken, t, PrevTokenStrategy::LeftParentheses);
+                        MarkNext(firstToken, t, NextTokenStrategy::RightParentheses);
                         spaceAnalyzer->SpaceLeft(node.GetFirstToken(t), t, 0, SpaceAnalyzer::SpacePriority::First);
                     } else {
-                        Mark(node.GetFirstToken(t), t, TokenStrategy::WithLeftParentheses);
+                        MarkPrev(node.GetFirstToken(t), t, PrevTokenStrategy::LeftParentheses);
+                        MarkNext(node.GetLastToken(t), t, NextTokenStrategy::RightParentheses);
                         spaceAnalyzer->SpaceLeft(node.GetFirstToken(t), t, 0, SpaceAnalyzer::SpacePriority::First);
-                        Mark(node.GetLastToken(t), t, TokenStrategy::WithRightParentheses);
                     }
 
                     return;
@@ -310,3 +322,5 @@ void TokenAnalyzer::AnalyzeComment(FormatState &f, LuaSyntaxNode n, const LuaSyn
         }
     }
 }
+
+

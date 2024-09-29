@@ -75,6 +75,16 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
             }
         }
 
+        switch (resolve.GetPrevTokenStrategy()) {
+            case PrevTokenStrategy::LeftParentheses: {
+                WriteChar('(');
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
         switch (resolve.GetTokenStrategy()) {
             case TokenStrategy::Origin: {
                 WriteSyntaxNode(syntaxNode, t);
@@ -146,22 +156,6 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
                 WriteSyntaxNode(syntaxNode, t);
                 break;
             }
-            case TokenStrategy::WithParentheses: {
-                WriteChar('(');
-                WriteSyntaxNode(syntaxNode, t);
-                WriteChar(')');
-                break;
-            }
-            case TokenStrategy::WithLeftParentheses:{
-                WriteChar('(');
-                WriteSyntaxNode(syntaxNode, t);
-                break;
-            }
-            case TokenStrategy::WithRightParentheses: {
-                WriteSyntaxNode(syntaxNode, t);
-                WriteChar(')');
-                break;
-            }
             case TokenStrategy::SpaceAfterCommentDash: {
                 auto text = syntaxNode.GetText(t);
                 std::size_t pos = 0;
@@ -178,17 +172,21 @@ void FormatBuilder::DoResolve(LuaSyntaxNode &syntaxNode, const LuaSyntaxTree &t,
             }
         }
 
-        switch (resolve.GetTokenAddStrategy()) {
-            case TokenAddStrategy::TableAddComma: {
+        switch (resolve.GetNextTokenStrategy()) {
+            case NextTokenStrategy::TableAddComma: {
                 WriteChar(',');
                 break;
             }
-            case TokenAddStrategy::TableAddColon: {
+            case NextTokenStrategy::TableAddColon: {
                 WriteChar(';');
                 break;
             }
-            case TokenAddStrategy::StmtEndSemicolon: {
+            case NextTokenStrategy::StmtEndSemicolon: {
                 WriteChar(';');
+                break;
+            }
+            case NextTokenStrategy::RightParentheses: {
+                WriteChar(')');
                 break;
             }
             default: {

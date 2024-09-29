@@ -17,6 +17,12 @@ enum class PrevSpaceStrategy {
     LineBreak
 };
 
+enum class PrevTokenStrategy {
+    None,
+    LeftParentheses,
+
+};
+
 enum class TokenStrategy {
     Origin,
     Remove,
@@ -28,17 +34,18 @@ enum class TokenStrategy {
     StmtEndSemicolon,
     NewLineBeforeToken,
 
-    WithParentheses,
-    WithLeftParentheses,
-    WithRightParentheses,
+//    WithParentheses,
+//    WithLeftParentheses,
+//    WithRightParentheses,
     SpaceAfterCommentDash
 };
 
-enum class TokenAddStrategy {
+enum class NextTokenStrategy {
     None,
     TableAddColon,
     TableAddComma,
     StmtEndSemicolon,
+    RightParentheses,
 };
 
 enum class IndentStrategy {

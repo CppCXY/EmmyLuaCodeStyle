@@ -70,6 +70,17 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
             }
         }
 
+        switch (resolve.GetPrevTokenStrategy()) {
+            case PrevTokenStrategy::LeftParentheses: {
+                d.PushDiagnostic(DiagnosticType::Parentheses, textRange,
+                                 LText("expected ("));
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
         switch (resolve.GetTokenStrategy()) {
             case TokenStrategy::StringSingleQuote: {
                 if (syntaxNode.GetTokenKind(t) == TK_STRING) {
@@ -117,11 +128,16 @@ void CodeStyleChecker::BasicResolve(LuaSyntaxNode syntaxNode, const LuaSyntaxTre
             }
         }
 
-        switch (resolve.GetTokenAddStrategy()) {
-            case TokenAddStrategy::StmtEndSemicolon: {
+        switch (resolve.GetNextTokenStrategy()) {
+            case NextTokenStrategy::StmtEndSemicolon: {
                 d.PushDiagnostic(DiagnosticType::Semicolon,
                                  TextRange(textRange.GetEndOffset(), 1),
                                  LText("expected ; at end of statement"));
+                break;
+            }
+            case NextTokenStrategy::RightParentheses: {
+                d.PushDiagnostic(DiagnosticType::Parentheses, textRange,
+                                 LText("expected )"));
                 break;
             }
             default: {
@@ -271,7 +287,7 @@ void CodeStyleChecker::ProcessIndentDiagnostic(LuaSyntaxNode &node, const LuaSyn
         // if(state.GetStyle().indent_style)
         d.PushDiagnostic(DiagnosticType::Indent,
                          currentIndentRange,
-                         GetIndentNote(indent,checkIndent.Space, checkIndent.Tab, state.GetStyle().indent_style));
+                         GetIndentNote(indent, checkIndent.Space, checkIndent.Tab, state.GetStyle().indent_style));
     }
 }
 

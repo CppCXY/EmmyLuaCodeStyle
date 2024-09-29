@@ -16,6 +16,7 @@ bool CodeActionService::Initialize() {
     CodeProtocol(DiagnosticType::Indent, "code-indent", &CodeActionService::Reformat);
     CodeProtocol(DiagnosticType::Space, "whitespace", &CodeActionService::Reformat);
     CodeProtocol(DiagnosticType::StringQuote, "string-quote", &CodeActionService::Reformat);
+    CodeProtocol(DiagnosticType::Parentheses, "parentheses", &CodeActionService::Reformat);
     CodeProtocol(DiagnosticType::EndWithNewLine, "end-with-new-line");
     CodeProtocol(DiagnosticType::NameStyle, "name-style");
     CodeProtocol(DiagnosticType::Semicolon, "semicolon");
