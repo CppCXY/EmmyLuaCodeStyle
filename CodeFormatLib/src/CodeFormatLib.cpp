@@ -1,5 +1,14 @@
 ﻿#include "LuaCodeFormat.h"
+#ifdef LUAJIT
+extern "C" {
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+}
+#include "LuaJIT-Compact.h"
+#else
 #include "lua.hpp"
+#endif
 
 #ifdef _MSC_VER
 #define EXPORT __declspec(dllexport)

@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.14)
 
 project(CodeFormatLib)
 
-add_library(CodeFormatLib SHARED)
+add_library(CodeFormatLib SHARED
+        src/LuaJIT-Compact.h
+        src/LuaJIT-Compact.cpp)
 
 
 add_subdirectory(${LuaCodeStyle_SOURCE_DIR}/3rd/lua-5.4.3 lua.out)
@@ -20,6 +22,7 @@ target_sources(CodeFormatLib
         PRIVATE
         src/CodeFormatLib.cpp
         src/LuaCodeFormat.cpp
+        src/LuaJIT-Compact.cpp
 )
 
 if (NOT WIN32)
