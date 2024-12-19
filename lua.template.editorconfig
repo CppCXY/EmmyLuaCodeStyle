@@ -101,6 +101,7 @@ align_call_args = false
 
 align_function_params = true
 
+# false or always
 align_continuous_assign_statement = true
 
 align_continuous_rect_table_field = true
