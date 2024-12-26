@@ -1,7 +1,15 @@
 #pragma once
 
-#include <stdint.h> // 使用固定大小的整数类型
-#include <stddef.h> // 对于指针大小
+#include <cstdint> // 使用固定大小的整数类型
+#include <cstddef> // 对于指针大小
+#include <string_view>
+
+#include "CodeFormatCore/Config/LuaEditorConfig.h"
+#include "CodeFormatCore/Config/LuaStyle.h"
+#include "CodeFormatCore/Diagnostic/DiagnosticBuilder.h"
+#include "CodeFormatCore/Diagnostic/Spell/CodeSpellChecker.h"
+#include "CodeFormatCore/Format/FormatBuilder.h"
+#include "CodeFormatCore/TypeFormat/LuaTypeFormat.h"
 
 struct LuaConfig {
     explicit LuaConfig(std::string_view workspace)
@@ -20,8 +28,8 @@ struct LuaDiagnosticInfo {
     DiagnosticType Type;
     Position Start;
     Position End;
-    char* Message;
-    char* Data;
+    std::string Message;
+    std::string Data;
 };
 
 enum class ResultType {

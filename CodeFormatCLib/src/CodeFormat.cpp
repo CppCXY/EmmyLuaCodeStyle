@@ -57,8 +57,8 @@ void CodeFormat::SupportNonStandardSymbol() {
     _supportNonStandardSymbol = true;
 }
 
-char* CodeFormat::Reformat(const std::string &uri, const std::string &text, size_t &length) {
-    auto file = std::make_shared<LuaSource>(text);
+char *CodeFormat::Reformat(const std::string &uri, std::string &&text) {
+    auto file = LuaSource::From(std::move(text));
     LuaLexer luaLexer(file);
     if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
@@ -69,11 +69,10 @@ char* CodeFormat::Reformat(const std::string &uri, const std::string &text, size
 
     luaLexer.Parse();
 
-    LuaParser p(file, luaLexer.GetTokens());
+    LuaParser p(file, std::move(luaLexer.GetTokens()));
     p.Parse();
 
     if (p.HasError()) {
-        length = 0;
         return nullptr;
     }
 
@@ -85,18 +84,11 @@ char* CodeFormat::Reformat(const std::string &uri, const std::string &text, size
     FormatBuilder f(style);
 
     auto result = f.GetFormatResult(t);
-    length = result.size();
+    auto length = result.size();
     char *ptr = new char[length + 1];
     std::copy(result.begin(), result.end(), ptr);
     ptr[length] = '\0';
     return ptr;
-}
-
-void CodeFormat::FreeRangeFormatResult(RangeFormatResult &result) {
-    if (result.Text) {
-        delete[] result.Text;
-        result.Text = nullptr;
-    }
 }
 
 Result<RangeFormatResult> CodeFormat::RangeFormat(const std::string &uri, FormatRange &range,

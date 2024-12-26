@@ -30,11 +30,11 @@ public:
 
     void SupportNonStandardSymbol();
 
-    char* Reformat(const std::string &uri, const std::string &text, size_t &length); // 修改返回类型和参数
-    RangeFormatResult RangeFormat(const std::string &uri, FormatRange &range, const std::string &text);
-    void FreeRangeFormatResult(RangeFormatResult &result); // 提供释放函数
+    char *Reformat(const std::string &uri, std::string &&text);
 
-    void SupportCLikeComments(); // 添加支持 C 语言注释的函数
+    Result<RangeFormatResult> RangeFormat(const std::string &uri, FormatRange &range, std::string &&text);
+
+    void SupportCLikeComments();// 添加支持 C 语言注释的函数
 
     Result<std::vector<LuaTypeFormat::Result>>
     TypeFormat(const std::string &uri, std::size_t line, std::size_t character, std::string &&text);
@@ -42,6 +42,7 @@ public:
     Result<std::vector<LuaDiagnosticInfo>> Diagnostic(const std::string &uri, std::string &&text);
 
     LuaStyle &GetStyle(const std::string &uri);
+
 private:
     std::vector<LuaDiagnosticInfo> MakeDiagnosticInfo(const std::vector<LuaDiagnostic> &diagnostics,
                                                       std::shared_ptr<LuaSource> file);
@@ -53,4 +54,3 @@ private:
     bool _supportNonStandardSymbol;
     bool _supportCLikeComments;
 };
-
