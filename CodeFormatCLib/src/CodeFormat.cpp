@@ -57,8 +57,8 @@ void CodeFormat::SupportNonStandardSymbol() {
     _supportNonStandardSymbol = true;
 }
 
-Result<char *> CodeFormat::Reformat(const std::string &uri, std::string &&text) {
-    auto file = std::make_shared<LuaSource>(std::move(text));
+char* CodeFormat::Reformat(const std::string &uri, const std::string &text, size_t &length) {
+    auto file = std::make_shared<LuaSource>(text);
     LuaLexer luaLexer(file);
     if (_supportNonStandardSymbol) {
         luaLexer.SupportNonStandardSymbol();
@@ -69,11 +69,12 @@ Result<char *> CodeFormat::Reformat(const std::string &uri, std::string &&text) 
 
     luaLexer.Parse();
 
-    LuaParser p(file, std::move(luaLexer.GetTokens()));
+    LuaParser p(file, luaLexer.GetTokens());
     p.Parse();
 
     if (p.HasError()) {
-        return ResultType::Err;
+        length = 0;
+        return nullptr;
     }
 
     LuaSyntaxTree t;
@@ -84,11 +85,18 @@ Result<char *> CodeFormat::Reformat(const std::string &uri, std::string &&text) 
     FormatBuilder f(style);
 
     auto result = f.GetFormatResult(t);
-    // 由于可能存在sso string，所以需要拷贝一份
-    char *ptr = new char[result.size() + 1];
+    length = result.size();
+    char *ptr = new char[length + 1];
     std::copy(result.begin(), result.end(), ptr);
-    ptr[result.size()] = '\0';// [result.size()] = '\0'
+    ptr[length] = '\0';
     return ptr;
+}
+
+void CodeFormat::FreeRangeFormatResult(RangeFormatResult &result) {
+    if (result.Text) {
+        delete[] result.Text;
+        result.Text = nullptr;
+    }
 }
 
 Result<RangeFormatResult> CodeFormat::RangeFormat(const std::string &uri, FormatRange &range,

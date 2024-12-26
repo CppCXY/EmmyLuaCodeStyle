@@ -30,9 +30,11 @@ public:
 
     void SupportNonStandardSymbol();
 
-    Result<char*> Reformat(const std::string &uri, std::string &&text);
+    char* Reformat(const std::string &uri, const std::string &text, size_t &length); // 修改返回类型和参数
+    RangeFormatResult RangeFormat(const std::string &uri, FormatRange &range, const std::string &text);
+    void FreeRangeFormatResult(RangeFormatResult &result); // 提供释放函数
 
-    Result<RangeFormatResult> RangeFormat(const std::string &uri, FormatRange &range, std::string &&text);
+    void SupportCLikeComments(); // 添加支持 C 语言注释的函数
 
     Result<std::vector<LuaTypeFormat::Result>>
     TypeFormat(const std::string &uri, std::size_t line, std::size_t character, std::string &&text);

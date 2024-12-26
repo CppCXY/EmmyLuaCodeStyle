@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h> // 使用固定大小的整数类型
+#include <stddef.h> // 对于指针大小
 
 struct LuaConfig {
     explicit LuaConfig(std::string_view workspace)
@@ -10,16 +12,16 @@ struct LuaConfig {
 };
 
 struct Position {
-    std::size_t Line;
-    std::size_t Col;
+    uint32_t Line;
+    uint32_t Col;
 };
 
 struct LuaDiagnosticInfo {
     DiagnosticType Type;
     Position Start;
     Position End;
-    std::string Message;
-    std::string Data;
+    char* Message;
+    char* Data;
 };
 
 enum class ResultType {
@@ -41,9 +43,9 @@ public:
 };
 
 struct RangeFormatResult {
-    int StartLine = 0;
-    int StartCharacter = 0;
-    int EndLine = 0;
-    int EndCharacter = 0;
-    char *Text = nullptr;
+    int32_t StartLine;
+    int32_t StartCharacter;
+    int32_t EndLine;
+    int32_t EndCharacter;
+    char *Text;
 };
