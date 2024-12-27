@@ -10,7 +10,7 @@
 #else
 #define EMMY_API
 #endif
-#include "Types.h"
+#include "UtilTypes.h"
 
 extern "C" {
 

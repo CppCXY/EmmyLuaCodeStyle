@@ -10,7 +10,7 @@
 #include "CodeFormatCore/Diagnostic/Spell/CodeSpellChecker.h"
 #include "CodeFormatCore/Format/FormatBuilder.h"
 #include "CodeFormatCore/TypeFormat/LuaTypeFormat.h"
-#include "Types.h"
+#include "UtilTypes.h"
 
 class CodeFormat {
 public:

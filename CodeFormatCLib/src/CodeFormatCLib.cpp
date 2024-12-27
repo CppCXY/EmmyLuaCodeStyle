@@ -1,6 +1,6 @@
 #include "CodeFormatCLib.h"
 #include "CodeFormat.h"
-#include "Types.h"
+#include "UtilTypes.h"
 
 extern "C" {
 
