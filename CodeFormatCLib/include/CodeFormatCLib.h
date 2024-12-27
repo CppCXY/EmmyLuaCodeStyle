@@ -10,9 +10,16 @@
 #else
 #define EMMY_API
 #endif
-#include "UtilTypes.h"
 
 extern "C" {
+
+struct RangeFormatResult {
+    int32_t StartLine;
+    int32_t StartCharacter;
+    int32_t EndLine;
+    int32_t EndCharacter;
+    char *Text;
+};
 
 EMMY_API char *ReformatLuaCode(const char *code, const char *uri);
 

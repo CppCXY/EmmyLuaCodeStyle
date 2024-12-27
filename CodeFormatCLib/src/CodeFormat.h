@@ -11,6 +11,7 @@
 #include "CodeFormatCore/Format/FormatBuilder.h"
 #include "CodeFormatCore/TypeFormat/LuaTypeFormat.h"
 #include "UtilTypes.h"
+#include "CodeFormatCLib.h"
 
 class CodeFormat {
 public:

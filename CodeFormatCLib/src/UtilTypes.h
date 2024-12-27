@@ -50,10 +50,3 @@ public:
     T Data;
 };
 
-struct RangeFormatResult {
-    int32_t StartLine;
-    int32_t StartCharacter;
-    int32_t EndLine;
-    int32_t EndCharacter;
-    char *Text;
-};
