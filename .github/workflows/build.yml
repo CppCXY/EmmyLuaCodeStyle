@@ -23,7 +23,7 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: '20'
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         ref: refs/heads/master
     - name: Prepare Linux-64
@@ -84,7 +84,7 @@ jobs:
         cmake --install . --config Release --prefix ${{ github.workspace }}/artifact/
 
     - name: Upload
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with: 
         name: ${{ matrix.platform }}
         path: ${{ github.workspace }}/artifact/
