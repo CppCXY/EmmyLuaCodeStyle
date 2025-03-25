@@ -24,8 +24,8 @@
 #include "EditDistance.h"
 #include "SuggestItem.h"
 #include <map>
-#include <string>
-#include <string_view>
+#include <cstddef>
+#include <cstdint>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
