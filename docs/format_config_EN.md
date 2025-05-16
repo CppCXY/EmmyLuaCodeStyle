@@ -73,7 +73,7 @@ When quote_style = single or double, unescaped target quote types are not format
 ### call_arg_parentheses
 
 This option means that if the parameter in the call expression has only a single-string literal constant or a table expression, you can consider keeping or removing the parentheses.
-The optional value for this option is keep/remove/remove_table_only/remove_string_only and the default value is keep.
+The optional value for this option is keep/remove/remove_table_only/remove_string_only/always and the default value is keep.
 
 ```lua
 f("wfwefw")({ e1231313 })("1e1231313131")
@@ -91,6 +91,8 @@ f "wfwefw" { e1231313 } "1e1231313131"
 f("wfwefw") { e1231313 } ("1e1231313131")
 --remove_string_only
 f "wfwefw" ({ e1231313 }) "1e1231313131"
+--always
+f("wfwefw")({ e1231313 })("1e1231313131") -- enforce parentheses
 ```
 
 ### continuation_indent
