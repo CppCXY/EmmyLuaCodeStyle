@@ -13,5 +13,5 @@ int lua_isinteger(lua_State *L, int idx);
 int luaL_len(lua_State *L, int idx);
 
 int lua_geti(lua_State *L, int idx, lua_Integer n);
-#endif LUAJIT
+#endif
 #endif //LUAJIT_COMPACT_H
