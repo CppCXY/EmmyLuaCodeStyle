@@ -117,8 +117,8 @@ public:
     // [Indent]
 
     /*
-	 * if语句的条件可以无延续行缩进
-	 */
+     * if语句的条件可以无延续行缩进
+     */
     bool never_indent_before_if_condition = false;
 
     bool never_indent_comment_on_if_branch = false;
@@ -168,4 +168,7 @@ public:
     bool leading_comma_style = false;
 
     EndStmtWithSemicolon end_statement_with_semicolon = EndStmtWithSemicolon::Keep;
+
+    // [preference] Remove leading zero in floats between 0 and 1 (e.g., 0.5 -> .5)
+    bool remove_leading_zero_in_float = false;
 };
