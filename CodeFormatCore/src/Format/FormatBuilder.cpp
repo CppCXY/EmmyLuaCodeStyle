@@ -34,6 +34,30 @@ void FormatBuilder::WriteSyntaxNode(LuaSyntaxNode &syntaxNode, const LuaSyntaxTr
             WriteText(text);
             break;
         }
+        case TK_NUMBER: {
+            // Remove leading zero in floats between 0 and 1 if enabled
+            const auto &style = _state.GetStyle();
+            if (style.remove_leading_zero_in_float) {
+                // Handle positive and negative numbers
+                if (text.size() > 1 && text[0] == '0' && text[1] == '.') {
+                    // 0.xxx -> .xxx
+                    _state.CurrentWidth() += utf8::Utf8nLen(text.data() + 1, text.size() - 1);
+                    _formattedText.append(text.substr(1));
+                    break;
+                } else if (text.size() > 2 && text[0] == '-' && text[1] == '0' && text[2] == '.') {
+                    // -0.xxx -> -.xxx
+                    _state.CurrentWidth() += utf8::Utf8nLen(text.data(), 1); // '-'
+                    _state.CurrentWidth() += utf8::Utf8nLen(text.data() + 2, text.size() - 2);
+                    _formattedText.push_back('-');
+                    _formattedText.append(text.substr(2));
+                    break;
+                }
+            }
+            // Default behavior
+            _state.CurrentWidth() += syntaxNode.GetUtf8Length(t);
+            _formattedText.append(text);
+            break;
+        }
         default: {
             _state.CurrentWidth() += syntaxNode.GetUtf8Length(t);
             _formattedText.append(text);

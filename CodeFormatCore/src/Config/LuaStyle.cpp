@@ -409,4 +409,7 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
             end_statement_with_semicolon = EndStmtWithSemicolon::Never;
         }
     }
+
+    // Custom: remove_leading_zero_in_float
+    BOOL_OPTION(remove_leading_zero_in_float)
 }
