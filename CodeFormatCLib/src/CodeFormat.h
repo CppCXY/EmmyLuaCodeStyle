@@ -31,9 +31,9 @@ public:
 
     void SupportNonStandardSymbol();
 
-    char *Reformat(const std::string &uri, std::string &&text);
+    char *Reformat(const std::string &uri, std::string &&text, FormattingOptions options);
 
-    Result<RangeFormatResult> RangeFormat(const std::string &uri, FormatRange &range, std::string &&text);
+    Result<RangeFormatResult> RangeFormat(const std::string &uri, FormatRange &range, std::string &&text, FormattingOptions options);
 
     void SupportCLikeComments();// 添加支持 C 语言注释的函数
 
@@ -47,6 +47,8 @@ public:
 private:
     std::vector<LuaDiagnosticInfo> MakeDiagnosticInfo(const std::vector<LuaDiagnostic> &diagnostics,
                                                       std::shared_ptr<LuaSource> file);
+
+    void SetupStyle(LuaStyle &style, const FormattingOptions &options);
 
     std::vector<LuaConfig> _configs;
     LuaStyle _defaultStyle;

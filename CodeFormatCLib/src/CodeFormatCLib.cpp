@@ -4,20 +4,20 @@
 
 extern "C" {
 
-EMMY_API char *ReformatLuaCode(const char *code, const char *uri) {
+EMMY_API char *ReformatLuaCode(const char *code, const char *uri, FormattingOptions options) {
     CodeFormat &codeFormat = CodeFormat::GetInstance();
-    auto result = codeFormat.Reformat(uri, code);
+    auto result = codeFormat.Reformat(uri, code, options);
     return result;
 }
 
-EMMY_API RangeFormatResult RangeFormatLuaCode(const char *code, const char *uri, int startLine, int startCol, int endLine, int endCol) {
+EMMY_API RangeFormatResult RangeFormatLuaCode(const char *code, const char *uri, int startLine, int startCol, int endLine, int endCol, FormattingOptions options) {
     CodeFormat &codeFormat = CodeFormat::GetInstance();
     FormatRange range;
     range.StartLine = startLine;
     range.StartCol = startCol;
     range.EndLine = endLine;
     range.EndCol = endCol;
-    auto result = codeFormat.RangeFormat(uri, range, code);
+    auto result = codeFormat.RangeFormat(uri, range, code, options);
     if (result.Type == ResultType::Ok) {
         return result.Data;
     } else {

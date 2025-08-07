@@ -21,9 +21,19 @@ struct RangeFormatResult {
     char *Text;
 };
 
-EMMY_API char *ReformatLuaCode(const char *code, const char *uri);
+struct FormattingOptions {
+    uint32_t indent_size;
+    bool use_tabs;
+    bool insert_final_newline;
+    bool non_standard_symbol;
+};
 
-EMMY_API RangeFormatResult RangeFormatLuaCode(const char *code, const char *uri, int startLine, int startCol, int endLine, int endCol);
+EMMY_API char *
+ReformatLuaCode(const char *code, const char *uri, FormattingOptions options);
+
+EMMY_API RangeFormatResult RangeFormatLuaCode(const char *code, const char *uri,
+                                              int32_t startLine, int32_t startCol, int32_t endLine, int32_t endCol,
+                                              FormattingOptions options);
 
 EMMY_API void FreeReformatResult(char *ptr);
 
@@ -31,7 +41,7 @@ EMMY_API void UpdateCodeStyle(const char *workspaceUri, const char *configPath);
 
 EMMY_API void RemoveCodeStyle(const char *workspaceUri);
 
-EMMY_API char* CheckCodeStyle(const char *code, const char *uri);
+EMMY_API char *CheckCodeStyle(const char *code, const char *uri);
 }
 
 

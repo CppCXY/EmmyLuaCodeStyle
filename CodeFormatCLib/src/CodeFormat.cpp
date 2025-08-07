@@ -57,13 +57,13 @@ void CodeFormat::SupportNonStandardSymbol() {
     _supportNonStandardSymbol = true;
 }
 
-char *CodeFormat::Reformat(const std::string &uri, std::string &&text) {
+char *CodeFormat::Reformat(const std::string &uri, std::string &&text, FormattingOptions options) {
     auto file = LuaSource::From(std::move(text));
     LuaLexer luaLexer(file);
-    if (_supportNonStandardSymbol) {
+    if (_supportNonStandardSymbol || options.non_standard_symbol) {
         luaLexer.SupportNonStandardSymbol();
     }
-    if (_supportCLikeComments) {
+    if (_supportCLikeComments || options.non_standard_symbol) {
         luaLexer.SupportCLikeComments();
     }
 
@@ -80,7 +80,7 @@ char *CodeFormat::Reformat(const std::string &uri, std::string &&text) {
     t.BuildTree(p);
 
     LuaStyle style = GetStyle(uri);
-
+    SetupStyle(style, options);
     FormatBuilder f(style);
 
     auto result = f.GetFormatResult(t);
@@ -92,13 +92,13 @@ char *CodeFormat::Reformat(const std::string &uri, std::string &&text) {
 }
 
 Result<RangeFormatResult> CodeFormat::RangeFormat(const std::string &uri, FormatRange &range,
-                                                  std::string &&text) {
+                                                  std::string &&text, FormattingOptions options) {
     auto file = std::make_shared<LuaSource>(std::move(text));
     LuaLexer luaLexer(file);
-    if (_supportNonStandardSymbol) {
+    if (_supportNonStandardSymbol || options.non_standard_symbol) {
         luaLexer.SupportNonStandardSymbol();
     }
-    if (_supportCLikeComments) {
+    if (_supportCLikeComments || options.non_standard_symbol) {
         luaLexer.SupportCLikeComments();
     }
 
@@ -115,6 +115,7 @@ Result<RangeFormatResult> CodeFormat::RangeFormat(const std::string &uri, Format
     t.BuildTree(p);
 
     LuaStyle style = GetStyle(uri);
+    SetupStyle(style, options);
 
     RangeFormatBuilder f(style, range);
 
@@ -125,11 +126,23 @@ Result<RangeFormatResult> CodeFormat::RangeFormat(const std::string &uri, Format
     std::copy(formattedText.begin(), formattedText.end(), ptr);
     ptr[formattedText.size()] = '\0';// [formattedText.size()] = '\0'
     return RangeFormatResult{
-            static_cast<int>(range.StartLine),
-            static_cast<int>(range.StartCol),
-            static_cast<int>(range.EndLine),
-            static_cast<int>(range.EndCol),
+            static_cast<int32_t>(range.StartLine),
+            static_cast<int32_t>(range.StartCol),
+            static_cast<int32_t>(range.EndLine),
+            static_cast<int32_t>(range.EndCol),
             ptr};
+}
+
+void CodeFormat::SetupStyle(LuaStyle &style, const FormattingOptions &options) {
+    if (options.use_tabs) {
+        style.indent_style = IndentStyle::Tab;
+        style.tab_width = options.indent_size;
+    } else {
+        style.indent_style = IndentStyle::Space;
+        style.indent_size = options.indent_size;
+    }
+
+    style.insert_final_newline = options.insert_final_newline;
 }
 
 Result<std::vector<LuaTypeFormat::Result>>
@@ -156,7 +169,6 @@ CodeFormat::TypeFormat(const std::string &uri, std::size_t line, std::size_t cha
     t.BuildTree(p);
 
     LuaStyle style = GetStyle(uri);
-
 
     LuaTypeFormatFeatures typeFormatOptions;
     typeFormatOptions.auto_complete_end = false;
