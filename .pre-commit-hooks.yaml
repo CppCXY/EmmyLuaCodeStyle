@@ -1,0 +1,26 @@
+---
+- id: emmyluacodestyle-check
+  language: lua
+  name: EmmyLuaCodeStyle check
+  description: >
+    use EmmyLuaCodeStyle to check lua files
+  entry: CodeFormat
+  types:
+    - lua
+  args:
+    - check
+    - -DAE
+    - -f
+
+- id: emmyluacodestyle-format
+  language: lua
+  name: EmmyLuaCodeStyle format
+  description: >
+    use EmmyLuaCodeStyle to format lua files
+  entry: CodeFormat
+  types:
+    - lua
+  args:
+    - format
+    - -ow
+    - -f
