@@ -24,9 +24,14 @@ target_sources(CodeFormatLib
         src/LuaCodeFormat.cpp
         src/LuaJIT-Compact.cpp
 )
+set_target_properties(CodeFormatLib PROPERTIES PREFIX "")
 
 if (NOT WIN32)
     target_compile_options(CodeFormatLib PUBLIC -fPIC)
 endif ()
 
 target_link_libraries(CodeFormatLib PUBLIC CodeFormatCore lua54)
+
+install(TARGETS CodeFormatLib
+    LIBRARY DESTINATION lib/lua/5.4
+)
