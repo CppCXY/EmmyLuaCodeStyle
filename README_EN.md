@@ -1,66 +1,74 @@
 # EmmyLuaCodeStyle
 
-If possible, you can help me improve the English document 
+_Fast, configurable, and feature-rich Lua formatting and checking language server._
 
-## Editor Support
+## Introduction
 
-vscode:
-[vscode-EmmyLuaCodeStyle](https://marketplace.visualstudio.com/items?itemName=CppCXY.emmylua-codestyle)
-[vscode-Lua](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
+**EmmyLuaCodeStyle** is a flexible and configurable source code checker, formatter and language server for the [Lua programming language](https://wikipedia.org/wiki/Lua). It supports simple extended syntax and offers a variety of formatting styles. Fast even for large codebases, it ensures a consistent, readable, and standardised Lua custom code style across projects.
 
-intellij:
-[intellij-EmmyLuaCodeStyle](https://plugins.jetbrains.com/plugin/21973-emmyluacodestyle)
+EmmyLuaCodeStyle supports Lua 5.1, Lua 5.2, Lua 5.3, Lua 5.4, and LuaJIT.
 
-neovim:
-[Lua Language Server](https://github.com/LuaLS/lua-language-server)
+The language server is based on the Language Server Protocol (LSP) and compatible with IDEs that support LSP. This includes Visual Studio Code, IntelliJ IDEA, Neovim and other popular IDEs.
 
-## Project Introduction 
+The project also provides an standalone command line interface called CodeFormat, which can be used for batch code checking and formatting.
 
-The project `is not a specification for the Lua code format`, this project is an example of Lua code analysis\formatting\code diagnosis algorithm library and language service based on C++
+> The aim of this project is not to create a coding convention for Lua.
 
-The main pursuit of this project is reasonable formatting and diagnosis of various code styles
+## 🧠 Editor integration
 
-In addition to providing language service examples, the project also provides an independent command line tool CodeFormat, which can be used for batch code formatting and code style checking.
+- [Lua for VSCode](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) or [EmmyLuaCodeStyle for VSCode](https://marketplace.visualstudio.com/items?itemName=CppCXY.emmylua-codestyle)
+- [SumnekoLua for IntelliJ](https://plugins.jetbrains.com/plugin/22315-sumnekolua) or [EmmyLuaCodeStyle in JetBrains IntelliJ](https://plugins.jetbrains.com/plugin/21973-emmyluacodestyle)
+- [LuaLS for Neovim](https://github.com/LuaLS/lua-language-server)
 
-## Feature
+Plugins are available for popular editors to provide on-save formatting and real-time code style enforcement.
 
-* Document formatting
-* Range formatting
-* Code format check
-* Code spell check
-* Can be used as a lua library/cli tool/C++ parsing lua library/language server
+## ✨ Features
 
-## RoadMap
-* plugin[0%]
+- **80+ configuration options**: Customise indentation, alignment, spacing, and line wrapping using `.editconfig` syntax.
+- **Extended syntax support**: Handles EmmyLua annotations and Lua extensions seamlessly.
+- **Multiple formatting styles**: Choose from built-in styles or define your own.
+- **Robust Lua parser**: Accurately interprets code structure before applying formatting rules, suitable for large projects and batch formatting.
+- **Multiple interfaces:** Language Server Protocol, command line interface, Lua or C++-based parser libraries
+- Also includes spell-checking and document formatting
 
-## Document
+## 🚀 Use cases
+
+- Enforcing a unified code style across repositories.
+- Automatically formatting configuration and script files.
+- Maintaining consistency in multi-contributor Lua codebases.
+- Supporting solo developers with specific personal style preferences.
+
+## 📚 Documentation
 
 * [Introduction to formatting behavior](docs/format_action_EN.md)
 * [How to configure formatting](docs/format_config_EN.md)
 * [How to configure naming style checking](docs/name_style_EN.md)
 
-## Contribute
-Any pr or issue are welcome 
+## 🧑‍💻 Contribute
 
-## Build
+Pull requests and issue reporting is appreciated. If possible, you can help improve the English documentation.
 
-If you want to compile the project yourself, make sure that your compiler can basically support C++20: 
+## 🔨 Build
+
+If you want to compile the project yourself, make sure that your compiler can support [C++20](https://en.cppreference.com/w/cpp/20.html):
+
 * VS2019 16.10 and above
 * gcc 10 and above
 * clang 10 and above
 
-```
+In the project's root directory, run the following shell commands:
+
+```bash
 mkdir build && cd build
 cmake ..
-cmake --build . 
-
+cmake --build .
 ```
 
-## Developed By
+## Contributors
 
 [**@CppCXY**](https://github.com/CppCXY)
 
-**Contributors**
+**Other contributors**
 
 [**@obszczymucha**](https://github.com/obszczymucha)
 
@@ -69,6 +77,7 @@ cmake --build .
 [**@AndreaWalchshoferSCCH**](https://github.com/AndreaWalchshoferSCCH)
 
 [**@一醉青衫**](https://github.com/qq792453582)
-## License
 
-[MIT](LICENSE)
+## 📄 License
+
+Licensed under the [MIT License](LICENSE).
