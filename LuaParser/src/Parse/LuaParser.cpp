@@ -63,6 +63,15 @@ void LuaParser::Next() {
     _invalid = true;
 }
 
+void LuaParser::NextAs(LuaTokenKind kind) {
+    auto me = MarkEvent(MarkEventType::EatToken);
+    me.U.Token.Kind = kind;
+    me.U.Token.Index = _tokenIndex;
+    _events.push_back(me);
+    _tokenIndex++;
+    _invalid = true;
+}
+
 LuaTokenKind LuaParser::LookAhead() {
     std::size_t nextIndex = _tokenIndex + 1;
 
@@ -101,6 +110,14 @@ LuaTokenKind LuaParser::Current() {
     }
 
     return _current;
+}
+
+std::string_view LuaParser::CurrentText() {
+    if (_tokenIndex < _tokens.size()) {
+        auto range = _tokens[_tokenIndex].Range;
+        return _file->GetSource().substr(range.StartOffset, range.GetEndOffset() - range.StartOffset + 1);
+    }
+    return "";
 }
 
 void LuaParser::SkipComment() {
@@ -453,6 +470,12 @@ void LuaParser::GotoStatement() {
 // exprStat -> call | assignment
 // assignment -> varList '=' exprList
 void LuaParser::ExpressionStatement() {
+    if (Current() == TK_NAME && CurrentText() == "global") {
+        if (TryGlobalStatement()) {
+            return;
+        }
+    }
+
     auto m = Mark();
     SuffixedExpression();
     if (Current() == '=' || Current() == ',') {
@@ -472,6 +495,66 @@ void LuaParser::ExpressionStatement() {
     } else {
         TestAndNext(';');
         m.Complete(*this, LuaSyntaxNodeKind::ExpressionStatement);
+    }
+}
+
+bool LuaParser::TryGlobalStatement() {
+    auto m = Mark();
+    switch (LookAhead()) {
+        case '*':
+            Next();// Global
+            Next();
+
+            TestAndNext(';');
+            m.Complete(*this, LuaSyntaxNodeKind::GlobalStatement);
+            return true;
+        case '<':
+            Next();// Global
+            LocalAttribute();
+
+            switch (Current()) {
+                case TK_NAME:
+                    GlobalNameList();
+                    break;
+                case '*':
+                    Next();
+                    break;
+                default:
+                    break;
+            }
+            TestAndNext(';');
+            m.Complete(*this, LuaSyntaxNodeKind::GlobalStatement);
+            return true;
+        case TK_FUNCTION:
+            Next();// Global
+            Next();// Function
+            CheckName();
+            FunctionBody();
+            TestAndNext(';');
+            m.Complete(*this, LuaSyntaxNodeKind::FunctionStatement);
+            break;
+        case TK_NAME:
+            Next();// Global
+            GlobalNameList();
+            TestAndNext(';');
+            m.Complete(*this, LuaSyntaxNodeKind::GlobalStatement);
+            return true;
+        default:
+            break;
+    }
+
+    m.Undo(*this);
+    return false;
+}
+
+void LuaParser::GlobalNameList() {
+    do {
+        CheckName();
+        LocalAttribute();
+    } while (TestAndNext(','));
+
+    if (TestAndNext('=')) {
+        ExpressionList();
     }
 }
 
@@ -692,6 +775,9 @@ void LuaParser::ParamList() {
                 case TK_DOTS: {
                     isVararg = true;
                     Next();
+                    if (Current() == TK_NAME) {
+                        Next();
+                    }
                     break;
                 }
                 case ')': {

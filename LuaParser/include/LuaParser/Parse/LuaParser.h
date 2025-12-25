@@ -33,9 +33,13 @@ public:
 private:
     void Next();
 
+    void NextAs(LuaTokenKind kind);
+
     LuaTokenKind LookAhead();
 
     LuaTokenKind Current();
+
+    std::string_view CurrentText();
 
     void SkipComment();
 
@@ -70,6 +74,10 @@ private:
     void GotoStatement();
 
     void ExpressionStatement();
+
+    bool TryGlobalStatement();
+
+    void GlobalNameList();
 
     void ForNumber();
 

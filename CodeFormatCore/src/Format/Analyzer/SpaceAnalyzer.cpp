@@ -145,7 +145,8 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                 case TK_FOR:
                 case TK_ELSE:
                 case TK_FUNCTION:
-                case TK_END: {
+                case TK_END:
+                case TK_GLOBAL: {
                     SpaceRight(syntaxNode, t);
                     break;
                 }
@@ -193,6 +194,12 @@ void SpaceAnalyzer::Analyze(FormatState &f, const LuaSyntaxTree &t) {
                     }
                     SpaceRight(syntaxNode, t, 1);
                     break;
+                }
+                case TK_DOTS: {
+                    auto rightToken = syntaxNode.GetNextToken(t);
+                    if (rightToken.GetTokenKind(t) == TK_NAME) {
+                        SpaceRight(syntaxNode, t, 0);
+                    }
                 }
                 default: {
                     break;
@@ -316,6 +323,15 @@ void SpaceAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                         SpaceLeft(syntaxNode, t, 0);
                     }
                     break;
+                }
+                case LuaSyntaxNodeKind::GlobalStatement: {
+                    auto childrens = syntaxNode.GetChildren(t);
+                    if (childrens.size() >= 2) {
+                        auto maybeAttrib = childrens[1];
+                        if (maybeAttrib.GetSyntaxKind(t) == LuaSyntaxNodeKind::Attribute) {
+                            SpaceRight(maybeAttrib, t, 1);
+                        }
+                    }
                 }
                 case LuaSyntaxNodeKind::FunctionBody: {
                     auto leftBrace = syntaxNode.GetChildToken('(', t);

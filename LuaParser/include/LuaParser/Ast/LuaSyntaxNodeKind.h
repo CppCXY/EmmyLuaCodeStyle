@@ -38,6 +38,8 @@ enum class LuaSyntaxNodeKind {
 
     AssignStatement,
 
+    GlobalStatement,
+
     SuffixedExpression,
 
     ParExpression,

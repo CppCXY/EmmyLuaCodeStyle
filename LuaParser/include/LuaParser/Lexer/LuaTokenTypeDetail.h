@@ -28,6 +28,7 @@ enum LuaTokenTypeDetail : int {
     TK_TRUE,
     TK_UNTIL,
     TK_WHILE,
+    TK_GLOBAL, // global lua5.5
     /* other terminal symbols */
     TK_IDIV,
     TK_CONCAT,
