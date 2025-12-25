@@ -99,6 +99,8 @@ std::string_view detail::debug::GetSyntaxKindDebugName(LuaSyntaxNodeKind kind) {
             return "DocTagFormat";
         case LuaSyntaxNodeKind::TableFieldSep:
             return "TableFieldSep";
+        case LuaSyntaxNodeKind::GlobalStatement:
+            return "GlobalStatement";
     }
     return "Unknown";
 }
