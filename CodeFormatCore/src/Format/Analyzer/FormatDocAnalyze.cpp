@@ -106,6 +106,27 @@ void FormatDocAnalyze::AnalyzeDocFormat(LuaSyntaxNode n, FormatState &f, const L
                         }
 
                         break;
+                    } else if (action == "disable-next-line") {
+                        const std::size_t ignoreLine = n.GetStartLine(t) + 1;
+                        auto isIgnore = [&] (const LuaSyntaxNode node) -> bool {
+                            return !node.IsNull(t) && node.GetStartLine(t) == ignoreLine;
+                        };
+
+                        auto endNode = n.GetNextSibling(t);
+                        while (isIgnore(endNode)) {
+                            if (endNode.GetEndLine(t) > ignoreLine) {
+                                endNode = endNode.GetFirstChild(t);
+                            } else if (const auto next = endNode.GetNextSibling(t); isIgnore(next)) {
+                                endNode.ToNext(t);
+                            } else {
+                                break;
+                            }
+                        }
+
+                        if (!endNode.IsNull(t)) {
+                            AddIgnoreRange(IndexRange(n.GetIndex(), endNode.GetIndex()), t);
+                        }
+                        break;
                     } else if (action == "on") {
                         state = ParseState::List;
                         // todo

@@ -156,19 +156,18 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
         resolve.Reset();
         if (traverse.Event == TraverseEvent::Enter) {
             traverseStack.back().Event = TraverseEvent::Exit;
-            if (_ignoreRange.EndIndex != 0) {
-                auto index = traverse.Node.GetIndex();
-                if (index >= _ignoreRange.StartIndex && index <= _ignoreRange.EndIndex) {
-                    continue;
-                }
-            }
-            for (auto &analyzer: _analyzers) {
-                analyzer->Query(*this, traverse.Node, t, resolve);
-            }
+
+            // We need to first add all child nodes to the traversal list.
             auto children = traverse.Node.GetChildren(t);
             // 不采用 <range>
             for (auto rIt = children.rbegin(); rIt != children.rend(); rIt++) {
                 traverseStack.emplace_back(*rIt, TraverseEvent::Enter);
+            }
+
+            // For the code that has already been ignored, we also need to
+            // analyze it to determine how to indent next.
+            for (auto &analyzer: _analyzers) {
+                analyzer->Query(*this, traverse.Node, t, resolve);
             }
 
             if (resolve.GetIndentStrategy() != IndentStrategy::None) {
@@ -201,6 +200,16 @@ void FormatState::DfsForeach(std::vector<LuaSyntaxNode> &startNodes,
                     default: {
                         break;
                     }
+                }
+            }
+
+            // Skip the nodes that need to be ignored. Since the range of ignoring starts
+            // from the @format node, we need to execute enterHandle once when entering
+            // the ignore range to output all the ignored content.
+            if (_ignoreRange.EndIndex != 0) {
+                auto index = traverse.Node.GetIndex();
+                if (index > _ignoreRange.StartIndex && index <= _ignoreRange.EndIndex) {
+                    continue;
                 }
             }
 
