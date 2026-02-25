@@ -892,6 +892,76 @@ local t = {
     gjopepgo = 123,
 }
 )"));
+
+    EXPECT_TRUE(TestHelper::TestFormatted(
+        R"(
+local t = {
+    ---@format disable-next-line
+    foo =  123, bar  = 234,
+    baz =  345,
+}
+)",
+        R"(
+local t = {
+    ---@format disable-next-line
+    foo =  123, bar  = 234,
+    baz = 345,
+}
+)"));
+
+    EXPECT_TRUE(TestHelper::TestFormatted(
+    R"(
+local t = {
+    ---@format disable-next-line
+    foo =   function( a,  b )
+        return  {
+            foo =   a,
+            bar =  b,
+        }
+    end,
+    bar =  1,
+}
+)",
+    R"(
+local t = {
+    ---@format disable-next-line
+    foo =   function( a,  b )
+        return {
+            foo = a,
+            bar = b,
+        }
+    end,
+    bar = 1,
+}
+)"));
+
+    EXPECT_TRUE(TestHelper::TestFormatted(
+    R"(
+local t = {
+    ---@format disable-next-line
+    foo =   function( a,  b )
+        return  {
+            foo =   a,
+            bar =  b,
+        }
+    end,
+    bar =  1,
+}
+---@format disable-next-line
+)",
+    R"(
+local t = {
+    ---@format disable-next-line
+    foo =   function( a,  b )
+        return {
+            foo = a,
+            bar = b,
+        }
+    end,
+    bar = 1,
+}
+---@format disable-next-line
+)"));
 }
 
 TEST(Format, feature_102) {
