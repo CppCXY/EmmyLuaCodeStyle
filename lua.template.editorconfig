@@ -1,171 +1,398 @@
+// Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Attach to Chrome",
+            "port": 9222,
+            "request": "attach",
+            "type": "chrome",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "msedge",
+            "request": "launch",
+            "name": "Open index.html",
+            "file": "c:\\Users\\gebruiker\\Downloads\\fast-loadingv6-escrow.pack\\fast-loadingv6\\html\\index.html"
+        }
+    ]
+}!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noorderburen Roleplay - HUD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Left: Noorderburen Logo -->
+    <div id="logoContainer" class="logo-container">
+        <div class="logo-box">
+            <div class="logo-title">NOORDERBUREN</div>
+            <div class="logo-subtitle">ROLEPLAY</div>
+        </div>
+    </div>
 
-# see https://github.com/CppCXY/EmmyLuaCodeStyle
-[*.lua]
-# [basic]
+    <!-- Right Top: Player Info Header -->
+    <div id="playerHeader" class="player-header">
+        <div class="header-icon">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="header-info">
+            <div class="server-name">NOORDERBUREN</div>
+            <div class="server-subtitle">ROLEPLAY</div>
+        </div>
+        <div class="header-status">
+            <div class="status-dot"></div>
+        </div>
+    </div>
 
-# optional space/tab
-indent_style = space
-# if indent_style is space, this is valid
-indent_size = 4
-# if indent_style is tab, this is valid
-tab_width = 4
-# none/single/double
-quote_style = none
+    <!-- Right: Player Stats Panel -->
+    <div id="statsPanel" class="stats-panel">
+        <div class="player-info-section">
+            <div class="player-name" id="playerName">JOHN DE VRIES</div>
+            <div class="player-meta">
+                <span class="player-job" id="playerJob">BURGER</span>
+                <span class="player-id" id="playerID">#4821</span>
+            </div>
+            <div class="player-divider"></div>
+        </div>
 
-continuation_indent = 4
-## extend option
-# continuation_indent.before_block = 4
-# continuation_indent.in_expr = 4
-# continuation_indent.in_table = 4
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-icon health">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="stat-name">GEZONDHEID</div>
+                <div class="stat-bar">
+                    <div class="stat-fill" id="healthBar"></div>
+                </div>
+                <div class="stat-value" id="healthValue">84%</div>
+            </div>
 
-# this mean utf8 length , if this is 'unset' then the line width is no longer checked
-# this option decides when to chopdown the code
-max_line_length = 120
+            <div class="stat-item">
+                <div class="stat-icon armor">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="stat-name">PANTSER</div>
+                <div class="stat-bar">
+                    <div class="stat-fill" id="armorBar"></div>
+                </div>
+                <div class="stat-value" id="armorValue">65%</div>
+            </div>
 
-# optional crlf/lf/cr/auto, if it is 'auto', in windows it is crlf other platforms are lf
-# in neovim the value 'auto' is not a valid option, please use 'unset' 
-end_of_line = auto
+            <div class="stat-item">
+                <div class="stat-icon hunger">
+                    <i class="fas fa-hamburger"></i>
+                </div>
+                <div class="stat-name">HONGER</div>
+                <div class="stat-bar">
+                    <div class="stat-fill" id="hungerBar"></div>
+                </div>
+                <div class="stat-value" id="hungerValue">52%</div>
+            </div>
 
-#  none/ comma / semicolon / only_kv_colon
-table_separator_style = none
+            <div class="stat-item">
+                <div class="stat-icon thirst">
+                    <i class="fas fa-droplet"></i>
+                </div>
+                <div class="stat-name">DORST</div>
+                <div class="stat-bar">
+                    <div class="stat-fill" id="thirstBar"></div>
+                </div>
+                <div class="stat-value" id="thirstValue">38%</div>
+            </div>
 
-#optional keep/never/always/smart
-trailing_table_separator = keep
+            <div class="stat-item">
+                <div class="stat-icon stamina">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="stat-name">ENERGIE</div>
+                <div class="stat-bar">
+                    <div class="stat-fill" id="staminaBar"></div>
+                </div>
+                <div class="stat-value" id="staminaValue">71%</div>
+            </div>
 
-# keep/remove/remove_table_only/remove_string_only
-call_arg_parentheses = keep
+            <div class="stat-item money">
+                <div class="stat-icon money-icon">
+                    <i class="fas fa-euro-sign"></i>
+                </div>
+                <div class="stat-name">GELD</div>
+                <div class="money-display" id="moneyValue">€24.850</div>
+            </div>
+        </div>
+    </div>
 
-detect_end_of_line = false
+    <!-- Left Bottom: Minimap -->
+    <div id="minimap" class="minimap">
+        <div class="minimap-header">N</div>
+        <div class="minimap-content">
+            <div class="minimap-marker"></div>
+        </div>
+        <div class="minimap-footer">NOORDERBUREN RP</div>
+    </div>
 
-# this will check text end with new line
-insert_final_newline = true
+    <!-- Right Bottom: Time & Location Info -->
+    <div id="infoPanel" class="info-panel">
+        <div class="info-item time">
+            <i class="fas fa-clock"></i>
+            <span id="timeDisplay">22:47</span>
+        </div>
+        <div class="info-item location">
+            <i class="fas fa-map-marker-alt"></i>
+            <span id="locationDisplay">GRONINGEN</span>
+        </div>
+        <div class="info-item date">
+            <i class="fas fa-calendar"></i>
+            <span id="dateDisplay">24-04-2024</span>
+        </div>
+    </div>
 
-# [space]
-space_around_table_field_list = true
+    <script src="script.js"></script>
+</body>
+</html>// Noorderburen Roleplay - Professional HUD Script
 
-space_before_attribute = true
+// DOM Elements
+const statsPanel = document.querySelector('.stats-panel');
+const playerHeader = document.querySelector('.player-header');
+const minimap = document.querySelector('.minimap');
+const infoPanel = document.querySelector('.info-panel');
 
-space_before_function_open_parenthesis = false
+// Player Elements
+const playerName = document.getElementById('playerName');
+const playerJob = document.getElementById('playerJob');
+const playerID = document.getElementById('playerID');
 
-space_before_function_call_open_parenthesis = false
+// Health Elements
+const healthBar = document.getElementById('healthBar');
+const healthValue = document.getElementById('healthValue');
 
-space_before_closure_open_parenthesis = true
+// Armor Elements
+const armorBar = document.getElementById('armorBar');
+const armorValue = document.getElementById('armorValue');
 
-# optional always/only_string/only_table/none
-# or true/false
-space_before_function_call_single_arg = always
-## extend option
-## always/keep/none
-# space_before_function_call_single_arg.table = always
-## always/keep/none
-# space_before_function_call_single_arg.string = always
+// Hunger Elements
+const hungerBar = document.getElementById('hungerBar');
+const hungerValue = document.getElementById('hungerValue');
 
-space_before_open_square_bracket = false
+// Thirst Elements
+const thirstBar = document.getElementById('thirstBar');
+const thirstValue = document.getElementById('thirstValue');
 
-space_inside_function_call_parentheses = false
+// Stamina Elements
+const staminaBar = document.getElementById('staminaBar');
+const staminaValue = document.getElementById('staminaValue');
 
-space_inside_function_param_list_parentheses = false
+// Money Element
+const moneyValue = document.getElementById('moneyValue');
 
-space_inside_square_brackets = false
+// Info Elements
+const timeDisplay = document.getElementById('timeDisplay');
+const locationDisplay = document.getElementById('locationDisplay');
+const dateDisplay = document.getElementById('dateDisplay');
 
-# like t[#t+1] = 1
-space_around_table_append_operator = false
+// HUD State
+let hudVisible = false;
 
-ignore_spaces_inside_function_call = false
+// Update bar function
+function updateBar(barElement, valueElement, current, max) {
+    const percentage = Math.max(0, Math.min(100, (current / max) * 100));
+    barElement.style.width = percentage + '%';
+    if (valueElement) {
+        valueElement.textContent = Math.round(percentage) + '%';
+    }
+}
 
-# detail number or 'keep'
-space_before_inline_comment = 1
+// Update HUD
+function updateHUD(data) {
+    // Player Info
+    if (data.playerName) playerName.textContent = data.playerName;
+    if (data.playerJob) playerJob.textContent = data.playerJob;
+    if (data.playerID) playerID.textContent = '#' + String(data.playerID).padStart(4, '0');
 
-# convert '---' to '--- ' or '--' to '-- '
-space_after_comment_dash = false
+    // Health
+    if (data.health !== undefined && data.maxHealth !== undefined) {
+        updateBar(healthBar, healthValue, data.health, data.maxHealth);
+    }
 
-# [operator space]
-space_around_math_operator = true
-# space_around_math_operator.exponent = false
+    // Armor
+    if (data.armor !== undefined) {
+        updateBar(armorBar, armorValue, data.armor, 100);
+    }
 
-space_after_comma = true
+    // Hunger
+    if (data.hunger !== undefined) {
+        updateBar(hungerBar, hungerValue, data.hunger, 100);
+    }
 
-space_after_comma_in_for_statement = true
+    // Thirst
+    if (data.thirst !== undefined) {
+        updateBar(thirstBar, thirstValue, data.thirst, 100);
+    }
 
-# true/false or none/always/no_space_asym
-space_around_concat_operator = true
+    // Stamina
+    if (data.stamina !== undefined) {
+        updateBar(staminaBar, staminaValue, data.stamina, 100);
+    }
 
-space_around_logical_operator = true
+    // Money
+    if (data.money !== undefined) {
+        moneyValue.textContent = '€' + data.money.toLocaleString();
+    }
 
-# true/false or none/always/no_space_asym
-space_around_assign_operator = true
+    // Time
+    if (data.time) timeDisplay.textContent = data.time;
 
-# [align]
+    // Location
+    if (data.location) locationDisplay.textContent = data.location;
 
-align_call_args = false
+    // Date
+    if (data.date) dateDisplay.textContent = data.date;
+}
 
-align_function_params = true
+// Show HUD
+function showHUD() {
+    statsPanel.style.display = 'block';
+    playerHeader.style.display = 'flex';
+    minimap.style.display = 'block';
+    infoPanel.style.display = 'flex';
+    hudVisible = true;
+}
 
-# true/false or always
-align_continuous_assign_statement = true
+// Hide HUD
+function hideHUD() {
+    statsPanel.style.display = 'none';
+    playerHeader.style.display = 'none';
+    minimap.style.display = 'none';
+    infoPanel.style.display = 'none';
+    hudVisible = false;
+}
 
-align_continuous_rect_table_field = true
+// Message listener
+window.addEventListener('message', function(event) {
+    const data = event.data;
 
-align_continuous_line_space = 2
+    if (data.type === 'updateHUD') {
+        updateHUD(data);
+    } else if (data.type === 'showHUD') {
+        showHUD();
+    } else if (data.type === 'hideHUD') {
+        hideHUD();
+    }
+});
 
-align_if_branch = false
+// Initialize - Hide HUD on start
+hideHUD();
+Noorderburen Roleplay - HUD Client Script
 
-# option none / always / contain_curly/
-align_array_table = true
+local hudVisible = false
 
-align_continuous_similar_call_args = false
+-- Dutch job titles
+local dutchJobs = {
+    "Burger", "Politie Agent", "Ambulance Broeder", "Mecanicien", "Taxichauffeur",
+    "Advocaat", "Journalist", "Bankier", "Leraren", "Vuilnisman",
+    "Kok", "Barkeeper", "Winkelier", "Boer", "Visser", "Electricien",
+    "Loodgieter", "Makelaar", "Bouwvakker", "Schoonmaker"
+}
 
-align_continuous_inline_comment = true
-# option none / always / only_call_stmt
-align_chain_expr = none
+-- Dutch locations
+local dutchLocations = {
+    "Amsterdam Centrum", "Amsterdam Noord", "Amsterdam Zuid", "Amsterdam Oost", "Amsterdam West",
+    "Rotterdam Centrum", "Rotterdam Haven", "Rotterdam Zuid", "Rotterdam Noord",
+    "Den Haag Centrum", "Den Haag Scheveningen", "Den Haag Laak",
+    "Utrecht Centrum", "Utrecht Leidsche Rijn", "Utrecht Overvecht",
+    "Eindhoven Centrum", "Eindhoven Strijp", "Eindhoven Woensel",
+    "Groningen Centrum", "Groningen Noord", "Groningen Zuid",
+    "Haarlem Centrum", "Haarlem Schoten", "Haarlem Boerhaave",
+    "Almere Centrum", "Almere Buiten", "Almere Hout",
+    "Noord-Holland", "Zuid-Holland", "Utrecht Provincie", "Flevoland", "Gelderland"
+}
 
-# [indent]
+-- Show HUD when player spawns
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(1000)
+        if NetworkIsPlayerActive(PlayerId()) then
+            hudVisible = true
+            SendNUIMessage({type = 'showHUD'})
+            break
+        end
+    end
+end)
 
-never_indent_before_if_condition = false
-
-never_indent_comment_on_if_branch = false
-
-keep_indents_on_empty_lines = false
-
-allow_non_indented_comments = false
-# [line space]
-
-# The following configuration supports four expressions
-# keep  
-# fixed(n)   
-# min(n)
-# max(n)
-# for eg. min(2)
-
-line_space_after_if_statement = keep
-
-line_space_after_do_statement = keep
-
-line_space_after_while_statement = keep
-
-line_space_after_repeat_statement = keep
-
-line_space_after_for_statement = keep
-
-line_space_after_local_or_assign_statement = keep
-
-line_space_after_function_statement = fixed(2)
-
-line_space_after_expression_statement = keep
-
-line_space_after_comment = keep
-
-line_space_around_block = fixed(1)
-# [line break]
-break_all_list_when_line_exceed = false
-
-auto_collapse_lines = false
-
-break_before_braces = false
-
-# [preference]
-ignore_space_after_colon = false
-
-remove_call_expression_list_finish_comma = false
-# keep / always / same_line / replace_with_newline / never
-end_statement_with_semicolon = keep
+-- Update HUD every 500ms
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(500)
+        
+        if IsPauseMenuActive() or IsEntityDead(PlayerPedId()) then
+            if hudVisible then
+                SendNUIMessage({type = 'hideHUD'})
+                hudVisible = false
+            end
+        else
+            if not hudVisible then
+                SendNUIMessage({type = 'showHUD'})
+                hudVisible = true
+            end
+            
+            local player = PlayerPedId()
+            
+            -- Health
+            local health = GetEntityHealth(player)
+            local maxHealth = GetEntityMaxHealth(player)
+            local healthValue = math.max(0, health - 100)
+            local maxHealthValue = math.max(100, maxHealth - 100)
+            
+            -- Armor
+            local armor = GetPedArmour(player)
+            
+            -- Stamina
+            local stamina = 100
+            
+            -- Player Info
+            local playerID = GetPlayerServerId(PlayerId())
+            local playerName = GetPlayerName(PlayerId())
+            local playerJob = dutchJobs[math.random(#dutchJobs)]
+            
+            -- Money (placeholder - integrate with your framework)
+            local money = 24850
+            
+            -- Hunger and Thirst (placeholder - integrate with your framework)
+            local hunger = 52
+            local thirst = 38
+            
+            -- Time
+            local timeHour = GetClockHours()
+            local timeMinute = GetClockMinutes()
+            local timeString = string.format('%02d:%02d', timeHour, timeMinute)
+            
+            -- Location
+            local location = dutchLocations[math.random(#dutchLocations)]
+            
+            -- Date
+            local date = '24-04-2024'
+            
+            SendNUIMessage({
+                type = 'updateHUD',
+                health = healthValue,
+                maxHealth = maxHealthValue,
+                armor = armor,
+                hunger = hunger,
+                thirst = thirst,
+                stamina = stamina,
+                money = money,
+                playerName = playerName,
+                playerJob = playerJob,
+                playerID = playerID,
+                time = timeString,
+                location = location,
+                date = date
+            })
+        end
+    end
+end)
