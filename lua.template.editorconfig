@@ -1,171 +1,357 @@
+# If at ~/.editorconfig then set below, so IDE does not search parent directories
+# root=true
 
-# see https://github.com/CppCXY/EmmyLuaCodeStyle
 [*.lua]
-# [basic]
 
-# optional space/tab
-indent_style = space
-# if indent_style is space, this is valid
+## Lua programming language. See https://github.com/CppCXY/EmmyLuaCodeStyle
+## {.}? Question mark `?` indicates that setting a value for that property is optional.
+
+## [Basic]
+
+# Defines indentation method. Controls whether tabs or spaces are used.
+# {space|tab}? (optional)
+indent_style = tab
+
+# Defines indentation width when using spaces.
+# {integer}?
 indent_size = 4
-# if indent_style is tab, this is valid
+
+# Defines tab width when indent_style is tab.
+# {integer}?
 tab_width = 4
-# none/single/double
-quote_style = none
 
+# Sets preferred quote style for strings.
+# {none|single|double}
+quote_style = single
+
+# Sets extra indent for wrapped statements. The value is added in addition to the standard indent.
+# {integer}
 continuation_indent = 4
-## extend option
-# continuation_indent.before_block = 4
-# continuation_indent.in_expr = 4
-# continuation_indent.in_table = 4
 
-# this mean utf8 length , if this is 'unset' then the line width is no longer checked
-# this option decides when to chopdown the code
+# Additional indent before block-start lines (if/for/while).
+# {integer}
+continuation_indent.before_block = 2
+
+# Additional indent for expression continuations.
+# {integer}
+continuation_indent.in_expr = 4
+
+# Additional indent for table constructor continuations.
+# {integer}
+continuation_indent.in_table = 4
+
+# Maximum line length for formatting.
+# This refers to the mean UTF-8 length, if this is `unset` then the line length will no longer checked
+# {integer|unset}
 max_line_length = 120
 
-# optional crlf/lf/cr/auto, if it is 'auto', in windows it is crlf other platforms are lf
-# in neovim the value 'auto' is not a valid option, please use 'unset' 
-end_of_line = auto
+# Defines line ending characters. `auto` means using system default.
+# In Windows, `auto` is `crlf` and other platforms are `lf`. `auto` is not supported in neovim, use `unset` instead.
+# {crlf|lf|cr|auto}?
+end_of_line = lf
 
-#  none/ comma / semicolon / only_kv_colon
-table_separator_style = none
+# Table field separator style in constructors.
+#   e.g. t = { field1: true, field2: false }
+#   or t = { field1 = true; field2 = false }
+#   or t = { field1: true field2: false }
+# `only_kv_colon` means only add separator when there is key-value colon in the table field.
+# {none|comma|semicolon|only_kv_colon}
+table_separator_style = comma
 
-#optional keep/never/always/smart
-trailing_table_separator = keep
+# Determines whether trailing table separators are kept or added.
+# e.g.
+#   t = { field1: true
+#       field2 = { a = 1,
+#           b = 2,
+#           c = 3,  <-- Trailing table separator
+#       }, <--
+#       field2: true,
+#       field3: true, <--
+#   }
+# {keep|never|always|smart}?
+trailing_table_separator = smart
 
-# keep/remove/remove_table_only/remove_string_only
+# Controls parentheses around single string or table arguments.
+# As in Lua syntax, parentheses in this case is optional.
+#   e.g. fn { a = 1 }  is equivalent to  fn({ a = 1 })
+#   and  fn "hello"    is equivalent to  fn( "hello" )
+# {keep|remove|remove_table_only|remove_string_only}
 call_arg_parentheses = keep
 
+# Detects EOL characters automatically.
+# {true|false}
 detect_end_of_line = false
 
-# this will check text end with new line
+# Ensures file ends with a newline.
+# {true|false}
 insert_final_newline = true
 
-# [space]
+##
+# [Whitespace between lexical elements]
+##
+
+# Inserts space inside table field braces. Space after '{' and before '}' in table constructor.
+# e.g. t = { 1, 2 }. {true|false}
 space_around_table_field_list = true
 
-space_before_attribute = true
+# Inserts space before attributes (. or :) if true. Space around attribute.
+# e.g. fn .sub() or fn :met() (as opposed to fn.sub() or fn:met()). {true|false}
+space_before_attribute = false
 
+# Space before '(' in function definitions.
+# e.g. local function foo () ... end. {true|false}
 space_before_function_open_parenthesis = false
 
+# Space before '(' in function calls.
+# e.g. print (y). {true|false}
 space_before_function_call_open_parenthesis = false
 
+# Space before '(' in anonymous function definitions.
+# e.g. local f = function () ... end. {true|false}
 space_before_closure_open_parenthesis = true
 
-# optional always/only_string/only_table/none
-# or true/false
+# Space before '(' in single-argument function calls.
+# Space after function name, but before parenthesis when calling an anonymous function (closure).
+# e.g. f = function () ... end; f ().
+# {always|only_string|only_table|none}?
+# or {true|false} along with extended options below.
 space_before_function_call_single_arg = always
-## extend option
-## always/keep/none
-# space_before_function_call_single_arg.table = always
-## always/keep/none
-# space_before_function_call_single_arg.string = always
 
+# Extended: space before '(' when argument is a table.
+# {always|keep|none}
+space_before_function_call_single_arg.table = keep
+
+# Extended: space before '(' when argument is a string.
+# {always|keep|none}
+space_before_function_call_single_arg.string = none
+
+# Space before '[' in table access.
+# e.g. t ['key'] = value.
+# {true|false}
 space_before_open_square_bracket = false
 
-space_inside_function_call_parentheses = false
+#  Space inside parentheses of function calls.
+# e.g. fn( arg1, arg2 ).
+# {true|false}
+space_inside_function_call_parentheses = true
 
-space_inside_function_param_list_parentheses = false
+# Space inside parentheses of function definitions
+# e.g. function foo( param1, param2 ) ... end.
+# {true|false}
+space_inside_function_param_list_parentheses = true
 
-space_inside_square_brackets = false
+# Space inside square brackets in table access
+# e.g. t[ 'key' ] = value.
+# {true|false}
+space_inside_square_brackets = true
 
-# like t[#t+1] = 1
+# Controls spacing around table append operator
+# e.g. if true then expect t[#t + 1] = 1
+# {true|false}
+# @FIXME INVERSE LOGIC. e.g. if true then expect t[#t + 1] = 1, instead of t[#t+1] = 1. Inverse occurs. If true, no space is added. If false, space is added.
 space_around_table_append_operator = false
 
+# Skip reformatting of spacing inside single-argument calls.
+#    e.g. fn {  a = 1}; or fn"hello"; or fn(  "hello").
+# {true|false}
 ignore_spaces_inside_function_call = false
 
-# detail number or 'keep'
+# Number of spaces before start of inline comments. Specify an integer or `keep`
+# {keep|integer[1,2,3..]}
 space_before_inline_comment = 1
 
-# convert '---' to '--- ' or '--' to '-- '
-space_after_comment_dash = false
+# Add space after comment dashes
+# e.g. convert '---text' to '--- text', and '--comment' to '-- comment'
+# {true|false}
+space_after_comment_dash = true
 
-# [operator space]
+##
+# [Whitespace around operators]
+##
+
+# Controls spacing around math operators ( +, -, *, / ).
+# e.g. a + b  or a+b or a + b.
+# `no_space_asym` means correct asymmetrical spacing for math operators
+# {true|false|none|always|no_space_asym}
 space_around_math_operator = true
-# space_around_math_operator.exponent = false
 
+# Specific setting for exponentiation operator spacing.
+# e.g. @TODO ??? Is this even supported?
+# {true|false}
+space_around_math_operator.exponent = true
+
+# Add space after commas in lists. e.g. t = { 1,2,3 } or t = { 1, 2, 3 }
+# {true|false}
 space_after_comma = true
 
+# Add space after commas in for loops. e.g. for i = 1, 10 do;  or for i = 1,10 do.
+# {true|false}
 space_after_comma_in_for_statement = true
 
-# true/false or none/always/no_space_asym
+# Controls spacing around concatenation operator `..`
+# e.g. print(a .. b)  or print(a..b) -- `no_space_asym` means correct asymmetric spacing for concat operator
+#      print(a..b..'string'..str); or print(a .. b .. 'string' .. str); or print(a ..b.. 'string'.. str)
+# {true|false|none|always|no_space_asym}
 space_around_concat_operator = true
 
+# Controls spacing around logical operators (and/or). e.g. a == b or a==b.
+# {true|false}
 space_around_logical_operator = true
 
-# true/false or none/always/no_space_asym
+# Controls spacing around assignment operators (=, +=, etc.). e.g. a = b  or a=b
+# {true|false|none|always|no_space_asym}
 space_around_assign_operator = true
 
-# [align]
+##
+# [Alignment]
+##
 
+# Aligns multiline call argument lists.
+# fn( red = #ff0000, blue = #0000ff
+#     n = 1,         time = os.clock()
+# )
+# {true|false}
 align_call_args = false
 
-align_function_params = true
+# Aligns parameters in multiline function definitions.
+# e.g. fn( elephant, rhinoceros, buffalo,
+#          shell,    fish,       shark )
+# {true|false}
+align_function_params = false
 
-# true/false or always
-align_continuous_assign_statement = true
+# Aligns continuous variable assignments vertically.
+# e.g. local a_long_variable_name = 10
+#      local b_name               = 20
+# {true|false|always}
+align_continuous_assign_statement = false
 
-align_continuous_rect_table_field = true
+# Aligns rect table fields (colon-aligned).
+# e.g. local a_long_variable_name: string
+#      local b_name              : number
+# {true|false}
+align_continuous_rect_table_field = false
 
-align_continuous_line_space = 2
+# Additional spaces when aligning multiline blocks.
+# {integer}
+align_continuous_line_space = 0
 
+# Aligns `if` and `elseif` branches vertically.
+# e.g. if condition then @TODO ???
+#     ...
+#     elseif other_condition then
+#     ...
+#     end
+# {true|false}
 align_if_branch = false
 
-# option none / always / contain_curly/
-align_array_table = true
+# Aligns arrays and tables in multi-line form. @TODO ??
+# {none | always | contain_curly}
+align_array_table = none
 
+# Aligns consecutive similar call arguments. @TODO ??
+# {true|false}
 align_continuous_similar_call_args = false
 
+# Aligns inline comments vertically.
+# {true|false}
 align_continuous_inline_comment = true
-# option none / always / only_call_stmt
-align_chain_expr = none
 
-# [indent]
+# Aligns chained expressions like method calls. @TODO ??
+# {none | always | only_call_stmt}
+align_chain_expr = only_call_stmt
 
+##
+# [Indentation]
+##
+
+# Prevents indentation before if-conditions. @TODO ??
+# {true|false}
 never_indent_before_if_condition = false
 
+# Prevents indentation of comments inside if-branches. @TODO ??
+# {true|false}
 never_indent_comment_on_if_branch = false
 
+# Keeps indentation on blank lines. @TODO ??
+# {true|false}
 keep_indents_on_empty_lines = false
 
+# Allows non-indented comments at column 0. @TODO ??
+# {true|false}
 allow_non_indented_comments = false
-# [line space]
 
-# The following configuration supports four expressions
-# keep  
-# fixed(n)   
-# min(n)
-# max(n)
-# for eg. min(2)
+##
+# [Line spacing]
+##
 
-line_space_after_if_statement = keep
+# Number of blank lines after an if statement.
+# {keep|fixed(n)|min(n)|max(n)}
+line_space_after_if_statement = fixed(1)
 
-line_space_after_do_statement = keep
+# Number of blank lines after a do statement.
+# {keep|fixed(n)|min(n)|max(n)}
+line_space_after_do_statement = fixed(1)
 
-line_space_after_while_statement = keep
+# Number of blank lines after a while statement.
+# {keep|fixed(n)|min(n)|max(n)}
+line_space_after_while_statement = fixed(1)
 
-line_space_after_repeat_statement = keep
+# Number of blank lines after a repeat statement.
+# {keep|fixed(n)|min(n)|max(n)}
+line_space_after_repeat_statement = fixed(1)
 
-line_space_after_for_statement = keep
+# Number of blank lines after a for statement.
+# {keep|fixed(n)|min(n)|max(n)}
+line_space_after_for_statement = fixed(1)
 
-line_space_after_local_or_assign_statement = keep
+# Number of blank lines after local/assign statements.
+# {keep|fixed(n)|min(n)|max(n)}
+line_space_after_local_or_assign_statement = max(1)
 
+# Number of blank lines after function statements.
+# {keep|fixed(n)|min(n)|max(n)}
 line_space_after_function_statement = fixed(2)
 
+# Number of blank lines after expression statements.
+# {keep|fixed(n)|min(n)|max(n)}
 line_space_after_expression_statement = keep
 
+# Number of blank lines after comments.
+# {keep|fixed(n)|min(n)|max(n)}
 line_space_after_comment = keep
 
+# Blank line spacing before/after code blocks.
+# {keep|fixed(n)|min(n)|max(n)}
 line_space_around_block = fixed(1)
-# [line break]
+
+##
+# [Line breaks]
+##
+
+# Forces line breaks for long lists when exceeding max line length.
+# {true|false}
 break_all_list_when_line_exceed = false
 
+# Collapses consecutive short lines automatically.
+# {true|false}
 auto_collapse_lines = false
 
+# Inserts line break before curly braces.
+# {true|false}
 break_before_braces = false
 
-# [preference]
+##
+# [Preference]
+##
+
+# Ignores spaces after colon in tables.
+# {true|false}
 ignore_space_after_colon = false
 
+# Removes trailing comma in call expressions.
+# {true|false}
 remove_call_expression_list_finish_comma = false
-# keep / always / same_line / replace_with_newline / never
-end_statement_with_semicolon = keep
+
+# Controls whether statements end with semicolons.
+# {keep|always|same_line|replace_with_newline|never}
+end_statement_with_semicolon = replace_with_newline
