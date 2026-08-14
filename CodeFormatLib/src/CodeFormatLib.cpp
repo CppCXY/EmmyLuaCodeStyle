@@ -202,9 +202,9 @@ int type_format(lua_State *L) {
 
             LuaCodeFormat::ConfigMap configMap;
 
-            if (top == 5 && lua_istable(L, 5)) {
+            if (top >= 5 && lua_istable(L, 5)) {
                 lua_pushnil(L);
-                while (lua_next(L, -2) != 0) {
+                while (lua_next(L, 5) != 0) {
                     auto key = luaToString(L, -2);
                     auto value = luaToString(L, -1);
 
@@ -217,9 +217,9 @@ int type_format(lua_State *L) {
             }
 
             LuaCodeFormat::ConfigMap stringTypeOptions;
-            if (top == 6 && lua_istable(L, 6)) {
+            if (top >= 6 && lua_istable(L, 6)) {
                 lua_pushnil(L);
-                while (lua_next(L, -2) != 0) {
+                while (lua_next(L, 6) != 0) {
                     auto key = luaToString(L, -2);
                     auto value = luaToString(L, -1);
 
