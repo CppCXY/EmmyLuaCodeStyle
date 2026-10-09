@@ -159,6 +159,9 @@ public:
     bool break_before_braces = false;
 
     BreakTableList break_table_list = BreakTableList::Smart;
+
+    // keep/always/never: break between '=' and its value
+    BreakAfterAssign break_after_assignment_statement = BreakAfterAssign::Never;
     // [preference]
     bool ignore_space_after_colon = false;
 

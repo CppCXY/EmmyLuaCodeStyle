@@ -36,8 +36,7 @@ local t =
 }
 )",
             R"(
-local t =
-{
+local t = {
     a = 123
 }
 )"));
@@ -107,10 +106,31 @@ a, b, c, d
 }
 )",
             R"(
-t =
-{
+t = {
     a, b, c, d
 }
+)"));
+}
+
+TEST(Format, MultiLineTableRightBrace) {
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+t = {
+    { aaa = 1, bbb = 2 },
+    { ccc = 3, ddd = 4 } }
+)",
+            R"(
+t = {
+    { aaa = 1, bbb = 2 },
+    { ccc = 3, ddd = 4 }
+}
+)"));
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+t = { a, b, c }
+)",
+            R"(
+t = { a, b, c }
 )"));
 }
 

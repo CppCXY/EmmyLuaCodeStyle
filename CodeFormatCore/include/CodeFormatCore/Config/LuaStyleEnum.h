@@ -98,6 +98,16 @@ enum class BreakTableList {
     Lazy
 };
 
+// Controls the line break between an assignment/table-field '=' and its value.
+enum class BreakAfterAssign {
+    // Leave the source as it is.
+    Keep,
+    // Always place the value on a new line after '='.
+    Always,
+    // Never break after '='; collapse the value onto the '=' line.
+    Never,
+};
+
 enum class SpaceAroundStyle {
     // for false and none
     None,

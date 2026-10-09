@@ -392,6 +392,16 @@ void LuaStyle::Parse(std::map<std::string, std::string, std::less<>> &configMap)
         }
     }
 
+    IF_EXIST(break_after_assignment_statement) {
+        if (value == "keep") {
+            break_after_assignment_statement = BreakAfterAssign::Keep;
+        } else if (value == "always") {
+            break_after_assignment_statement = BreakAfterAssign::Always;
+        } else if (value == "never") {
+            break_after_assignment_statement = BreakAfterAssign::Never;
+        }
+    }
+
     BOOL_OPTION(ignore_space_after_colon)
 
     BOOL_OPTION(remove_call_expression_list_finish_comma)

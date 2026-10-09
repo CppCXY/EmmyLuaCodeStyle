@@ -134,10 +134,15 @@ void LineBreakAnalyzer::ComplexAnalyze(FormatState &f, const LuaSyntaxTree &t) {
                 case LuaSyntaxNodeKind::LocalStatement:
                 case LuaSyntaxNodeKind::AssignStatement:
                 case LuaSyntaxNodeKind::ReturnStatement: {
+                    AnalyzeAssignBreak(f, syntaxNode, t);
                     auto exprList = syntaxNode.GetChildSyntaxNode(NodeKind::ExpressionList, t);
                     if (exprList.IsNode(t)) {
                         AnalyzeExprList(f, exprList, t);
                     }
+                    break;
+                }
+                case LuaSyntaxNodeKind::TableField: {
+                    AnalyzeAssignBreak(f, syntaxNode, t);
                     break;
                 }
                 case LuaSyntaxNodeKind::IfStatement: {
@@ -317,6 +322,39 @@ void LineBreakAnalyzer::AnalyzeSuffixedExpr(FormatState &f, LuaSyntaxNode expr, 
     }
 }
 
+void LineBreakAnalyzer::AnalyzeAssignBreak(FormatState &f, LuaSyntaxNode assignNode, const LuaSyntaxTree &t) {
+    auto strategy = f.GetStyle().break_after_assignment_statement;
+    if (strategy == BreakAfterAssign::Keep) {
+        return;
+    }
+
+    auto eq = assignNode.GetChildToken('=', t);
+    if (!eq.IsToken(t)) {
+        return;
+    }
+
+    auto next = eq.GetNextToken(t);
+    if (!next.IsToken(t)) {
+        return;
+    }
+
+    // a comment after '=' must stay on its own line
+    auto nextKind = next.GetTokenKind(t);
+    if (nextKind == TK_SHORT_COMMENT || nextKind == TK_LONG_COMMENT) {
+        return;
+    }
+
+    if (strategy == BreakAfterAssign::Never) {
+        // break_before_braces wins for a table value
+        if (f.GetStyle().break_before_braces && nextKind == '{') {
+            return;
+        }
+        CancelBreakAfter(eq, t);
+    } else {
+        BreakAfter(eq, t, LineSpace(1));
+    }
+}
+
 // 是格式化的重点内容
 void LineBreakAnalyzer::AnalyzeTableExpr(FormatState &f, LuaSyntaxNode table, const LuaSyntaxTree &t) {
 
@@ -333,6 +371,14 @@ void LineBreakAnalyzer::AnalyzeTableExpr(FormatState &f, LuaSyntaxNode table, co
 
     if (f.GetStyle().break_table_list == BreakTableList::Never) {
         return;
+    }
+
+    // a multi-line table puts its closing '}' on its own line
+    if (!table.IsSingleLineNode(t)) {
+        auto rightBrace = table.GetChildToken('}', t);
+        if (rightBrace.IsToken(t)) {
+            BreakBefore(rightBrace, t, LineSpace(LineSpaceType::Keep));
+        }
     }
 
     // force break

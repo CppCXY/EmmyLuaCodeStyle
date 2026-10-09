@@ -163,6 +163,9 @@ auto_collapse_lines = false
 
 break_before_braces = false
 
+# never / keep / always
+break_after_assignment_statement = never
+
 # [preference]
 ignore_space_after_colon = false
 

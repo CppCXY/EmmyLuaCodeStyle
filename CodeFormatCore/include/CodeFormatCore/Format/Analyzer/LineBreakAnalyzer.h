@@ -44,6 +44,8 @@ private:
 
     void AnalyzeTableExpr(FormatState &f, LuaSyntaxNode table, const LuaSyntaxTree &t);
 
+    void AnalyzeAssignBreak(FormatState &f, LuaSyntaxNode assignNode, const LuaSyntaxTree &t);
+
     bool CanBreakAll(FormatState &f, LuaSyntaxNode n, const LuaSyntaxTree &t);
 
     bool CanCollapseLines(FormatState &f, LuaSyntaxNode &n, const LuaSyntaxTree &t);

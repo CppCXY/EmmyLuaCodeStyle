@@ -516,6 +516,20 @@ This option means that when an expression with a list exceeds the row width sett
 
 This option means that expressions on the list should not be interrupted after evaluation, they will all collapse to the same row, the default value is false, and it is currently only valid for tables
 
+### break_after_assignment_statement
+
+This option controls the line break between an assignment/table-field `=` and its value. It applies to assignment statements, local statements and table fields.
+
+The possible values are:
+- never (default)
+    never break after `=`; the value is collapsed onto the same line as `=`, for example `key =\n{ ... }` becomes `key = { ... }`
+- keep
+    leave the source layout as it is
+- always
+    always place the value on a new line after `=`
+
+When the value is a table and `break_before_braces` is enabled, `break_before_braces` takes precedence and the `never` behaviour is skipped for that value. A comment immediately after `=` is never merged onto the `=` line.
+
 ## Preferences
 
 ### ignore_space_after_colon

@@ -407,11 +407,13 @@ local t = { {
             R"(
 local t = { function()
     local t = 123
-end }
+end
+}
 
 local t = { {
     okokok = 123,
-} }
+}
+}
 )",
             style));
 }
@@ -1677,6 +1679,82 @@ local t =
     {
         okokok = 123
     }
+}
+)",
+            style));
+}
+
+TEST(FormatByStyleOption, break_after_assignment_statement) {
+    LuaStyle style;
+
+    style.break_after_assignment_statement = BreakAfterAssign::Never;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t =
+{
+    a = 123
+}
+local d =
+{
+    aaa =
+    { 1, 2, 3 }
+}
+)",
+            R"(
+local t = {
+    a = 123
+}
+local d = {
+    aaa = { 1, 2, 3 }
+}
+)",
+            style));
+
+    style.break_after_assignment_statement = BreakAfterAssign::Keep;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t =
+{
+    a = 123
+}
+local d = { a = 123 }
+)",
+            R"(
+local t =
+{
+    a = 123
+}
+local d = { a = 123 }
+)",
+            style));
+
+    style.break_after_assignment_statement = BreakAfterAssign::Always;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = 123
+local d = { a = 123 }
+)",
+            R"(
+local t =
+123
+local d =
+{ a =
+123 }
+)",
+            style));
+
+    style.break_after_assignment_statement = BreakAfterAssign::Never;
+    style.break_before_braces = true;
+    EXPECT_TRUE(TestHelper::TestFormatted(
+            R"(
+local t = {
+    a = 123
+}
+)",
+            R"(
+local t =
+{
+    a = 123
 }
 )",
             style));
